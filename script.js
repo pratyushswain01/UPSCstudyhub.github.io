@@ -1,12 +1,14 @@
-document.getElementById('toggleButton').addEventListener('click', function() {
-    var hiddenTopic = document.getElementById('hiddenTopic');
-    var button = document.getElementById('toggleButton');
+document.addEventListener('DOMContentLoaded', function() {
+    const button = document.querySelector('.collapsible-button');
+    const content = document.querySelector('.collapsible-content');
     
-    if (hiddenTopic.classList.contains('hidden')) {
-        hiddenTopic.classList.remove('hidden');
-        button.textContent = 'Hide Topic';
-    } else {
-        hiddenTopic.classList.add('hidden');
-        button.textContent = 'Show Topic';
-    }
+    button.addEventListener('click', function() {
+        if (content.style.display === 'block') {
+            content.style.display = 'none';
+            button.classList.remove('active');
+        } else {
+            content.style.display = 'block';
+            button.classList.add('active');
+        }
+    });
 });
