@@ -3,325 +3,170 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Traditional Focus Timer</title>
+    <title>Focus Timer</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            background: #f4e1c1;
             font-family: 'Georgia', serif;
-            color: #4e4e4e;
+            background-color: #f4f4f4;
+            color: #333;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            text-align: center;
+            margin: 0;
             flex-direction: column;
-            padding: 20px;
-            overflow: hidden;
         }
 
         .container {
-            background: #fff;
-            padding: 40px 60px;
-            border-radius: 20px;
-            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
             width: 100%;
-            max-width: 600px;
-            margin-bottom: 40px;
-            border: 2px solid #4e4e4e;
-            background-color: #fff3e6;
         }
 
         h1 {
-            font-size: 36px;
-            font-family: 'Georgia', serif;
-            color: #6b4226;
+            font-size: 2rem;
             margin-bottom: 20px;
+            color: #4CAF50;
         }
 
-        /* Analog Clock Container */
-        .clock-container {
-            margin-bottom: 30px;
+        .timer {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
         }
 
         .clock {
-            width: 250px;
-            height: 250px;
-            background: #fdf8e3;
-            border-radius: 50%;
-            position: relative;
-            border: 10px solid #6b4226;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
-            margin: 0 auto;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #777;
         }
 
-        .clock .hour, .clock .minute, .clock .second {
-            position: absolute;
-            width: 50%;
-            height: 3px;
-            background: #6b4226;
-            top: 50%;
-            transform-origin: 100%;
-            transform: translateY(-50%);
-            transition: transform 0.5s ease-in-out;
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
         }
 
-        .clock .minute {
-            background: #d79d00;
-            height: 4px;
-        }
-
-        .clock .second {
-            background: #cc0000;
-            height: 2px;
-        }
-
-        .clock .center {
-            width: 15px;
-            height: 15px;
-            background: #6b4226;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        /* Digital Time Below the Clock */
-        .digital-time {
-            font-size: 28px;
-            font-weight: bold;
-            color: #6b4226;
-            margin-top: 10px;
-            font-family: 'Courier New', Courier, monospace;
-        }
-
-        /* Timer Container Styling */
-        .timer-container {
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            width: fit-content;
-            margin: 0 auto;
-            font-size: 60px;
-            font-weight: bold;
-            color: #6b4226;
-            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Buttons Styling */
-        button {
-            background: #d79d00;
-            color: #fff;
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
             border: none;
-            padding: 15px 30px;
-            font-size: 18px;
-            border-radius: 30px;
-            margin: 15px 10px;
+            border-radius: 5px;
             cursor: pointer;
-            outline: none;
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s, background 0.3s;
+            font-size: 1rem;
         }
 
-        button:hover {
-            background: #b78c00;
-            transform: translateY(-5px);
-            box-shadow: 0px 6px 25px rgba(0, 0, 0, 0.3);
-        }
-
-        button:disabled {
-            background: #b78c00;
+        .button:disabled {
+            background-color: #888;
             cursor: not-allowed;
         }
 
-        .button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 30px;
-        }
-
-        .button-container button {
-            margin: 0 15px;
-        }
-
-        /* Footer Section */
-        .footer {
-            position: fixed;
-            bottom: 10px;
-            width: 100%;
+        footer {
+            position: absolute;
+            bottom: 20px;
             text-align: center;
-            font-size: 18px;
-            color: #6b4226;
+            width: 100%;
+            font-size: 1rem;
+            color: #333;
+        }
+
+        footer a {
+            color: #4CAF50;
             font-weight: bold;
         }
 
-        .footer a {
-            color: #6b4226;
+        footer a:hover {
             text-decoration: underline;
         }
-
     </style>
 </head>
 <body>
-
-<div class="container">
-    <h1>Traditional Focus Timer</h1>
-
-    <!-- Analog Clock Display -->
-    <div class="clock-container">
-        <div class="clock">
-            <div class="hour" id="hour"></div>
-            <div class="minute" id="minute"></div>
-            <div class="second" id="second"></div>
-            <div class="center"></div>
+    <div class="container">
+        <h1>Focus Timer</h1>
+        <div class="timer" id="timer">00:00</div>
+        <div class="clock" id="clock">12:00 AM</div>
+        <div class="buttons">
+            <button class="button" id="startButton">Start</button>
+            <button class="button" id="pauseButton" disabled>Pause</button>
+            <button class="button" id="resetButton">Reset</button>
         </div>
     </div>
+    <footer>
+        Powered by <a href="https://upsc.hub">UPSC Hub</a>
+    </footer>
 
-    <!-- Digital Time Below the Clock -->
-    <div class="digital-time" id="digitalClock">00:00:00</div>
+    <script>
+        let timer = 0; // time in seconds
+        let interval;
+        let isRunning = false;
 
-    <!-- Timer Display -->
-    <div class="timer-container">
-        <div class="timer" id="timerDisplay">00:00:00</div>
-    </div>
-
-    <!-- Buttons -->
-    <div class="button-container">
-        <button id="startBtn">Start</button>
-        <button id="stopBtn" disabled>Stop</button>
-        <button id="resetBtn">Reset</button>
-    </div>
-</div>
-
-<!-- Footer Section -->
-<div class="footer">
-    <p>Powered by <a href="https://upsc-hub.com" target="_blank"><strong>UPSC Hub</strong></a></p>
-</div>
-
-<script>
-    // Timer variables
-    let timer;
-    let seconds = 0;
-    let isRunning = false;
-    let startTime = null;
-    let elapsedTime = 0;
-
-    // Elements
-    const timerDisplay = document.getElementById("timerDisplay");
-    const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const hourHand = document.getElementById("hour");
-    const minuteHand = document.getElementById("minute");
-    const secondHand = document.getElementById("second");
-    const digitalClock = document.getElementById("digitalClock");
-
-    // Load the timer state from localStorage
-    if (localStorage.getItem("startTime") && localStorage.getItem("elapsedTime")) {
-        startTime = parseInt(localStorage.getItem("startTime"));
-        elapsedTime = parseInt(localStorage.getItem("elapsedTime"));
-        seconds = elapsedTime;
-        displayTime();
-    }
-
-    // Function to update the timer display
-    function displayTime() {
-        const hours = Math.floor(seconds / 3600);
-        const minutes = Math.floor((seconds % 3600) / 60);
-        const secs = seconds % 60;
-        timerDisplay.textContent = `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
-    }
-
-    // Function to add leading zero for single digits
-    function pad(num) {
-        return num < 10 ? "0" + num : num;
-    }
-
-    // Start the timer
-    function startTimer() {
-        isRunning = true;
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-
-        if (!startTime) {
-            startTime = Date.now(); // Record the start time
-            localStorage.setItem("startTime", startTime); // Save start time to localStorage
+        // Check if there's a saved timer value in localStorage
+        if (localStorage.getItem('timer')) {
+            timer = parseInt(localStorage.getItem('timer'));
+            updateTimerDisplay();
         }
 
-        // Clear any previous timers before starting a new one
-        if (timer) {
-            clearInterval(timer);
+        function startTimer() {
+            isRunning = true;
+            document.getElementById('startButton').disabled = true;
+            document.getElementById('pauseButton').disabled = false;
+
+            interval = setInterval(() => {
+                timer++;
+                localStorage.setItem('timer', timer);
+                updateTimerDisplay();
+            }, 1000);
         }
 
-        timer = setInterval(() => {
-            elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-            localStorage.setItem("elapsedTime", elapsedTime); // Store elapsed time
-            seconds = elapsedTime;
-            displayTime();
-        }, 1000);
-    }
+        function pauseTimer() {
+            isRunning = false;
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('pauseButton').disabled = true;
+            clearInterval(interval);
+        }
 
-    // Stop the timer
-    function stopTimer() {
-        isRunning = false;
-        clearInterval(timer);
-        timer = null; // Reset the timer to null to ensure no background interval is running
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        localStorage.removeItem("startTime"); // Remove start time after stopping
-    }
+        function resetTimer() {
+            timer = 0;
+            localStorage.removeItem('timer');
+            updateTimerDisplay();
+        }
 
-    // Reset the timer
-    function resetTimer() {
-        clearInterval(timer);
-        timer = null;
-        isRunning = false;
-        seconds = 0;
-        elapsedTime = 0;
-        startTime = null;
-        displayTime();
-        localStorage.removeItem("startTime");
-        localStorage.removeItem("elapsedTime");
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-    }
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
 
-    // Event listeners for buttons
-    startBtn.addEventListener("click", startTimer);
-    stopBtn.addEventListener("click", stopTimer);
-    resetBtn.addEventListener("click", resetTimer);
+        // Event listeners for buttons
+        document.getElementById('startButton').addEventListener('click', startTimer);
+        document.getElementById('pauseButton').addEventListener('click', pauseTimer);
+        document.getElementById('resetButton').addEventListener('click', resetTimer);
 
-    // Function to update the analog clock every second
-    function updateClock() {
-        const now = new Date();
-        const hours = now.getHours() % 12;  // 12-hour format
-        const minutes = now.getMinutes();
-        const seconds = now.getSeconds();
+        // Real-time clock update
+        function updateClock() {
+            const currentTime = new Date();
+            const hours = currentTime.getHours();
+            const minutes = currentTime.getMinutes();
+            const seconds = currentTime.getSeconds();
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const displayHours = hours % 12 || 12;
+            const displayMinutes = minutes < 10 ? '0' + minutes : minutes;
+            const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
 
-        const hourDeg = (360 / 12) * hours + (minutes / 60) * (360 / 12);
-        const minuteDeg = (360 / 60) * minutes;
-        const secondDeg = (360 / 60) * seconds;
+            const clockString = `${displayHours}:${displayMinutes}:${displaySeconds} ${period}`;
+            document.getElementById('clock').textContent = clockString;
+        }
 
-        hourHand.style.transform = `translateY(-50%) rotate(${hourDeg}deg)`;
-        minuteHand.style.transform = `translateY(-50%) rotate(${minuteDeg}deg)`;
-        secondHand.style.transform = `translateY(-50%) rotate(${secondDeg}deg)`;
+        // Update the clock every second
+        setInterval(updateClock, 1000);
 
-        // Update the digital time as well
-        digitalClock.textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
-    }
-
-    // Update the clock every second
-    setInterval(updateClock, 1000);
-    updateClock(); // Initialize the clock immediately
-</script>
-
+    </script>
 </body>
 </html>
