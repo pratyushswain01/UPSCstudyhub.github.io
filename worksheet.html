@@ -134,6 +134,23 @@
             color: white;
             font-weight: bold;
         }
+
+        .timer {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .timer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .timer span {
+            font-size: 24px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -173,6 +190,15 @@
             </ul>
         </div>
 
+        <div class="timer">
+            <h3>Focus Timer</h3>
+            <span id="focus-time">00:00</span>
+            <br>
+            <button id="start-timer">Start</button>
+            <button id="stop-timer" disabled>Stop</button>
+        </div>
+
+
         <!-- Progress Tracker Section -->
         <h3>Progress Tracker</h3>
         <div class="progress-container">
@@ -209,6 +235,67 @@
         <p>&copy; Copyright @ 2024 by UPSC Hub</p>
         <p>Managed by Pratyush Swain</p>
     </footer>
+
+        <script>
+        // Focus Timer Variables
+        let timerInterval;
+        let seconds = 0;
+        let minutes = 0;
+
+        // Load saved focus time from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedFocusTime = localStorage.getItem("focusTime");
+            const savedTime = localStorage.getItem("elapsedTime"); // Retrieve saved elapsed time
+            if (savedFocusTime) {
+                document.getElementById('focus-time').textContent = savedFocusTime;
+                if (savedTime) {
+                    // If there is saved time, resume the timer
+                    const [savedMinutes, savedSeconds] = savedTime.split(':');
+                    minutes = parseInt(savedMinutes, 10);
+                    seconds = parseInt(savedSeconds, 10);
+                    startTimer(); // Resume timer
+                }
+            }
+        });
+
+        // Start Timer
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                seconds++;
+                if (seconds == 60) {
+                    seconds = 0;
+                    minutes++;
+                }
+                // Format time as mm:ss
+                document.getElementById('focus-time').textContent = 
+                    (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
+                
+                // Save current focus time to localStorage during the timer run
+                localStorage.setItem("focusTime", document.getElementById('focus-time').textContent);
+                localStorage.setItem("elapsedTime", (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds));
+            }, 1000);
+
+            // Disable the start button and enable the stop button
+            document.getElementById('start-timer').disabled = true;
+            document.getElementById('stop-timer').disabled = false;
+        }
+
+        // Stop Timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+
+            // Enable the start button and disable the stop button
+            document.getElementById('start-timer').disabled = false;
+            document.getElementById('stop-timer').disabled = true;
+
+            // Save the final focus time to localStorage
+            localStorage.setItem("focusTime", document.getElementById('focus-time').textContent);
+            localStorage.setItem("elapsedTime", (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds));
+        }
+
+        // Add event listeners to the buttons
+        document.getElementById('start-timer').addEventListener('click', startTimer);
+        document.getElementById('stop-timer').addEventListener('click', stopTimer);
 
     <script>
         // Function to update progress bar based on checked checkboxes
