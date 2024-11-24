@@ -1,98 +1,141 @@
-let timer = 0; // Timer value in seconds
-let interval;
-let isRunning = false;
-
-// Check if there's a saved timer value in localStorage
-if (localStorage.getItem('timer')) {
-    timer = parseInt(localStorage.getItem('timer')); // Retrieve saved timer value
-    updateTimerDisplay(); // Update the timer display with saved value
-}
-
-// Mark as present
-const markPresentButton = document.getElementById('markPresentButton');
-const markAbsentButton = document.getElementById('markAbsentButton');
-const attendanceStatus = document.getElementById('attendanceStatus');
-const streakDisplay = document.getElementById('streakDisplay');
-
-// Attendance and streak-related code
-// (similar to the previous implementation)
-
-// Timer Functions
-
-function startTimer() {
-    isRunning = true;
-    document.getElementById('startButton').disabled = true;
-    document.getElementById('pauseButton').disabled = false;
-
-    interval = setInterval(() => {
-        timer++; // Increment the timer every second
-        localStorage.setItem('timer', timer); // Store the updated timer in localStorage
-        updateTimerDisplay(); // Update the timer display
-        checkAndUpdateStreak(); // Update the streak based on the timer value
-    }, 1000);
-}
-
-function pauseTimer() {
-    isRunning = false;
-    document.getElementById('startButton').disabled = false;
-    document.getElementById('pauseButton').disabled = true;
-    clearInterval(interval); // Stop the timer
-}
-
-function resetTimer() {
-    timer = 0;
-    localStorage.removeItem('timer'); // Remove the timer from localStorage
-    updateTimerDisplay(); // Update the display to show "00:00:00"
-}
-
-function updateTimerDisplay() {
-    const hours = Math.floor(timer / 3600); // Calculate hours
-    const minutes = Math.floor((timer % 3600) / 60); // Calculate minutes
-    const seconds = timer % 60; // Calculate seconds
-    document.getElementById('timer').textContent = 
-        `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
-}
-
-document.getElementById('startButton').addEventListener('click', startTimer);
-document.getElementById('pauseButton').addEventListener('click', pauseTimer);
-document.getElementById('resetButton').addEventListener('click', resetTimer);
-
-// Streak Logic (for example if you want to track streak of hours above 3)
-
-function checkAndUpdateStreak() {
-    const currentTime = timer / 3600; // Convert seconds to hours
-    if (currentTime >= 3) {
-        if (localStorage.getItem('lastStreakUpdate') !== new Date().toLocaleDateString()) {
-            let streak = parseInt(localStorage.getItem('streak') || '0');
-            streak++;
-            localStorage.setItem('streak', streak); // Store streak in localStorage
-            localStorage.setItem('lastStreakUpdate', new Date().toLocaleDateString());
-            streakDisplay.textContent = `Current Streak: ${streak} days`;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus Timer</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', serif;
+            background-color: #f7f1e1;
+            color: #3e2723;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
         }
-    }
-}
+        .container {
+            background-color: #fff7e6;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: normal;
+        }
+        .timer {
+            font-size: 3.5rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 20px;
+        }
+        .button {
+            padding: 12px 25px;
+            background-color: #6d4c41;
+            color: white;
+            border: 2px solid #6d4c41;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Focus Timer</h1>
+        <div class="timer" id="timer">00:00:00</div>
+        <div class="buttons">
+            <button class="button" id="startButton">Start</button>
+            <button class="button" id="pauseButton" disabled>Pause</button>
+            <button class="button" id="resetButton">Reset</button>
+        </div>
+    </div>
+    <footer>
+        Powered by <a href="index.html">UPSC hub</a>
+    </footer>
 
-// Real-time clock update (this is the current time shown on the page)
-function updateClock() {
-    const currentTime = new Date();
-    const hours = currentTime.getHours();
-    const minutes = currentTime.getMinutes();
-    const seconds = currentTime.getSeconds();
-    const dayOfWeek = currentTime.toLocaleString('en-us', { weekday: 'long' });
-    const month = currentTime.toLocaleString('en-us', { month: 'long' });
-    const date = currentTime.getDate();
-    const year = currentTime.getFullYear();
-    const period = hours >= 12 ? 'PM' : 'AM';
-    const displayHours = hours % 12 || 12;
-    const displayMinutes = minutes < 10 ? '0' + minutes : minutes;
-    const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
+    <script>
+        let timer = 0; // time in seconds
+        let interval;
+        let isRunning = false;
 
-    const clockString = `${displayHours}:${displayMinutes}:${displaySeconds} ${period}`;
-    const dateString = `${dayOfWeek}, ${month} ${date}, ${year}`;
+        // Get the saved timestamp from localStorage
+        if (localStorage.getItem('startTimestamp')) {
+            const savedTimestamp = localStorage.getItem('startTimestamp');
+            const savedTime = parseInt(localStorage.getItem('timer'));
+            const elapsedTime = Math.floor((Date.now() - savedTimestamp) / 1000); // Calculate elapsed time
+            timer = savedTime + elapsedTime; // Add elapsed time to the saved timer value
+            updateTimerDisplay();
+        }
 
-    document.getElementById('clock').textContent = clockString;
-    document.getElementById('dateDay').textContent = dateString;
-}
+        // Start the timer
+        function startTimer() {
+            if (!isRunning) {
+                isRunning = true;
+                document.getElementById('startButton').disabled = true;
+                document.getElementById('pauseButton').disabled = false;
 
-// Update the clock every second
-setInterval(updateClock, 1000);
+                const startTimestamp = Date.now();
+                localStorage.setItem('startTimestamp', startTimestamp); // Save the timestamp when timer starts
+                localStorage.setItem('timer', timer); // Save the current timer value
+
+                interval = setInterval(() => {
+                    timer++; // Increment the timer every second
+                    localStorage.setItem('timer', timer); // Store the updated timer in localStorage
+                    updateTimerDisplay();
+                }, 1000);
+            }
+        }
+
+        // Pause the timer
+        function pauseTimer() {
+            clearInterval(interval); // Stop the timer
+            isRunning = false;
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('pauseButton').disabled = true;
+        }
+
+        // Reset the timer
+        function resetTimer() {
+            clearInterval(interval); // Stop the timer
+            isRunning = false;
+            timer = 0;
+            localStorage.removeItem('startTimestamp'); // Remove the timestamp from localStorage
+            localStorage.removeItem('timer'); // Remove the timer from localStorage
+            updateTimerDisplay();
+            document.getElementById('startButton').disabled = false;
+            document.getElementById('pauseButton').disabled = true;
+        }
+
+        // Update the timer display
+        function updateTimerDisplay() {
+            const hours = Math.floor(timer / 3600); // Calculate hours
+            const minutes = Math.floor((timer % 3600) / 60); // Calculate minutes
+            const seconds = timer % 60; // Calculate seconds
+            document.getElementById('timer').textContent = 
+                `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+
+        // Event listeners for buttons
+        document.getElementById('startButton').addEventListener('click', startTimer);
+        document.getElementById('pauseButton').addEventListener('click', pauseTimer);
+        document.getElementById('resetButton').addEventListener('click', resetTimer);
+    </script>
+</body>
+</html>
