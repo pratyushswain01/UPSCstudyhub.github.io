@@ -17,6 +17,7 @@
             flex-direction: column;
             text-align: center;
             padding: 20px;
+            position: relative;
         }
 
         .container {
@@ -27,6 +28,7 @@
             max-width: 600px;
             width: 100%;
             border: 2px solid #c49a6c; /* Subtle border with a warm tone */
+            z-index: 1;
         }
 
         h1 {
@@ -133,6 +135,68 @@
         footer a:hover {
             text-decoration: underline;
         }
+
+        /* Flower Design */
+        .flower-container {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            z-index: 0;
+        }
+
+        .flower {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto;
+        }
+
+        .petal {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background-color: #f9c5d1; /* Light pink */
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .petal:nth-child(1) {
+            top: 0;
+            left: 20px;
+            transform: rotate(0deg);
+        }
+
+        .petal:nth-child(2) {
+            top: 20px;
+            left: 0;
+            transform: rotate(90deg);
+        }
+
+        .petal:nth-child(3) {
+            top: 40px;
+            left: 20px;
+            transform: rotate(180deg);
+        }
+
+        .petal:nth-child(4) {
+            top: 20px;
+            left: 40px;
+            transform: rotate(270deg);
+        }
+
+        .center {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background-color: #f4b400; /* Bright yellow */
+            border-radius: 50%;
+            top: 35%;
+            left: 35%;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -160,6 +224,17 @@
             <button class="button" id="resetButton">Reset</button>
         </div>
     </div>
+    
+    <div class="flower-container">
+        <div class="flower">
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="petal"></div>
+            <div class="center"></div>
+        </div>
+    </div>
+
     <footer>
         Powered by <a href="https://upsc.hub">UPSC Hub</a>
     </footer>
@@ -202,60 +277,37 @@
             }
         }
 
-        // Mark as present
-        markPresentButton.addEventListener('click', () => {
-            const today = new Date().toLocaleDateString();
-            if (lastAttendance !== today) {
-                streak = 0; // Reset streak on a new day
-            }
-
+        markPresentButton.addEventListener('click', function() {
             localStorage.setItem('attendance', 'present');
-            localStorage.setItem('lastAttendanceDate', today);
-            checkAndUpdateStreak();
-
             attendanceStatus.textContent = "You are marked as Present today.";
             markPresentButton.disabled = true;
             markAbsentButton.disabled = true;
+            streak++;
+            localStorage.setItem('streak', streak);
             streakDisplay.textContent = `Current Streak: ${streak} days`;
         });
 
-        // Mark as absent
-        markAbsentButton.addEventListener('click', () => {
-            const today = new Date().toLocaleDateString();
+        markAbsentButton.addEventListener('click', function() {
             localStorage.setItem('attendance', 'absent');
-            localStorage.setItem('lastAttendanceDate', today);
-            streak = 0; // Reset streak on absence
-            localStorage.setItem('streak', streak);
-
             attendanceStatus.textContent = "You are marked as Absent today.";
             markPresentButton.disabled = true;
             markAbsentButton.disabled = true;
-            streakDisplay.textContent = `Current Streak: 0 days`;
+            streak = 0;
+            localStorage.setItem('streak', streak);
+            streakDisplay.textContent = `Current Streak: ${streak} days`;
         });
 
-        // Check if timer exceeds 3 hours, then increase streak
-        function checkAndUpdateStreak() {
-            const currentTime = timer / 3600; // Convert seconds to hours
-            if (currentTime >= 3) {
-                if (lastStreakUpdate !== new Date().toLocaleDateString()) {
-                    streak++;
-                    localStorage.setItem('streak', streak);
-                    localStorage.setItem('lastStreakUpdate', new Date().toLocaleDateString());
-                    streakDisplay.textContent = `Current Streak: ${streak} days`;
-                }
-            }
-        }
-
+        // Timer functionality
         function startTimer() {
+            if (isRunning) return;
             isRunning = true;
             document.getElementById('startButton').disabled = true;
             document.getElementById('pauseButton').disabled = false;
 
-            interval = setInterval(() => {
+            interval = setInterval(function() {
                 timer++;
                 localStorage.setItem('timer', timer);
                 updateTimerDisplay();
-                checkAndUpdateStreak(); // Check if streak should increase based on timer
             }, 1000);
         }
 
@@ -309,7 +361,6 @@
 
         // Update the clock every second
         setInterval(updateClock, 1000);
-
     </script>
 </body>
 </html>
