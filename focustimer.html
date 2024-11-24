@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Timer with Digital Clock, Attendance Checker, and Streak</title>
     <style>
-        /* Traditional, clean design */
         body {
             font-family: 'Times New Roman', serif;
             background-color: #f7f1e1;
@@ -86,14 +85,34 @@
             cursor: not-allowed;
         }
 
-        .attendance-streak {
-            margin-top: 30px;
+        .attendance-checker {
+            margin-top: 20px;
         }
 
-        .streak-info {
-            font-size: 1.1rem;
+        .attendance-checker input {
+            padding: 10px;
+            font-size: 1rem;
+            margin-right: 10px;
+            border-radius: 5px;
+            border: 1px solid #6d4c41;
+        }
+
+        .attendance-checker button {
+            padding: 10px 20px;
+            background-color: #6d4c41;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .attendance-checker button:hover {
+            background-color: #4e342e;
+        }
+
+        .attendance-checker p {
+            margin-top: 10px;
             color: #6d4c41;
-            margin-bottom: 10px;
+            font-size: 1.1rem;
         }
     </style>
 </head>
@@ -109,10 +128,11 @@
             <button class="button" id="resetButton">Reset</button>
         </div>
 
-        <!-- Attendance and Streak Info -->
-        <div class="attendance-streak">
-            <div class="streak-info" id="currentStreak">Current Streak: 0 days</div>
-            <div class="streak-info" id="attendanceHistory">Attendance: None</div>
+        <!-- Attendance Checker -->
+        <div class="attendance-checker">
+            <input type="date" id="attendanceDate">
+            <button id="checkAttendanceButton">Check Attendance</button>
+            <p id="attendanceResult"></p>
         </div>
     </div>
 
@@ -123,9 +143,8 @@
         let startTime = 0; // The time when the timer was started
         let timeElapsed = 0; // The time that has passed since the app was closed
 
-        // Initialize attendance and streak variables
+        // Initialize attendance variable
         let attendance = JSON.parse(localStorage.getItem('attendance')) || [];
-        let currentStreak = localStorage.getItem('streak') ? parseInt(localStorage.getItem('streak')) : 0;
 
         // Check if there's a saved timer value in localStorage
         if (localStorage.getItem('timerStartTime')) {
@@ -182,49 +201,26 @@
         document.getElementById('pauseButton').addEventListener('click', pauseTimer);
         document.getElementById('resetButton').addEventListener('click', resetTimer);
 
-        // Update attendance and streak
+        // Mark attendance for the current day
         function markAttendance() {
-            const currentDate = new Date().toLocaleDateString();
+            const currentDate = new Date().toLocaleDateString();  // Format the date as "MM/DD/YYYY"
             if (!attendance.includes(currentDate)) {
-                attendance.push(currentDate);
+                attendance.push(currentDate);  // Add current date to the attendance log
                 localStorage.setItem('attendance', JSON.stringify(attendance));
-
-                // Calculate streak
-                updateStreak();
             }
         }
 
-        function updateStreak() {
-            const today = new Date().toLocaleDateString();
-            let streakCount = 0;
+        // Check attendance for a selected date
+        document.getElementById('checkAttendanceButton').addEventListener('click', function() {
+            const selectedDate = document.getElementById('attendanceDate').value;
+            const formattedSelectedDate = new Date(selectedDate).toLocaleDateString();  // Format the selected date
 
-            // Count consecutive days of attendance
-            for (let i = attendance.length - 1; i >= 0; i--) {
-                if (isConsecutiveDays(attendance[i], today, streakCount)) {
-                    streakCount++;
-                } else {
-                    break;
-                }
+            if (attendance.includes(formattedSelectedDate)) {
+                document.getElementById('attendanceResult').textContent = `You were present on ${formattedSelectedDate}.`;
+            } else {
+                document.getElementById('attendanceResult').textContent = `You were absent on ${formattedSelectedDate}.`;
             }
-
-            currentStreak = streakCount;
-            localStorage.setItem('streak', currentStreak);
-
-            // Update UI
-            document.getElementById('currentStreak').textContent = `Current Streak: ${currentStreak} days`;
-            document.getElementById('attendanceHistory').textContent = `Attendance: ${attendance.join(', ')}`;
-        }
-
-        function isConsecutiveDays(lastDate, today, streakCount) {
-            const lastDateObj = new Date(lastDate);
-            const todayObj = new Date(today);
-
-            const timeDifference = todayObj - lastDateObj;
-            const oneDay = 24 * 60 * 60 * 1000; // Milliseconds in a day
-
-            // Check if the dates are consecutive
-            return timeDifference === oneDay * streakCount;
-        }
+        });
 
         // Real-time clock update
         function updateClock() {
