@@ -256,6 +256,9 @@
             localStorage.setItem("startTime", startTime); // Save start time to localStorage
         }
 
+        // Clear any previous timers before starting a new one
+        if (timer) clearInterval(timer);
+
         timer = setInterval(() => {
             elapsedTime = Math.floor((Date.now() - startTime) / 1000); // Calculate elapsed time
             seconds = elapsedTime;
@@ -270,6 +273,7 @@
         isRunning = false;
         startBtn.disabled = false;
         stopBtn.disabled = true;
+        localStorage.removeItem("startTime"); // Optional: Remove start time after stopping
     }
 
     // Reset the timer
@@ -280,8 +284,8 @@
         elapsedTime = 0;
         startTime = null;
         displayTime();
-        localStorage.removeItem("startTime"); // Remove the start time from localStorage
-        localStorage.removeItem("elapsedTime"); // Remove the elapsed time from localStorage
+        localStorage.removeItem("startTime");
+        localStorage.removeItem("elapsedTime");
         startBtn.disabled = false;
         stopBtn.disabled = true;
     }
