@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Timer with Digital Clock, Attendance Checker, and Streak</title>
     <style>
+        /* Traditional, clean design */
         body {
             font-family: 'Times New Roman', serif;
-            background-color: #f7f1e1; /* Pale beige background for a vintage feel */
-            background-image: url('https://www.transparenttextures.com/patterns/old-wallpaper.png'); /* Vintage wallpaper pattern */
+            background-color: #f7f1e1;
+            background-image: url('https://www.transparenttextures.com/patterns/old-wallpaper.png');
             background-size: cover;
             background-position: center;
-            color: #3e2723; /* Dark brown text for contrast */
+            color: #3e2723;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -20,56 +21,20 @@
             flex-direction: column;
             text-align: center;
             padding: 20px;
-            position: relative;
         }
 
         .container {
-            background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white for content box */
+            background-color: #fff;
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            max-width: 600px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             width: 100%;
-            border: 2px solid #c49a6c; /* Subtle border with a warm tone */
-            z-index: 1;
+            max-width: 600px;
         }
 
         h1 {
             font-size: 2.5rem;
-            margin-bottom: 30px;
-            font-weight: normal;
-            color: #6d4c41; /* Rich brown */
-        }
-
-        .attendance {
-            font-size: 1.1rem;
             margin-bottom: 20px;
-        }
-
-        .attendance button {
-            padding: 12px 24px;
-            background-color: #6d4c41; /* Traditional brown */
-            color: white;
-            border: 2px solid #6d4c41;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-
-        .attendance button:hover {
-            background-color: #4e342e; /* Darker brown for hover effect */
-        }
-
-        .attendance button:disabled {
-            background-color: #c9c9c9;
-            cursor: not-allowed;
-        }
-
-        .streak {
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin-top: 25px;
             color: #6d4c41;
         }
 
@@ -120,103 +85,10 @@
             background-color: #c9c9c9;
             cursor: not-allowed;
         }
-
-        footer {
-            position: absolute;
-            bottom: 20px;
-            text-align: center;
-            width: 100%;
-            font-size: 1rem;
-            color: #3e2723;
-        }
-
-        footer a {
-            color: #6d4c41;
-            font-weight: bold;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Flower Design */
-        .flower-container {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 200px;
-            height: 200px;
-            z-index: 0;
-        }
-
-        .flower {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto;
-        }
-
-        .petal {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background-color: #f9c5d1; /* Light pink */
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .petal:nth-child(1) {
-            top: 0;
-            left: 20px;
-            transform: rotate(0deg);
-        }
-
-        .petal:nth-child(2) {
-            top: 20px;
-            left: 0;
-            transform: rotate(90deg);
-        }
-
-        .petal:nth-child(3) {
-            top: 40px;
-            left: 20px;
-            transform: rotate(180deg);
-        }
-
-        .petal:nth-child(4) {
-            top: 20px;
-            left: 40px;
-            transform: rotate(270deg);
-        }
-
-        .center {
-            position: absolute;
-            width: 30px;
-            height: 30px;
-            background-color: #f4b400; /* Bright yellow */
-            border-radius: 50%;
-            top: 35%;
-            left: 35%;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Attendance Checker -->
-        <div class="attendance">
-            <h2>Daily Attendance</h2>
-            <p id="attendanceStatus">Please mark your attendance for today.</p>
-            <button id="markPresentButton" class="attendanceButton">Mark Present</button>
-            <button id="markAbsentButton" class="attendanceButton">Mark Absent</button>
-        </div>
-
-        <!-- Streak Display -->
-        <div class="streak" id="streakDisplay">
-            Current Streak: 0 days
-        </div>
-
         <h1>Focus Timer</h1>
         <div class="timer" id="timer">00:00:00</div>
         <div class="clock" id="clock">12:00 AM</div>
@@ -227,78 +99,21 @@
             <button class="button" id="resetButton">Reset</button>
         </div>
     </div>
-    
-    <div class="flower-container">
-        <div class="flower">
-            <div class="petal"></div>
-            <div class="petal"></div>
-            <div class="petal"></div>
-            <div class="petal"></div>
-            <div class="center"></div>
-        </div>
-    </div>
-
-    <footer>
-        Powered by <a href="https://upsc.hub">UPSC Hub</a>
-    </footer>
 
     <script>
-        let timer = 0; // time in seconds
+        let timer = 0; // Time in seconds
         let interval;
         let isRunning = false;
+        let startTime = 0; // The time when the timer was started
+        let timeElapsed = 0; // The time that has passed since the app was closed
 
         // Check if there's a saved timer value in localStorage
-        if (localStorage.getItem('timer')) {
-            timer = parseInt(localStorage.getItem('timer'));
+        if (localStorage.getItem('timerStartTime')) {
+            startTime = parseInt(localStorage.getItem('timerStartTime'));
+            timeElapsed = Math.floor((Date.now() - startTime) / 1000); // Calculate elapsed time
+            timer = parseInt(localStorage.getItem('timer')) + timeElapsed;
             updateTimerDisplay();
         }
-
-        // Check and update attendance status and streak
-        const attendanceStatus = document.getElementById('attendanceStatus');
-        const markPresentButton = document.getElementById('markPresentButton');
-        const markAbsentButton = document.getElementById('markAbsentButton');
-        const streakDisplay = document.getElementById('streakDisplay');
-
-        // Retrieve saved streak and timer data from localStorage
-        let streak = localStorage.getItem('streak') || 0;
-        let lastAttendance = localStorage.getItem('lastAttendanceDate') || '';
-        let lastStreakUpdate = localStorage.getItem('lastStreakUpdate') || '';
-
-        // Update the streak display
-        streakDisplay.textContent = `Current Streak: ${streak} days`;
-
-        if (localStorage.getItem('attendance')) {
-            const attendance = localStorage.getItem('attendance');
-            if (attendance === 'present') {
-                attendanceStatus.textContent = "You are marked as Present today.";
-                markPresentButton.disabled = true;
-                markAbsentButton.disabled = true;
-            } else if (attendance === 'absent') {
-                attendanceStatus.textContent = "You are marked as Absent today.";
-                markPresentButton.disabled = true;
-                markAbsentButton.disabled = true;
-            }
-        }
-
-        markPresentButton.addEventListener('click', function() {
-            localStorage.setItem('attendance', 'present');
-            attendanceStatus.textContent = "You are marked as Present today.";
-            markPresentButton.disabled = true;
-            markAbsentButton.disabled = true;
-            streak++;
-            localStorage.setItem('streak', streak);
-            streakDisplay.textContent = `Current Streak: ${streak} days`;
-        });
-
-        markAbsentButton.addEventListener('click', function() {
-            localStorage.setItem('attendance', 'absent');
-            attendanceStatus.textContent = "You are marked as Absent today.";
-            markPresentButton.disabled = true;
-            markAbsentButton.disabled = true;
-            streak = 0;
-            localStorage.setItem('streak', streak);
-            streakDisplay.textContent = `Current Streak: ${streak} days`;
-        });
 
         // Timer functionality
         function startTimer() {
@@ -306,6 +121,9 @@
             isRunning = true;
             document.getElementById('startButton').disabled = true;
             document.getElementById('pauseButton').disabled = false;
+
+            startTime = Date.now(); // Record the time when the timer started
+            localStorage.setItem('timerStartTime', startTime);
 
             interval = setInterval(function() {
                 timer++;
@@ -324,14 +142,15 @@
         function resetTimer() {
             timer = 0;
             localStorage.removeItem('timer');
+            localStorage.removeItem('timerStartTime');
             updateTimerDisplay();
         }
 
         function updateTimerDisplay() {
-            const hours = Math.floor(timer / 3600); // Calculate hours
-            const minutes = Math.floor((timer % 3600) / 60); // Calculate minutes
-            const seconds = timer % 60; // Calculate seconds
-            document.getElementById('timer').textContent = 
+            const hours = Math.floor(timer / 3600);
+            const minutes = Math.floor((timer % 3600) / 60);
+            const seconds = timer % 60;
+            document.getElementById('timer').textContent =
                 `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
 
