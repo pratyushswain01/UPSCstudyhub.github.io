@@ -92,7 +92,7 @@
             transform: translate(-50%, -50%);
         }
 
-        /* Digital Time Below Clock */
+        /* Digital Time Below the Clock */
         .digital-time {
             font-size: 28px;
             font-weight: bold;
@@ -260,17 +260,17 @@
         if (timer) clearInterval(timer);
 
         timer = setInterval(() => {
-            elapsedTime = Math.floor((Date.now() - startTime) / 1000); // Calculate elapsed time
+            elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+            localStorage.setItem("elapsedTime", elapsedTime);
             seconds = elapsedTime;
             displayTime();
-            localStorage.setItem("elapsedTime", elapsedTime); // Save elapsed time to localStorage
         }, 1000);
     }
 
     // Stop the timer
     function stopTimer() {
-        clearInterval(timer);
         isRunning = false;
+        clearInterval(timer);
         startBtn.disabled = false;
         stopBtn.disabled = true;
         localStorage.removeItem("startTime"); // Optional: Remove start time after stopping
