@@ -37,6 +37,80 @@
             overflow-y: auto;
         }
 
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+        }
+
+        .task-list, .resource-links {
+            margin-bottom: 20px;
+        }
+
+        .task-list h3, .resource-links h3 {
+            margin-bottom: 10px;
+        }
+
+        .task-list ul, .resource-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li, .resource-links li {
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .task-list li.complete {
+            background-color: #d4edda;
+        }
+
+        .task-list li.incomplete {
+            background-color: #f8d7da;
+        }
+
+        .task-list input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .resource-links a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .resource-links a:hover {
+            text-decoration: underline;
+        }
+
         .progress-container {
             width: 100%;
             background-color: #f3f3f3;
@@ -58,23 +132,6 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-weight: bold;
-        }
-
-        .timer {
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .timer button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            margin: 5px;
-        }
-
-        .timer span {
-            font-size: 24px;
             font-weight: bold;
         }
     </style>
@@ -106,13 +163,14 @@
             </ul>
         </div>
 
-        <!-- Focus Timer Section -->
-        <div class="timer">
-            <h3>Focus Timer</h3>
-            <span id="focus-time">00:00</span>
-            <br>
-            <button id="start-timer">Start</button>
-            <button id="stop-timer" disabled>Stop</button>
+        <!-- Resource Links Section -->
+        <div class="resource-links">
+            <h3>Additional Resources</h3>
+            <ul>
+                <li><a href="https://docs.google.com/document/d/1NcR6ouT0ERtMB3igHDeJaSUY2VTjr95w_7Cg8ePKbYw/edit?usp=drivesdk" target="_blank">Read Today's Current Affairs</a></li>
+                <li><a href="https://www.youtube.com/live/RbVzebEYkik?si=PP8ou8gkbM0ahlA6" target="_blank">Watch Today's Current Affairs class</a></li>
+                <li><a href="" target="_blank">Watch Today's Indian Polity class</a></li>
+            </ul>
         </div>
 
         <!-- Progress Tracker Section -->
@@ -153,54 +211,7 @@
     </footer>
 
     <script>
-        // Focus Timer Variables
-        let timerInterval;
-        let seconds = 0;
-        let minutes = 0;
-
-        // Start Timer
-        function startTimer() {
-            timerInterval = setInterval(function() {
-                seconds++;
-                if (seconds == 60) {
-                    seconds = 0;
-                    minutes++;
-                }
-                // Format time as mm:ss
-                document.getElementById('focus-time').textContent = 
-                    (minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds);
-            }, 1000);
-
-            // Disable the start button and enable the stop button
-            document.getElementById('start-timer').disabled = true;
-            document.getElementById('stop-timer').disabled = false;
-        }
-
-        // Stop Timer
-        function stopTimer() {
-            clearInterval(timerInterval);
-
-            // Enable the start button and disable the stop button
-            document.getElementById('start-timer').disabled = false;
-            document.getElementById('stop-timer').disabled = true;
-
-            // Save the focus time to localStorage
-            localStorage.setItem("focusTime", document.getElementById('focus-time').textContent);
-        }
-
-        // Load the saved focus time from localStorage
-        document.addEventListener('DOMContentLoaded', function() {
-            const savedFocusTime = localStorage.getItem("focusTime");
-            if (savedFocusTime) {
-                document.getElementById('focus-time').textContent = savedFocusTime;
-            }
-        });
-
-        // Add event listeners to the buttons
-        document.getElementById('start-timer').addEventListener('click', startTimer);
-        document.getElementById('stop-timer').addEventListener('click', stopTimer);
-
-        // Function to update progress bar
+        // Function to update progress bar based on checked checkboxes
         function updateProgressBar() {
             const checkboxes = document.querySelectorAll("input[type='checkbox']");
             let completed = 0;
@@ -214,6 +225,7 @@
             const totalTasks = checkboxes.length;
             const percentage = (completed / totalTasks) * 100;
 
+            // Update the progress bar and text
             document.getElementById("progress-bar").style.width = percentage + "%";
             document.getElementById("progress-text").textContent = Math.round(percentage) + "%";
         }
@@ -246,7 +258,7 @@
         document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
             checkbox.addEventListener("change", function() {
                 localStorage.setItem(this.id, this.checked);
-                updateProgressBar();
+                updateProgressBar(); // Update the progress bar each time a checkbox is clicked
             });
         });
     </script>
