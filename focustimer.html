@@ -114,6 +114,12 @@
             color: #6d4c41;
             font-size: 1.1rem;
         }
+
+        .streak {
+            margin-top: 20px;
+            font-size: 1.3rem;
+            color: #6d4c41;
+        }
     </style>
 </head>
 <body>
@@ -134,6 +140,11 @@
             <button id="checkAttendanceButton">Check Attendance</button>
             <p id="attendanceResult"></p>
         </div>
+
+        <!-- Streak Display -->
+        <div class="streak">
+            <p id="streakCount">Current Streak: 0 days</p>
+        </div>
     </div>
 
     <script>
@@ -143,8 +154,13 @@
         let startTime = 0; // The time when the timer was started
         let timeElapsed = 0; // The time that has passed since the app was closed
 
-        // Initialize attendance variable
+        // Initialize attendance and streak variables
         let attendance = JSON.parse(localStorage.getItem('attendance')) || [];
+        let streak = JSON.parse(localStorage.getItem('streak')) || 0;
+        let lastAttendanceDate = localStorage.getItem('lastAttendanceDate');
+
+        // Initialize attendance and streak display
+        document.getElementById('streakCount').textContent = `Current Streak: ${streak} days`;
 
         // Check if there's a saved timer value in localStorage
         if (localStorage.getItem('timerStartTime')) {
@@ -201,12 +217,28 @@
         document.getElementById('pauseButton').addEventListener('click', pauseTimer);
         document.getElementById('resetButton').addEventListener('click', resetTimer);
 
-        // Mark attendance for the current day
+        // Mark attendance for the current day and check if streak should increase
         function markAttendance() {
             const currentDate = new Date().toLocaleDateString();  // Format the date as "MM/DD/YYYY"
             if (!attendance.includes(currentDate)) {
                 attendance.push(currentDate);  // Add current date to the attendance log
                 localStorage.setItem('attendance', JSON.stringify(attendance));
+
+                // Check if the timer reached 3 hours (10,800 seconds)
+                if (timer >= 10800) {
+                    streak++; // Increment streak if session was at least 3 hours
+                    localStorage.setItem('streak', streak);
+                    document.getElementById('streakCount').textContent = `Current Streak: ${streak} days`;
+                } else {
+                    // If the streak is broken, reset the streak to 0
+                    if (lastAttendanceDate && new Date(lastAttendanceDate).getDate() !== new Date(currentDate).getDate()) {
+                        streak = 0;
+                        localStorage.setItem('streak', streak);
+                        document.getElementById('streakCount').textContent = `Current Streak: ${streak} days`;
+                    }
+                }
+
+                localStorage.setItem('lastAttendanceDate', currentDate); // Save the last attendance date
             }
         }
 
@@ -244,7 +276,6 @@
             document.getElementById('dateDay').textContent = dateString;
         }
 
-        // Update the clock every second
         setInterval(updateClock, 1000);
     </script>
 </body>
