@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Timer with Digital Clock and Attendance Checker</title>
+    <title>Focus Timer with Digital Clock, Attendance Checker, and Streak</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -46,6 +46,19 @@
         .attendance button:disabled {
             background-color: #888;
             cursor: not-allowed;
+        }
+
+        .attendance-status {
+            font-size: 1rem;
+            color: #555;
+            margin-top: 10px;
+        }
+
+        .streak {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 20px;
+            color: #4CAF50;
         }
 
         h1 {
@@ -124,6 +137,11 @@
             <button id="markAbsentButton" class="attendanceButton">Mark Absent</button>
         </div>
 
+        <!-- Streak Display -->
+        <div class="streak" id="streakDisplay">
+            Current Streak: 0 days
+        </div>
+
         <h1>Focus Timer</h1>
         <div class="timer" id="timer">00:00</div>
         <div class="clock" id="clock">12:00 AM</div>
@@ -149,10 +167,19 @@
             updateTimerDisplay();
         }
 
-        // Check and update attendance status
+        // Check and update attendance status and streak
         const attendanceStatus = document.getElementById('attendanceStatus');
         const markPresentButton = document.getElementById('markPresentButton');
         const markAbsentButton = document.getElementById('markAbsentButton');
+        const streakDisplay = document.getElementById('streakDisplay');
+
+        // Retrieve saved streak and timer data from localStorage
+        let streak = localStorage.getItem('streak') || 0;
+        let lastAttendance = localStorage.getItem('lastAttendanceDate') || '';
+        let lastStreakUpdate = localStorage.getItem('lastStreakUpdate') || '';
+
+        // Update the streak display
+        streakDisplay.textContent = `Current Streak: ${streak} days`;
 
         if (localStorage.getItem('attendance')) {
             const attendance = localStorage.getItem('attendance');
@@ -169,19 +196,47 @@
 
         // Mark as present
         markPresentButton.addEventListener('click', () => {
+            const today = new Date().toLocaleDateString();
+            if (lastAttendance !== today) {
+                streak = 0; // Reset streak on a new day
+            }
+
             localStorage.setItem('attendance', 'present');
+            localStorage.setItem('lastAttendanceDate', today);
+            checkAndUpdateStreak();
+
             attendanceStatus.textContent = "You are marked as Present today.";
             markPresentButton.disabled = true;
             markAbsentButton.disabled = true;
+            streakDisplay.textContent = `Current Streak: ${streak} days`;
         });
 
         // Mark as absent
         markAbsentButton.addEventListener('click', () => {
+            const today = new Date().toLocaleDateString();
             localStorage.setItem('attendance', 'absent');
+            localStorage.setItem('lastAttendanceDate', today);
+            streak = 0; // Reset streak on absence
+            localStorage.setItem('streak', streak);
+
             attendanceStatus.textContent = "You are marked as Absent today.";
             markPresentButton.disabled = true;
             markAbsentButton.disabled = true;
+            streakDisplay.textContent = `Current Streak: 0 days`;
         });
+
+        // Check if timer exceeds 3 hours, then increase streak
+        function checkAndUpdateStreak() {
+            const currentTime = timer / 3600; // Convert seconds to hours
+            if (currentTime >= 3) {
+                if (lastStreakUpdate !== new Date().toLocaleDateString()) {
+                    streak++;
+                    localStorage.setItem('streak', streak);
+                    localStorage.setItem('lastStreakUpdate', new Date().toLocaleDateString());
+                    streakDisplay.textContent = `Current Streak: ${streak} days`;
+                }
+            }
+        }
 
         function startTimer() {
             isRunning = true;
@@ -192,6 +247,7 @@
                 timer++;
                 localStorage.setItem('timer', timer);
                 updateTimerDisplay();
+                checkAndUpdateStreak(); // Check if streak should increase based on timer
             }, 1000);
         }
 
