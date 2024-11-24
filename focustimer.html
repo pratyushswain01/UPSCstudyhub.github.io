@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Timer with Digital Clock</title>
+    <title>Focus Timer with Digital Clock and Attendance Checker</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -26,6 +26,26 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             max-width: 500px;
             width: 100%;
+        }
+
+        .attendance {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .attendance button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .attendance button:disabled {
+            background-color: #888;
+            cursor: not-allowed;
         }
 
         h1 {
@@ -96,6 +116,14 @@
 </head>
 <body>
     <div class="container">
+        <!-- Attendance Checker -->
+        <div class="attendance">
+            <h2>Daily Attendance</h2>
+            <p id="attendanceStatus">Please mark your attendance for today.</p>
+            <button id="markPresentButton" class="attendanceButton">Mark Present</button>
+            <button id="markAbsentButton" class="attendanceButton">Mark Absent</button>
+        </div>
+
         <h1>Focus Timer</h1>
         <div class="timer" id="timer">00:00</div>
         <div class="clock" id="clock">12:00 AM</div>
@@ -120,6 +148,40 @@
             timer = parseInt(localStorage.getItem('timer'));
             updateTimerDisplay();
         }
+
+        // Check and update attendance status
+        const attendanceStatus = document.getElementById('attendanceStatus');
+        const markPresentButton = document.getElementById('markPresentButton');
+        const markAbsentButton = document.getElementById('markAbsentButton');
+
+        if (localStorage.getItem('attendance')) {
+            const attendance = localStorage.getItem('attendance');
+            if (attendance === 'present') {
+                attendanceStatus.textContent = "You are marked as Present today.";
+                markPresentButton.disabled = true;
+                markAbsentButton.disabled = true;
+            } else if (attendance === 'absent') {
+                attendanceStatus.textContent = "You are marked as Absent today.";
+                markPresentButton.disabled = true;
+                markAbsentButton.disabled = true;
+            }
+        }
+
+        // Mark as present
+        markPresentButton.addEventListener('click', () => {
+            localStorage.setItem('attendance', 'present');
+            attendanceStatus.textContent = "You are marked as Present today.";
+            markPresentButton.disabled = true;
+            markAbsentButton.disabled = true;
+        });
+
+        // Mark as absent
+        markAbsentButton.addEventListener('click', () => {
+            localStorage.setItem('attendance', 'absent');
+            attendanceStatus.textContent = "You are marked as Absent today.";
+            markPresentButton.disabled = true;
+            markAbsentButton.disabled = true;
+        });
 
         function startTimer() {
             isRunning = true;
