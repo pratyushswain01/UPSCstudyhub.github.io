@@ -257,11 +257,13 @@
         }
 
         // Clear any previous timers before starting a new one
-        if (timer) clearInterval(timer);
+        if (timer) {
+            clearInterval(timer);
+        }
 
         timer = setInterval(() => {
             elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-            localStorage.setItem("elapsedTime", elapsedTime);
+            localStorage.setItem("elapsedTime", elapsedTime); // Store elapsed time
             seconds = elapsedTime;
             displayTime();
         }, 1000);
@@ -271,14 +273,16 @@
     function stopTimer() {
         isRunning = false;
         clearInterval(timer);
+        timer = null; // Reset the timer to null to ensure no background interval is running
         startBtn.disabled = false;
         stopBtn.disabled = true;
-        localStorage.removeItem("startTime"); // Optional: Remove start time after stopping
+        localStorage.removeItem("startTime"); // Remove start time after stopping
     }
 
     // Reset the timer
     function resetTimer() {
         clearInterval(timer);
+        timer = null;
         isRunning = false;
         seconds = 0;
         elapsedTime = 0;
