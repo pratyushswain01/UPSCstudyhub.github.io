@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Focus Timer with Digital Clock, Attendance Checker, and Streak</title>
     <style>
-        /* Traditional, clean design */
         body {
             font-family: 'Times New Roman', serif;
-            background-color: #f7f1e1;
-            background-image: url('https://www.transparenttextures.com/patterns/old-wallpaper.png');
-            background-size: cover;
-            background-position: center;
-            color: #3e2723;
+            background-color: #f7f1e1; /* Pale beige background for a vintage feel */
+            color: #3e2723; /* Dark brown text for contrast */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -24,17 +20,51 @@
         }
 
         .container {
-            background-color: #fff;
+            background-color: #fff7e6; /* Light off-white with a slight warm hue */
             padding: 40px;
             border-radius: 15px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 100%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
             max-width: 600px;
+            width: 100%;
+            border: 2px solid #c49a6c; /* Subtle border with a warm tone */
         }
 
         h1 {
             font-size: 2.5rem;
+            margin-bottom: 30px;
+            font-weight: normal;
+            color: #6d4c41; /* Rich brown */
+        }
+
+        .attendance {
+            font-size: 1.1rem;
             margin-bottom: 20px;
+        }
+
+        .attendance button {
+            padding: 12px 24px;
+            background-color: #6d4c41; /* Traditional brown */
+            color: white;
+            border: 2px solid #6d4c41;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        .attendance button:hover {
+            background-color: #4e342e; /* Darker brown for hover effect */
+        }
+
+        .attendance button:disabled {
+            background-color: #c9c9c9;
+            cursor: not-allowed;
+        }
+
+        .streak {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 25px;
             color: #6d4c41;
         }
 
@@ -85,10 +115,41 @@
             background-color: #c9c9c9;
             cursor: not-allowed;
         }
+
+        footer {
+            position: absolute;
+            bottom: 20px;
+            text-align: center;
+            width: 100%;
+            font-size: 1rem;
+            color: #3e2723;
+        }
+
+        footer a {
+            color: #6d4c41;
+            font-weight: bold;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Attendance Checker -->
+        <div class="attendance">
+            <h2>Daily Attendance</h2>
+            <p id="attendanceStatus">Please mark your attendance for today.</p>
+            <button id="markPresentButton" class="attendanceButton">Mark Present</button>
+            <button id="markAbsentButton" class="attendanceButton">Mark Absent</button>
+        </div>
+
+        <!-- Streak Display -->
+        <div class="streak" id="streakDisplay">
+            Current Streak: 0 days
+        </div>
+
         <h1>Focus Timer</h1>
         <div class="timer" id="timer">00:00:00</div>
         <div class="clock" id="clock">12:00 AM</div>
@@ -99,36 +160,102 @@
             <button class="button" id="resetButton">Reset</button>
         </div>
     </div>
+    <footer>
+        Powered by <a href="https://upsc.hub">UPSC Hub</a>
+    </footer>
 
     <script>
-        let timer = 0; // Time in seconds
+        let timer = 0; // time in seconds
         let interval;
         let isRunning = false;
-        let startTime = 0; // The time when the timer was started
-        let timeElapsed = 0; // The time that has passed since the app was closed
 
         // Check if there's a saved timer value in localStorage
-        if (localStorage.getItem('timerStartTime')) {
-            startTime = parseInt(localStorage.getItem('timerStartTime'));
-            timeElapsed = Math.floor((Date.now() - startTime) / 1000); // Calculate elapsed time
-            timer = parseInt(localStorage.getItem('timer')) + timeElapsed;
+        if (localStorage.getItem('timer')) {
+            timer = parseInt(localStorage.getItem('timer'));
             updateTimerDisplay();
         }
 
-        // Timer functionality
+        // Check and update attendance status and streak
+        const attendanceStatus = document.getElementById('attendanceStatus');
+        const markPresentButton = document.getElementById('markPresentButton');
+        const markAbsentButton = document.getElementById('markAbsentButton');
+        const streakDisplay = document.getElementById('streakDisplay');
+
+        // Retrieve saved streak and timer data from localStorage
+        let streak = localStorage.getItem('streak') || 0;
+        let lastAttendance = localStorage.getItem('lastAttendanceDate') || '';
+        let lastStreakUpdate = localStorage.getItem('lastStreakUpdate') || '';
+
+        // Update the streak display
+        streakDisplay.textContent = `Current Streak: ${streak} days`;
+
+        if (localStorage.getItem('attendance')) {
+            const attendance = localStorage.getItem('attendance');
+            if (attendance === 'present') {
+                attendanceStatus.textContent = "You are marked as Present today.";
+                markPresentButton.disabled = true;
+                markAbsentButton.disabled = true;
+            } else if (attendance === 'absent') {
+                attendanceStatus.textContent = "You are marked as Absent today.";
+                markPresentButton.disabled = true;
+                markAbsentButton.disabled = true;
+            }
+        }
+
+        // Mark as present
+        markPresentButton.addEventListener('click', () => {
+            const today = new Date().toLocaleDateString();
+            if (lastAttendance !== today) {
+                streak = 0; // Reset streak on a new day
+            }
+
+            localStorage.setItem('attendance', 'present');
+            localStorage.setItem('lastAttendanceDate', today);
+            checkAndUpdateStreak();
+
+            attendanceStatus.textContent = "You are marked as Present today.";
+            markPresentButton.disabled = true;
+            markAbsentButton.disabled = true;
+            streakDisplay.textContent = `Current Streak: ${streak} days`;
+        });
+
+        // Mark as absent
+        markAbsentButton.addEventListener('click', () => {
+            const today = new Date().toLocaleDateString();
+            localStorage.setItem('attendance', 'absent');
+            localStorage.setItem('lastAttendanceDate', today);
+            streak = 0; // Reset streak on absence
+            localStorage.setItem('streak', streak);
+
+            attendanceStatus.textContent = "You are marked as Absent today.";
+            markPresentButton.disabled = true;
+            markAbsentButton.disabled = true;
+            streakDisplay.textContent = `Current Streak: 0 days`;
+        });
+
+        // Check if timer exceeds 3 hours, then increase streak
+        function checkAndUpdateStreak() {
+            const currentTime = timer / 3600; // Convert seconds to hours
+            if (currentTime >= 3) {
+                if (lastStreakUpdate !== new Date().toLocaleDateString()) {
+                    streak++;
+                    localStorage.setItem('streak', streak);
+                    localStorage.setItem('lastStreakUpdate', new Date().toLocaleDateString());
+                    streakDisplay.textContent = `Current Streak: ${streak} days`;
+                }
+            }
+        }
+
         function startTimer() {
-            if (isRunning) return;
             isRunning = true;
             document.getElementById('startButton').disabled = true;
             document.getElementById('pauseButton').disabled = false;
 
-            startTime = Date.now(); // Record the time when the timer started
-            localStorage.setItem('timerStartTime', startTime);
-
-            interval = setInterval(function() {
+            interval = setInterval(() => {
                 timer++;
                 localStorage.setItem('timer', timer);
                 updateTimerDisplay();
+                checkAndUpdateStreak(); // Check if streak should increase based on timer
             }, 1000);
         }
 
@@ -142,15 +269,14 @@
         function resetTimer() {
             timer = 0;
             localStorage.removeItem('timer');
-            localStorage.removeItem('timerStartTime');
             updateTimerDisplay();
         }
 
         function updateTimerDisplay() {
-            const hours = Math.floor(timer / 3600);
-            const minutes = Math.floor((timer % 3600) / 60);
-            const seconds = timer % 60;
-            document.getElementById('timer').textContent =
+            const hours = Math.floor(timer / 3600); // Calculate hours
+            const minutes = Math.floor((timer % 3600) / 60); // Calculate minutes
+            const seconds = timer % 60; // Calculate seconds
+            document.getElementById('timer').textContent = 
                 `${hours < 10 ? '0' : ''}${hours}:${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
         }
 
@@ -183,6 +309,7 @@
 
         // Update the clock every second
         setInterval(updateClock, 1000);
+
     </script>
 </body>
 </html>
