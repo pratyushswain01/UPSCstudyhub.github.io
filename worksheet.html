@@ -134,6 +134,39 @@
             color: white;
             font-weight: bold;
         }
+
+        /* Focus Timer Styles */
+        .focus-timer {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .focus-timer .timer-display {
+            font-size: 50px;
+            font-family: 'Courier New', Courier, monospace;
+            color: #00ff00;
+            background: #000;
+            padding: 10px 20px;
+            border-radius: 10px;
+            display: inline-block;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+            letter-spacing: 2px;
+        }
+
+        .focus-timer button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .focus-timer button:disabled {
+            background-color: #ccc;
+        }
     </style>
 </head>
 <body>
@@ -203,6 +236,15 @@
             </tbody>
         </table>
 
+        <!-- Focus Timer Section -->
+        <div class="focus-timer">
+            <h3>Focus Timer</h3>
+            <div id="timer-display" class="timer-display">00:00</div>
+            <br>
+            <button id="start-btn">Start</button>
+            <button id="stop-btn" disabled>Stop</button>
+        </div>
+
     </div>
 
     <footer>
@@ -211,55 +253,60 @@
     </footer>
 
     <script>
-        // Function to update progress bar based on checked checkboxes
-        function updateProgressBar() {
-            const checkboxes = document.querySelectorAll("input[type='checkbox']");
-            let completed = 0;
+        // Timer Variables
+        let timerInterval;
+        let seconds = 0;
+        let minutes = 0;
 
-            checkboxes.forEach(checkbox => {
-                if (checkbox.checked) {
-                    completed++;
-                }
-            });
-
-            const totalTasks = checkboxes.length;
-            const percentage = (completed / totalTasks) * 100;
-
-            // Update the progress bar and text
-            document.getElementById("progress-bar").style.width = percentage + "%";
-            document.getElementById("progress-text").textContent = Math.round(percentage) + "%";
-        }
-
-        // Load checkbox states from localStorage
-        document.addEventListener("DOMContentLoaded", function() {
-            // Load task checkboxes
-            const task1 = document.getElementById("task1");
-            const task2 = document.getElementById("task2");
-            const task3 = document.getElementById("task3");
-
-            task1.checked = localStorage.getItem("task1") === "true";
-            task2.checked = localStorage.getItem("task2") === "true";
-            task3.checked = localStorage.getItem("task3") === "true";
-
-            // Load progress checkboxes
-            const progress1 = document.getElementById("progress1");
-            const progress2 = document.getElementById("progress2");
-            const progress3 = document.getElementById("progress3");
-
-            progress1.checked = localStorage.getItem("progress1") === "true";
-            progress2.checked = localStorage.getItem("progress2") === "true";
-            progress3.checked = localStorage.getItem("progress3") === "true";
-
-            // Update progress bar on page load
-            updateProgressBar();
+        // Load saved time from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedTime = localStorage.getItem("focusTime");
+            if (savedTime) {
+                const [savedMinutes, savedSeconds] = savedTime.split(':');
+                minutes = parseInt(savedMinutes, 10);
+                seconds = parseInt(savedSeconds, 10);
+                document.getElementById('timer-display').textContent = formatTime(minutes, seconds);
+            }
         });
 
-        // Save checkbox states to localStorage and update progress bar
-        document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
-            checkbox.addEventListener("change", function() {
-                localStorage.setItem(this.id, this.checked);
-                updateProgressBar(); // Update the progress bar each time a checkbox is clicked
-            });
+        // Function to format time as MM:SS
+        function formatTime(mins, secs) {
+            return (mins < 10 ? '0' + mins : mins) + ':' + (secs < 10 ? '0' + secs : secs);
+        }
+
+        // Start Timer
+        function startTimer() {
+            timerInterval = setInterval(function() {
+                seconds++;
+                if (seconds === 60) {
+                    seconds = 0;
+                    minutes++;
+                }
+
+                // Update the timer display
+                document.getElementById('timer-display').textContent = formatTime(minutes, seconds);
+
+                // Save current time to localStorage
+                localStorage.setItem("focusTime", formatTime(minutes, seconds));
+            }, 1000);
+        }
+
+        // Stop Timer
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.getElementById("start-btn").disabled = false;
+            document.getElementById("stop-btn").disabled = true;
+        }
+
+        // Event Listeners for Start and Stop Buttons
+        document.getElementById("start-btn").addEventListener("click", function() {
+            startTimer();
+            document.getElementById("start-btn").disabled = true;
+            document.getElementById("stop-btn").disabled = false;
+        });
+
+        document.getElementById("stop-btn").addEventListener("click", function() {
+            stopTimer();
         });
     </script>
 </body>
