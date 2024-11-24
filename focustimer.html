@@ -1,1 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metallic Focus Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 100px auto;
+            padding: 20px;
+            background: linear-gradient(145deg, #7f8c8d, #bdc3c7);
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+        .timer {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #2980b9;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #3498db;
+        }
+        button:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Metallic Focus Timer</h1>
+    <div class="timer" id="timerDisplay">00:00:00</div>
+    <div>
+        <button id="startBtn">Start</button>
+        <button id="stopBtn" disabled>Stop</button>
+        <button id="resetBtn">Reset</button>
+    </div>
+</div>
+
+<script>
+    // Timer variables
+    let timer;
+    let seconds = 0;
+    let isRunning = false;
+
+    // Elements
+    const timerDisplay = document.getElementById("timerDisplay");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    // Load the timer state from localStorage
+    if (localStorage.getItem("timer")) {
+        seconds = parseInt(localStorage.getItem("timer"));
+        displayTime();
+    }
+
+    // Function to update the display of the timer
+    function displayTime() {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+        timerDisplay.textContent = `${pad(hours)}:${pad(minutes)}:${pad(secs)}`;
+    }
+
+    // Function to add leading zero for single digits
+    function pad(num) {
+        return num < 10 ? "0" + num : num;
+    }
+
+    // Start the timer
+    function startTimer() {
+        isRunning = true;
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+
+        timer = setInterval(() => {
+            seconds++;
+            displayTime();
+            localStorage.setItem("timer", seconds); // Save timer state to localStorage
+        }, 1000);
+    }
+
+    // Stop the timer
+    function stopTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    }
+
+    // Reset the timer
+    function resetTimer() {
+        clearInterval(timer);
+        isRunning = false;
+        seconds = 0;
+        displayTime();
+        localStorage.removeItem("timer"); // Remove the timer state from localStorage
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    }
+
+    // Event listeners for buttons
+    startBtn.addEventListener("click", startTimer);
+    stopBtn.addEventListener("click", stopTimer);
+    resetBtn.addEventListener("click", resetTimer);
+</script>
+
+</body>
+</html>
 
