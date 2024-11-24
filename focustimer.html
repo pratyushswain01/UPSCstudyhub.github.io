@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Timer</title>
+    <title>Focus Timer with Analog Clock</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -15,6 +15,7 @@
             height: 100vh;
             margin: 0;
             flex-direction: column;
+            text-align: center;
         }
 
         .container {
@@ -23,7 +24,7 @@
             padding: 30px;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
+            max-width: 500px;
             width: 100%;
         }
 
@@ -46,10 +47,60 @@
             color: #777;
         }
 
+        .analog-clock {
+            position: relative;
+            margin-top: 30px;
+            width: 200px;
+            height: 200px;
+            border: 10px solid #4CAF50;
+            border-radius: 50%;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .analog-clock .hour, .analog-clock .minute, .analog-clock .second {
+            position: absolute;
+            width: 50%;
+            height: 2px;
+            background-color: #333;
+            top: 50%;
+            transform-origin: 100%;
+            transition: all 0.05s;
+        }
+
+        .analog-clock .hour {
+            background-color: #4CAF50;
+            width: 30%;
+        }
+
+        .analog-clock .minute {
+            background-color: #000;
+            width: 40%;
+        }
+
+        .analog-clock .second {
+            background-color: red;
+            width: 45%;
+        }
+
+        .analog-clock .center {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #4CAF50;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
         .buttons {
             display: flex;
             justify-content: center;
             gap: 20px;
+            margin-top: 20px;
         }
 
         .button {
@@ -95,6 +146,12 @@
             <button class="button" id="startButton">Start</button>
             <button class="button" id="pauseButton" disabled>Pause</button>
             <button class="button" id="resetButton">Reset</button>
+        </div>
+        <div class="analog-clock" id="analogClock">
+            <div class="hour" id="hourHand"></div>
+            <div class="minute" id="minuteHand"></div>
+            <div class="second" id="secondHand"></div>
+            <div class="center"></div>
         </div>
     </div>
     <footer>
@@ -162,6 +219,15 @@
 
             const clockString = `${displayHours}:${displayMinutes}:${displaySeconds} ${period}`;
             document.getElementById('clock').textContent = clockString;
+
+            // Update analog clock hands
+            const hourDegree = (hours % 12) * 30 + (minutes / 60) * 30; // 30 degrees per hour
+            const minuteDegree = minutes * 6; // 6 degrees per minute
+            const secondDegree = seconds * 6; // 6 degrees per second
+
+            document.getElementById('hourHand').style.transform = `rotate(${hourDegree}deg)`;
+            document.getElementById('minuteHand').style.transform = `rotate(${minuteDegree}deg)`;
+            document.getElementById('secondHand').style.transform = `rotate(${secondDegree}deg)`;
         }
 
         // Update the clock every second
