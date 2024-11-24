@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Focus Timer with Analog Clock</title>
+    <title>Focus Timer with Digital Clock</title>
     <style>
         body {
             font-family: 'Georgia', serif;
@@ -45,77 +45,8 @@
             font-size: 1.5rem;
             margin-bottom: 20px;
             color: #777;
-        }
-
-        .analog-clock {
-            position: relative;
-            margin-top: 30px;
-            width: 250px;
-            height: 250px;
-            border: 10px solid #4CAF50;
-            border-radius: 50%;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .analog-clock .hour, .analog-clock .minute, .analog-clock .second {
-            position: absolute;
-            width: 50%;
-            height: 2px;
-            background-color: #333;
-            top: 50%;
-            transform-origin: 100%;
-            transition: all 0.05s;
-        }
-
-        .analog-clock .hour {
-            background-color: #4CAF50;
-            width: 30%;
-        }
-
-        .analog-clock .minute {
-            background-color: #000;
-            width: 40%;
-        }
-
-        .analog-clock .second {
-            background-color: red;
-            width: 45%;
-        }
-
-        .analog-clock .center {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background-color: #4CAF50;
-            border-radius: 50%;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .number {
-            position: absolute;
-            font-size: 18px;
             font-weight: bold;
-            color: #333;
         }
-
-        /* Positioning the numbers around the clock (12 at top, 6 at bottom) */
-        .number:nth-child(1) { top: 10px; left: 50%; transform: translateX(-50%); }    /* 12 */
-        .number:nth-child(2) { top: 25px; right: 10px; }   /* 1 */
-        .number:nth-child(3) { top: 50%; right: 10px; transform: translateY(-50%); }  /* 2 */
-        .number:nth-child(4) { bottom: 25px; right: 10px; } /* 3 */
-        .number:nth-child(5) { bottom: 10px; left: 50%; transform: translateX(-50%); }  /* 4 */
-        .number:nth-child(6) { bottom: 25px; left: 10px; } /* 5 */
-        .number:nth-child(7) { top: 50%; left: 10px; transform: translateY(-50%); } /* 6 */
-        .number:nth-child(8) { top: 25px; left: 10px; }    /* 7 */
-        .number:nth-child(9) { top: 10px; left: 50%; transform: translateX(-50%); }    /* 8 */
-        .number:nth-child(10) { top: 25px; right: 10px; }  /* 9 */
-        .number:nth-child(11) { top: 50%; right: 10px; transform: translateY(-50%); }  /* 10 */
-        .number:nth-child(12) { bottom: 25px; right: 10px; }  /* 11 */
 
         .buttons {
             display: flex;
@@ -162,31 +93,11 @@
     <div class="container">
         <h1>Focus Timer</h1>
         <div class="timer" id="timer">00:00</div>
-        <div class="clock" id="clock">12:00 AM</div>
+        <div class="clock" id="clock">12:00 AM, Sunday, January 1</div>
         <div class="buttons">
             <button class="button" id="startButton">Start</button>
             <button class="button" id="pauseButton" disabled>Pause</button>
             <button class="button" id="resetButton">Reset</button>
-        </div>
-        <div class="analog-clock" id="analogClock">
-            <div class="hour" id="hourHand"></div>
-            <div class="minute" id="minuteHand"></div>
-            <div class="second" id="secondHand"></div>
-            <div class="center"></div>
-
-            <!-- Numbers 1 to 12, 12 at the top, 6 at the bottom -->
-            <div class="number" style="transform: rotate(0deg);">12</div>
-            <div class="number" style="transform: rotate(30deg);">1</div>
-            <div class="number" style="transform: rotate(60deg);">2</div>
-            <div class="number" style="transform: rotate(90deg);">3</div>
-            <div class="number" style="transform: rotate(120deg);">4</div>
-            <div class="number" style="transform: rotate(150deg);">5</div>
-            <div class="number" style="transform: rotate(180deg);">6</div>
-            <div class="number" style="transform: rotate(210deg);">7</div>
-            <div class="number" style="transform: rotate(240deg);">8</div>
-            <div class="number" style="transform: rotate(270deg);">9</div>
-            <div class="number" style="transform: rotate(300deg);">10</div>
-            <div class="number" style="transform: rotate(330deg);">11</div>
         </div>
     </div>
     <footer>
@@ -247,27 +158,21 @@
             const hours = currentTime.getHours();
             const minutes = currentTime.getMinutes();
             const seconds = currentTime.getSeconds();
+            const dayOfWeek = currentTime.toLocaleString('en-us', { weekday: 'long' });
+            const month = currentTime.toLocaleString('en-us', { month: 'long' });
+            const date = currentTime.getDate();
+            const year = currentTime.getFullYear();
             const period = hours >= 12 ? 'PM' : 'AM';
             const displayHours = hours % 12 || 12;
             const displayMinutes = minutes < 10 ? '0' + minutes : minutes;
             const displaySeconds = seconds < 10 ? '0' + seconds : seconds;
 
-            const clockString = `${displayHours}:${displayMinutes}:${displaySeconds} ${period}`;
+            const clockString = `${displayHours}:${displayMinutes}:${displaySeconds} ${period}, ${dayOfWeek}, ${month} ${date}, ${year}`;
             document.getElementById('clock').textContent = clockString;
-
-            // Update analog clock hands
-            const hourDegree = (hours % 12) * 30 + (minutes / 60) * 30; // 30 degrees per hour
-            const minuteDegree = minutes * 6; // 6 degrees per minute
-            const secondDegree = seconds * 6; // 6 degrees per second
-
-            document.getElementById('hourHand').style.transform = `rotate(${hourDegree}deg)`;
-            document.getElementById('minuteHand').style.transform = `rotate(${minuteDegree}deg)`;
-            document.getElementById('secondHand').style.transform = `rotate(${secondDegree}deg)`;
         }
 
         // Update the clock every second
         setInterval(updateClock, 1000);
-
     </script>
 </body>
 </html>
