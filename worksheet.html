@@ -1,1 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Worksheet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        html, body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            margin-top: auto;
+        }
+
+        .task-list, .resource-links {
+            margin-bottom: 20px;
+        }
+
+        .task-list h3, .resource-links h3 {
+            margin-bottom: 10px;
+        }
+
+        .task-list ul, .resource-links ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .task-list li, .resource-links li {
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+        .task-list li.complete {
+            background-color: #d4edda;
+        }
+
+        .task-list li.incomplete {
+            background-color: #f8d7da;
+        }
+
+        .task-list input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .resource-links a {
+            color: #007BFF;
+            text-decoration: none;
+        }
+
+        .resource-links a:hover {
+            text-decoration: underline;
+        }
+
+        .progress-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border-radius: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 30px;
+            background-color: #4CAF50;
+            border-radius: 20px;
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>To-Do List</h1>
+    </header>
+
+    <div class="container">
+        <h2>Today's Tasks</h2>
+        
+        <!-- Task List Section -->
+        <div class="task-list">
+            <h3>Complete these tasks</h3>
+            <ul>
+                <li class="incomplete">
+                    <input type="checkbox" id="task1">
+                    <label for="task1">Do Today's Current Affairs class</label>
+                </li>
+                <li class="incomplete">
+                    <input type="checkbox" id="task2">
+                    <label for="task2">Complete Newspaper Analysis</label>
+                </li>
+                <li class="incomplete">
+                    <input type="checkbox" id="task3">
+                    <label for="task3">Complete Today's Indian Polity class</label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Resource Links Section -->
+        <div class="resource-links">
+            <h3>Additional Resources</h3>
+            <ul>
+                <li><a href="https://docs.google.com/document/d/1NcR6ouT0ERtMB3igHDeJaSUY2VTjr95w_7Cg8ePKbYw/edit?usp=drivesdk" target="_blank">Read Today's Current Affairs</a></li>
+                <li><a href="https://www.youtube.com/live/RbVzebEYkik?si=PP8ou8gkbM0ahlA6" target="_blank">Watch Today's Current Affairs class</a></li>
+                <li><a href="" target="_blank">Watch Today's Indian Polity class</a></li>
+            </ul>
+        </div>
+
+        <!-- Progress Tracker Section -->
+        <h3>Progress Tracker</h3>
+        <div class="progress-container">
+            <div id="progress-bar" class="progress-bar"></div>
+            <div id="progress-text" class="progress-text">0%</div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Task</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Yoga, Exercise</td>
+                    <td><input type="checkbox" id="progress1"></td>
+                </tr>
+                <tr>
+                    <td>Current Affairs Class</td>
+                    <td><input type="checkbox" id="progress2"></td>
+                </tr>
+                <tr>
+                    <td>Polity Class and Notes</td>
+                    <td><input type="checkbox" id="progress3"></td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+
+    <footer>
+        <p>&copy; Copyright @ 2024 by UPSC Hub</p>
+        <p>Managed by Pratyush Swain</p>
+    </footer>
+
+    <script>
+        // Function to update progress bar based on checked checkboxes
+        function updateProgressBar() {
+            const checkboxes = document.querySelectorAll("input[type='checkbox']");
+            let completed = 0;
+
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    completed++;
+                }
+            });
+
+            const totalTasks = checkboxes.length;
+            const percentage = (completed / totalTasks) * 100;
+
+            // Update the progress bar and text
+            document.getElementById("progress-bar").style.width = percentage + "%";
+            document.getElementById("progress-text").textContent = Math.round(percentage) + "%";
+        }
+
+        // Load checkbox states from localStorage
+        document.addEventListener("DOMContentLoaded", function() {
+            // Load task checkboxes
+            const task1 = document.getElementById("task1");
+            const task2 = document.getElementById("task2");
+            const task3 = document.getElementById("task3");
+
+            task1.checked = localStorage.getItem("task1") === "true";
+            task2.checked = localStorage.getItem("task2") === "true";
+            task3.checked = localStorage.getItem("task3") === "true";
+
+            // Load progress checkboxes
+            const progress1 = document.getElementById("progress1");
+            const progress2 = document.getElementById("progress2");
+            const progress3 = document.getElementById("progress3");
+
+            progress1.checked = localStorage.getItem("progress1") === "true";
+            progress2.checked = localStorage.getItem("progress2") === "true";
+            progress3.checked = localStorage.getItem("progress3") === "true";
+
+            // Update progress bar on page load
+            updateProgressBar();
+        });
+
+        // Save checkbox states to localStorage and update progress bar
+        document.querySelectorAll("input[type='checkbox']").forEach(checkbox => {
+            checkbox.addEventListener("change", function() {
+                localStorage.setItem(this.id, this.checked);
+                updateProgressBar(); // Update the progress bar each time a checkbox is clicked
+            });
+        });
+    </script>
+</body>
+</html>
