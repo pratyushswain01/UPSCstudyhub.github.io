@@ -79,16 +79,6 @@
                 </div>
             </div>
 
-            <div id="question-3" class="question-container">
-                <h2>Question 3</h2>
-                <p>What is the name of the recently approved COVID-19 vaccine for children?</p>
-                <div class="options">
-                    <label><input type="radio" name="answer3" value="Covovax"> Covovax</label>
-                    <label><input type="radio" name="answer3" value="Covishield"> Covishield</label>
-                    <label><input type="radio" name="answer3" value="Comirnaty"> Comirnaty</label>
-                    <label><input type="radio" name="answer3" value="Sinovac"> Sinovac</label>
-                </div>
-            </div>
             <!-- Add other questions here -->
 
             <!-- Navigation Buttons -->
@@ -106,7 +96,6 @@
 
     <script>
         // Initialize variables
-        const screens = document.querySelectorAll('.screen');
         const airplaneModeScreen = document.getElementById('airplane-mode-screen');
         const mockTestScreen = document.getElementById('mock-test-screen');
         const checkAirplaneModeButton = document.getElementById('check-airplane-mode');
@@ -114,21 +103,6 @@
         const prevButton = document.getElementById('prev-btn');
         const nextButton = document.getElementById('next-btn');
         let currentQuestionIndex = 0;
-
-        // Mock airplane mode check
-        function isAirplaneModeEnabled() {
-            return confirm("Have you enabled Airplane Mode?");
-        }
-
-        // Airplane mode check event
-        checkAirplaneModeButton.addEventListener('click', () => {
-            if (isAirplaneModeEnabled()) {
-                airplaneModeScreen.classList.remove('active');
-                mockTestScreen.classList.add('active');
-            } else {
-                alert('Please enable Airplane Mode to proceed.');
-            }
-        });
 
         // Update question visibility
         function updateQuestionVisibility() {
@@ -152,6 +126,28 @@
                 currentQuestionIndex++;
                 updateQuestionVisibility();
             }
+        });
+
+        // Check if the device is offline
+        function checkIfOffline() {
+            return !navigator.onLine;
+        }
+
+        // Mock airplane mode check
+        checkAirplaneModeButton.addEventListener('click', () => {
+            if (checkIfOffline()) {
+                airplaneModeScreen.classList.remove('active');
+                mockTestScreen.classList.add('active');
+            } else {
+                alert('Please enable Airplane Mode and disconnect from the internet to proceed.');
+            }
+        });
+
+        // Monitor connection status to ensure compliance
+        window.addEventListener('online', () => {
+            alert('You are connected to the internet! Please enable Airplane Mode to continue.');
+            airplaneModeScreen.classList.add('active');
+            mockTestScreen.classList.remove('active');
         });
     </script>
 </body>
