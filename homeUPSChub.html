@@ -16,7 +16,7 @@
 </head>
 <body>
 
-   <style>
+     <style>
       /* Notification CSS */
       .notification {
           position: fixed;
@@ -49,58 +49,87 @@
           color: white;
           cursor: pointer;
       }
+
+      /* Centered Pop-up Box Styles */
+      .popup-box {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: #fff;
+          padding: 30px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+          width: 80%;
+          max-width: 400px;
+          display: none;
+          z-index: 10000;
+      }
+
+      .popup-box .popup-header {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+      }
+
+      .popup-box .popup-message {
+          font-size: 16px;
+          margin: 15px 0;
+          color: #555;
+      }
+
+      .popup-box .popup-close {
+          display: inline-block;
+          background-color: #f44336;
+          color: white;
+          padding: 10px;
+          border-radius: 5px;
+          cursor: pointer;
+          text-align: center;
+          width: 100%;
+      }
+
+      .popup-box .popup-close:hover {
+          background-color: #d32f2f;
+      }
    </style>
 
    <script>
-      // Request notification permission on page load
-      document.addEventListener("DOMContentLoaded", () => {
-          // Check if Notification API is available
+      // Function to show the center popup
+      function showPopup() {
+          const popup = document.querySelector('.popup-box');
+          popup.style.display = 'block'; // Show the popup
+      }
+
+      // Function to close the center popup
+      function closePopup() {
+          const popup = document.querySelector('.popup-box');
+          popup.style.display = 'none'; // Hide the popup
+      }
+
+      // Show the pop-up when the page is loaded
+      document.addEventListener("DOMContentLoaded", function() {
+          showPopup();
+
+          // Show browser notification
           if ("Notification" in window) {
-              // If notification permission is not granted, ask the user for permission
               if (Notification.permission === "default") {
                   Notification.requestPermission().then(permission => {
                       if (permission === "granted") {
-                          sendBrowserNotification();  // Send browser notification if permission is granted
+                          new Notification("Welcome to UPSC Hub!", {
+                              body: "Explore the latest courses and updates for UPSC preparation.",
+                              icon: "images/LOGO.jpg"
+                          });
                       }
                   });
               } else if (Notification.permission === "granted") {
-                  sendBrowserNotification();  // Send notification if already granted
+                  new Notification("Welcome to UPSC Hub!", {
+                      body: "Explore the latest courses and updates for UPSC preparation.",
+                      icon: "images/LOGO.jpg"
+                  });
               }
-          } else {
-              console.log("Notifications are not supported in this browser.");
           }
-
-          // Show custom styled notification
-          showCustomNotification();
       });
-
-      // Function to send browser notification
-      function sendBrowserNotification() {
-          new Notification("Welcome to UPSC Hub!", {
-              body: "Explore the latest courses and updates for UPSC preparation.",
-              icon: "images/LOGO.jpg",  // Replace with your desired icon path
-          });
-      }
-
-      // Function to show a custom notification on the page
-      function showCustomNotification() {
-          const notification = document.createElement("div");
-          notification.className = "notification";
-          notification.innerHTML = "Welcome to UPSC Hub! Explore the latest courses and updates.";
-          const closeButton = document.createElement("span");
-          closeButton.className = "close-btn";
-          closeButton.innerHTML = "&times;";
-          closeButton.onclick = function () {
-              notification.style.display = "none";  // Close the notification
-          };
-          notification.appendChild(closeButton);
-          document.body.appendChild(notification);
-
-          // Automatically hide notification after 5 seconds
-          setTimeout(() => {
-              notification.style.display = "none";
-          }, 5000);
-      }
    </script>
 
 <header class="header">
