@@ -1,2 +1,24 @@
-<button id="notify-button">Show Notification</button>
-<script src="notificationscript.js"></script>
+<script>
+        document.addEventListener("DOMContentLoaded", () => {
+            if ("Notification" in window) {
+                if (Notification.permission === "default") {
+                    Notification.requestPermission().then(permission => {
+                        if (permission === "granted") {
+                            sendNotification();
+                        }
+                    });
+                } else if (Notification.permission === "granted") {
+                    sendNotification();
+                }
+            } else {
+                console.log("Notifications are not supported in this browser.");
+            }
+        });
+
+        function sendNotification() {
+            new Notification("Welcome Back!", {
+                body: "Thanks for visiting our website again!",
+                icon: "path-to-icon.png", // Replace with your icon URL
+            });
+        }
+    </script>
