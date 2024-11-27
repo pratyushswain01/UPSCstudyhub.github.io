@@ -12,13 +12,97 @@
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
+   <style>
+      /* Notification CSS */
+      .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background-color: #4CAF50;
+          color: white;
+          border-radius: 5px;
+          padding: 15px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          opacity: 0;
+          animation: slideIn 1s forwards;
+          z-index: 9999;
+      }
+
+      @keyframes slideIn {
+          from {
+              top: -50px;
+              opacity: 0;
+          }
+          to {
+              top: 20px;
+              opacity: 1;
+          }
+      }
+
+      .notification .close-btn {
+          margin-left: 15px;
+          font-size: 18px;
+          color: white;
+          cursor: pointer;
+      }
+   </style>
+
+   <script>
+      // JavaScript to request notification permission and send a notification on page load
+      document.addEventListener("DOMContentLoaded", () => {
+          // Check if Notification API is available
+          if ("Notification" in window) {
+              // Request notification permission if not already granted
+              if (Notification.permission === "default") {
+                  Notification.requestPermission().then(permission => {
+                      if (permission === "granted") {
+                          sendNotification();  // Send notification if permission is granted
+                      }
+                  });
+              } else if (Notification.permission === "granted") {
+                  sendNotification();  // Send notification if already granted
+              }
+          } else {
+              console.log("Notifications are not supported in this browser.");
+          }
+      });
+
+      // Function to send the notification
+      function sendNotification() {
+          new Notification("Welcome to UPSC Hub!", {
+              body: "Explore the latest courses and updates for UPSC preparation.",
+              icon: "images/LOGO.jpg",  // Replace with your desired icon path
+          });
+
+          // Display a custom styled notification on the webpage
+          showNotification();
+      }
+
+      // Function to show a custom notification on the page
+      function showNotification() {
+          const notification = document.createElement("div");
+          notification.className = "notification";
+          notification.innerHTML = "Welcome to UPSC Hub! Explore the latest courses and updates.";
+          const closeButton = document.createElement("span");
+          closeButton.className = "close-btn";
+          closeButton.innerHTML = "&times;";
+          closeButton.onclick = function () {
+              notification.style.display = "none";
+          };
+          notification.appendChild(closeButton);
+          document.body.appendChild(notification);
+
+          // Automatically hide notification after 5 seconds
+          setTimeout(() => {
+              notification.style.display = "none";
+          }, 5000);
+      }
+   </script>
 </head>
 <body>
 
 <header class="header">
-   
    <section class="flex">
-
       <a href="index.html" class="logo">UPSC hub</a>
 
       <form action="search.html" method="post" class="search-form">
@@ -37,16 +121,11 @@
          <img src="images/LOGO.jpg" class="image" alt="">
          <h3 class="name">UPSC hub</h3>
          <p class="role">ADMIN & HOST</p>
-        
-         </div>
       </div>
-
    </section>
-
-</header>   
+</header>
 
 <div class="side-bar">
-
    <div id="close-btn">
       <i class="fas fa-times"></i>
    </div>
@@ -55,7 +134,6 @@
       <img src="images/LOGO.jpg" class="image" alt="">
       <h3 class="name">UPSC hub</h3>
       <p class="role">ADMIN & HOST</p>
-   
    </div>
 
    <nav class="navbar">
@@ -65,50 +143,40 @@
       <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
       <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
    </nav>
-
 </div>
-   
-   
-   
-   
+
 <section class="home-grid">
-
-
-          
    <h1 class="heading">quick options</h1>
 
    <div class="box-container">
-
-      
-
       <div class="box">
          <h3 class="title">UPSC</h3>
          <p class="likes">PRELIMS : </p>
          <a href="syllabus.html" class="inline-btn">view syllabus</a>
-         <p class="likes">MAINS : <span></span></p>
+         <p class="likes">MAINS : </p>
          <a href="syllabus.html" class="inline-btn">view syllabus</a>
       </div>
 
       <div class="box">
-         <h3 class="title"> Focus Timer</h3>
-         <p class="likes"> Track your consistency & Sterk : </p>
-         <a href="focustimer.html" class="inline-btn"> Ready to FOCUS...</a>
-      </div>
-
-       <div class="box">
-         <h3 class="title"> Today's News Update</h3>
-         <p class="likes"> Top news : daily : </p>
-         <a href="newsupdate.html" class="inline-btn"> view...</a>
+         <h3 class="title">Focus Timer</h3>
+         <p class="likes">Track your consistency & Sterk : </p>
+         <a href="focustimer.html" class="inline-btn">Ready to FOCUS...</a>
       </div>
 
       <div class="box">
-         <h3 class="title"> NEWS-Paper </h3>
-         <p class="likes">  daily  </p>
-         <a href="newspaper.html" class="inline-btn"> read news...</a>
+         <h3 class="title">Today's News Update</h3>
+         <p class="likes">Top news : daily : </p>
+         <a href="newsupdate.html" class="inline-btn">view...</a>
       </div>
 
       <div class="box">
-         <h3 class="title">top categories</h3>
+         <h3 class="title">NEWS-Paper</h3>
+         <p class="likes">daily</p>
+         <a href="newspaper.html" class="inline-btn">read news...</a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Top Categories</h3>
          <div class="flex">
             <a href="#"><i class=""></i><span>Geography</span></a>
             <a href="#"><i class=""></i><span>Polity</span></a>
@@ -116,68 +184,45 @@
             <a href="#"><i class=""></i><span>Mapping</span></a>
             <a href="#"><i class=""></i><span>Science & tech</span></a>
             <a href="#"><i class=""></i><span>General studies</span></a>
-            <a href="#"><i class=""></i><span></span></a>
-            <a href="#"><i class=""></i><span></span></a>
          </div>
       </div>
 
       <div class="box">
-         <h3 class="title">popular topics</h3>
+         <h3 class="title">Popular Topics</h3>
          <div class="flex">
             <a href="#"><i class=""></i><span>Current affairs</span></a>
             <a href="#"><i class=""></i><span>Articles</span></a>
             <a href="#"><i class=""></i><span>Editorials</span></a>
             <a href="#"><i class=""></i><span>Newspaper analysis</span></a>
-            <a href="#"><i class=""></i><span></span></a>
-            <a href="#"><i class=""></i><span></span></a>
          </div>
       </div>
 
       <div class="box">
-         <h3 class="title">UPLOAD WRITTEN FILES</h3>
-         <p class="tutor">UPSC mains is fully based on writing skil , so lets practice daily....</p>
+         <h3 class="title">Upload Written Files</h3>
+         <p class="tutor">UPSC mains is fully based on writing skills, so let's practice daily....</p>
          <a href="drive.doc.html" class="inline-btn">upload doc</a>
       </div>
 
-   
- 
       <div class="box">
-         <h3 class="title">MOCK TEST SERIES</h3>
-         <P class="tutor">Let's test our brain....!!!</P>
+         <h3 class="title">Mock Test Series</h3>
+         <p class="tutor">Let's test our brain....!!!</p>
          <a href="test.html" class="inline-btn">go to test</a>
-
       </div>
 
       <div class="box">
-         <h3 class="title">Test result and analysis</h3>
-         <p class="tutor">best analysis give best result..</p>
-         <a href="testinfo.html"  class="inline-btn">View report</a>
-         
+         <h3 class="title">Test Result and Analysis</h3>
+         <p class="tutor">Best analysis gives the best result..</p>
+         <a href="testinfo.html" class="inline-btn">View report</a>
       </div>
-
-      
-   </div>   
+   </div>
 </section>
-
-
-
-
-
-</section>
-
-
-
-
 
 <footer class="footer">
-
-   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved! (owner)
-
+   &copy; copyright @ 2024 by <span>Pratyush Swain</span> | all rights reserved! (owner)
 </footer>
 
 <!-- custom js file link  -->
 <script src="js/script.js"></script>
 
-   
 </body>
-</html> 
+</html>
