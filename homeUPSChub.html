@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +16,123 @@
 
 </head>
 <body>
+
+   <style>
+      /* Notification CSS */
+      .notification {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background-color: #4CAF50;
+          color: white;
+          border-radius: 5px;
+          padding: 15px;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          opacity: 0;
+          animation: slideIn 1s forwards;
+          z-index: 9999;
+      }
+
+      @keyframes slideIn {
+          from {
+              top: -50px;
+              opacity: 0;
+          }
+          to {
+              top: 20px;
+              opacity: 1;
+          }
+      }
+
+      .notification .close-btn {
+          margin-left: 15px;
+          font-size: 18px;
+          color: white;
+          cursor: pointer;
+      }
+
+      /* Centered Pop-up Box Styles */
+      .popup-box {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background-color: #fff;
+          padding: 30px;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          border-radius: 10px;
+          width: 80%;
+          max-width: 400px;
+          display: none;
+          z-index: 10000;
+      }
+
+      .popup-box .popup-header {
+          font-size: 18px;
+          font-weight: bold;
+          color: #333;
+      }
+
+      .popup-box .popup-message {
+          font-size: 16px;
+          margin: 15px 0;
+          color: #555;
+          padding: 10px;
+      }
+
+      .popup-box .popup-close {
+          display: inline-block;
+          background-color: #f44336;
+          color: white;
+          padding: 10px;
+          border-radius: 5px;
+          cursor: pointer;
+          text-align: center;
+          width: 100%;
+      }
+
+      .popup-box .popup-close:hover {
+          background-color: #d32f2f;
+      }
+   </style>
+
+   <script>
+      // Function to show the center popup
+      function showPopup() {
+          const popup = document.querySelector('.popup-box');
+          popup.style.display = 'block'; // Show the popup
+      }
+
+      // Function to close the center popup
+      function closePopup() {
+          const popup = document.querySelector('.popup-box');
+          popup.style.display = 'none'; // Hide the popup
+      }
+
+      // Show the pop-up when the page is loaded
+      document.addEventListener("DOMContentLoaded", function() {
+          showPopup();
+
+          // Show browser notification
+          if ("Notification" in window) {
+              if (Notification.permission === "default") {
+                  Notification.requestPermission().then(permission => {
+                      if (permission === "granted") {
+                          new Notification("Hello and Welcome to UPSC Hub!", {
+                              body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!",
+                              icon: "images/images/LOGO.jpg"
+                          });
+                      }
+                  });
+              } else if (Notification.permission === "granted") {
+                  new Notification("Welcome to UPSC Hub!", {
+                      body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!.",
+                      icon: "images/LOGO.jpg"
+                  });
+              }
+          }
+      });
+   </script>
 
 <header class="header">
    
@@ -155,6 +274,8 @@
          
       </div>
 
+      
+
    </div>   
 </section>
 
@@ -171,7 +292,15 @@
 
 
 
+<div class="popup-box">
+   <div class="popup-header">Welcome to UPSC Hub!</div>
+   <div class="popup-message">Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. 
+      
+      <h3>✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!</h3>
 
+   </div>
+   <div class="popup-close" onclick="closePopup()">Close</div>
+</div>
 
 
 
