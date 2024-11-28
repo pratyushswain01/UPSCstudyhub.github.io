@@ -20,13 +20,12 @@
 
         <!-- Google Form Embed -->
         <div id="google-form-container">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBEdgbKDGmVM4M3Ep3sPgIZaFDabWZPwr7rDEGYxPKxywoZw/viewform?embedded=true" 
+            <iframe id="google-form" 
+                    src="https://docs.google.com/forms/d/e/1FAIpQLSfD5kPmhzQLV7F_JxY-kfiDj6lb1yxrDJri8XfBvnfwWAlACw/viewform?usp=sf_link" 
                     width="100%" height="100%" frameborder="0">
             </iframe>
         </div>
 
-
-        
         <div id="offline-warning">You are offline. Please reconnect to the internet before submitting.</div>
         <button id="submit-btn" onclick="submitTest()">Submit Test</button>
     </div>
@@ -35,6 +34,17 @@
         let timer;
         let timeLeft = 10 * 60; // 10 minutes timer (in seconds)
         let isOnline = navigator.onLine;
+        let examStarted = false;
+
+        // Function to detect if Airplane Mode is on
+        function checkAirplaneMode() {
+            // Simulate Airplane Mode by checking for an offline connection (no network)
+            if (!navigator.onLine && !examStarted) {
+                alert("Please turn on Airplane Mode to start the exam.");
+                return false; // Exam cannot start unless Airplane Mode is enabled
+            }
+            return true; // Exam can start
+        }
 
         // Show or hide the offline warning based on internet connectivity
         function updateInternetStatus() {
@@ -58,7 +68,7 @@
                 if (timeLeft <= 0) {
                     clearInterval(timer);
                     alert("Time is up!");
-                    submitTest();
+                    autoSubmitTest(); // Auto-submit the test when time is up
                 }
                 timeLeft--;
             }, 1000);
@@ -68,22 +78,37 @@
             return time < 10 ? "0" + time : time;
         }
 
+        // Function to auto-submit the test when time runs out
+        function autoSubmitTest() {
+            if (!isOnline) {
+                alert("You need to turn on the internet to submit the test.");
+                return;
+            }
+            alert("Test submitted automatically.");
+            submitTest();
+        }
+
+        // Function to manually submit the test when the user clicks submit button
         function submitTest() {
             if (!isOnline) {
                 alert("Please reconnect to the internet before submitting.");
                 return;
             }
-            // Simulate form submission, you can enhance this by integrating with your backend or Google Sheets
             alert("Test submitted successfully!");
+            // Simulate form submission or integration with Google Sheets backend
         }
 
         // Detect changes in internet connection
         window.addEventListener("online", updateInternetStatus);
         window.addEventListener("offline", updateInternetStatus);
 
-        // Initialize
-        updateInternetStatus();
-        startTimer();
+        // Initialize the process
+        if (checkAirplaneMode()) {
+            examStarted = true;
+            startTimer(); // Start the exam timer when Airplane Mode is confirmed
+        }
+
+        updateInternetStatus(); // Initialize the internet status
     </script>
 </body>
 </html>
