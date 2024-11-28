@@ -110,6 +110,28 @@
             font-size: 14px;
             margin-top: 10px;
         }
+
+        #response-sheet {
+            display: none;
+            padding: 20px;
+        }
+
+        .response-sheet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .response-sheet-table th, .response-sheet-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .response-sheet-table th {
+            background-color: #007bff;
+            color: #fff;
+        }
     </style>
 </head>
 <body>
@@ -160,6 +182,19 @@
                 <button id="review-btn">Review Flagged Questions</button>
                 <button id="submit-btn">Submit</button>
             </div>
+            <div id="response-sheet" class="hidden">
+                <h2>Response Sheet</h2>
+                <table class="response-sheet-table">
+                    <thead>
+                        <tr>
+                            <th>Question</th>
+                            <th>Your Response</th>
+                            <th>Correct Answer</th>
+                        </tr>
+                    </thead>
+                    <tbody id="response-body"></tbody>
+                </table>
+            </div>
         </main>
         <footer class="test-footer">
             <p>National Testing Agency - Mock Test</p>
@@ -174,10 +209,20 @@
             const instructions = document.querySelector(".instructions");
             const networkStatus = document.getElementById("network-status");
             const timerDisplay = document.getElementById("timer");
+            const responseSheet = document.getElementById("response-sheet");
+            const responseBody = document.getElementById("response-body");
 
             let testActive = false;
             let flaggedQuestions = new Set();
             let countdown;
+            let userResponses = {};
+
+            // Correct answers for comparison
+            const answerKey = {
+                q1: "1",  // cos(x)
+                q2: ["1", "3"], // 2 and 5 are primes
+                q3: "7"  // 3 + 4 = 7
+            };
 
             // Timer setup
             const setTimer = (duration) => {
@@ -218,6 +263,27 @@
                 }
             });
 
+            // Capture user answers
+            document.querySelectorAll(".question").forEach((question) => {
+                question.addEventListener("change", (e) => {
+                    const questionId = question.dataset.questionId;
+                    const userAnswer = e.target.value;
+                    if (e.target.type === "radio" || e.target.type === "checkbox") {
+                        if (!userResponses[questionId]) {
+                            userResponses[questionId] = [];
+                        }
+                        if (e.target.checked) {
+                            userResponses[questionId].push(userAnswer);
+                        } else {
+                            const index = userResponses[questionId].indexOf(userAnswer);
+                            if (index !== -1) userResponses[questionId].splice(index, 1);
+                        }
+                    } else {
+                        userResponses[questionId] = userAnswer;
+                    }
+                });
+            });
+
             // Flagging questions for review
             document.querySelectorAll(".flag-btn").forEach((button) => {
                 button.addEventListener("click", (e) => {
@@ -247,7 +313,26 @@
                 clearInterval(countdown);
                 testSection.classList.add("hidden");
                 instructions.classList.remove("hidden");
-                alert("Test submitted successfully!");
+
+                // Show Response Sheet
+                responseSheet.classList.remove("hidden");
+
+                // Generate response sheet
+                Object.keys(answerKey).forEach((questionId) => {
+                    const userAnswer = userResponses[questionId];
+                    const correctAnswer = answerKey[questionId];
+                    const userResponseText = Array.isArray(userAnswer) ? userAnswer.join(", ") : userAnswer;
+
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>Question ${questionId}</td>
+                        <td>${userResponseText}</td>
+                        <td>${Array.isArray(correctAnswer) ? correctAnswer.join(", ") : correctAnswer}</td>
+                    `;
+                    responseBody.appendChild(row);
+                });
+
+                alert("Test submitted successfully! Please review your response sheet.");
             };
 
             submitButton.addEventListener("click", submitTest);
