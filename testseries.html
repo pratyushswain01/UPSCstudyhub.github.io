@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mock Test - Airplane Mode</title>
+  <title>Mock Test with Airplane Mode</title>
   <style>
-    /* Global Styles */
+    /* General Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -13,115 +13,46 @@
       background-color: #f4f4f9;
     }
 
-    /* Pre-Test Airplane Mode Check */
-    #pre-test-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      background-color: #003366;
-      color: white;
-      text-align: center;
-    }
-
-    #pre-test-container h1 {
-      font-size: 32px;
-      margin-bottom: 20px;
-    }
-
-    #pre-test-container button {
-      padding: 15px 20px;
-      font-size: 16px;
-      background-color: #007bff;
-      border: none;
-      border-radius: 5px;
-      color: white;
-      cursor: pointer;
-    }
-
-    #pre-test-container button:hover {
-      background-color: #0056b3;
-    }
-
-    /* Mock Test Interface */
-    #app {
-      display: none;
-      flex-direction: column;
-      height: 100vh;
-    }
-
-    #header {
+    #header, #footer {
       background-color: #003366;
       color: white;
       padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      text-align: center;
     }
 
     #header h1 {
+      margin: 0;
       font-size: 24px;
     }
 
-    #header #timer-container {
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    #main {
-      flex: 1;
-      display: flex;
-    }
-
-    #question-section {
-      flex: 3;
+    #main, #review-section, #result-section, #airplane-check {
       padding: 20px;
-      background-color: white;
-      border-right: 2px solid #ddd;
     }
 
-    #question-number {
-      font-size: 18px;
-      margin-bottom: 10px;
-      color: #003366;
+    #main, #review-section, #result-section {
+      display: none;
     }
 
-    #question-text {
-      margin-bottom: 20px;
-      font-size: 16px;
+    /* Buttons */
+    button {
+      padding: 10px 15px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
     }
 
-    #options {
-      list-style: none;
-      padding: 0;
+    button:hover {
+      background-color: #0056b3;
     }
 
-    #options li {
-      margin-bottom: 10px;
-    }
-
-    #options input[type="radio"] {
-      margin-right: 10px;
-    }
-
-    #sidebar {
-      flex: 1;
-      background-color: #f7f7f7;
-      padding: 20px;
-      border-left: 2px solid #ddd;
-    }
-
-    #sidebar h2 {
-      font-size: 18px;
-      color: #003366;
-      margin-bottom: 15px;
-    }
-
+    /* Navigation Grid */
     #navigation-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
+      margin: 20px 0;
     }
 
     #navigation-grid button {
@@ -139,7 +70,7 @@
       color: white;
     }
 
-    .unanswered {
+    .not-answered {
       background-color: #dc3545;
       color: white;
     }
@@ -151,97 +82,88 @@
 
     .not-visited {
       background-color: #ddd;
+      color: black;
     }
 
-    #footer {
-      background-color: #f1f1f1;
-      padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-top: 2px solid #ddd;
-    }
-
-    button {
-      padding: 10px 15px;
-      background-color: #007bff;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
+    .hidden {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <!-- Pre-Test Airplane Mode Check -->
-  <div id="pre-test-container">
-    <h1>Airplane Mode is Required</h1>
-    <p>Please enable airplane mode on your device and disconnect from the internet to start the exam.</p>
+  <!-- Airplane Mode Check -->
+  <div id="airplane-check">
+    <h1>Enable Airplane Mode</h1>
+    <p>To start the exam, please enable airplane mode on your device and disconnect from the internet.</p>
     <button id="check-status-btn">Check Again</button>
   </div>
 
-  <!-- Mock Test Interface -->
-  <div id="app">
-    <div id="header">
-      <h1>Mock Test</h1>
-      <div id="timer-container">Time Remaining: <span id="timer">10:00</span></div>
+  <!-- Header -->
+  <div id="header" class="hidden">
+    <h1>Mock Test</h1>
+  </div>
+
+  <!-- Main Test Interface -->
+  <div id="main">
+    <div id="question-section">
+      <h2 id="question-number">Question 1</h2>
+      <p id="question-text">What is the capital of India?</p>
+      <ul id="options"></ul>
     </div>
 
-    <div id="main">
-      <div id="question-section">
-        <h2 id="question-number">Question 1</h2>
-        <p id="question-text">What is the capital of India?</p>
-        <ul id="options"></ul>
-      </div>
+    <div id="navigation-grid"></div>
+    <button id="mark-review">Mark for Review</button>
+    <button id="next">Next</button>
+    <button id="end-test">End Test</button>
+  </div>
 
-      <div id="sidebar">
-        <h2>Navigation</h2>
-        <div id="navigation-grid"></div>
-      </div>
-    </div>
+  <!-- Review Section -->
+  <div id="review-section" class="hidden">
+    <h2>Review Your Answers</h2>
+    <div id="review-grid"></div>
+    <button id="submit-test">Submit Test</button>
+  </div>
 
-    <div id="footer">
-      <button id="mark-review">Mark for Review</button>
-      <div>
-        <button id="prev">Previous</button>
-        <button id="next">Next</button>
-      </div>
-      <button id="submit">Submit</button>
-    </div>
+  <!-- Result Section -->
+  <div id="result-section" class="hidden">
+    <h2>Test Results</h2>
+    <p id="result-text"></p>
+    <button onclick="location.reload()">Restart Test</button>
   </div>
 
   <script>
-    // Airplane Mode Check
-    function checkAirplaneMode() {
-      if (navigator.onLine) {
-        alert("Your device is still connected to the internet. Please enable airplane mode and try again.");
-      } else {
-        document.getElementById("pre-test-container").style.display = "none";
-        document.getElementById("app").style.display = "flex";
-        startExam();
-      }
-    }
-
-    document.getElementById("check-status-btn").addEventListener("click", checkAirplaneMode);
-
-    // Mock Test Functionality
     const questions = [
       { question: "What is the capital of India?", options: ["Delhi", "Mumbai", "Kolkata", "Chennai"], answer: 0 },
       { question: "Who wrote the national anthem of India?", options: ["Mahatma Gandhi", "Rabindranath Tagore", "Subhash Chandra Bose", "Sarojini Naidu"], answer: 1 },
-      { question: "What is the largest planet in our Solar System?", options: ["Earth", "Mars", "Jupiter", "Saturn"], answer: 2 },
+      { question: "What is the largest planet in our Solar System?", options: ["Earth", "Mars", "Jupiter", "Saturn"], answer: 2 }
     ];
 
     let currentQuestionIndex = 0;
     let userAnswers = Array(questions.length).fill(null);
     let reviewQuestions = new Set();
-    const totalTimeInMinutes = 10;
-    let remainingTimeInSeconds = totalTimeInMinutes * 60;
+    const totalQuestions = questions.length;
 
-    function renderQuestion() {
+    const checkAirplaneMode = () => {
+      if (navigator.onLine) {
+        alert("Please enable airplane mode and disconnect from the internet.");
+      } else {
+        document.getElementById("airplane-check").classList.add("hidden");
+        document.getElementById("header").classList.remove("hidden");
+        document.getElementById("main").style.display = "block";
+        monitorConnection();
+        renderQuestion();
+        updateNavigationGrid();
+      }
+    };
+
+    const monitorConnection = () => {
+      window.addEventListener("online", () => {
+        alert("Internet connection detected. The exam has been automatically submitted.");
+        submitTest();
+      });
+    };
+
+    const renderQuestion = () => {
       const question = questions[currentQuestionIndex];
       document.getElementById("question-number").innerText = `Question ${currentQuestionIndex + 1}`;
       document.getElementById("question-text").innerText = question.question;
@@ -255,54 +177,78 @@
           userAnswers[currentQuestionIndex] === index ? "checked" : ""
         }>
           <label for="option-${index}">${option}</label>`;
-        li.onclick = () => (userAnswers[currentQuestionIndex] = index);
+        li.onclick = () => {
+          userAnswers[currentQuestionIndex] = index;
+          updateNavigationGrid();
+        };
         optionsContainer.appendChild(li);
       });
-    }
+    };
 
-    function startExam() {
-      renderQuestion();
-      updateNavigationGrid();
-      setInterval(updateTimer, 1000);
-    }
-
-    function updateNavigationGrid() {
+    const updateNavigationGrid = () => {
       const grid = document.getElementById("navigation-grid");
       grid.innerHTML = "";
       questions.forEach((_, i) => {
         const btn = document.createElement("button");
         btn.innerText = i + 1;
-        btn.className = userAnswers[i] !== null ? "answered" : "not-visited";
+        if (reviewQuestions.has(i)) btn.className = "review";
+        else if (userAnswers[i] !== null) btn.className = "answered";
+        else btn.className = "not-answered";
         btn.onclick = () => {
           currentQuestionIndex = i;
           renderQuestion();
         };
         grid.appendChild(btn);
       });
-    }
-
-    function updateTimer() {
-      const timer = document.getElementById("timer");
-      const minutes = Math.floor(remainingTimeInSeconds / 60);
-      const seconds = remainingTimeInSeconds % 60;
-      timer.innerText = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-      remainingTimeInSeconds--;
-      if (remainingTimeInSeconds < 0) alert("Time's up!");
-    }
-
-    document.getElementById("next").onclick = () => {
-      currentQuestionIndex = Math.min(currentQuestionIndex + 1, questions.length - 1);
-      renderQuestion();
     };
-    document.getElementById("prev").onclick = () => {
-      currentQuestionIndex = Math.max(currentQuestionIndex - 1, 0);
-      renderQuestion();
+
+    const showReviewSection = () => {
+      document.getElementById("main").classList.add("hidden");
+      document.getElementById("review-section").classList.remove("hidden");
+      renderReviewGrid();
     };
+
+    const renderReviewGrid = () => {
+      const grid = document.getElementById("review-grid");
+      grid.innerHTML = "";
+      questions.forEach((_, i) => {
+        const div = document.createElement("div");
+        div.style.marginBottom = "10px";
+        div.innerHTML = `
+          Question ${i + 1}: ${
+          userAnswers[i] !== null
+            ? reviewQuestions.has(i)
+              ? "<span style='color:orange'>Marked for Review</span>"
+              : "<span style='color:green'>Answered</span>"
+            : "<span style='color:red'>Not Answered</span>"
+        }`;
+        grid.appendChild(div);
+      });
+    };
+
+    const submitTest = () => {
+      document.getElementById("review-section").classList.add("hidden");
+      document.getElementById("result-section").classList.remove("hidden");
+
+      let score = 0;
+      questions.forEach((q, i) => {
+        if (userAnswers[i] === q.answer) score++;
+      });
+
+      document.getElementById("result-text").innerText = `You scored ${score} out of ${totalQuestions}.`;
+    };
+
+    document.getElementById("check-status-btn").onclick = checkAirplaneMode;
     document.getElementById("mark-review").onclick = () => {
       reviewQuestions.add(currentQuestionIndex);
       updateNavigationGrid();
     };
-    document.getElementById("submit").onclick = () => alert("Test Submitted!");
+    document.getElementById("next").onclick = () => {
+      currentQuestionIndex = Math.min(currentQuestionIndex + 1, totalQuestions - 1);
+      renderQuestion();
+    };
+    document.getElementById("end-test").onclick = showReviewSection;
+    document.getElementById("submit-test").onclick = submitTest;
   </script>
 </body>
 </html>
