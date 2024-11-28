@@ -3,196 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPSChub Mock Test</title>
+    <title>UPSChub Test</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-        }
-
-        .test-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .test-header {
-            background: #0056b3;
-            color: #fff;
-            padding: 20px;
-            text-align: center;
-        }
-
-        .header-right {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 10px;
-            font-size: 14px;
-        }
-
-        .timer {
-            font-weight: bold;
-            font-size: 18px;
-            color: #ff0000;
-        }
-
-        .test-main {
-            padding: 20px;
-        }
-
-        .instructions {
-            text-align: center;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        #review-btn {
-            background-color: #17a2b8;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-
-        #review-btn:hover {
-            background-color: #138496;
-        }
-
-        #submit-btn {
-            background-color: #28a745;
-            color: #fff;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        #submit-btn:hover {
-            background-color: #218838;
-        }
-
-        .status {
-            text-align: center;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .instructions {
-            margin-bottom: 20px;
-        }
-
-        iframe {
-            width: 100%;
-            height: 500px;
-            border: none;
-        }
+        #test-container { max-width: 800px; margin: 0 auto; }
+        #timer { font-size: 2em; margin-bottom: 20px; }
+        #submit-btn { display: none; }
+        #offline-warning { color: red; font-weight: bold; }
+        #google-form-container { width: 100%; height: 600px; }
     </style>
 </head>
 <body>
-    <div class="test-container">
-        <header class="test-header">
-            <h1>UPSChub Mock Test</h1>
-            <div class="header-right">
-                <span id="timer">Time Left: 00:00:00</span>
-                <div id="network-status" class="status">Offline Mode: Enabled</div>
-            </div>
-        </header>
-        <main class="test-main">
-            <div class="instructions">
-                <h2>Instructions</h2>
-                <p>
-                    Please ensure you are in airplane mode before starting the test. 
-                    If network connectivity is detected, your test will be auto-submitted.
-                </p>
-                <button id="start-btn">Start Test</button>
-            </div>
-            <div id="test-section" class="hidden">
-                <h2>Test</h2>
-                <!-- Embed your UPSChub's Google Form here -->
-                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBEdgbKDGmVM4M3Ep3sPgIZaFDabWZPwr7rDEGYxPKxywoZw/viewform?embedded=true" width="640" height="4513" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+    <div id="test-container">
+        <h1>UPSChub Test</h1>
+        <div id="timer">Timer: 00:00</div>
+        <p>Test Instructions: Answer the questions below. You cannot submit until you're online.</p>
 
-                <button id="submit-btn">Submit Test</button>
-            </div>
+        <!-- Google Form Embed -->
+        <div id="google-form-container">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLScBEdgbKDGmVM4M3Ep3sPgIZaFDabWZPwr7rDEGYxPKxywoZw/viewform?embedded=true" 
+                    width="100%" height="100%" frameborder="0">
+            </iframe>
+        </div>
 
-            <div id="prompt-section" class="hidden">
-                <h2>Test Submission</h2>
-                <p>Please enable your internet connection to submit the test.</p>
-                <button id="enable-internet-btn">Enable Internet</button>
-            </div>
-        </main>
-        <footer class="test-footer">
-            <p>UPSChub - Your Guide to UPSC Success</p>
-        </footer>
+
+        
+        <div id="offline-warning">You are offline. Please reconnect to the internet before submitting.</div>
+        <button id="submit-btn" onclick="submitTest()">Submit Test</button>
     </div>
 
     <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const startButton = document.getElementById("start-btn");
-            const submitButton = document.getElementById("submit-btn");
-            const promptSection = document.getElementById("prompt-section");
-            const googleFormIframe = document.getElementById("google-form-iframe");
-            const networkStatus = document.getElementById("network-status");
+        let timer;
+        let timeLeft = 10 * 60; // 10 minutes timer (in seconds)
+        let isOnline = navigator.onLine;
 
-            let testActive = false;
+        // Show or hide the offline warning based on internet connectivity
+        function updateInternetStatus() {
+            if (navigator.onLine) {
+                document.getElementById("offline-warning").style.display = "none";
+                document.getElementById("submit-btn").style.display = "block"; // Show the submit button if online
+                isOnline = true;
+            } else {
+                document.getElementById("offline-warning").style.display = "block";
+                document.getElementById("submit-btn").style.display = "none"; // Hide submit if offline
+                isOnline = false;
+            }
+        }
 
-            // Function to detect if the user is in airplane mode (offline)
-            const checkNetworkStatus = () => {
-                if (navigator.onLine) {
-                    networkStatus.textContent = "Online Mode: Enabled";
-                    promptSection.classList.add("hidden");
-                    googleFormIframe.classList.remove("hidden");
-                } else {
-                    networkStatus.textContent = "Offline Mode: Enabled";
-                    googleFormIframe.classList.add("hidden");
-                    promptSection.classList.remove("hidden");
+        // Countdown timer logic
+        function startTimer() {
+            timer = setInterval(function() {
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                document.getElementById("timer").textContent = `Timer: ${formatTime(minutes)}:${formatTime(seconds)}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    alert("Time is up!");
+                    submitTest();
                 }
-            };
+                timeLeft--;
+            }, 1000);
+        }
 
-            // Start Test
-            startButton.addEventListener("click", () => {
-                if (!navigator.onLine) {
-                    alert("You are currently in offline mode. Test will start now.");
-                    testActive = true;
-                    checkNetworkStatus();
-                } else {
-                    alert("Please ensure you are in Airplane Mode before starting the test.");
-                }
-            });
+        function formatTime(time) {
+            return time < 10 ? "0" + time : time;
+        }
 
-            // Handle submission and check for network status
-            submitButton.addEventListener("click", () => {
-                if (!navigator.onLine) {
-                    alert("Please enable your internet connection to submit the test.");
-                    promptSection.classList.remove("hidden");
-                } else {
-                    alert("Submitting the test now...");
-                    window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLScBEdgbKDGmVM4M3Ep3sPgIZaFDabWZPwr7rDEGYxPKxywoZw/viewform?usp=sf_link/viewform";
-                }
-            });
+        function submitTest() {
+            if (!isOnline) {
+                alert("Please reconnect to the internet before submitting.");
+                return;
+            }
+            // Simulate form submission, you can enhance this by integrating with your backend or Google Sheets
+            alert("Test submitted successfully!");
+        }
 
-            // Action when the user chooses to enable the internet
-            document.getElementById("enable-internet-btn").addEventListener("click", () => {
-                if (navigator.onLine) {
-                    alert("Internet is now enabled. Submitting the test.");
-                    window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLScBEdgbKDGmVM4M3Ep3sPgIZaFDabWZPwr7rDEGYxPKxywoZw/viewform?usp=sf_link";
-                } else {
-                    alert("Please ensure your internet is enabled.");
-                }
-            });
+        // Detect changes in internet connection
+        window.addEventListener("online", updateInternetStatus);
+        window.addEventListener("offline", updateInternetStatus);
 
-            // Monitor network status and update accordingly
-            setInterval(checkNetworkStatus, 2000);
-        });
+        // Initialize
+        updateInternetStatus();
+        startTimer();
     </script>
 </body>
 </html>
