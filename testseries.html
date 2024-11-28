@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mock Test with Airplane Mode</title>
+  <title> Secure Mock Test l UPSChub Interface </title>
   <style>
-    /* General Styles */
+    /* General Page Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
@@ -16,25 +16,26 @@
       height: 100vh;
     }
 
-    #header, #footer {
+    #header {
       background-color: #003366;
       color: white;
-      padding: 10px 20px;
       text-align: center;
+      padding: 10px;
     }
 
     #header h1 {
       margin: 0;
-      font-size: 24px;
     }
 
-    #main, #review-section, #result-section, #airplane-check {
-      flex: 1;
-      padding: 20px;
+    #main, #review-section, #airplane-check, #result-section {
       display: none;
+      flex: 1;
+      flex-direction: column;
+      padding: 20px;
       overflow-y: auto;
     }
 
+    /* Question Box */
     #question-box {
       background: white;
       border: 1px solid #ddd;
@@ -49,6 +50,7 @@
       color: #003366;
     }
 
+    /* Options Styling */
     #options {
       list-style: none;
       padding: 0;
@@ -62,41 +64,21 @@
       margin-right: 10px;
     }
 
-    #buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 20px;
-    }
-
-    button {
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    .primary {
-      background-color: #007bff;
-      color: white;
-    }
-
-    .danger {
-      background-color: #dc3545;
-      color: white;
-    }
-
     /* Navigation Toggle */
     #navigation-toggle {
-      display: block;
-      margin: 10px 0;
+      margin: 20px 0;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
     }
 
     #navigation-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
-      margin-top: 10px;
       display: none;
     }
 
@@ -107,7 +89,6 @@
       border-radius: 5px;
       font-weight: bold;
       cursor: pointer;
-      transition: all 0.3s ease;
     }
 
     .answered {
@@ -125,27 +106,53 @@
       color: black;
     }
 
-    .not-visited {
-      background-color: #ddd;
-      color: black;
+    /* Button Styles */
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .primary {
+      background-color: #007bff;
+      color: white;
+    }
+
+    .danger {
+      background-color: #dc3545;
+      color: white;
     }
   </style>
 </head>
 <body>
   <!-- Airplane Mode Check -->
   <div id="airplane-check">
-    <h1>Enable Aeroplane Mode</h1>
+    <h1>Enable Airplane Mode</h1>
     <p>To start the exam, please enable aeroplane mode on your device and disconnect from the internet.</p>
     <button id="check-status-btn">Check Again</button>
   </div>
 
   <!-- Header -->
-  <div id="header" class="hidden">
+  <div id="header">
     <h1>Mock Test</h1>
   </div>
 
-  <!-- Main Test Interface -->
+  <!-- Main Test Section -->
   <div id="main">
+    <div id="question-box">
+      <h2 id="question-number">Question 1</h2>
+      <p id="question-text">What is the capital of India?</p>
+      <ul id="options"></ul>
+    </div>
+
+    <div id="question-box">
+      <h2 id="question-number">Question 1</h2>
+      <p id="question-text">What is the capital of India?</p>
+      <ul id="options"></ul>
+    </div>
+
     <div id="question-box">
       <h2 id="question-number">Question 1</h2>
       <p id="question-text">What is the capital of India?</p>
@@ -163,14 +170,14 @@
   </div>
 
   <!-- Review Section -->
-  <div id="review-section" class="hidden">
+  <div id="review-section">
     <h2>Review Your Answers</h2>
     <div id="review-grid"></div>
     <button id="submit-test" class="primary">Submit Test</button>
   </div>
 
   <!-- Result Section -->
-  <div id="result-section" class="hidden">
+  <div id="result-section">
     <h2>Test Results</h2>
     <p id="result-text"></p>
     <button onclick="location.reload()">Restart Test</button>
@@ -186,15 +193,13 @@
     let currentQuestionIndex = 0;
     let userAnswers = Array(questions.length).fill(null);
     let reviewQuestions = new Set();
-    const totalQuestions = questions.length;
 
     const checkAirplaneMode = () => {
       if (navigator.onLine) {
-        alert("Please enable airplane mode and disconnect from the internet.");
+        alert("Please enable airplane mode to start the test.");
       } else {
-        document.getElementById("airplane-check").classList.add("hidden");
-        document.getElementById("header").classList.remove("hidden");
-        document.getElementById("main").style.display = "block";
+        document.getElementById("airplane-check").style.display = "none";
+        document.getElementById("main").style.display = "flex";
         monitorConnection();
         renderQuestion();
       }
@@ -202,7 +207,7 @@
 
     const monitorConnection = () => {
       window.addEventListener("online", () => {
-        alert("Internet connection detected. The exam has been automatically submitted.");
+        alert("Internet connection detected. The test will be automatically submitted.");
         submitTest();
       });
     };
@@ -217,9 +222,7 @@
       question.options.forEach((option, index) => {
         const li = document.createElement("li");
         li.innerHTML = `
-          <input type="radio" name="option" id="option-${index}" ${
-          userAnswers[currentQuestionIndex] === index ? "checked" : ""
-        }>
+          <input type="radio" name="option" id="option-${index}">
           <label for="option-${index}">${option}</label>`;
         li.onclick = () => {
           userAnswers[currentQuestionIndex] = index;
@@ -228,24 +231,20 @@
       });
     };
 
-    const toggleNavigationGrid = () => {
-      const grid = document.getElementById("navigation-grid");
-      grid.style.display = grid.style.display === "none" ? "grid" : "none";
-    };
-
     document.getElementById("check-status-btn").onclick = checkAirplaneMode;
-    document.getElementById("navigation-toggle").onclick = toggleNavigationGrid;
     document.getElementById("next").onclick = () => {
-      currentQuestionIndex = Math.min(currentQuestionIndex + 1, totalQuestions - 1);
+      currentQuestionIndex = Math.min(currentQuestionIndex + 1, questions.length - 1);
       renderQuestion();
     };
     document.getElementById("end-test").onclick = () => {
-      document.getElementById("main").classList.add("hidden");
-      document.getElementById("review-section").classList.remove("hidden");
+      document.getElementById("main").style.display = "none";
+      document.getElementById("review-section").style.display = "flex";
     };
     document.getElementById("submit-test").onclick = () => {
-      alert("Exam submitted!");
+      alert("Test submitted!");
     };
+
+    checkAirplaneMode();
   </script>
 </body>
 </html>
