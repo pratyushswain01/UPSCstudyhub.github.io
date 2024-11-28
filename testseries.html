@@ -3,114 +3,236 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mock Test with Review</title>
+  <title>Mock Test - Airplane Mode</title>
   <style>
-    /* Basic Styling */
+    /* Global Styles */
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
       background-color: #f4f4f9;
-      color: #333;
     }
-    #app {
-      max-width: 800px;
-      margin: 50px auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-    h1, h2 {
+
+    /* Pre-Test Airplane Mode Check */
+    #pre-test-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #003366;
+      color: white;
       text-align: center;
-      color: #007bff;
     }
-    #timer-container {
-      font-size: 20px;
-      color: red;
+
+    #pre-test-container h1 {
+      font-size: 32px;
       margin-bottom: 20px;
-      text-align: center;
     }
-    #question-container, #review-container, #result-container {
-      margin-top: 20px;
+
+    #pre-test-container button {
+      padding: 15px 20px;
+      font-size: 16px;
+      background-color: #007bff;
+      border: none;
+      border-radius: 5px;
+      color: white;
+      cursor: pointer;
     }
-    #options, #review-list {
+
+    #pre-test-container button:hover {
+      background-color: #0056b3;
+    }
+
+    /* Mock Test Interface */
+    #app {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #header {
+      background-color: #003366;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    #header h1 {
+      font-size: 24px;
+    }
+
+    #header #timer-container {
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    #main {
+      flex: 1;
+      display: flex;
+    }
+
+    #question-section {
+      flex: 3;
+      padding: 20px;
+      background-color: white;
+      border-right: 2px solid #ddd;
+    }
+
+    #question-number {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: #003366;
+    }
+
+    #question-text {
+      margin-bottom: 20px;
+      font-size: 16px;
+    }
+
+    #options {
       list-style: none;
       padding: 0;
     }
-    #options li, #review-list li {
+
+    #options li {
       margin-bottom: 10px;
     }
-    button {
+
+    #options input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    #sidebar {
+      flex: 1;
+      background-color: #f7f7f7;
+      padding: 20px;
+      border-left: 2px solid #ddd;
+    }
+
+    #sidebar h2 {
+      font-size: 18px;
+      color: #003366;
+      margin-bottom: 15px;
+    }
+
+    #navigation-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 10px;
+    }
+
+    #navigation-grid button {
+      width: 40px;
+      height: 40px;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .answered {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .unanswered {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    .review {
+      background-color: #ffc107;
+      color: black;
+    }
+
+    .not-visited {
+      background-color: #ddd;
+    }
+
+    #footer {
+      background-color: #f1f1f1;
       padding: 10px 20px;
-      margin: 5px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid #ddd;
+    }
+
+    button {
+      padding: 10px 15px;
       background-color: #007bff;
-      color: #fff;
+      color: white;
       border: none;
       border-radius: 4px;
       cursor: pointer;
     }
+
     button:hover {
       background-color: #0056b3;
-    }
-    #result-container h2 {
-      color: #28a745;
     }
   </style>
 </head>
 <body>
+  <!-- Pre-Test Airplane Mode Check -->
+  <div id="pre-test-container">
+    <h1>Airplane Mode is Required</h1>
+    <p>Please enable airplane mode on your device and disconnect from the internet to start the exam.</p>
+    <button id="check-status-btn">Check Again</button>
+  </div>
+
+  <!-- Mock Test Interface -->
   <div id="app">
-    <h1>Mock Test</h1>
-    <div id="timer-container">
-      <h2>Time Remaining: <span id="timer">10:00</span></h2>
+    <div id="header">
+      <h1>Mock Test</h1>
+      <div id="timer-container">Time Remaining: <span id="timer">10:00</span></div>
     </div>
 
-    <div id="question-container">
-      <h2 id="question-number">Question 1</h2>
-      <p id="question-text">What is the capital of India?</p>
-      <ul id="options"></ul>
+    <div id="main">
+      <div id="question-section">
+        <h2 id="question-number">Question 1</h2>
+        <p id="question-text">What is the capital of India?</p>
+        <ul id="options"></ul>
+      </div>
+
+      <div id="sidebar">
+        <h2>Navigation</h2>
+        <div id="navigation-grid"></div>
+      </div>
+    </div>
+
+    <div id="footer">
       <button id="mark-review">Mark for Review</button>
-      <button id="prev">Previous</button>
-      <button id="next">Next</button>
+      <div>
+        <button id="prev">Previous</button>
+        <button id="next">Next</button>
+      </div>
       <button id="submit">Submit</button>
-    </div>
-
-    <div id="review-container" style="display: none;">
-      <h2>Review Your Answers</h2>
-      <ul id="review-list"></ul>
-      <button id="back-to-questions">Back to Test</button>
-      <button id="final-submit">Submit Test</button>
-    </div>
-
-    <div id="result-container" style="display: none;">
-      <h2>Results</h2>
-      <p>Total Questions: <span id="total-questions"></span></p>
-      <p>Correct Answers: <span id="correct-answers"></span></p>
-      <p>Wrong Answers: <span id="wrong-answers"></span></p>
-      <p>Your Score: <span id="score"></span></p>
     </div>
   </div>
 
   <script>
+    // Airplane Mode Check
+    function checkAirplaneMode() {
+      if (navigator.onLine) {
+        alert("Your device is still connected to the internet. Please enable airplane mode and try again.");
+      } else {
+        document.getElementById("pre-test-container").style.display = "none";
+        document.getElementById("app").style.display = "flex";
+        startExam();
+      }
+    }
+
+    document.getElementById("check-status-btn").addEventListener("click", checkAirplaneMode);
+
+    // Mock Test Functionality
     const questions = [
-      {
-        id: 1,
-        question: "What is the capital of India?",
-        options: ["Delhi", "Mumbai", "Kolkata", "Chennai"],
-        answer: 0,
-      },
-      {
-        id: 2,
-        question: "Who wrote the national anthem of India?",
-        options: ["Mahatma Gandhi", "Rabindranath Tagore", "Subhash Chandra Bose", "Sarojini Naidu"],
-        answer: 1,
-      },
-      {
-        id: 3,
-        question: "What is the largest planet in our Solar System?",
-        options: ["Earth", "Mars", "Jupiter", "Saturn"],
-        answer: 2,
-      },
+      { question: "What is the capital of India?", options: ["Delhi", "Mumbai", "Kolkata", "Chennai"], answer: 0 },
+      { question: "Who wrote the national anthem of India?", options: ["Mahatma Gandhi", "Rabindranath Tagore", "Subhash Chandra Bose", "Sarojini Naidu"], answer: 1 },
+      { question: "What is the largest planet in our Solar System?", options: ["Earth", "Mars", "Jupiter", "Saturn"], answer: 2 },
     ];
 
     let currentQuestionIndex = 0;
@@ -133,105 +255,54 @@
           userAnswers[currentQuestionIndex] === index ? "checked" : ""
         }>
           <label for="option-${index}">${option}</label>`;
-        li.onclick = () => {
-          userAnswers[currentQuestionIndex] = index;
-        };
+        li.onclick = () => (userAnswers[currentQuestionIndex] = index);
         optionsContainer.appendChild(li);
       });
     }
 
-    function updateTimer() {
-      const timerElement = document.getElementById("timer");
-      const minutes = Math.floor(remainingTimeInSeconds / 60);
-      const seconds = remainingTimeInSeconds % 60;
-
-      timerElement.innerText = `${minutes.toString().padStart(2, "0")}:${seconds
-        .toString()
-        .padStart(2, "0")}`;
-
-      remainingTimeInSeconds--;
-
-      if (remainingTimeInSeconds < 0) {
-        clearInterval(timerInterval);
-        alert("Time's up! Proceeding to review your answers.");
-        showReviewPage();
-      }
-    }
-
-    const timerInterval = setInterval(updateTimer, 1000);
-    updateTimer();
-
-    function handleNavigation(direction) {
-      if (direction === "next" && currentQuestionIndex < questions.length - 1) {
-        currentQuestionIndex++;
-      } else if (direction === "prev" && currentQuestionIndex > 0) {
-        currentQuestionIndex--;
-      }
+    function startExam() {
       renderQuestion();
+      updateNavigationGrid();
+      setInterval(updateTimer, 1000);
     }
 
-    function markForReview() {
-      reviewQuestions.add(currentQuestionIndex);
-      alert("Marked for review.");
-    }
-
-    function showReviewPage() {
-      document.getElementById("question-container").style.display = "none";
-      document.getElementById("review-container").style.display = "block";
-
-      const reviewList = document.getElementById("review-list");
-      reviewList.innerHTML = "";
-
-      questions.forEach((q, index) => {
-        const status = userAnswers[index] !== null
-          ? reviewQuestions.has(index)
-            ? "Marked for Review"
-            : "Answered"
-          : "Unanswered";
-
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span>Question ${index + 1}: ${status}</span>
-          <button onclick="goToQuestion(${index})">Edit</button>`;
-        reviewList.appendChild(li);
+    function updateNavigationGrid() {
+      const grid = document.getElementById("navigation-grid");
+      grid.innerHTML = "";
+      questions.forEach((_, i) => {
+        const btn = document.createElement("button");
+        btn.innerText = i + 1;
+        btn.className = userAnswers[i] !== null ? "answered" : "not-visited";
+        btn.onclick = () => {
+          currentQuestionIndex = i;
+          renderQuestion();
+        };
+        grid.appendChild(btn);
       });
     }
 
-    function goToQuestion(index) {
-      currentQuestionIndex = index;
-      document.getElementById("review-container").style.display = "none";
-      document.getElementById("question-container").style.display = "block";
+    function updateTimer() {
+      const timer = document.getElementById("timer");
+      const minutes = Math.floor(remainingTimeInSeconds / 60);
+      const seconds = remainingTimeInSeconds % 60;
+      timer.innerText = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+      remainingTimeInSeconds--;
+      if (remainingTimeInSeconds < 0) alert("Time's up!");
+    }
+
+    document.getElementById("next").onclick = () => {
+      currentQuestionIndex = Math.min(currentQuestionIndex + 1, questions.length - 1);
       renderQuestion();
-    }
-
-    function submitTest() {
-      const correctAnswers = questions.filter(
-        (q, i) => q.answer === userAnswers[i]
-      ).length;
-      const wrongAnswers = userAnswers.filter(
-        (ans, i) => ans !== null && ans !== questions[i].answer
-      ).length;
-
-      document.getElementById("total-questions").innerText = questions.length;
-      document.getElementById("correct-answers").innerText = correctAnswers;
-      document.getElementById("wrong-answers").innerText = wrongAnswers;
-      document.getElementById("score").innerText = correctAnswers;
-
-      document.getElementById("review-container").style.display = "none";
-      document.getElementById("result-container").style.display = "block";
-    }
-
-    document.getElementById("next").onclick = () => handleNavigation("next");
-    document.getElementById("prev").onclick = () => handleNavigation("prev");
-    document.getElementById("mark-review").onclick = markForReview;
-    document.getElementById("submit").onclick = showReviewPage;
-    document.getElementById("back-to-questions").onclick = () => {
-      document.getElementById("review-container").style.display = "none";
-      document.getElementById("question-container").style.display = "block";
     };
-    document.getElementById("final-submit").onclick = submitTest;
-
-    renderQuestion();
+    document.getElementById("prev").onclick = () => {
+      currentQuestionIndex = Math.max(currentQuestionIndex - 1, 0);
+      renderQuestion();
+    };
+    document.getElementById("mark-review").onclick = () => {
+      reviewQuestions.add(currentQuestionIndex);
+      updateNavigationGrid();
+    };
+    document.getElementById("submit").onclick = () => alert("Test Submitted!");
   </script>
 </body>
 </html>
