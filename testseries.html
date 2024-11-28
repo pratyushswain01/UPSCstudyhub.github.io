@@ -54,23 +54,6 @@
             display: none;
         }
 
-        .question {
-            margin-bottom: 20px;
-        }
-
-        .flag-btn {
-            background-color: #ffc107;
-            border: none;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .flag-btn:hover {
-            background-color: #e0a800;
-        }
-
         #review-btn {
             background-color: #17a2b8;
             color: #fff;
@@ -98,39 +81,20 @@
             background-color: #218838;
         }
 
-        .test-footer {
-            background: #343a40;
-            color: #fff;
-            text-align: center;
-            padding: 10px;
-        }
-
         .status {
             text-align: center;
             font-size: 14px;
             margin-top: 10px;
         }
 
-        #response-sheet {
-            display: none;
-            padding: 20px;
+        .instructions {
+            margin-bottom: 20px;
         }
 
-        .response-sheet-table {
+        iframe {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-        }
-
-        .response-sheet-table th, .response-sheet-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .response-sheet-table th {
-            background-color: #007bff;
-            color: #fff;
+            height: 500px;
+            border: none;
         }
     </style>
 </head>
@@ -154,191 +118,80 @@
             </div>
             <div id="test-section" class="hidden">
                 <h2>Test</h2>
-                <div class="question" data-question-id="1">
-                    <p>1. What is the derivative of sin(x)?</p>
-                    <ul>
-                        <li><input type="radio" name="q1" value="1"> cos(x)</li>
-                        <li><input type="radio" name="q1" value="2"> sin(x)</li>
-                        <li><input type="radio" name="q1" value="3"> -cos(x)</li>
-                        <li><input type="radio" name="q1" value="4"> None</li>
-                    </ul>
-                    <button class="flag-btn">Flag for Review</button>
-                </div>
-                <div class="question" data-question-id="2">
-                    <p>2. Which of the following are prime numbers? (Multiple correct answers)</p>
-                    <ul>
-                        <li><input type="checkbox" name="q2" value="1"> 2</li>
-                        <li><input type="checkbox" name="q2" value="2"> 4</li>
-                        <li><input type="checkbox" name="q2" value="3"> 5</li>
-                        <li><input type="checkbox" name="q2" value="4"> 9</li>
-                    </ul>
-                    <button class="flag-btn">Flag for Review</button>
-                </div>
-                <div class="question" data-question-id="3">
-                    <p>3. What is the value of 3 + 4?</p>
-                    <input type="number" name="q3">
-                    <button class="flag-btn">Flag for Review</button>
-                </div>
-                <button id="review-btn">Review Flagged Questions</button>
-                <button id="submit-btn">Submit</button>
+                <!-- Embed your Google Form here -->
+                <iframe id="google-form-iframe" src="https://docs.google.com/forms/d/e/1FAIpQLSfhKH99xyd9sE3eOJKs5tSKG7F1P06vq6BdFdp76D1Gft99XA/viewform?embedded=true"></iframe>
+
+                <button id="submit-btn">Submit Test</button>
             </div>
-            <div id="response-sheet" class="hidden">
-                <h2>Response Sheet</h2>
-                <table class="response-sheet-table">
-                    <thead>
-                        <tr>
-                            <th>Question</th>
-                            <th>Your Response</th>
-                            <th>Correct Answer</th>
-                        </tr>
-                    </thead>
-                    <tbody id="response-body"></tbody>
-                </table>
+
+            <div id="prompt-section" class="hidden">
+                <h2>Test Submission</h2>
+                <p>Please enable your internet connection to submit the test.</p>
+                <button id="enable-internet-btn">Enable Internet</button>
             </div>
         </main>
         <footer class="test-footer">
             <p>National Testing Agency - Mock Test</p>
         </footer>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const startButton = document.getElementById("start-btn");
             const submitButton = document.getElementById("submit-btn");
-            const reviewButton = document.getElementById("review-btn");
-            const testSection = document.getElementById("test-section");
-            const instructions = document.querySelector(".instructions");
+            const promptSection = document.getElementById("prompt-section");
+            const googleFormIframe = document.getElementById("google-form-iframe");
             const networkStatus = document.getElementById("network-status");
-            const timerDisplay = document.getElementById("timer");
-            const responseSheet = document.getElementById("response-sheet");
-            const responseBody = document.getElementById("response-body");
 
             let testActive = false;
-            let flaggedQuestions = new Set();
-            let countdown;
-            let userResponses = {};
 
-            // Correct answers for comparison
-            const answerKey = {
-                q1: "1",  // cos(x)
-                q2: ["1", "3"], // 2 and 5 are primes
-                q3: "7"  // 3 + 4 = 7
-            };
-
-            // Timer setup
-            const setTimer = (duration) => {
-                let timer = duration;
-                countdown = setInterval(() => {
-                    const hours = String(Math.floor(timer / 3600)).padStart(2, "0");
-                    const minutes = String(Math.floor((timer % 3600) / 60)).padStart(2, "0");
-                    const seconds = String(timer % 60).padStart(2, "0");
-                    timerDisplay.textContent = `Time Left: ${hours}:${minutes}:${seconds}`;
-                    timer--;
-
-                    if (timer < 0) {
-                        clearInterval(countdown);
-                        alert("Time's up! Submitting the test...");
-                        submitTest();
-                    }
-                }, 1000);
-            };
-
-            // Function to check network status
-            const checkNetwork = () => {
-                if (navigator.onLine && testActive) {
-                    alert("Network detected! Your test will now be submitted.");
-                    submitTest();
+            // Function to detect if the user is in airplane mode (offline)
+            const checkNetworkStatus = () => {
+                if (navigator.onLine) {
+                    networkStatus.textContent = "Online Mode: Enabled";
+                    promptSection.classList.add("hidden");
+                    googleFormIframe.classList.remove("hidden");
+                } else {
+                    networkStatus.textContent = "Offline Mode: Enabled";
+                    googleFormIframe.classList.add("hidden");
+                    promptSection.classList.remove("hidden");
                 }
             };
 
             // Start Test
             startButton.addEventListener("click", () => {
                 if (!navigator.onLine) {
-                    instructions.classList.add("hidden");
-                    testSection.classList.remove("hidden");
+                    alert("You are currently in offline mode. Test will start now.");
                     testActive = true;
-                    setTimer(60 * 30); // 30 minutes
-                    alert("Test started. Airplane mode detected.");
+                    checkNetworkStatus();
                 } else {
-                    alert("Please enable Airplane mode before starting the test.");
+                    alert("Please ensure you are in Airplane Mode before starting the test.");
                 }
             });
 
-            // Capture user answers
-            document.querySelectorAll(".question").forEach((question) => {
-                question.addEventListener("change", (e) => {
-                    const questionId = question.dataset.questionId;
-                    const userAnswer = e.target.value;
-                    if (e.target.type === "radio" || e.target.type === "checkbox") {
-                        if (!userResponses[questionId]) {
-                            userResponses[questionId] = [];
-                        }
-                        if (e.target.checked) {
-                            userResponses[questionId].push(userAnswer);
-                        } else {
-                            const index = userResponses[questionId].indexOf(userAnswer);
-                            if (index !== -1) userResponses[questionId].splice(index, 1);
-                        }
-                    } else {
-                        userResponses[questionId] = userAnswer;
-                    }
-                });
-            });
-
-            // Flagging questions for review
-            document.querySelectorAll(".flag-btn").forEach((button) => {
-                button.addEventListener("click", (e) => {
-                    const questionId = e.target.closest(".question").dataset.questionId;
-                    if (flaggedQuestions.has(questionId)) {
-                        flaggedQuestions.delete(questionId);
-                        alert(`Question ${questionId} unflagged.`);
-                    } else {
-                        flaggedQuestions.add(questionId);
-                        alert(`Question ${questionId} flagged for review.`);
-                    }
-                });
-            });
-
-            // Review flagged questions
-            reviewButton.addEventListener("click", () => {
-                if (flaggedQuestions.size > 0) {
-                    alert(`Review these questions: ${Array.from(flaggedQuestions).join(", ")}`);
+            // Handle submission and check for network status
+            submitButton.addEventListener("click", () => {
+                if (!navigator.onLine) {
+                    alert("Please enable your internet connection to submit the test.");
+                    promptSection.classList.remove("hidden");
                 } else {
-                    alert("No questions flagged for review.");
+                    alert("Submitting the test now...");
+                    window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSfhKH99xyd9sE3eOJKs5tSKG7F1P06vq6BdFdp76D1Gft99XA/viewform";
                 }
             });
 
-            // Submit Test
-            const submitTest = () => {
-                testActive = false;
-                clearInterval(countdown);
-                testSection.classList.add("hidden");
-                instructions.classList.remove("hidden");
+            // Action when the user chooses to enable the internet
+            document.getElementById("enable-internet-btn").addEventListener("click", () => {
+                if (navigator.onLine) {
+                    alert("Internet is now enabled. Submitting the test.");
+                    window.location.href = "https://docs.google.com/forms/d/e/1FAIpQLSfhKH99xyd9sE3eOJKs5tSKG7F1P06vq6BdFdp76D1Gft99XA/viewform";
+                } else {
+                    alert("Please ensure your internet is enabled.");
+                }
+            });
 
-                // Show Response Sheet
-                responseSheet.classList.remove("hidden");
-
-                // Generate response sheet
-                Object.keys(answerKey).forEach((questionId) => {
-                    const userAnswer = userResponses[questionId];
-                    const correctAnswer = answerKey[questionId];
-                    const userResponseText = Array.isArray(userAnswer) ? userAnswer.join(", ") : userAnswer;
-
-                    const row = document.createElement("tr");
-                    row.innerHTML = `
-                        <td>Question ${questionId}</td>
-                        <td>${userResponseText}</td>
-                        <td>${Array.isArray(correctAnswer) ? correctAnswer.join(", ") : correctAnswer}</td>
-                    `;
-                    responseBody.appendChild(row);
-                });
-
-                alert("Test submitted successfully! Please review your response sheet.");
-            };
-
-            submitButton.addEventListener("click", submitTest);
-
-            // Monitor network status
-            setInterval(checkNetwork, 2000);
+            // Monitor network status and update accordingly
+            setInterval(checkNetworkStatus, 2000);
         });
     </script>
 </body>
