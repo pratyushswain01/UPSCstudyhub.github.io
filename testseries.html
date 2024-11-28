@@ -1,154 +1,237 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Secure Mock Test | UPSChub Interface</title>
-    <link rel="stylesheet" href="testseries.css">
-    <style>
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
-        }
-        .question-container {
-            display: none;
-        }
-        .question-container.active {
-            display: block;
-        }
-        .navigation-buttons {
-            text-align: center;
-            margin-top: 20px;
-        }
-        .navigation-buttons button {
-            padding: 10px 20px;
-            margin: 0 5px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .navigation-buttons button:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mock Test with Review</title>
+  <style>
+    /* Basic Styling */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+      color: #333;
+    }
+    #app {
+      max-width: 800px;
+      margin: 50px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #007bff;
+    }
+    #timer-container {
+      font-size: 20px;
+      color: red;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    #question-container, #review-container, #result-container {
+      margin-top: 20px;
+    }
+    #options, #review-list {
+      list-style: none;
+      padding: 0;
+    }
+    #options li, #review-list li {
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result-container h2 {
+      color: #28a745;
+    }
+  </style>
 </head>
 <body>
-    <!-- Airplane Mode Screen -->
-    <div id="airplane-mode-screen" class="screen active">
-        <h1>Enable Airplane Mode</h1>
-        <p>Please enable airplane mode to proceed with the exam. Turn off all network connections.</p>
-        <button id="check-airplane-mode">Check Airplane Mode</button>
+  <div id="app">
+    <h1>Mock Test</h1>
+    <div id="timer-container">
+      <h2>Time Remaining: <span id="timer">10:00</span></h2>
     </div>
 
-    <!-- Mock Test Screen -->
-    <div id="mock-test-screen" class="screen">
-        <!-- Header -->
-        <header class="mock-test-header">
-            <h1>UPSC hub Mock-Test Portal</h1>
-            <div class="timer-container">
-                <p><span id="timer">01:00:00</span></p>
-            </div>
-        </header>
-
-        <!-- Questions -->
-        <main class="mock-test-main">
-            <div id="question-1" class="question-container active">
-                <h2>Question 1</h2>
-                <p>Who is the current chairperson of the G20 for 2024?</p>
-                <div class="options">
-                    <label><input type="radio" name="answer1" value="USA"> USA</label>
-                    <label><input type="radio" name="answer1" value="India"> India</label>
-                    <label><input type="radio" name="answer1" value="Brazil"> Brazil</label>
-                    <label><input type="radio" name="answer1" value="China"> China</label>
-                </div>
-            </div>
-
-            <div id="question-2" class="question-container">
-                <h2>Question 2</h2>
-                <p>Which country recently launched the "Aditya-L1" mission to study the Sun?</p>
-                <div class="options">
-                    <label><input type="radio" name="answer2" value="China"> China</label>
-                    <label><input type="radio" name="answer2" value="USA"> USA</label>
-                    <label><input type="radio" name="answer2" value="India"> India</label>
-                    <label><input type="radio" name="answer2" value="Russia"> Russia</label>
-                </div>
-            </div>
-
-            <!-- Add other questions here -->
-
-            <!-- Navigation Buttons -->
-            <div class="navigation-buttons">
-                <button id="prev-btn" disabled>Previous</button>
-                <button id="next-btn">Next</button>
-            </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="mock-test-footer">
-            <button id="end-test-btn">End Test</button>
-        </footer>
+    <div id="question-container">
+      <h2 id="question-number">Question 1</h2>
+      <p id="question-text">What is the capital of India?</p>
+      <ul id="options"></ul>
+      <button id="mark-review">Mark for Review</button>
+      <button id="prev">Previous</button>
+      <button id="next">Next</button>
+      <button id="submit">Submit</button>
     </div>
 
-    <script>
-        // Initialize variables
-        const airplaneModeScreen = document.getElementById('airplane-mode-screen');
-        const mockTestScreen = document.getElementById('mock-test-screen');
-        const checkAirplaneModeButton = document.getElementById('check-airplane-mode');
-        const questionContainers = document.querySelectorAll('.question-container');
-        const prevButton = document.getElementById('prev-btn');
-        const nextButton = document.getElementById('next-btn');
-        let currentQuestionIndex = 0;
+    <div id="review-container" style="display: none;">
+      <h2>Review Your Answers</h2>
+      <ul id="review-list"></ul>
+      <button id="back-to-questions">Back to Test</button>
+      <button id="final-submit">Submit Test</button>
+    </div>
 
-        // Update question visibility
-        function updateQuestionVisibility() {
-            questionContainers.forEach((container, index) => {
-                container.classList.toggle('active', index === currentQuestionIndex);
-            });
-            prevButton.disabled = currentQuestionIndex === 0;
-            nextButton.disabled = currentQuestionIndex === questionContainers.length - 1;
-        }
+    <div id="result-container" style="display: none;">
+      <h2>Results</h2>
+      <p>Total Questions: <span id="total-questions"></span></p>
+      <p>Correct Answers: <span id="correct-answers"></span></p>
+      <p>Wrong Answers: <span id="wrong-answers"></span></p>
+      <p>Your Score: <span id="score"></span></p>
+    </div>
+  </div>
 
-        // Navigation buttons
-        prevButton.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                updateQuestionVisibility();
-            }
-        });
+  <script>
+    const questions = [
+      {
+        id: 1,
+        question: "What is the capital of India?",
+        options: ["Delhi", "Mumbai", "Kolkata", "Chennai"],
+        answer: 0,
+      },
+      {
+        id: 2,
+        question: "Who wrote the national anthem of India?",
+        options: ["Mahatma Gandhi", "Rabindranath Tagore", "Subhash Chandra Bose", "Sarojini Naidu"],
+        answer: 1,
+      },
+      {
+        id: 3,
+        question: "What is the largest planet in our Solar System?",
+        options: ["Earth", "Mars", "Jupiter", "Saturn"],
+        answer: 2,
+      },
+    ];
 
-        nextButton.addEventListener('click', () => {
-            if (currentQuestionIndex < questionContainers.length - 1) {
-                currentQuestionIndex++;
-                updateQuestionVisibility();
-            }
-        });
+    let currentQuestionIndex = 0;
+    let userAnswers = Array(questions.length).fill(null);
+    let reviewQuestions = new Set();
+    const totalTimeInMinutes = 10;
+    let remainingTimeInSeconds = totalTimeInMinutes * 60;
 
-        // Check if the device is offline
-        function checkIfOffline() {
-            return !navigator.onLine;
-        }
+    function renderQuestion() {
+      const question = questions[currentQuestionIndex];
+      document.getElementById("question-number").innerText = `Question ${currentQuestionIndex + 1}`;
+      document.getElementById("question-text").innerText = question.question;
 
-        // Mock airplane mode check
-        checkAirplaneModeButton.addEventListener('click', () => {
-            if (checkIfOffline()) {
-                airplaneModeScreen.classList.remove('active');
-                mockTestScreen.classList.add('active');
-            } else {
-                alert('Please enable Airplane Mode and disconnect from the internet to proceed.');
-            }
-        });
+      const optionsContainer = document.getElementById("options");
+      optionsContainer.innerHTML = "";
+      question.options.forEach((option, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <input type="radio" name="option" id="option-${index}" ${
+          userAnswers[currentQuestionIndex] === index ? "checked" : ""
+        }>
+          <label for="option-${index}">${option}</label>`;
+        li.onclick = () => {
+          userAnswers[currentQuestionIndex] = index;
+        };
+        optionsContainer.appendChild(li);
+      });
+    }
 
-        // Monitor connection status to ensure compliance
-        window.addEventListener('online', () => {
-            alert('You are connected to the internet! Please enable Airplane Mode to continue.');
-            airplaneModeScreen.classList.add('active');
-            mockTestScreen.classList.remove('active');
-        });
-    </script>
+    function updateTimer() {
+      const timerElement = document.getElementById("timer");
+      const minutes = Math.floor(remainingTimeInSeconds / 60);
+      const seconds = remainingTimeInSeconds % 60;
+
+      timerElement.innerText = `${minutes.toString().padStart(2, "0")}:${seconds
+        .toString()
+        .padStart(2, "0")}`;
+
+      remainingTimeInSeconds--;
+
+      if (remainingTimeInSeconds < 0) {
+        clearInterval(timerInterval);
+        alert("Time's up! Proceeding to review your answers.");
+        showReviewPage();
+      }
+    }
+
+    const timerInterval = setInterval(updateTimer, 1000);
+    updateTimer();
+
+    function handleNavigation(direction) {
+      if (direction === "next" && currentQuestionIndex < questions.length - 1) {
+        currentQuestionIndex++;
+      } else if (direction === "prev" && currentQuestionIndex > 0) {
+        currentQuestionIndex--;
+      }
+      renderQuestion();
+    }
+
+    function markForReview() {
+      reviewQuestions.add(currentQuestionIndex);
+      alert("Marked for review.");
+    }
+
+    function showReviewPage() {
+      document.getElementById("question-container").style.display = "none";
+      document.getElementById("review-container").style.display = "block";
+
+      const reviewList = document.getElementById("review-list");
+      reviewList.innerHTML = "";
+
+      questions.forEach((q, index) => {
+        const status = userAnswers[index] !== null
+          ? reviewQuestions.has(index)
+            ? "Marked for Review"
+            : "Answered"
+          : "Unanswered";
+
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <span>Question ${index + 1}: ${status}</span>
+          <button onclick="goToQuestion(${index})">Edit</button>`;
+        reviewList.appendChild(li);
+      });
+    }
+
+    function goToQuestion(index) {
+      currentQuestionIndex = index;
+      document.getElementById("review-container").style.display = "none";
+      document.getElementById("question-container").style.display = "block";
+      renderQuestion();
+    }
+
+    function submitTest() {
+      const correctAnswers = questions.filter(
+        (q, i) => q.answer === userAnswers[i]
+      ).length;
+      const wrongAnswers = userAnswers.filter(
+        (ans, i) => ans !== null && ans !== questions[i].answer
+      ).length;
+
+      document.getElementById("total-questions").innerText = questions.length;
+      document.getElementById("correct-answers").innerText = correctAnswers;
+      document.getElementById("wrong-answers").innerText = wrongAnswers;
+      document.getElementById("score").innerText = correctAnswers;
+
+      document.getElementById("review-container").style.display = "none";
+      document.getElementById("result-container").style.display = "block";
+    }
+
+    document.getElementById("next").onclick = () => handleNavigation("next");
+    document.getElementById("prev").onclick = () => handleNavigation("prev");
+    document.getElementById("mark-review").onclick = markForReview;
+    document.getElementById("submit").onclick = showReviewPage;
+    document.getElementById("back-to-questions").onclick = () => {
+      document.getElementById("review-container").style.display = "none";
+      document.getElementById("question-container").style.display = "block";
+    };
+    document.getElementById("final-submit").onclick = submitTest;
+
+    renderQuestion();
+  </script>
 </body>
 </html>
