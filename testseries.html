@@ -11,6 +11,9 @@
       margin: 0;
       padding: 0;
       background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
     }
 
     #header, #footer {
@@ -26,33 +29,75 @@
     }
 
     #main, #review-section, #result-section, #airplane-check {
+      flex: 1;
       padding: 20px;
-    }
-
-    #main, #review-section, #result-section {
       display: none;
+      overflow-y: auto;
     }
 
-    /* Buttons */
+    #question-box {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    #question-box h2 {
+      margin: 0;
+      color: #003366;
+    }
+
+    #options {
+      list-style: none;
+      padding: 0;
+    }
+
+    #options li {
+      margin-bottom: 10px;
+    }
+
+    #options input[type="radio"] {
+      margin-right: 10px;
+    }
+
+    #buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
     button {
-      padding: 10px 15px;
-      background-color: #007bff;
-      color: white;
+      padding: 10px 20px;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
+      font-size: 16px;
       cursor: pointer;
     }
 
-    button:hover {
-      background-color: #0056b3;
+    .primary {
+      background-color: #007bff;
+      color: white;
     }
 
-    /* Navigation Grid */
+    .danger {
+      background-color: #dc3545;
+      color: white;
+    }
+
+    /* Navigation Toggle */
+    #navigation-toggle {
+      display: block;
+      margin: 10px 0;
+    }
+
     #navigation-grid {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 10px;
-      margin: 20px 0;
+      margin-top: 10px;
+      display: none;
     }
 
     #navigation-grid button {
@@ -84,17 +129,13 @@
       background-color: #ddd;
       color: black;
     }
-
-    .hidden {
-      display: none;
-    }
   </style>
 </head>
 <body>
   <!-- Airplane Mode Check -->
   <div id="airplane-check">
-    <h1>Enable Airplane Mode</h1>
-    <p>To start the exam, please enable airplane mode on your device and disconnect from the internet.</p>
+    <h1>Enable Aeroplane Mode</h1>
+    <p>To start the exam, please enable aeroplane mode on your device and disconnect from the internet.</p>
     <button id="check-status-btn">Check Again</button>
   </div>
 
@@ -105,23 +146,27 @@
 
   <!-- Main Test Interface -->
   <div id="main">
-    <div id="question-section">
+    <div id="question-box">
       <h2 id="question-number">Question 1</h2>
       <p id="question-text">What is the capital of India?</p>
       <ul id="options"></ul>
     </div>
 
+    <button id="navigation-toggle">Show Question Numbers</button>
     <div id="navigation-grid"></div>
-    <button id="mark-review">Mark for Review</button>
-    <button id="next">Next</button>
-    <button id="end-test">End Test</button>
+
+    <div id="buttons">
+      <button id="mark-review" class="primary">Mark for Review</button>
+      <button id="next" class="primary">Next</button>
+      <button id="end-test" class="danger">End Test</button>
+    </div>
   </div>
 
   <!-- Review Section -->
   <div id="review-section" class="hidden">
     <h2>Review Your Answers</h2>
     <div id="review-grid"></div>
-    <button id="submit-test">Submit Test</button>
+    <button id="submit-test" class="primary">Submit Test</button>
   </div>
 
   <!-- Result Section -->
@@ -152,7 +197,6 @@
         document.getElementById("main").style.display = "block";
         monitorConnection();
         renderQuestion();
-        updateNavigationGrid();
       }
     };
 
@@ -179,76 +223,29 @@
           <label for="option-${index}">${option}</label>`;
         li.onclick = () => {
           userAnswers[currentQuestionIndex] = index;
-          updateNavigationGrid();
         };
         optionsContainer.appendChild(li);
       });
     };
 
-    const updateNavigationGrid = () => {
+    const toggleNavigationGrid = () => {
       const grid = document.getElementById("navigation-grid");
-      grid.innerHTML = "";
-      questions.forEach((_, i) => {
-        const btn = document.createElement("button");
-        btn.innerText = i + 1;
-        if (reviewQuestions.has(i)) btn.className = "review";
-        else if (userAnswers[i] !== null) btn.className = "answered";
-        else btn.className = "not-answered";
-        btn.onclick = () => {
-          currentQuestionIndex = i;
-          renderQuestion();
-        };
-        grid.appendChild(btn);
-      });
-    };
-
-    const showReviewSection = () => {
-      document.getElementById("main").classList.add("hidden");
-      document.getElementById("review-section").classList.remove("hidden");
-      renderReviewGrid();
-    };
-
-    const renderReviewGrid = () => {
-      const grid = document.getElementById("review-grid");
-      grid.innerHTML = "";
-      questions.forEach((_, i) => {
-        const div = document.createElement("div");
-        div.style.marginBottom = "10px";
-        div.innerHTML = `
-          Question ${i + 1}: ${
-          userAnswers[i] !== null
-            ? reviewQuestions.has(i)
-              ? "<span style='color:orange'>Marked for Review</span>"
-              : "<span style='color:green'>Answered</span>"
-            : "<span style='color:red'>Not Answered</span>"
-        }`;
-        grid.appendChild(div);
-      });
-    };
-
-    const submitTest = () => {
-      document.getElementById("review-section").classList.add("hidden");
-      document.getElementById("result-section").classList.remove("hidden");
-
-      let score = 0;
-      questions.forEach((q, i) => {
-        if (userAnswers[i] === q.answer) score++;
-      });
-
-      document.getElementById("result-text").innerText = `You scored ${score} out of ${totalQuestions}.`;
+      grid.style.display = grid.style.display === "none" ? "grid" : "none";
     };
 
     document.getElementById("check-status-btn").onclick = checkAirplaneMode;
-    document.getElementById("mark-review").onclick = () => {
-      reviewQuestions.add(currentQuestionIndex);
-      updateNavigationGrid();
-    };
+    document.getElementById("navigation-toggle").onclick = toggleNavigationGrid;
     document.getElementById("next").onclick = () => {
       currentQuestionIndex = Math.min(currentQuestionIndex + 1, totalQuestions - 1);
       renderQuestion();
     };
-    document.getElementById("end-test").onclick = showReviewSection;
-    document.getElementById("submit-test").onclick = submitTest;
+    document.getElementById("end-test").onclick = () => {
+      document.getElementById("main").classList.add("hidden");
+      document.getElementById("review-section").classList.remove("hidden");
+    };
+    document.getElementById("submit-test").onclick = () => {
+      alert("Exam submitted!");
+    };
   </script>
 </body>
 </html>
