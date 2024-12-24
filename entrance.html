@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entrance Test Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to bottom, #4facfe, #00f2fe);
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .test-box {
+      width: 90%;
+      max-width: 400px;
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      text-align: center;
+      padding: 20px;
+    }
+    .test-name {
+      font-size: 1.8rem;
+      color: #007BFF;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .test-details {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin: 10px 0;
+    }
+    .test-details strong {
+      color: #007BFF;
+    }
+    #countdown {
+      font-size: 1.2rem;
+      color: #FF5733;
+      font-weight: bold;
+    }
+    .details-btn {
+      display: block;
+      margin: 15px auto;
+      padding: 12px 20px;
+      font-size: 1rem;
+      color: #fff;
+      background: linear-gradient(90deg, #007BFF, #0056b3);
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .details-btn:hover {
+      background: linear-gradient(90deg, #0056b3, #007BFF);
+      transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="test-box">
+    <h2 class="test-name">Entrance Test</h2>
+    <div class="test-details">
+      <p><strong>Test Date:</strong> 12th January 2025</p>
+      <p><strong>Time:</strong> 10:00 AM - 1:00 PM</p>
+      <p><strong>Remaining Time:</strong> <span id="countdown">Loading...</span></p>
+    </div>
+    <button class="details-btn" onclick="viewExamDetails()">View Exam Details</button>
+  </div>
+
+  <script>
+    // Set your test date and time here
+    const testDate = new Date("2025-01-12T10:00:00");
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = testDate - now;
+
+      if (diff <= 0) {
+        document.getElementById("countdown").innerText = "Test has started!";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      document.getElementById("countdown").innerText = `${days} days, ${hours} hrs, ${minutes} mins, ${seconds} secs`;
+    }
+
+    function viewExamDetails() {
+      alert("Test Details:\n\nName: Entrance Test\nDate: 12th January 2025\nTime: 10:00 AM - 1:00 PM");
+    }
+
+    // Initialize countdown and update every second
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
