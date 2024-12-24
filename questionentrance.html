@@ -14,10 +14,12 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: flex-start; /* Changed from center to top */
-            min-height: 100vh; /* Ensure the body takes full viewport height */
-            padding-bottom: 50px; /* Added bottom padding for space */
-            overflow-y: auto; /* Allow scrolling if content overflows */
+            justify-content: flex-start;
+            min-height: 100vh;
+            padding-bottom: 50px;
+            overflow-y: auto;
+            border: 5px solid #4CAF50; /* Border around the page */
+            margin: 20px; /* Narrow margin around the body */
         }
 
         header {
@@ -27,6 +29,7 @@
             padding: 20px 0;
             text-align: center;
             font-size: 2em;
+            border-bottom: 5px solid #4CAF50; /* Border at the bottom of the header */
         }
 
         main {
@@ -34,7 +37,11 @@
             padding: 20px;
             width: 100%;
             max-width: 600px;
-            overflow-y: auto; /* Allow scrolling inside main content */
+            overflow-y: auto;
+            border: 2px solid #4CAF50; /* Border around the main content */
+            border-radius: 8px; /* Rounded corners */
+            background-color: white;
+            margin-top: 20px;
         }
 
         .btn {
@@ -76,6 +83,37 @@
         .rules {
             text-align: left;
             margin-top: 20px;
+        }
+
+        .login-form {
+            margin-bottom: 20px;
+            border: 1px solid #ccc; /* Border around the login form */
+            padding: 20px;
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        .login-form input {
+            padding: 10px;
+            margin: 10px 0;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .login-form button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 1em;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .login-form button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -380,6 +418,31 @@
     <footer>
         &copy; 2024 UPSChub. All rights reserved.
     </footer>
+
+    <script>
+        // Hardcoded credentials for validation
+        const validUsername = "testuser";
+        const validPassword = "testpassword";
+
+        // Validate login function
+        function validateLogin(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            // Get the entered username and password
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+
+            // Check if the entered credentials match the valid ones
+            if (username === validUsername && password === validPassword) {
+                // Hide login section and show exam content
+                document.getElementById("loginFormSection").style.display = "none";
+                document.getElementById("rulesSection").style.display = "block";
+                document.getElementById("mcqForm").style.display = "block";
+            } else {
+                alert("Invalid username or password. Please try again.");
+            }
+        }
+    </script>
 
     <script>
         document.getElementById('mcqForm').addEventListener('submit', function(event) {
