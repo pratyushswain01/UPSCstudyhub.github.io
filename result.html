@@ -3,76 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Results</title>
+    <title>Quiz Results</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
             color: #333;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-
-        .result-box {
-            text-align: center;
             padding: 20px;
-            border: 2px solid #4CAF50;
-            border-radius: 10px;
-            background-color: white;
-            width: 80%;
-            max-width: 500px;
         }
-
-        .score {
-            font-size: 2em;
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+        }
+        .result-container {
+            width: 80%;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .result-container p {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        .question {
             margin: 20px 0;
         }
-
-        .message {
-            font-size: 1.2em;
+        .correct {
+            color: green;
         }
-
-        .btn {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            font-size: 1em;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-top: 20px;
+        .incorrect {
+            color: red;
         }
-
-        .btn:hover {
-            background-color: #45a049;
+        #chart-container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
         }
     </style>
 </head>
 <body>
+    <h1>Your Quiz Results</h1>
+    <div class="result-container">
+        <p id="result"></p>
 
-    <div class="result-box">
-        <h1>Test Results</h1>
-        <div class="score" id="score"></div>
-        <div class="message" id="message"></div>
-        <a href="index.html" class="btn">Go Back</a>
+        <div id="questionsResults"></div>
+
+        <div id="chart-container">
+            <canvas id="scoreChart"></canvas>
+        </div>
     </div>
 
     <script>
-        // Get the score from the URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const score = urlParams.get('score');
-        
-        // Display the score and message
-        document.getElementById('score').textContent = `You scored: ${score}%`;
+        // Get query parameters
+        const params = new URLSearchParams(window.location.search);
+        const score = params.get('score');
+        const total = params.get('total');
 
-        if (score >= 60) {
-            document.getElementById('message').textContent = "Congratulations! You have passed the test.";
-        } else {
-            document.getElementById('message').textContent = "Unfortunately, you did not pass the test. Better luck next time!";
+        // Answer key for the questions
+        const answers = {
+            q1: 'B',
+            q2: 'B',
+            q3: 'A',
+            q4: 'A',
+            q5: 'B',
+            q6: 'C',
+            q7: 'B',
+            q8: 'D',
+            q9: 'B',
+            q10: 'A',
+            q11: 'A',
+            q12: 'C',
+            q13: 'C',
+            q14: 'B',
+            q15: 'B',
+            q16: 'A',
+            q17: 'C',
+            q18: 'A',
+            q19: 'B',
+            q20: 'C',
+            q21: 'B',
+            q22: 'B',
+            q23: 'A',
+            q24: 'C',
+            q25: 'B',
+            q26: 'A',
+            q27: 'B',
+            q28: 'B',
+            q29: 'A',
+            q30: 'D'
+        };
+
+        // Display the result percentage
+        const scorePercentage = ((score / total) * 100).toFixed(2);
+        document.getElementById('result').textContent = `You scored ${score} out of ${total} (${scorePercentage}%)`;
+
+        // Display the correct/incorrect answers
+        let questionsResults = '';
+        for (let i = 1; i <= total; i++) {
+            const userAnswer = params.get(`q${i}`);
+            const correctAnswer = answers[`q${i}`];
+            const questionClass = userAnswer === correctAnswer ? 'correct' : 'incorrect';
+
+            questionsResults += `
+                <div class="question">
+                    <p>Question ${i}: Your Answer: <span class="${questionClass}">${userAnswer}</span> (Correct Answer: ${correctAnswer})</p>
+                </div>
+            `;
         }
-    </script>
+        document.getElementById('questionsResults').innerHTML = questionsResults;
 
+        // Graphical Representation using Chart.js
+        const ctx = document.getElementById('scoreChart').getContext('2d');
+        const scoreChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Score', 'Remaining'],
+                datasets: [{
+                    label: 'Quiz Score',
+                    data: [score, total - score],
+                    backgroundColor: ['#2ecc71', '#e74c3c'],
+                    borderColor: ['#27ae60', '#c0392b'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.raw + ' questions';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
