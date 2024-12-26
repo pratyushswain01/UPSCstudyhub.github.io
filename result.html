@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,10 +12,12 @@
             color: #333;
             padding: 20px;
         }
+
         h1 {
             text-align: center;
             color: #2c3e50;
         }
+
         .result-container {
             width: 80%;
             margin: 0 auto;
@@ -25,33 +26,87 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .result-container p {
-            font-size: 18px;
-            margin-bottom: 10px;
+
+        .summary-table, .questions-table {
+            margin-top: 20px;
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 20px;
         }
-        .question {
-            margin: 20px 0;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
-        .correct {
-            color: green;
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
         }
-        .incorrect {
-            color: red;
+
+        th {
+            background-color: #2c3e50;
+            color: white;
         }
+
+        td {
+            background-color: #ecf0f1;
+        }
+
+        .summary-table th, .summary-table td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        .percentage {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
         #chart-container {
             width: 50%;
             margin: 0 auto;
             padding: 20px;
         }
+
     </style>
 </head>
 <body>
     <h1>Your Quiz Results</h1>
     <div class="result-container">
-        <p id="result"></p>
+        <!-- Summary Table: Total Marks and Percentage -->
+        <div class="summary-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Total Marks</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="totalMarks"></td>
+                        <td id="percentage" class="percentage"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-        <div id="questionsResults"></div>
+        <!-- Answer Key Table: Questions and Answers -->
+        <div class="questions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Correct Answer</th>
+                    </tr>
+                </thead>
+                <tbody id="answerKey"></tbody>
+            </table>
+        </div>
 
+        <!-- Graphical Representation -->
         <div id="chart-container">
             <canvas id="scoreChart"></canvas>
         </div>
@@ -63,58 +118,128 @@
         const score = params.get('score');
         const total = params.get('total');
 
-        // Answer key for the questions
-        const answers = {
-            q1: 'B',
-            q2: 'B',
-            q3: 'A',
-            q4: 'A',
-            q5: 'B',
-            q6: 'C',
-            q7: 'B',
-            q8: 'D',
-            q9: 'B',
-            q10: 'A',
-            q11: 'A',
-            q12: 'C',
-            q13: 'C',
-            q14: 'B',
-            q15: 'B',
-            q16: 'A',
-            q17: 'C',
-            q18: 'A',
-            q19: 'B',
-            q20: 'C',
-            q21: 'B',
-            q22: 'B',
-            q23: 'A',
-            q24: 'C',
-            q25: 'B',
-            q26: 'A',
-            q27: 'B',
-            q28: 'B',
-            q29: 'A',
-            q30: 'D'
-        };
+        // Answer key for the questions (Question text included)
+        const questions = [
+    "Who is known as the 'Father of Indian Renaissance'?",
+    "Which Charter Act introduced the concept of a law commission in India?",
+    "The Government of India Act, 1919, is also known as:",
+    "Who was the first Governor-General of independent India?",
+    "The Regulating Act of 1773 was significant because it:",
+    "Which Act abolished the East India Company's monopoly of trade in India?",
+    "The Indian Councils Act of 1909 is also known as:",
+    "Which Act provided for the establishment of a Federal Court in India?",
+    "The Vernacular Press Act was passed by:",
+    "The Simon Commission was appointed during the tenure of:",
+    "When was the Constituent Assembly of India formed?",
+    "Who was the chairman of the Drafting Committee of the Constituent Assembly?",
+    "Which plan provided for the establishment of the Constituent Assembly?",
+    "How many members initially constituted the Constituent Assembly?",
+    "The idea of the Constitution of India was first proposed by:",
+    "When was the first session of the Constituent Assembly held?",
+    "The Constitution of India was adopted on:",
+    "The drafting of the Constitution of India took approximately:",
+    "Which was the first country to grant universal adult suffrage?",
+    "Who proposed the Objectives Resolution in the Constituent Assembly?",
+    "Which of the following influenced the Indian Constitution the most?",
+    "How many schedules did the original Constitution of India have?",
+    "The concept of Fundamental Rights in the Indian Constitution is borrowed from:",
+    "The method of election of the President of India is taken from:",
+    "Who was the first Vice President of India?",
+    "The term 'secular' was added to the Preamble of the Constitution by:",
+    "Which Article of the Indian Constitution provides for the abolition of untouchability?",
+    "Which of the following Articles deals with the Right to Equality?",
+    "The Panchayati Raj system was first adopted by which Indian state?",
+    "The largest state in India by area is:"
+];
+
+
+     const answers = {
+    q1: 'B',
+    q2: 'B',
+    q3: 'A',
+    q4: 'A',
+    q5: 'B',
+    q6: 'C',
+    q7: 'B',
+    q8: 'D',
+    q9: 'B',
+    q10: 'A',
+    q11: 'A',
+    q12: 'C',
+    q13: 'C',
+    q14: 'B',
+    q15: 'B',
+    q16: 'A',
+    q17: 'C',
+    q18: 'A',
+    q19: 'B',
+    q20: 'C',
+    q21: 'B',
+    q22: 'B',
+    q23: 'A',
+    q24: 'C',
+    q25: 'B',
+    q26: 'A',
+    q27: 'B',
+    q28: 'B',
+    q29: 'A',
+    q30: 'D'
+};
+ 
+  
+
+       const answerOptions = {
+    q1: ['A) Mahatma Gandhi', 'B) Raja Ram Mohan Roy', 'C) Swami Vivekananda', 'D) Dadabhai Naoroji'],
+    q2: ['A) Charter Act of 1813', 'B) Charter Act of 1833', 'C) Charter Act of 1853', 'D) Charter Act of 1793'],
+    q3: ['A) Montague-Chelmsford Reforms', 'B) Morley-Minto Reforms', 'C) Pitt\'s India Act', 'D) Charter Act of 1853'],
+    q4: ['A) Lord Mountbatten', 'B) Jawaharlal Nehru', 'C) Rajendra Prasad', 'D) C. Rajagopalachari'],
+    q5: ['A) Introduced local self-government in India', 'B) Was the first step to regulate the affairs of the East India Company', 'C) Separated judiciary from the executive', 'D) Abolished the monopoly of the East India Company'],
+    q6: ['A) Regulating Act of 1773', 'B) Pitt\'s India Act, 1784', 'C) Charter Act of 1813', 'D) Charter Act of 1833'],
+    q7: ['A) Montague-Chelmsford Reforms', 'B) Morley-Minto Reforms', 'C) Pitts India Act', 'D) Charter Act of 1813'],
+    q8: ['A) Indian Councils Act, 1861', 'B) Indian Councils Act, 1892', 'C) Government of India Act, 1919', 'D) Government of India Act, 1935'],
+    q9: ['A) Lord Ripon', 'B) Lord Lytton', 'C) Lord Curzon', 'D) Lord Wellesley'],
+    q10: ['A) Lord Irwin', 'B) Lord Willingdon', 'C) Lord Reading', 'D) Lord Chelmsford'],
+    q11: ['A) 1946', 'B) 1947', 'C) 1948', 'D) 1950'],
+    q12: ['A) Dr. Rajendra Prasad', 'B) Jawaharlal Nehru', 'C) B.R. Ambedkar', 'D) Sardar Vallabhbhai Patel'],
+    q13: ['A) Cripps Mission', 'B) August Offer', 'C) Cabinet Mission Plan', 'D) Wavell Plan'],
+    q14: ['A) 299', 'B) 389', 'C) 296', 'D) 308'],
+    q15: ['A) Mahatma Gandhi', 'B) M.N. Roy', 'C) Jawaharlal Nehru', 'D) B.R. Ambedkar'],
+    q16: ['A) December 9, 1946', 'B) August 15, 1947', 'C) January 26, 1950', 'D) November 26, 1949'],
+    q17: ['A) January 26, 1950', 'B) August 15, 1947', 'C) November 26, 1949', 'D) December 9, 1946'],
+    q18: ['A) 2 years and 11 months', 'B) 3 years and 1 month', 'C) 2 years and 6 months', 'D) 3 years and 6 months'],
+    q19: ['A) France', 'B) New Zealand', 'C) USA', 'D) India'],
+    q20: ['A) Dr. B.R. Ambedkar', 'B) Mahatma Gandhi', 'C) Jawaharlal Nehru', 'D) Sardar Patel'],
+    q21: ['A) US Constitution', 'B) British Constitution', 'C) French Constitution', 'D) Irish Constitution'],
+    q22: ['A) 10', 'B) 8', 'C) 12', 'D) 7'],
+    q23: ['A) USA', 'B) Canada', 'C) Ireland', 'D) France'],
+    q24: ['A) USA', 'B) UK', 'C) Ireland', 'D) France'],
+    q25: ['A) Dr. Rajendra Prasad', 'B) Dr. S. Radhakrishnan', 'C) V.V. Giri', 'D) Gopal Krishna Gokhale'],
+    q26: ['A) 42nd Amendment', 'B) 44th Amendment', 'C) 52nd Amendment', 'D) 61st Amendment'],
+    q27: ['A) Article 14', 'B) Article 17', 'C) Article 19', 'D) Article 21'],
+    q28: ['A) Articles 19–22', 'B) Articles 14–18', 'C) Articles 23–24', 'D) Articles 25–28'],
+    q29: ['A) Rajasthan', 'B) Maharashtra', 'C) Gujarat', 'D) Haryana'],
+    q30: ['A) Uttar Pradesh', 'B) Maharashtra', 'C) Madhya Pradesh', 'D) Rajasthan']
+};
+
 
         // Display the result percentage
         const scorePercentage = ((score / total) * 100).toFixed(2);
-        document.getElementById('result').textContent = `You scored ${score} out of ${total} (${scorePercentage}%)`;
+        document.getElementById('totalMarks').textContent = `${score} / ${total}`;
+        document.getElementById('percentage').textContent = `${scorePercentage}%`;
 
-        // Display the correct/incorrect answers
-        let questionsResults = '';
+        // Display the correct answers in a table
+        let answerKeyHTML = '';
         for (let i = 1; i <= total; i++) {
-            const userAnswer = params.get(`q${i}`);
             const correctAnswer = answers[`q${i}`];
-            const questionClass = userAnswer === correctAnswer ? 'correct' : 'incorrect';
-
-            questionsResults += `
-                <div class="question">
-                    <p>Question ${i}: Your Answer: <span class="${questionClass}">${userAnswer}</span> (Correct Answer: ${correctAnswer})</p>
-                </div>
+            const questionText = questions[i - 1];
+            answerKeyHTML += `
+                <tr>
+                    <td>${questionText}</td>
+                    <td class="correct">${answerOptions[`q${i}`].find(option => option.startsWith(correctAnswer))}</td>
+                </tr>
             `;
         }
-        document.getElementById('questionsResults').innerHTML = questionsResults;
+        document.getElementById('answerKey').innerHTML = answerKeyHTML;
 
         // Graphical Representation using Chart.js
         const ctx = document.getElementById('scoreChart').getContext('2d');
