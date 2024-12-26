@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Hub - PDF Viewer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Layout styles */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.5rem;
+        }
+
+        header h1 span {
+            color: #ffdd57;
+        }
+
+        header .controls {
+            display: flex;
+            gap: 15px;
+        }
+
+        header .controls button {
+            padding: 8px;
+            font-size: 1.2rem;
+            background-color: transparent;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        header .controls button:hover {
+            color: #ffdd57;
+            transform: scale(1.2);
+        }
+
+        .pdf-container {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #eaeaea;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            transition: transform 0.3s ease;
+        }
+
+        footer {
+            background-color: #0056b3;
+            color: white;
+            text-align: center;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>UPSC Hub <span>PDF Viewer</span></h1>
+        <div class="controls">
+            <button onclick="zoomIn()" title="Zoom In">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button onclick="zoomOut()" title="Zoom Out">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <button onclick="fitToWidth()" title="Fit to Width">
+                <i class="fas fa-arrows-alt-h"></i>
+            </button>
+            <button onclick="fitToHeight()" title="Fit to Height">
+                <i class="fas fa-arrows-alt-v"></i>
+            </button>
+        </div>
+    </header>
+
+    <div class="pdf-container">
+        <iframe id="pdfViewer" src="path/to/your-pdf-file.pdf"></iframe>
+    </div>
+
+    <footer>
+        <p>© 2024 UPSC Hub. All Rights Reserved.</p>
+    </footer>
+
+    <script>
+        const iframe = document.getElementById('pdfViewer');
+
+        // Zoom control variables
+        let scale = 1;
+
+        function zoomIn() {
+            scale += 0.1;
+            iframe.style.transform = `scale(${scale})`;
+        }
+
+        function zoomOut() {
+            scale = Math.max(0.5, scale - 0.1);
+            iframe.style.transform = `scale(${scale})`;
+        }
+
+        function fitToWidth() {
+            iframe.style.width = '100%';
+            iframe.style.height = 'auto';
+            iframe.style.transform = 'scale(1)';
+        }
+
+        function fitToHeight() {
+            iframe.style.width = 'auto';
+            iframe.style.height = '100%';
+            iframe.style.transform = 'scale(1)';
+        }
+    </script>
+</body>
+</html>
