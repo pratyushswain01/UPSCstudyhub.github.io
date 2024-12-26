@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -413,7 +414,8 @@
             <button type="submit" class="btn">Submit</button>
         </form>
 
-       
+        <p id="result" style="display:none;"></p>
+    </main>
 
     <footer>
         &copy; 2024 UPSChub. All rights reserved.
@@ -483,26 +485,35 @@
  
   
 
-           document.getElementById('mcqForm').addEventListener('submit', function (event) {
-        event.preventDefault(); // Prevent page refresh
+            let score = 0;
+            const totalQuestions = Object.keys(answers).length;
 
-         let score = 0;
-            // Check answers
-            for (let question in correctAnswers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                if (selected && selected.value === correctAnswers[question]) {
+            for (const [question, correctAnswer] of Object.entries(answers)) {
+                const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
+                if (selectedAnswer && selectedAnswer.value === correctAnswer) {
                     score++;
                 }
             }
 
-            // Calculate score percentage
-            const totalQuestions = Object.keys(correctAnswers).length;
-            const percentage = (score / totalQuestions) * 100;
+            const passingMark = totalQuestions * 0.6; // Set 60% as the passing mark
+            const resultElement = document.getElementById('result');
 
-            // Redirect to result page with score as query parameter
-            window.location.href = `result.html?score=${percentage}`;
+            if (score >= passingMark) {
+                resultElement.style.color = 'green';
+                resultElement.textContent = `Congratulations! You scored ${score}/${totalQuestions}. Welcome to UPSChub.`;
+                resultElement.style.display = 'block';
+                setTimeout(() => {
+                    window.location.href = 'index01.html'; // Redirect to the index home page
+                }, 2000);
+            } else {
+                resultElement.style.color = 'red';
+                resultElement.textContent = `Sorry, you scored ${score}/${totalQuestions}. The app will now close.`;
+                resultElement.style.display = 'block';
+                setTimeout(() => {
+                    window.close(); // Close the app (may not work in some browsers due to security restrictions)
+                }, 3000);
+            }
         });
     </script>
-    
 </body>
 </html>
