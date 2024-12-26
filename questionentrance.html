@@ -484,37 +484,28 @@
  
   
 
-            let score = 0;
-            const totalQuestions = Object.keys(answers).length;
+           document.getElementById('mcqForm').addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent page refresh
 
-            for (const [question, correctAnswer] of Object.entries(answers)) {
-                const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
-                if (selectedAnswer && selectedAnswer.value === correctAnswer) {
-                    score++;
-                }
+        let score = 0;
+        const totalQuestions = Object.keys(correctAnswers).length;
+
+        for (const [question, correctAnswer] of Object.entries(correctAnswers)) {
+            const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
+            if (selectedAnswer && selectedAnswer.value === correctAnswer) {
+                score++;
             }
+        }
 
-            const passingMark = totalQuestions * 0.6; // Set 60% as the passing mark
-            const resultElement = document.getElementById('result');
+        // Store score and total questions in sessionStorage
+        sessionStorage.setItem("testScore", score);
+        sessionStorage.setItem("totalQuestions", totalQuestions);
 
-            if (score >= passingMark) {
-                resultElement.style.color = 'green';
-                resultElement.textContent = `Congratulations! You scored ${score}/${totalQuestions}. Welcome to UPSChub.`;
-                resultElement.style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = 'index01.html'; // Redirect to the index home page
-                }, 2000);
-            } else {
-                resultElement.style.color = 'red';
-                resultElement.textContent = `Sorry, you scored ${score}/${totalQuestions}. The app will now close.`;
-                resultElement.style.display = 'block';
-                setTimeout(() => {
-                    window.close(); // Close the app (may not work in some browsers due to security restrictions)
-                }, 3000);
-
-                
-            }
-        });
-    </script>
+        // Redirect to results.html
+        window.location.href = "results.html";
+    });
+   
+   </script>
+    
 </body>
 </html>
