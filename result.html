@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -57,37 +58,59 @@
     </div>
 
     <script>
-        // Parse the query string from the URL
+        // Get query parameters
         const params = new URLSearchParams(window.location.search);
         const score = params.get('score');
         const total = params.get('total');
-        const scorePercentage = params.get('percentage');
-        const userAnswers = JSON.parse(decodeURIComponent(params.get('userAnswers')));
-        const correctAnswers = JSON.parse(decodeURIComponent(params.get('correctAnswers')));
+
+        // Answer key for the questions
+        const answers = {
+            q1: 'B',
+            q2: 'B',
+            q3: 'A',
+            q4: 'A',
+            q5: 'B',
+            q6: 'C',
+            q7: 'B',
+            q8: 'D',
+            q9: 'B',
+            q10: 'A',
+            q11: 'A',
+            q12: 'C',
+            q13: 'C',
+            q14: 'B',
+            q15: 'B',
+            q16: 'A',
+            q17: 'C',
+            q18: 'A',
+            q19: 'B',
+            q20: 'C',
+            q21: 'B',
+            q22: 'B',
+            q23: 'A',
+            q24: 'C',
+            q25: 'B',
+            q26: 'A',
+            q27: 'B',
+            q28: 'B',
+            q29: 'A',
+            q30: 'D'
+        };
 
         // Display the result percentage
+        const scorePercentage = ((score / total) * 100).toFixed(2);
         document.getElementById('result').textContent = `You scored ${score} out of ${total} (${scorePercentage}%)`;
 
-        // Display the correct/incorrect answers with proper formatting
+        // Display the correct/incorrect answers
         let questionsResults = '';
         for (let i = 1; i <= total; i++) {
-            const userAnswer = userAnswers[`q${i}`];
-            const correctAnswer = correctAnswers[`q${i}`];
-            let userAnswerClass = 'incorrect';
-            let correctAnswerClass = 'correct';
+            const userAnswer = params.get(`q${i}`);
+            const correctAnswer = answers[`q${i}`];
+            const questionClass = userAnswer === correctAnswer ? 'correct' : 'incorrect';
 
-            // If the user's answer is correct, we display it in green
-            if (userAnswer === correctAnswer) {
-                userAnswerClass = 'correct';
-                correctAnswerClass = '';  // No need to display correct answer in green if user got it right
-            }
-
-            // Format the question display
             questionsResults += `
                 <div class="question">
-                    <p><strong>Question ${i}:</strong> What is 2 + 2?</p>
-                    <p>Your Answer: <span class="${userAnswerClass}">${userAnswer}</span></p>
-                    ${userAnswer !== correctAnswer ? `<p>Correct Answer: <span class="${correctAnswerClass}">${correctAnswer}</span></p>` : ''}
+                    <p>Question ${i}: Your Answer: <span class="${questionClass}">${userAnswer}</span> (Correct Answer: ${correctAnswer})</p>
                 </div>
             `;
         }
