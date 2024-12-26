@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Viewer - UPSC Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        /* Basic reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            color: #333;
+        }
+
+        header p {
+            font-size: 1rem;
+            color: #777;
+        }
+
+        .viewer-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .nav-btn {
+            background-color: #0056b3;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .nav-btn:hover {
+            background-color: #00408e;
+        }
+
+        .page-input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        #pdf-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        canvas {
+            border: 1px solid #ddd;
+            max-width: 100%;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UPSC Hub PDF Viewer</h1>
+            <p>View your study materials with ease.</p>
+        </header>
+
+        <div class="viewer-container">
+            <div class="toolbar">
+                <button id="prevBtn" class="nav-btn">Previous</button>
+                <button id="nextBtn" class="nav-btn">Next</button>
+                <input type="number" id="pageNum" class="page-input" min="1" value="1">
+                <span> / <span id="totalPages"></span></span>
+            </div>
+
+            <div id="pdf-container">
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+        </div>
+
+        <footer>
+            <p>&copy; 2024 UPSC Hub. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        let pdfDoc = null,
+            currentPage = 1,
+            totalPages = 0;
+
+        const canvas = document.getElementById("pdf-canvas");
+        const ctx = canvas.getContext("2d");
+        const pageInput = document.getElementById("pageNum");
+        const totalPagesEl = document.getElementById("totalPages");
+
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Replace with your PDF file URL
+        const pdfUrl = 'your-pdf-url.pdf';
+
+        // Load the PDF document
+        pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
+            pdfDoc = pdf;
+            totalPages = pdf.numPages;
+            totalPagesEl.textContent = totalPages;
+            renderPage(currentPage);
+        });
+
+        function renderPage(pageNum) {
+            pdfDoc.getPage(pageNum).then(function (page) {
+                const viewport = page.getViewport({ scale: 1 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                });
+            });
+        }
+
+        prevBtn.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                pageInput.value = currentPage;
+                renderPage(currentPage);
+            }
+        });
+
+        nextBtn.addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                pageInput.value = currentPage;
+                renderPage(currentPage);
+            }
+        });
+
+        pageInput.addEventListener("change", function () {
+            const page = parseInt(pageInput.value);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderPage(currentPage);
+            }
+        });
+    </script>
+</body>
+</html>
