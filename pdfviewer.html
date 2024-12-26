@@ -7,83 +7,96 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <style>
-        /* General styles */
+        /* General page styling */
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f3f3f3;
+            background-color: #f4f7f6;
             display: flex;
             flex-direction: column;
             height: 100vh;
+            color: #333;
         }
 
+        /* Header section */
         header {
-            background: #0056b3;
+            background-color: #006bb3;
             color: white;
-            padding: 10px 20px;
+            padding: 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 1.2rem;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.5rem;
         }
 
-        header .toolbar {
+        /* Toolbar (buttons) */
+        .toolbar {
             display: flex;
+            gap: 15px;
             align-items: center;
-            gap: 10px;
         }
 
-        header .toolbar button {
-            background: none;
+        .toolbar button {
+            background-color: #0077cc;
             border: none;
+            padding: 8px 15px;
             color: white;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             cursor: pointer;
-            padding: 5px;
-            transition: transform 0.3s, color 0.3s;
+            border-radius: 5px;
+            transition: background-color 0.3s, transform 0.3s;
         }
 
-        header .toolbar button:hover {
-            color: #ffdd57;
+        .toolbar button:hover {
+            background-color: #005fa3;
             transform: scale(1.1);
         }
 
+        /* PDF viewer container */
         #viewer-container {
             flex: 1;
-            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #ffffff;
+            padding: 20px;
             overflow: auto;
         }
 
         #pdf-viewer {
             width: 100%;
-            background-color: #eaeaea;
+            max-width: 1000px;
+            background-color: #f4f7f6;
         }
 
+        /* Footer section */
         footer {
-            background: #0056b3;
+            background-color: #006bb3;
             color: white;
             text-align: center;
-            font-size: 0.8rem;
-            padding: 5px;
+            font-size: 0.9rem;
+            padding: 10px;
             position: fixed;
             bottom: 0;
             width: 100%;
         }
 
-        /* Controls for navigation */
-        .navigation {
-            display: flex;
-            align-items: center;
-            gap: 5px;
+        .navigation input {
+            width: 60px;
+            padding: 5px;
+            text-align: center;
+            font-size: 1rem;
         }
 
-        .navigation input {
-            width: 50px;
-            text-align: center;
+        /* Spacing adjustments */
+        .toolbar .navigation {
+            display: flex;
+            gap: 5px;
+            align-items: center;
         }
     </style>
 </head>
@@ -91,20 +104,20 @@
     <header>
         <h1>UPSC Hub PDF Viewer</h1>
         <div class="toolbar">
-            <button id="prev-page" title="Previous Page"><i class="fas fa-chevron-left"></i></button>
+            <button id="prev-page"><i class="fas fa-chevron-left"></i> Prev</button>
             <div class="navigation">
                 <span>Page</span>
-                <input id="page-num" type="number" value="1" min="1">
+                <input id="page-num" type="number" value="1" min="1" />
                 <span>of</span>
                 <span id="page-count">1</span>
             </div>
-            <button id="next-page" title="Next Page"><i class="fas fa-chevron-right"></i></button>
-            <button id="zoom-in" title="Zoom In"><i class="fas fa-search-plus"></i></button>
-            <button id="zoom-out" title="Zoom Out"><i class="fas fa-search-minus"></i></button>
-            <button id="fit-to-width" title="Fit to Width"><i class="fas fa-arrows-alt-h"></i></button>
-            <button id="fit-to-height" title="Fit to Height"><i class="fas fa-arrows-alt-v"></i></button>
-            <button id="download" title="Download PDF"><i class="fas fa-download"></i></button>
-            <button id="print" title="Print PDF"><i class="fas fa-print"></i></button>
+            <button id="next-page"><i class="fas fa-chevron-right"></i> Next</button>
+            <button id="zoom-in"><i class="fas fa-search-plus"></i></button>
+            <button id="zoom-out"><i class="fas fa-search-minus"></i></button>
+            <button id="fit-to-width"><i class="fas fa-arrows-alt-h"></i> Fit Width</button>
+            <button id="fit-to-height"><i class="fas fa-arrows-alt-v"></i> Fit Height</button>
+            <button id="download"><i class="fas fa-download"></i> Download</button>
+            <button id="print"><i class="fas fa-print"></i> Print</button>
         </div>
     </header>
 
@@ -117,7 +130,7 @@
     </footer>
 
     <script>
-        const url = "path/to/your-pdf-file.pdf"; // Replace with your PDF file URL
+        const url = "path/to/your-pdf-file.pdf"; // Replace with the actual PDF path
 
         let pdfDoc = null,
             pageNum = 1,
@@ -163,17 +176,13 @@
         };
 
         const onPrevPage = () => {
-            if (pageNum <= 1) {
-                return;
-            }
+            if (pageNum <= 1) return;
             pageNum--;
             queueRenderPage(pageNum);
         };
 
         const onNextPage = () => {
-            if (pageNum >= pdfDoc.numPages) {
-                return;
-            }
+            if (pageNum >= pdfDoc.numPages) return;
             pageNum++;
             queueRenderPage(pageNum);
         };
@@ -206,6 +215,7 @@
             window.open(url, "_blank");
         };
 
+        // Event listeners for buttons
         document.getElementById("prev-page").addEventListener("click", onPrevPage);
         document.getElementById("next-page").addEventListener("click", onNextPage);
         document.getElementById("zoom-in").addEventListener("click", zoomIn);
