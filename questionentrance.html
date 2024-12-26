@@ -488,32 +488,17 @@
             let score = 0;
             const totalQuestions = Object.keys(answers).length;
 
-            for (const [question, correctAnswer] of Object.entries(answers)) {
-                const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
-                if (selectedAnswer && selectedAnswer.value === correctAnswer) {
-                    score++;
-                }
+            for (const [question, answer] of Object.entries(correctAnswers)) {
+            const userAnswer = document.querySelector(`input[name="${question}"]:checked`);
+            if (userAnswer && userAnswer.value === answer) {
+                score++;
             }
+        }
 
-            const passingMark = totalQuestions * 0.6; // Set 60% as the passing mark
-            const resultElement = document.getElementById('result');
-
-            if (score >= passingMark) {
-                resultElement.style.color = 'green';
-                resultElement.textContent = `Congratulations! You scored ${score}/${totalQuestions}. cheak your result.`;
-                resultElement.style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = 'result.html'; // Redirect to the result page
-                }, 2000);
-            } else {
-                resultElement.style.color = 'red';
-                resultElement.textContent = `Sorry, you scored ${score}/${totalQuestions}. CHEAK your result`;
-                resultElement.style.display = 'block';
-                setTimeout(() => {
-                    window.location.href = 'result.html'; // Redirect to the result page
-                }, 3000);
-            }
-        });
-    </script>
+        // Redirect to result.html with score in query string
+        const scorePercentage = (score / totalQuestions) * 100;
+        window.location.href = `result.html?score=${score}&total=${totalQuestions}`;
+    });
+</script>
 </body>
 </html>
