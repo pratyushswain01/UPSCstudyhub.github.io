@@ -486,25 +486,23 @@
            document.getElementById('mcqForm').addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent page refresh
 
-        let score = 0;
-        const totalQuestions = Object.keys(correctAnswers).length;
-
-        for (const [question, correctAnswer] of Object.entries(correctAnswers)) {
-            const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
-            if (selectedAnswer && selectedAnswer.value === correctAnswer) {
-                score++;
+         let score = 0;
+            // Check answers
+            for (let question in correctAnswers) {
+                const selected = document.querySelector(`input[name="${question}"]:checked`);
+                if (selected && selected.value === correctAnswers[question]) {
+                    score++;
+                }
             }
-        }
 
-        // Store score and total questions in sessionStorage
-        sessionStorage.setItem("testScore", score);
-        sessionStorage.setItem("totalQuestions", totalQuestions);
+            // Calculate score percentage
+            const totalQuestions = Object.keys(correctAnswers).length;
+            const percentage = (score / totalQuestions) * 100;
 
-        // Redirect to results.html
-        window.location.href = "results.html";
-    });
-   
-   </script>
+            // Redirect to result page with score as query parameter
+            window.location.href = `result.html?score=${percentage}`;
+        });
+    </script>
     
 </body>
 </html>
