@@ -5,128 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPSC Hub - PDF Viewer</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://mozilla.github.io/pdf.js/build/pdf.js"></script>
     <style>
-        /* General page styling */
-        body {
+        /* Reset styles */
+        * {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            color: #333;
-            overflow: hidden; /* Prevent horizontal scrolling */
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        /* Header section */
-        header {
-            background-color: #006bb3;
-            color: white;
-            padding: 15px;
+        html, body {
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        /* Layout styles */
+        body {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #0056b3;
+            color: white;
+            padding: 10px 20px;
+            display: flex;
             align-items: center;
-            font-size: 1.2rem;
-            z-index: 100;
-            position: relative;
+            justify-content: space-between;
         }
 
         header h1 {
             margin: 0;
+            font-size: 1.5rem;
         }
 
-        /* Toolbar (buttons) */
-        .toolbar {
+        header h1 span {
+            color: #ffdd57;
+        }
+
+        header .controls {
             display: flex;
             gap: 15px;
-            align-items: center;
         }
 
-        .toolbar button {
-            background-color: #0077cc;
-            border: none;
-            padding: 8px 15px;
+        header .controls button {
+            padding: 8px;
+            font-size: 1.2rem;
+            background-color: transparent;
             color: white;
-            font-size: 1.1rem;
+            border: none;
             cursor: pointer;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.3s;
+            transition: transform 0.3s ease, color 0.3s ease;
         }
 
-        .toolbar button:hover {
-            background-color: #005fa3;
-            transform: scale(1.1);
+        header .controls button:hover {
+            color: #ffdd57;
+            transform: scale(1.2);
         }
 
-        /* PDF viewer container */
-        #viewer-container {
+        .pdf-container {
             flex: 1;
+            overflow: hidden;
             display: flex;
             justify-content: center;
             align-items: center;
-            background-color: #ffffff;
-            padding: 20px;
-            overflow: hidden; /* Prevent horizontal scrolling */
+            background-color: #eaeaea;
         }
 
-        #pdf-viewer {
+        iframe {
             width: 100%;
             height: 100%;
-            background-color: #f4f7f6;
-            overflow: hidden;
+            border: none;
+            transition: transform 0.3s ease;
         }
 
-        /* Footer section */
         footer {
-            background-color: #006bb3;
+            background-color: #0056b3;
             color: white;
             text-align: center;
-            font-size: 0.9rem;
-            padding: 10px;
+            font-size: 0.8rem;
+            padding: 5px 10px;
             position: fixed;
             bottom: 0;
             width: 100%;
-        }
-
-        .navigation input {
-            width: 60px;
-            padding: 5px;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        /* Spacing adjustments */
-        .toolbar .navigation {
-            display: flex;
-            gap: 5px;
-            align-items: center;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>UPSC Hub PDF Viewer</h1>
-        <div class="toolbar">
-            <button id="prev-page"><i class="fas fa-chevron-left"></i> Prev</button>
-            <div class="navigation">
-                <span>Page</span>
-                <input id="page-num" type="number" value="1" min="1" />
-                <span>of</span>
-                <span id="page-count">1</span>
-            </div>
-            <button id="next-page"><i class="fas fa-chevron-right"></i> Next</button>
-            <button id="zoom-in"><i class="fas fa-search-plus"></i></button>
-            <button id="zoom-out"><i class="fas fa-search-minus"></i></button>
-            <button id="fit-to-width"><i class="fas fa-arrows-alt-h"></i> Fit Width</button>
-            <button id="fit-to-height"><i class="fas fa-arrows-alt-v"></i> Fit Height</button>
-            <button id="download"><i class="fas fa-download"></i> Download</button>
-            <button id="print"><i class="fas fa-print"></i> Print</button>
+        <h1>UPSC Hub <span>PDF Viewer</span></h1>
+        <div class="controls">
+            <button onclick="zoomIn()" title="Zoom In">
+                <i class="fas fa-search-plus"></i>
+            </button>
+            <button onclick="zoomOut()" title="Zoom Out">
+                <i class="fas fa-search-minus"></i>
+            </button>
+            <button onclick="fitToWidth()" title="Fit to Width">
+                <i class="fas fa-arrows-alt-h"></i>
+            </button>
+            <button onclick="fitToHeight()" title="Fit to Height">
+                <i class="fas fa-arrows-alt-v"></i>
+            </button>
         </div>
     </header>
 
-    <div id="viewer-container">
-        <canvas id="pdf-viewer"></canvas>
+    <div class="pdf-container">
+        <iframe id="pdfViewer" src="path/to/your-pdf-file.pdf"></iframe>
     </div>
 
     <footer>
@@ -134,106 +119,32 @@
     </footer>
 
     <script>
-        const url = "path/to/your-pdf-file.pdf"; // Replace with the actual PDF path
+        const iframe = document.getElementById('pdfViewer');
 
-        let pdfDoc = null,
-            pageNum = 1,
-            scale = 1,
-            pageRendering = false,
-            pageNumPending = null;
+        // Zoom control variables
+        let scale = 1;
 
-        const canvas = document.getElementById("pdf-viewer");
-        const ctx = canvas.getContext("2d");
-
-        const renderPage = (num) => {
-            pageRendering = true;
-            pdfDoc.getPage(num).then((page) => {
-                const viewport = page.getViewport({ scale });
-                canvas.height = viewport.height;
-                canvas.width = viewport.width;
-
-                const renderContext = {
-                    canvasContext: ctx,
-                    viewport: viewport,
-                };
-
-                const renderTask = page.render(renderContext);
-
-                renderTask.promise.then(() => {
-                    pageRendering = false;
-                    if (pageNumPending !== null) {
-                        renderPage(pageNumPending);
-                        pageNumPending = null;
-                    }
-                });
-            });
-
-            document.getElementById("page-num").value = num;
-        };
-
-        const queueRenderPage = (num) => {
-            if (pageRendering) {
-                pageNumPending = num;
-            } else {
-                renderPage(num);
-            }
-        };
-
-        const onPrevPage = () => {
-            if (pageNum <= 1) return;
-            pageNum--;
-            queueRenderPage(pageNum);
-        };
-
-        const onNextPage = () => {
-            if (pageNum >= pdfDoc.numPages) return;
-            pageNum++;
-            queueRenderPage(pageNum);
-        };
-
-        const zoomIn = () => {
+        function zoomIn() {
             scale += 0.1;
-            queueRenderPage(pageNum);
-        };
+            iframe.style.transform = `scale(${scale})`;
+        }
 
-        const zoomOut = () => {
-            scale = Math.max(scale - 0.1, 0.5);
-            queueRenderPage(pageNum);
-        };
+        function zoomOut() {
+            scale = Math.max(0.5, scale - 0.1);
+            iframe.style.transform = `scale(${scale})`;
+        }
 
-        const fitToWidth = () => {
-            scale = canvas.parentElement.offsetWidth / canvas.width;
-            queueRenderPage(pageNum);
-        };
+        function fitToWidth() {
+            iframe.style.width = '100%';
+            iframe.style.height = 'auto';
+            iframe.style.transform = 'scale(1)';
+        }
 
-        const fitToHeight = () => {
-            scale = canvas.parentElement.offsetHeight / canvas.height;
-            queueRenderPage(pageNum);
-        };
-
-        const downloadPDF = () => {
-            window.open(url, "_blank");
-        };
-
-        const printPDF = () => {
-            window.open(url, "_blank");
-        };
-
-        // Event listeners for buttons
-        document.getElementById("prev-page").addEventListener("click", onPrevPage);
-        document.getElementById("next-page").addEventListener("click", onNextPage);
-        document.getElementById("zoom-in").addEventListener("click", zoomIn);
-        document.getElementById("zoom-out").addEventListener("click", zoomOut);
-        document.getElementById("fit-to-width").addEventListener("click", fitToWidth);
-        document.getElementById("fit-to-height").addEventListener("click", fitToHeight);
-        document.getElementById("download").addEventListener("click", downloadPDF);
-        document.getElementById("print").addEventListener("click", printPDF);
-
-        pdfjsLib.getDocument(url).promise.then((doc) => {
-            pdfDoc = doc;
-            document.getElementById("page-count").textContent = pdfDoc.numPages;
-            renderPage(pageNum);
-        });
+        function fitToHeight() {
+            iframe.style.width = 'auto';
+            iframe.style.height = '100%';
+            iframe.style.transform = 'scale(1)';
+        }
     </script>
 </body>
 </html>
