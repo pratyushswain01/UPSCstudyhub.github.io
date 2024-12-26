@@ -17,6 +17,7 @@
             height: 100%;
             font-family: 'Roboto', sans-serif;
             background-color: #f8f9fa;
+            overflow: hidden; /* Prevent scrolling */
         }
 
         /* Layout styles */
@@ -30,22 +31,31 @@
             color: white;
             padding: 10px 20px;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: space-between;
+            justify-content: center;
+            text-align: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.5rem;
+            font-size: 2rem;
         }
 
-        header h1 span {
-            color: #ffdd57;
+        header h2 {
+            margin: 5px 0;
+            font-size: 1.2rem;
         }
 
         header .controls {
             display: flex;
             gap: 15px;
+            margin-top: 10px;
         }
 
         header .controls button {
@@ -70,6 +80,7 @@
             justify-content: center;
             align-items: center;
             background-color: #eaeaea;
+            margin-top: 80px; /* Adjust for fixed header */
         }
 
         iframe {
@@ -93,20 +104,10 @@
 </head>
 <body>
     <header>
-        <h1>UPSC Hub <span>PDF Viewer</span></h1>
+        <h1>UPSC Hub</h1>
+        <h2>PDF Viewer</h2>
         <div class="controls">
-            <button onclick="zoomIn()" title="Zoom In">
-                <i class="fas fa-search-plus"></i>
-            </button>
-            <button onclick="zoomOut()" title="Zoom Out">
-                <i class="fas fa-search-minus"></i>
-            </button>
-            <button onclick="fitToWidth()" title="Fit to Width">
-                <i class="fas fa-arrows-alt-h"></i>
-            </button>
-            <button onclick="fitToHeight()" title="Fit to Height">
-                <i class="fas fa-arrows-alt-v"></i>
-            </button>
+            <!-- No zoom buttons to avoid zooming functionality -->
         </div>
     </header>
 
@@ -118,33 +119,5 @@
         <p>© 2024 UPSC Hub. All Rights Reserved.</p>
     </footer>
 
-    <script>
-        const iframe = document.getElementById('pdfViewer');
-
-        // Zoom control variables
-        let scale = 1;
-
-        function zoomIn() {
-            scale += 0.1;
-            iframe.style.transform = `scale(${scale})`;
-        }
-
-        function zoomOut() {
-            scale = Math.max(0.5, scale - 0.1);
-            iframe.style.transform = `scale(${scale})`;
-        }
-
-        function fitToWidth() {
-            iframe.style.width = '100%';
-            iframe.style.height = 'auto';
-            iframe.style.transform = 'scale(1)';
-        }
-
-        function fitToHeight() {
-            iframe.style.width = 'auto';
-            iframe.style.height = '100%';
-            iframe.style.transform = 'scale(1)';
-        }
-    </script>
 </body>
 </html>
