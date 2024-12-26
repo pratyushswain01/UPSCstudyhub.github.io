@@ -1,328 +1,247 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title> Home: UPSC hub </title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern PDF Viewer - UPSC Hub</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <style>
+        /* Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: 'Roboto', sans-serif;
+            background-color: #f8f9fa;
+        }
 
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            width: 100%;
+        }
 
+        header {
+            background: linear-gradient(90deg, #0056b3, #00408e);
+            color: white;
+            padding: 15px 20px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        header p {
+            font-size: 1rem;
+        }
+
+        .viewer-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #e9ecef;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .toolbar select,
+        .toolbar input,
+        .toolbar button {
+            font-size: 1rem;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .toolbar button {
+            background-color: #0056b3;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .toolbar button:hover {
+            background-color: #00408e;
+        }
+
+        .toolbar select {
+            width: 200px;
+        }
+
+        .viewer {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+            background-color: #ffffff;
+        }
+
+        canvas {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        footer {
+            background-color: #0056b3;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 0.9rem;
+            position: sticky;
+            bottom: 0;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        footer a {
+            color: #ffdd57;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-
-   <style>
-      /* Notification CSS */
-      .notification {
-          position: fixed;
-          top: 20px;
-          right: 20px;
-          background-color: #4CAF50;
-          color: white;
-          border-radius: 5px;
-          padding: 15px;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-          opacity: 0;
-          animation: slideIn 1s forwards;
-          z-index: 9999;
-      }
-
-      @keyframes slideIn {
-          from {
-              top: -50px;
-              opacity: 0;
-          }
-          to {
-              top: 20px;
-              opacity: 1;
-          }
-      }
-
-      .notification .close-btn {
-          margin-left: 15px;
-          font-size: 18px;
-          color: white;
-          cursor: pointer;
-      }
-
-      /* Centered Pop-up Box Styles */
-      .popup-box {
-          position: fixed;
-          top: 50%;
-          left: 50%;
-          transform: translate(-50%, -50%);
-          background-color: #fff;
-          padding: 30px;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-          border-radius: 10px;
-          width: 80%;
-          max-width: 400px;
-          display: none;
-          z-index: 10000;
-      }
-
-      .popup-box .popup-header {
-          font-size: 18px;
-          font-weight: bold;
-          color: #333;
-      }
-
-      .popup-box .popup-message {
-          font-size: 16px;
-          margin: 15px 0;
-          color: #555;
-          padding: 10px;
-      }
-
-      .popup-box .popup-close {
-          display: inline-block;
-          background-color: #f44336;
-          color: white;
-          padding: 10px;
-          border-radius: 5px;
-          cursor: pointer;
-          text-align: center;
-          width: 100%;
-      }
-
-      .popup-box .popup-close:hover {
-          background-color: #d32f2f;
-      }
-   </style>
-
-   <script>
-      // Function to show the center popup
-      function showPopup() {
-          const popup = document.querySelector('.popup-box');
-          popup.style.display = 'block'; // Show the popup
-      }
-
-      // Function to close the center popup
-      function closePopup() {
-          const popup = document.querySelector('.popup-box');
-          popup.style.display = 'none'; // Hide the popup
-      }
-
-      // Show the pop-up when the page is loaded
-      document.addEventListener("DOMContentLoaded", function() {
-          showPopup();
-
-          // Show browser notification
-          if ("Notification" in window) {
-              if (Notification.permission === "default") {
-                  Notification.requestPermission().then(permission => {
-                      if (permission === "granted") {
-                          new Notification("Hello and Welcome to UPSC Hub!", {
-                              body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!",
-                              icon: "images/images/LOGO.jpg"
-                          });
-                      }
-                  });
-              } else if (Notification.permission === "granted") {
-                  new Notification("Welcome to UPSC Hub!", {
-                      body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!.",
-                      icon: "images/LOGO.jpg"
-                  });
-              }
-          }
-      });
-   </script>
-
-<header class="header">
-   
-   <section class="flex">
-
-      <a href="index.html" class="logo">UPSC hub</a>
-
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
-      </div>
-
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-        
-         </div>
-      </div>
-
-   </section>
-
-</header>   
-
-<div class="side-bar">
-
-   <div id="close-btn">
-      <i class="fas fa-times"></i>
-   </div>
-
-   <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   
-   </div>
-
-   <nav class="navbar">
-      <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-      <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-      <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-   </nav>
-
-</div>
-   
-   
-   
-   
-<section class="home-grid">
-
-
-          
-   <h1 class="heading">quick options</h1>
-
-   <div class="box-container">
-
-      
-
-      <div class="box">
-         <h3 class="title">UPSC</h3>
-         <p class="likes">PRELIMS : </p>
-         <a href="syllabus.html" class="inline-btn">view syllabus</a>
-         <p class="likes">MAINS : <span></span></p>
-         <a href="syllabus.html" class="inline-btn">view syllabus</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> VIEW files</h3>
-         <p class="likes"> UPSChub:personal pdf viewer </p>
-         <a href="pdfviewer.html" class="inline-btn"> View...</a>
-      </div>
-
-
-      <div class="box">
-         <h3 class="title"> Focus Timer</h3>
-         <p class="likes"> Track your consistency & Sterk : </p>
-         <a href="focustimer.html" class="inline-btn"> Ready to FOCUS...</a>
-      </div>
-
-       <div class="box">
-         <h3 class="title"> Today's News Update</h3>
-         <p class="likes"> Top news : daily : </p>
-         <a href="newsupdate.html" class="inline-btn"> view...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> NEWS-Paper </h3>
-         <p class="likes">  daily  </p>
-         <a href="newspaper.html" class="inline-btn"> read news...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">top categories</h3>
-         <div class="flex">
-            <a href="#"><i class=""></i><span>Geography</span></a>
-            <a href="#"><i class=""></i><span>Polity</span></a>
-            <a href="#"><i class=""></i><span>History</span></a>
-            <a href="#"><i class=""></i><span>Mapping</span></a>
-            <a href="#"><i class=""></i><span>Science & tech</span></a>
-            <a href="#"><i class=""></i><span>General studies</span></a>
-            <a href="#"><i class=""></i><span></span></a>
-            <a href="#"><i class=""></i><span></span></a>
-         </div>
-      </div>
-
-      <div class="box">
-         <h3 class="title">popular topics</h3>
-         <div class="flex">
-            <a href="#"><i class=""></i><span>Current affairs</span></a>
-            <a href="#"><i class=""></i><span>Articles</span></a>
-            <a href="#"><i class=""></i><span>Editorials</span></a>
-            <a href="#"><i class=""></i><span>Newspaper analysis</span></a>
-            <a href="#"><i class=""></i><span></span></a>
-            <a href="#"><i class=""></i><span></span></a>
-         </div>
-      </div>
-
-      <div class="box">
-         <h3 class="title">UPLOAD WRITTEN FILES</h3>
-         <p class="tutor">UPSC mains is fully based on writing skil , so lets practice daily....</p>
-         <a href="drive.doc.html" class="inline-btn">upload doc</a>
-      </div>
-
-   
- 
-      <div class="box">
-         <h3 class="title">MOCK TEST SERIES</h3>
-         <P class="tutor">Let's test our brain....!!!</P>
-         <a href="test.html" class="inline-btn">go to test</a>
-
-      </div>
-
-      <div class="box">
-         <h3 class="title">Test result and analysis</h3>
-         <p class="tutor">best analysis give best result..</p>
-         <a href="testinfo.html"  class="inline-btn">View report</a>
-         
-      </div>
-
-      
-
-   </div>   
-</section>
-
-
-
-
-
-</section>
-
-
-
-
-
-
-
-
-<div class="popup-box">
-   <div class="popup-header">Welcome to UPSC Hub!</div>
-   <div class="popup-message">Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. 
-      
-      <h3>✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!</h3>
-
-   </div>
-   <div class="popup-close" onclick="closePopup()">Close</div>
-</div>
-
-
-
-
-
-
-<footer class="footer">
-
-   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved! (owner)
-
-</footer>
-
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
-
-   
+    <div class="container">
+        <header>
+            <h1>UPSC Hub PDF Viewer</h1>
+            <p>Your ultimate tool for accessing study materials</p>
+        </header>
+
+        <div class="viewer-container">
+            <div class="toolbar">
+                <select id="fileSelect">
+                    <option value="" disabled selected>Select a PDF</option>
+                </select>
+                <div>
+                    <button id="prevBtn">Previous</button>
+                    <input type="number" id="pageNum" value="1" min="1" style="width: 60px;">
+                    <span>/ <span id="totalPages"></span></span>
+                    <button id="nextBtn">Next</button>
+                </div>
+            </div>
+            <div class="viewer">
+                <canvas id="pdf-canvas"></canvas>
+            </div>
+        </div>
+
+        <footer>
+            &copy; 2024 UPSC Hub. Designed with ❤️ for aspirants. Visit our <a href="#">website</a>.
+        </footer>
+    </div>
+
+    <script>
+        let pdfDoc = null,
+            currentPage = 1,
+            totalPages = 0;
+
+        const canvas = document.getElementById("pdf-canvas");
+        const ctx = canvas.getContext("2d");
+        const pageInput = document.getElementById("pageNum");
+        const totalPagesEl = document.getElementById("totalPages");
+        const fileSelect = document.getElementById("fileSelect");
+
+        const prevBtn = document.getElementById("prevBtn");
+        const nextBtn = document.getElementById("nextBtn");
+
+        // Load list of PDFs dynamically
+        const pdfList = [
+            { name: "Indian Polity", url: "path/to/indian_polity.pdf" },
+            { name: "Modern History", url: "path/to/modern_history.pdf" },
+            { name: "Geography", url: "path/to/geography.pdf" },
+        ];
+
+        // Populate the select dropdown
+        pdfList.forEach(pdf => {
+            const option = document.createElement("option");
+            option.value = pdf.url;
+            option.textContent = pdf.name;
+            fileSelect.appendChild(option);
+        });
+
+        // Load and render PDF
+        fileSelect.addEventListener("change", function () {
+            const pdfUrl = fileSelect.value;
+            if (pdfUrl) {
+                loadPDF(pdfUrl);
+            }
+        });
+
+        function loadPDF(url) {
+            pdfjsLib.getDocument(url).promise.then(function (pdf) {
+                pdfDoc = pdf;
+                totalPages = pdf.numPages;
+                totalPagesEl.textContent = totalPages;
+                currentPage = 1;
+                pageInput.value = currentPage;
+                renderPage(currentPage);
+            });
+        }
+
+        function renderPage(pageNum) {
+            pdfDoc.getPage(pageNum).then(function (page) {
+                const viewport = page.getViewport({ scale: 1.5 });
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
+
+                page.render({
+                    canvasContext: ctx,
+                    viewport: viewport
+                });
+            });
+        }
+
+        prevBtn.addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                pageInput.value = currentPage;
+                renderPage(currentPage);
+            }
+        });
+
+        nextBtn.addEventListener("click", function () {
+            if (currentPage < totalPages) {
+                currentPage++;
+                pageInput.value = currentPage;
+                renderPage(currentPage);
+            }
+        });
+
+        pageInput.addEventListener("change", function () {
+            const page = parseInt(pageInput.value);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                renderPage(currentPage);
+            }
+        });
+    </script>
 </body>
-</html> 
+</html>
