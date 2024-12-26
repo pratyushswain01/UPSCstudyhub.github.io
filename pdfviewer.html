@@ -82,6 +82,14 @@
             font-size: 1rem;
         }
 
+        .file-select {
+            padding: 5px 10px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
         #pdf-container {
             width: 100%;
             display: flex;
@@ -110,6 +118,10 @@
 
         <div class="viewer-container">
             <div class="toolbar">
+                <select id="fileSelect" class="file-select">
+                    <option value="" disabled selected>Select a PDF</option>
+                    <!-- Add options dynamically -->
+                </select>
                 <button id="prevBtn" class="nav-btn">Previous</button>
                 <button id="nextBtn" class="nav-btn">Next</button>
                 <input type="number" id="pageNum" class="page-input" min="1" value="1">
@@ -135,20 +147,44 @@
         const ctx = canvas.getContext("2d");
         const pageInput = document.getElementById("pageNum");
         const totalPagesEl = document.getElementById("totalPages");
+        const fileSelect = document.getElementById("fileSelect");
 
         const prevBtn = document.getElementById("prevBtn");
         const nextBtn = document.getElementById("nextBtn");
 
-        // Replace with your PDF file URL
-        const pdfUrl = 'your-pdf-url.pdf';
+        // Load list of PDFs dynamically
+        const pdfList = [
+            { name: "Document 1", url: "path/to/document1.pdf" },
+            { name: "Document 2", url: "path/to/document2.pdf" },
+            { name: "Document 3", url: "path/to/document3.pdf" },
+        ];
 
-        // Load the PDF document
-        pdfjsLib.getDocument(pdfUrl).promise.then(function (pdf) {
-            pdfDoc = pdf;
-            totalPages = pdf.numPages;
-            totalPagesEl.textContent = totalPages;
-            renderPage(currentPage);
+        // Populate the select dropdown
+        pdfList.forEach(pdf => {
+            const option = document.createElement("option");
+            option.value = pdf.url;
+            option.textContent = pdf.name;
+            fileSelect.appendChild(option);
         });
+
+        // Load and render PDF
+        fileSelect.addEventListener("change", function () {
+            const pdfUrl = fileSelect.value;
+            if (pdfUrl) {
+                loadPDF(pdfUrl);
+            }
+        });
+
+        function loadPDF(url) {
+            pdfjsLib.getDocument(url).promise.then(function (pdf) {
+                pdfDoc = pdf;
+                totalPages = pdf.numPages;
+                totalPagesEl.textContent = totalPages;
+                currentPage = 1;
+                pageInput.value = currentPage;
+                renderPage(currentPage);
+            });
+        }
 
         function renderPage(pageNum) {
             pdfDoc.getPage(pageNum).then(function (page) {
