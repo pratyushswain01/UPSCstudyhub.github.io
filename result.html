@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPSC Hub Entrance Result Sheet</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -75,12 +74,6 @@
             color: #27ae60;
         }
 
-        #chart-container {
-            width: 80%;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
         .admin-info {
             text-align: center;
             margin-top: 20px;
@@ -120,14 +113,6 @@
             background-color: #27ae60;
         }
 
-        .pdf-upload {
-            margin-top: 20px;
-        }
-
-        .pdf-upload input[type="file"] {
-            padding: 10px;
-        }
-
         .pdf-section {
             margin-top: 30px;
         }
@@ -135,6 +120,22 @@
         .pdf-section iframe {
             width: 100%;
             height: 600px;
+        }
+
+        .pdf-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #2ecc71;
+            color: white;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .pdf-link:hover {
+            background-color: #27ae60;
         }
 
         #okButtonContainer {
@@ -182,16 +183,15 @@
             </table>
         </div>
 
-        <!-- PDF Upload for Question Paper -->
-        <div class="pdf-upload">
-            <label for="questionPaper">Upload Question Paper (PDF):</label>
-            <input type="file" id="questionPaper" accept="application/pdf">
+        <!-- Links to View PDFs -->
+        <div class="pdf-section">
+            <h3>Click to view the Question Paper:</h3>
+            <button class="pdf-link" onclick="viewPdf('question_papers/sample_question_paper.pdf', 'questionPaperViewer')">View Question Paper</button>
         </div>
 
-        <!-- PDF Upload for Explanation -->
-        <div class="pdf-upload">
-            <label for="explanationPdf">Upload Explanation (PDF):</label>
-            <input type="file" id="explanationPdf" accept="application/pdf">
+        <div class="pdf-section">
+            <h3>Click to view the Explanation:</h3>
+            <button class="pdf-link" onclick="viewPdf('explanations/sample_explanation.pdf', 'explanationViewer')">View Explanation</button>
         </div>
 
         <!-- Display PDFs -->
@@ -203,11 +203,6 @@
         <div class="pdf-section" id="explanationSection" style="display: none;">
             <h3>Explanation:</h3>
             <iframe id="explanationViewer" src="" type="application/pdf"></iframe>
-        </div>
-
-        <!-- Graphical Representation -->
-        <div id="chart-container">
-            <canvas id="scoreChart"></canvas>
         </div>
 
         <!-- Admin Section -->
@@ -311,37 +306,6 @@
         document.getElementById('totalMarks').textContent = totalMarks + ' / ' + total;
         document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
 
-        // Create a larger line chart for marks and percentage
-        const ctx = document.getElementById('scoreChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Marks vs Percentage'], // Label for X-axis
-                datasets: [{
-                    label: 'Marks',
-                    data: [score],
-                    fill: false,
-                    borderColor: '#2ecc71',
-                    borderWidth: 4
-                }, {
-                    label: 'Percentage',
-                    data: [percentage],
-                    fill: false,
-                    borderColor: '#e74c3c',
-                    borderWidth: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: total + 10, // Adding a little buffer for the chart
-                    }
-                }
-            }
-        });
-
         // Show the "OK" button or redirect based on percentage
         const okButton = document.getElementById('okButton');
         if (percentage < 60) {
@@ -352,24 +316,11 @@
             }, 3000);  // 3-second delay
         }
 
-        // PDF file handling
-        document.getElementById('questionPaper').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file && file.type === 'application/pdf') {
-                const fileURL = URL.createObjectURL(file);
-                document.getElementById('questionPaperViewer').src = fileURL;
-                document.getElementById('questionPaperSection').style.display = 'block';
-            }
-        });
-
-        document.getElementById('explanationPdf').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (file && file.type === 'application/pdf') {
-                const fileURL = URL.createObjectURL(file);
-                document.getElementById('explanationViewer').src = fileURL;
-                document.getElementById('explanationSection').style.display = 'block';
-            }
-        });
+        // Function to view PDF
+        function viewPdf(pdfPath, viewerId) {
+            document.getElementById(viewerId).src = pdfPath;
+            document.getElementById(viewerId).parentElement.style.display = 'block';
+        }
 
         // Close the window when OK is clicked
         function closeWindow() {
