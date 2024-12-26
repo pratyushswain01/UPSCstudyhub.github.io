@@ -485,18 +485,27 @@
  
   
 
-             let score = 0;
-            const totalQuestions = Object.keys(answers).length;
+              let userAnswers = {};
+            let score = 0;
+            const totalQuestions = Object.keys(correctAnswers).length;
 
-            for (const [question, answer] of Object.entries(answers)) {
-                const userAnswer = document.querySelector(`input[name="${question}"]:checked`);
-                if (userAnswer && userAnswer.value === answer) {
-                    score++;
+            // Collect answers from the form
+            for (let i = 1; i <= totalQuestions; i++) {
+                const userAnswer = document.querySelector(`input[name="q${i}"]:checked`);
+                if (userAnswer) {
+                    userAnswers[`q${i}`] = userAnswer.value;
+                    if (userAnswer.value === correctAnswers[`q${i}`]) {
+                        score++;
+                    }
                 }
             }
 
-            // Redirect to result.html with the score and total in the query string
-            window.location.href = `result.html?score=${score}&total=${totalQuestions}`;
+            // Pass user answers and score to result page
+            const scorePercentage = (score / totalQuestions) * 100;
+            const userAnswersJson = encodeURIComponent(JSON.stringify(userAnswers));
+            const correctAnswersJson = encodeURIComponent(JSON.stringify(correctAnswers));
+
+            window.location.href = `result.html?score=${score}&total=${totalQuestions}&percentage=${scorePercentage}&userAnswers=${userAnswersJson}&correctAnswers=${correctAnswersJson}`;
         });
     </script>
 </body>
