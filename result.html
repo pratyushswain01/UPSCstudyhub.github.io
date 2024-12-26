@@ -27,7 +27,7 @@
         }
 
         .result-container {
-            width: 100%;
+            width: 80%;
             margin: 0 auto;
             background-color: white;
             padding: 20px;
@@ -35,6 +35,8 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             flex: 1;
             overflow-y: auto;
+            border-left: 5px solid #2c3e50;
+            border-right: 5px solid #2c3e50;
         }
 
         .summary-table, .questions-table {
@@ -90,7 +92,7 @@
             text-align: center;
             background-color: #34495e;
             color: #fff;
-            padding: 10px;
+            padding: 8px;
             font-size: 1em;
             position: fixed;
             width: 100%;
@@ -277,18 +279,24 @@
         document.getElementById('totalMarks').textContent = totalMarks + ' / ' + total;
         document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
 
-        // Create the chart
+        // Create the line chart for marks and percentage
         const ctx = document.getElementById('scoreChart').getContext('2d');
         new Chart(ctx, {
-            type: 'bar',
+            type: 'line',
             data: {
-                labels: ['Score'],
+                labels: ['Marks vs Percentage'], // Label for X-axis
                 datasets: [{
-                    label: 'Your Score',
+                    label: 'Marks',
                     data: [score],
-                    backgroundColor: ['#2ecc71'],
-                    borderColor: ['#27ae60'],
-                    borderWidth: 1
+                    fill: false,
+                    borderColor: '#2ecc71',
+                    borderWidth: 2
+                }, {
+                    label: 'Percentage',
+                    data: [percentage],
+                    fill: false,
+                    borderColor: '#e74c3c',
+                    borderWidth: 2
                 }]
             },
             options: {
@@ -296,7 +304,7 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        max: total
+                        max: total + 10, // Adding a little buffer for the chart
                     }
                 }
             }
