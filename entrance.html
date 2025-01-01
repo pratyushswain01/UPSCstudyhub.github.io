@@ -3,116 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Entrance Test Details</title>
+  <title>Entrance Test</title>
   <style>
-    /* Similar styles as before... */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f9;
+    }
+    .test-box, .content {
+      text-align: center;
+      padding: 20px;
+    }
+    .test-box {
+      background-color: #007BFF;
+      color: white;
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+    }
+    .start-btn {
+      background-color: #fff;
+      color: #007BFF;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .start-btn:hover {
+      background-color: #f1f1f1;
+    }
+    .blinking-box {
+      margin: 20px auto;
+      animation: blink 1.5s infinite;
+      color: red;
+      font-weight: bold;
+      background-color: yellow;
+      padding: 10px;
+      border-radius: 8px;
+      display: inline-block;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
   </style>
 </head>
 <body>
-  <!-- Fixed Header with Test Box -->
   <div class="test-box">
     <h2>Entrance Test</h2>
-    <div class="test-details">
-      <p><strong>Test Date:</strong> 01st January 2025</p>
-      <p><strong>Time:</strong> 10:00 AM - 11:00 PM</p>
-      <p><strong>Remaining Time:</strong> <span id="countdown">Loading...</span></p>
-      <p><strong>All the best!</strong></p>
-    </div>
-    <button class="details-btn" onclick="viewExamDetails()">View Exam Details</button>
-    <button class="start-btn" onclick="startExam()">Start Exam</button>
+    <p><strong>Test Date:</strong> 01st January 2025</p>
+    <p><strong>Time:</strong> 10:00 AM - 11:00 PM</p>
+    <button class="start-btn" onclick="checkAirplaneMode()">Start Exam</button>
   </div>
 
-  <!-- Main Content -->
   <div class="content">
-    <div class="blinking-box">
-      <p>Airplane mode will turn on during the exam. Please be prepared!</p>
-    </div>
-    <div class="section">
-      <h3>Test Focus</h3>
-      <p>This entrance test is based on:</p>
-    </div>
-
-    <div class="section">
-      <h3>Syllabus</h3>
-      <div class="syllabus-box">
-        <h4>Chapter 1: Historical Background</h4>
-        <ul>
-          <li><strong>Key Points:</strong> Evolution of the Indian Constitution, important historical events, the role of key figures.</li>
-          <li><strong>Number of Questions:</strong> 10</li>
-          <li><strong>Mark Distribution:</strong> 20 Marks</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="section">
-      <h3>Best of Luck!</h3>
-      <p>We trust you will give this test your best effort. Take it seriously!</p>
-      <p>- UPSC Hub Team</p>
-    </div>
-  </div>
-
-  <!-- Footer -->
-  <div class="footer">
-    <p>© Created by UPSChub | All Rights Reserved</p>
+    <div class="blinking-box">Airplane mode is required to start the exam. Please disconnect all networks.</div>
   </div>
 
   <script>
-    // Set your test date and time
-    const testDate = new Date("2025-01-01T10:00:00");
+    let examStarted = false;
 
-    function updateCountdown() {
-      const now = new Date();
-      const diff = testDate - now;
-
-      if (diff <= 0) {
-        document.getElementById("countdown").innerText = "Test has started!";
+    function checkAirplaneMode() {
+      if (navigator.onLine) {
+        alert("You are connected to the internet. Please enable airplane mode and disconnect from all networks to start the exam.");
         return;
       }
 
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-      document.getElementById("countdown").innerText = `${days} days. ${hours} hrs. ${minutes} mins. ${seconds} secs`;
-    }
-
-    function viewExamDetails() {
-      alert("Test Details:\n\nName: Entrance Test\nDate: 01st January 2025\nTime: 10:00 AM - 11:00 PM");
-    }
-
-    function startExam() {
-      if (navigator.onLine) {
-        // If network is on, prompt the user to enable airplane mode
-        const confirmAirplaneMode = confirm("Please enable Airplane Mode to begin the exam. The exam will freeze if network is detected or airplane mode is turned off.");
-        
-        if (confirmAirplaneMode) {
-          // Simulate that airplane mode is turned on
-          alert("Exam started. Please make sure you are in Airplane Mode.");
-          window.location.href = 'questionentrance.html'; // Redirect to test page
-        } else {
-          alert("You must enable Airplane Mode to start the exam.");
-        }
-      } else {
-        // If already in Airplane Mode (offline), start the exam
-        alert("You are already in Airplane Mode. The exam is starting!");
-        window.location.href = 'questionentrance.html'; // Redirect to test page
+      const confirmStart = confirm("Airplane mode is enabled. Do you want to start the exam?");
+      if (confirmStart) {
+        examStarted = true;
+        alert("The exam has started. Stay offline!");
+        window.location.href = 'questionentrance.html'; // Redirect to the test page
       }
     }
 
-    // Monitor network status during the exam
-    window.addEventListener('online', () => {
-      alert("Network detected! The exam will freeze now.");
-      // Redirect to auto-submit page or freeze the exam
-      window.location.href = 'result.html'; // Redirect to submission page (automatically submit the exam)
-    });
+    function monitorNetwork() {
+      window.addEventListener('online', () => {
+        if (examStarted) {
+          alert("Network detected! The exam will be auto-submitted.");
+          window.location.href = 'result.html'; // Redirect to submission page
+        }
+      });
 
-    window.addEventListener('offline', () => {
-      alert("You are in Airplane Mode. The exam is safe to continue.");
-    });
+      window.addEventListener('offline', () => {
+        if (examStarted) {
+          console.log("Offline mode detected. Exam continues.");
+        }
+      });
+    }
 
-    // Initialize countdown and update every second
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+    // Initialize network monitoring
+    monitorNetwork();
   </script>
 </body>
 </html>
