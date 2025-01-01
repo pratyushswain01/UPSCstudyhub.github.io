@@ -39,9 +39,34 @@
             border-right: 5px solid #2c3e50;
         }
 
-        .summary-table {
+        .summary-table, .questions-table {
             width: 100%;
             margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        td {
+            background-color: #ecf0f1;
+        }
+
+        .summary-table th, .summary-table td {
+            text-align: center;
+            padding: 12px;
         }
 
         .percentage {
@@ -66,6 +91,11 @@
             position: fixed;
             width: 100%;
             bottom: 0;
+        }
+
+        .questions-table {
+            max-height: calc(100vh - 280px); /* Adjust height as needed */
+            overflow-y: auto;
         }
 
         .ok-button {
@@ -102,8 +132,33 @@
     <div class="result-container">
         <!-- Summary Table: Total Marks and Percentage -->
         <div class="summary-table">
-            <p>Total Marks: <span id="totalMarks"></span></p>
-            <p>Percentage: <span id="percentage" class="percentage"></span></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Total Marks</th>
+                        <th>Percentage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="totalMarks"></td>
+                        <td id="percentage" class="percentage"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Answer Key Table: Questions and Answers -->
+        <div class="questions-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Question</th>
+                        <th>Correct Answer</th>
+                    </tr>
+                </thead>
+                <tbody id="answerKey"></tbody>
+            </table>
         </div>
 
         <!-- Message and OK Button -->
@@ -129,6 +184,84 @@
         const score = params.get('score');
         const total = params.get('total');
 
+        // Answer key for the questions with correct answers displayed directly
+        const questions = [
+            "Who is known as the 'Father of Indian Renaissance'?",
+            "Which Charter Act introduced the concept of a law commission in India?",
+            "The Government of India Act, 1919, is also known as:",
+            "Who was the first Governor-General of independent India?",
+            "The Regulating Act of 1773 was significant because it:",
+            "Which Act abolished the East India Company's monopoly of trade in India?",
+            "The Indian Councils Act of 1909 is also known as:",
+            "Which Act provided for the establishment of a Federal Court in India?",
+            "The Vernacular Press Act was passed by:",
+            "The Simon Commission was appointed during the tenure of:",
+            "When was the Constituent Assembly of India formed?",
+            "Who was the chairman of the Drafting Committee of the Constituent Assembly?",
+            "Which plan provided for the establishment of the Constituent Assembly?",
+            "How many members initially constituted the Constituent Assembly?",
+            "The idea of the Constitution of India was first proposed by:",
+            "When was the first session of the Constituent Assembly held?",
+            "The Constitution of India was adopted on:",
+            "The drafting of the Constitution of India took approximately:",
+            "Which was the first country to grant universal adult suffrage?",
+            "Who proposed the Objectives Resolution in the Constituent Assembly?",
+            "Which of the following influenced the Indian Constitution the most?",
+            "How many schedules did the original Constitution of India have?",
+            "The concept of Fundamental Rights in the Indian Constitution is borrowed from:",
+            "The method of election of the President of India is taken from:",
+            "Who was the first Vice President of India?",
+            "The term 'secular' was added to the Preamble of the Constitution by:",
+            "Which Article of the Indian Constitution provides for the abolition of untouchability?",
+            "Which of the following Articles deals with the Right to Equality?",
+            "The Panchayati Raj system was first adopted by which Indian state?",
+            "The largest state in India by area is:"
+        ];
+
+        const answers = [
+            'Raja Ram Mohan Roy',
+            'Charter Act of 1833',
+            'Montague-Chelmsford Reforms',
+            'Lord Mountbatten',
+            'Was the first step to regulate the affairs of the East India Company',
+            'Regulating Act of 1773',
+            'Indian Councils Act of 1909',
+            'Indian Councils Act of 1861',
+            'Lord Lytton',
+            'Lord Irwin',
+            '1946',
+            'Dr. Rajendra Prasad',
+            'Cabinet Mission Plan',
+            '299',
+            'M.N. Roy',
+            'December 9, 1946',
+            'November 26, 1949',
+            '2 years and 11 months',
+            'France',
+            'Jawaharlal Nehru',
+            'India',
+            'Part III',
+            'Fundamental Rights',
+            'Switzerland',
+            'Rajendra Prasad',
+            'Mahatma Gandhi',
+            'Article 17',
+            'Article 14',
+            'Rajasthan',
+            'Rajasthan'
+        ];
+
+        // Fill in the answers in the table
+        const answerKeyTable = document.getElementById('answerKey');
+        questions.forEach((question, index) => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${question}</td>
+                <td>${answers[index]}</td>
+            `;
+            answerKeyTable.appendChild(row);
+        });
+
         // Update the total marks and percentage
         const totalMarks = score;
         const percentage = (score / total) * 100;
@@ -145,24 +278,16 @@
             }, 3000);  // 3-second delay
         }
 
+        // Send email using EmailJS
         function sendResultEmail() {
-            const emailSubject = "UPSC Hub Entrance Exam Result";
-            const emailBody = `
-                Hello {{to_name}},
-                
-                Your UPSChub test results are in. Below are your exam details:
-
-                Total Marks: ${totalMarks} / ${total}
-                Percentage: ${percentage.toFixed(2)}%
-                
-                Keep up the great work! If you need any further assistance, feel free to reach out to us.
-                
-                Best regards,
-                UPSChub Team
-            `;
+            const emailSubject = "UPSC Entrance Exam Result";
+            const emailBody = `The exam result for the student is as follows:
+            Total Marks: ${totalMarks} / ${total}
+            Percentage: ${percentage.toFixed(2)} %
+            \nPlease contact your admin.`;
 
             const templateParams = {
-                to_email: 'upscstudyhub01@gmail.com', // Replace with the admin's email
+                to_email: 'admin@example.com', // Replace with the admin's email
                 subject: emailSubject,
                 body: emailBody
             };
@@ -173,15 +298,18 @@
                 }, function(error) {
                     console.log('FAILED...', error);
                 });
+
+            // If percentage is below 60%, redirect to a different page
+            if (percentage < 60) {
+                setTimeout(() => {
+                    window.location.href = "index02.html"; // Redirect to retry.html for below 60%
+                }, 3000); // 3-second delay after sending email
+            }
         }
 
         function closeWindow() {
             sendResultEmail();
-            if (percentage < 60) {
-                window.location.href = "index02.html"; // Redirect to index02.html if below 60%
-            } else {
-                window.location.href = "index.html"; // Redirect to index.html if above 60%
-            }
+            window.location.href = "index.html"; // Close the current window or tab
         }
     </script>
 </body>
