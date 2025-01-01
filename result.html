@@ -268,14 +268,7 @@ const percentage = (score / total) * 100;
 document.getElementById('totalMarks').textContent = totalMarks + ' / ' + total;
 document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
 
-// Show the "OK" button or redirect based on percentage
-const okButton = document.getElementById('okButton');
-if (percentage < 60) {
-    okButton.style.display = 'block'; // Display "OK" button if percentage is below 60%
-} else {
-    setTimeout(() => {
-        window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html after 3 seconds if above 60%
-    }, 3000);  // 3-second delay
+// 
 }
 
 // Send email using EmailJS
@@ -286,31 +279,17 @@ function sendResultEmail() {
     Percentage: ${percentage.toFixed(2)} %
     \nPlease contact your admin.`;
 
-    const templateParams = {
-        to_email: 'admin@example.com', // Replace with the admin's email
-        subject: emailSubject,
-        body: emailBody
-    };
+   
 
-    emailjs.send('service_oi91cy4', 'template_md9n9gh', templateParams)
-        .then(function(response) {
-            console.log('SUCCESS!', response);
-        }, function(error) {
-            console.log('FAILED...', error);
-        });
-
-    // If percentage is below 60%, redirect to a different page
-    if (percentage < 60) {
-        setTimeout(() => {
-            window.location.href = "close.html"; // Redirect to index01.html if below 60%
-        }, 3000); // 3-second delay after sending email
+    
+    
     }
 }
 
 function closeWindow() {
     sendResultEmail();
     // Ensure the redirection is based on the percentage
-    if (percentage < 60) {
+    if (percentage < 70) {
         window.location.href = "close.html"; // Redirect to index01.html if below 60%
     } else {
         window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html if above 60%
