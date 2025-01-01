@@ -137,6 +137,7 @@
     </style>
 </head>
 <body>
+
     <header>UPSC Hub Entrance Test</header>
     <main>
         <h1>Entrance Test</h1>
@@ -151,6 +152,12 @@
                 <li><strong>No Room for Errors:</strong> This is an important step to assess your readiness. Scoring below 60% will result in disqualification from accessing the app, as this reflects insufficient preparation for more advanced content.</li>
             </ol>
             <p><strong> Test alert ⚠️:</strong> This test will determine your continued access to UPSC Hub. If your score is below 60%, you will be disqualified, and your access to the app will be revoked. We want to ensure that only dedicated and well-prepared candidates progress further.</p>
+        </div>
+
+        <div class="container">
+        <div class="toggle-container">
+            <label for="aeroplane-mode">Aeroplane Mode:</label>
+            <input type="checkbox" id="aeroplane-mode">
         </div>
 
         <!-- Form for Questions -->
@@ -440,29 +447,54 @@
     </footer>
 
     <script>
-        // Aeroplane Mode Toggle Functionality
-        const aeroplaneToggle = document.getElementById('aeroplaneToggle');
-        const mcqForm = document.getElementById('mcqForm');
-        const inputs = mcqForm.querySelectorAll('input, button');
+    const startExamButton = document.getElementById("startExam");
+    const examContent = document.getElementById("examContent");
+    const statusMessage = document.getElementById("status");
 
-        aeroplaneToggle.addEventListener('change', () => {
-            if (aeroplaneToggle.checked) {
-                // Activate Aeroplane Mode
-                inputs.forEach(input => {
-                    input.disabled = true;
-                    input.classList.add('disabled');
-                });
-                alert('Aeroplane Mode Activated: Test functionality is temporarily disabled.');
-            } else {
-                // Deactivate Aeroplane Mode
-                inputs.forEach(input => {
-                    input.disabled = false;
-                    input.classList.remove('disabled');
-                });
-                alert('Aeroplane Mode Deactivated: You can now proceed with the test.');
-            }
-        });
-    </script>
+    // Function to check if airplane mode (offline mode) is enabled
+    function checkAirplaneMode() {
+      if (!navigator.onLine) {
+        // Device is offline (potential airplane mode)
+        statusMessage.textContent = "Airplane mode is enabled. You can start the exam.";
+        startExamButton.disabled = false;
+      } else {
+        // Device is online
+        statusMessage.textContent = "Please enable airplane mode to start the exam.";
+        startExamButton.disabled = true;
+
+        // If exam has already started, auto-submit
+        if (!examContent.classList.contains("hidden")) {
+          alert("Airplane mode disabled. Exam auto-submitted.");
+          submitExam();
+        }
+      }
+    }
+
+    // Start exam when the button is clicked
+    startExamButton.addEventListener("click", () => {
+      startExamButton.classList.add("hidden");
+      examContent.classList.remove("hidden");
+      statusMessage.textContent = "Exam in progress. Keep airplane mode enabled.";
+    });
+
+    // Function to submit the exam
+    function submitExam() {
+      alert("Exam submitted!");
+      // Reset the exam page
+      startExamButton.classList.remove("hidden");
+      examContent.classList.add("hidden");
+      statusMessage.textContent = "Please enable airplane mode to start the exam.";
+    }
+
+    // Monitor connectivity changes
+    window.addEventListener("online", checkAirplaneMode);
+    window.addEventListener("offline", checkAirplaneMode);
+
+    // Initial check
+    checkAirplaneMode();
+  </script>
+
+   
 
     <script>
         // Hardcoded credentials for validation
