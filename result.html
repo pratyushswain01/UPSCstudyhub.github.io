@@ -176,139 +176,149 @@
         <p>Created by UPSChub, All Rights Reserved</p>
     </footer>
 
-    <script>
-        // Initialize EmailJS
-        emailjs.init("YOUR_USER_ID");
+ <script>
+    // Initialize EmailJS
+    emailjs.init("YOUR_USER_ID");
 
-        // Get query parameters
-        const params = new URLSearchParams(window.location.search);
-        const score = params.get('score');
-        const total = params.get('total');
+    // Get query parameters
+    const params = new URLSearchParams(window.location.search);
+    const score = params.get('score');
+    const total = params.get('total');
 
-        // Answer key for the questions with correct answers displayed directly
-        const questions = [
-            "Who is known as the 'Father of Indian Renaissance'?",
-            "Which Charter Act introduced the concept of a law commission in India?",
-            "The Government of India Act, 1919, is also known as:",
-            "Who was the first Governor-General of independent India?",
-            "The Regulating Act of 1773 was significant because it:",
-            "Which Act abolished the East India Company's monopoly of trade in India?",
-            "The Indian Councils Act of 1909 is also known as:",
-            "Which Act provided for the establishment of a Federal Court in India?",
-            "The Vernacular Press Act was passed by:",
-            "The Simon Commission was appointed during the tenure of:",
-            "When was the Constituent Assembly of India formed?",
-            "Who was the chairman of the Drafting Committee of the Constituent Assembly?",
-            "Which plan provided for the establishment of the Constituent Assembly?",
-            "How many members initially constituted the Constituent Assembly?",
-            "The idea of the Constitution of India was first proposed by:",
-            "When was the first session of the Constituent Assembly held?",
-            "The Constitution of India was adopted on:",
-            "The drafting of the Constitution of India took approximately:",
-            "Which was the first country to grant universal adult suffrage?",
-            "Who proposed the Objectives Resolution in the Constituent Assembly?",
-            "Which of the following influenced the Indian Constitution the most?",
-            "How many schedules did the original Constitution of India have?",
-            "The concept of Fundamental Rights in the Indian Constitution is borrowed from:",
-            "The method of election of the President of India is taken from:",
-            "Who was the first Vice President of India?",
-            "The term 'secular' was added to the Preamble of the Constitution by:",
-            "Which Article of the Indian Constitution provides for the abolition of untouchability?",
-            "Which of the following Articles deals with the Right to Equality?",
-            "The Panchayati Raj system was first adopted by which Indian state?",
-            "The largest state in India by area is:"
-        ];
-
-        const answers = [
-            'Raja Ram Mohan Roy',
-            'Charter Act of 1833',
-            'Montague-Chelmsford Reforms',
-            'Lord Mountbatten',
-            'Was the first step to regulate the affairs of the East India Company',
-            'Regulating Act of 1773',
-            'Indian Councils Act of 1909',
-            'Indian Councils Act of 1861',
-            'Lord Lytton',
-            'Lord Irwin',
-            '1946',
-            'Dr. Rajendra Prasad',
-            'Cabinet Mission Plan',
-            '299',
-            'M.N. Roy',
-            'December 9, 1946',
-            'November 26, 1949',
-            '2 years and 11 months',
-            'France',
-            'Jawaharlal Nehru',
-            'India',
-            'Part III',
-            'Fundamental Rights',
-            'Switzerland',
-            'Rajendra Prasad',
-            'Mahatma Gandhi',
-            'Article 17',
-            'Article 14',
-            'Rajasthan',
-            'Rajasthan'
-        ];
-
-        // Fill in the answers in the table
-        const answerKeyTable = document.getElementById('answerKey');
-        questions.forEach((question, index) => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${question}</td>
-                <td>${answers[index]}</td>
-            `;
-            answerKeyTable.appendChild(row);
-        });
-
-        // Update the total marks and percentage
-const totalMarks = score;
-const percentage = (score / total) * 100;
-document.getElementById('totalMarks').textContent = totalMarks + ' / ' + total;
-document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
-
-
-// Send email using EmailJS
-function sendResultEmail() {
-    const emailSubject = "UPSC Entrance Exam Result";
-    const emailBody = `The exam result for the student is as follows:
-    Total Marks: ${totalMarks} / ${total}
-    Percentage: ${percentage.toFixed(2)} %
-    \nPlease contact your admin.`;
-
-    const templateParams = {
-        to_email: 'admin@example.com', // Replace with the admin's email
-        subject: emailSubject,
-        body: emailBody
-    };
-
-    emailjs.send('service_oi91cy4', 'template_md9n9gh', templateParams)
-        .then(function(response) {
-            console.log('SUCCESS!', response);
-        }, function(error) {
-            console.log('FAILED...', error);
-        });
-
-    // If percentage is below 60%, redirect to a different page
-    if (percentage < 60) {
-        setTimeout(() => {
-            window.location.href = "close.html"; // Redirect to index01.html if below 60%
-        }, 3000); // 3-second delay after sending email
-    }
-}
-
-function closeWindow() {
-    sendResultEmail();
-    // Ensure the redirection is based on the percentage
-    if (percentage < 60) {
-        window.location.href = "close.html"; // Redirect to index01.html if below 60%
+    // Check if the user has already taken the exam
+    if (localStorage.getItem('examTaken')) {
+        // Redirect if the user has already taken the exam
+        window.location.href = "alreadyAttempted.html"; // Redirect to a page informing that the exam has already been taken
     } else {
-        window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html if above 60%
+        // Store the result in LocalStorage
+        localStorage.setItem('examTaken', 'true');
+        localStorage.setItem('totalMarks', score);
+        localStorage.setItem('total', total);
     }
-}
 
- </script>
+    // Answer key for the questions with correct answers displayed directly
+    const questions = [
+        "Who is known as the 'Father of Indian Renaissance'?",
+        "Which Charter Act introduced the concept of a law commission in India?",
+        "The Government of India Act, 1919, is also known as:",
+        "Who was the first Governor-General of independent India?",
+        "The Regulating Act of 1773 was significant because it:",
+        "Which Act abolished the East India Company's monopoly of trade in India?",
+        "The Indian Councils Act of 1909 is also known as:",
+        "Which Act provided for the establishment of a Federal Court in India?",
+        "The Vernacular Press Act was passed by:",
+        "The Simon Commission was appointed during the tenure of:",
+        "When was the Constituent Assembly of India formed?",
+        "Who was the chairman of the Drafting Committee of the Constituent Assembly?",
+        "Which plan provided for the establishment of the Constituent Assembly?",
+        "How many members initially constituted the Constituent Assembly?",
+        "The idea of the Constitution of India was first proposed by:",
+        "When was the first session of the Constituent Assembly held?",
+        "The Constitution of India was adopted on:",
+        "The drafting of the Constitution of India took approximately:",
+        "Which was the first country to grant universal adult suffrage?",
+        "Who proposed the Objectives Resolution in the Constituent Assembly?",
+        "Which of the following influenced the Indian Constitution the most?",
+        "How many schedules did the original Constitution of India have?",
+        "The concept of Fundamental Rights in the Indian Constitution is borrowed from:",
+        "The method of election of the President of India is taken from:",
+        "Who was the first Vice President of India?",
+        "The term 'secular' was added to the Preamble of the Constitution by:",
+        "Which Article of the Indian Constitution provides for the abolition of untouchability?",
+        "Which of the following Articles deals with the Right to Equality?",
+        "The Panchayati Raj system was first adopted by which Indian state?",
+        "The largest state in India by area is:"
+    ];
+
+    const answers = [
+        'Raja Ram Mohan Roy',
+        'Charter Act of 1833',
+        'Montague-Chelmsford Reforms',
+        'Lord Mountbatten',
+        'Was the first step to regulate the affairs of the East India Company',
+        'Regulating Act of 1773',
+        'Indian Councils Act of 1909',
+        'Indian Councils Act of 1861',
+        'Lord Lytton',
+        'Lord Irwin',
+        '1946',
+        'Dr. Rajendra Prasad',
+        'Cabinet Mission Plan',
+        '299',
+        'M.N. Roy',
+        'December 9, 1946',
+        'November 26, 1949',
+        '2 years and 11 months',
+        'France',
+        'Jawaharlal Nehru',
+        'India',
+        'Part III',
+        'Fundamental Rights',
+        'Switzerland',
+        'Rajendra Prasad',
+        'Mahatma Gandhi',
+        'Article 17',
+        'Article 14',
+        'Rajasthan',
+        'Rajasthan'
+    ];
+
+    // Fill in the answers in the table
+    const answerKeyTable = document.getElementById('answerKey');
+    questions.forEach((question, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${question}</td>
+            <td>${answers[index]}</td>
+        `;
+        answerKeyTable.appendChild(row);
+    });
+
+    // Update the total marks and percentage
+    const totalMarks = score;
+    const percentage = (score / total) * 100;
+    document.getElementById('totalMarks').textContent = totalMarks + ' / ' + total;
+    document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
+
+    // Send email using EmailJS
+    function sendResultEmail() {
+        const emailSubject = "UPSC Entrance Exam Result";
+        const emailBody = `The exam result for the student is as follows:
+        Total Marks: ${totalMarks} / ${total}
+        Percentage: ${percentage.toFixed(2)} %
+        \nPlease contact your admin.`;
+
+        const templateParams = {
+            to_email: 'admin@example.com', // Replace with the admin's email
+            subject: emailSubject,
+            body: emailBody
+        };
+
+        emailjs.send('service_oi91cy4', 'template_md9n9gh', templateParams)
+            .then(function(response) {
+                console.log('SUCCESS!', response);
+            }, function(error) {
+                console.log('FAILED...', error);
+            });
+
+        // If percentage is below 60%, redirect to a different page
+        if (percentage < 60) {
+            setTimeout(() => {
+                window.location.href = "close.html"; // Redirect to close.html if below 60%
+            }, 3000); // 3-second delay after sending email
+        }
+    }
+
+    function closeWindow() {
+        sendResultEmail();
+        // Ensure the redirection is based on the percentage
+        if (percentage < 60) {
+            window.location.href = "close.html"; // Redirect to close.html if below 60%
+        } else {
+            window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html if above 60%
+        }
+    }
+</script>
+
 </body>
 </html>
