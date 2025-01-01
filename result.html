@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -262,13 +263,21 @@
             answerKeyTable.appendChild(row);
         });
 
-        // Update the total marks and percentage
+      // Update the total marks and percentage
 const totalMarks = score;
 const percentage = (score / total) * 100;
 document.getElementById('totalMarks').textContent = totalMarks + ' / ' + total;
 document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
 
-// 
+function closeWindow() {
+    sendResultEmail();
+    // Ensure the redirection is based on the percentage
+    if (percentage < 70) {
+        window.location.href = "close.html"; // Redirect to index01.html if below 70%
+    }8000);
+    else {
+        window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html if above 70%
+    }3000);
 }
 
 // Send email using EmailJS
@@ -279,10 +288,24 @@ function sendResultEmail() {
     Percentage: ${percentage.toFixed(2)} %
     \nPlease contact your admin.`;
 
-   
+    const templateParams = {
+        to_email: 'admin@example.com', // Replace with the admin's email
+        subject: emailSubject,
+        body: emailBody
+    };
 
-    
-    
+    emailjs.send('service_oi91cy4', 'template_md9n9gh', templateParams)
+        .then(function(response) {
+            console.log('SUCCESS!', response);
+        }, function(error) {
+            console.log('FAILED...', error);
+        });
+
+    // If percentage is below 70%, redirect to a different page
+    if (percentage < 70) {
+        setTimeout(() => {
+            window.location.href = "close.html"; // Redirect to index01.html if below 70%
+        }, 3000); // 3-second delay after sending email
     }
 }
 
@@ -290,11 +313,12 @@ function closeWindow() {
     sendResultEmail();
     // Ensure the redirection is based on the percentage
     if (percentage < 70) {
-        window.location.href = "close.html"; // Redirect to index01.html if below 60%
+        window.location.href = "close.html"; // Redirect to index01.html if below 70%
     } else {
-        window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html if above 60%
+        window.location.href = "homeUPSChub.html"; // Redirect to homeUPSChub.html if above 70%
     }
 }
+
 
  </script>
 </body>
