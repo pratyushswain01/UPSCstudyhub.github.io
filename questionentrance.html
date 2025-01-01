@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -87,23 +88,6 @@
             margin-top: 20px;
         }
 
-        .aeroplane-mode {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-top: 20px;
-        }
-
-        .aeroplane-toggle {
-            margin-left: 10px;
-        }
-
-        .disabled {
-            background-color: #ddd;
-            color: #aaa;
-            cursor: not-allowed;
-        }
-
         .login-form {
             margin-bottom: 20px;
             border: 1px solid #ccc; /* Border around the login form */
@@ -137,7 +121,6 @@
     </style>
 </head>
 <body>
-
     <header>UPSC Hub Entrance Test</header>
     <main>
         <h1>Entrance Test</h1>
@@ -153,8 +136,6 @@
             </ol>
             <p><strong> Test alert ⚠️:</strong> This test will determine your continued access to UPSC Hub. If your score is below 60%, you will be disqualified, and your access to the app will be revoked. We want to ensure that only dedicated and well-prepared candidates progress further.</p>
         </div>
-
-        
 
         <!-- Form for Questions -->
         <form id="mcqForm">
@@ -443,86 +424,82 @@
     </footer>
 
     <script>
-    const startExamButton = document.getElementById("startExam");
-    const examContent = document.getElementById("examContent");
-    const statusMessage = document.getElementById("status");
+        // Hardcoded credentials for validation
+        const validUsername = "testuser";
+        const validPassword = "testpassword";
 
-<script>
-    // Flag to track if the exam is manually submitted
-    let isManuallySubmitted = false;
+        // Validate login function
+        function validateLogin(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            // Get the entered username and password
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
 
-    // Add a listener to handle page unload events (refresh, back, close)
-    window.addEventListener('beforeunload', (event) => {
-        if (!isManuallySubmitted) {
-            autoSubmitExam();
-            event.preventDefault();
-            event.returnValue = ''; // Necessary for most browsers to display a warning
-        }
-    });
-
-    // Function to handle auto-submission and redirection
-    function autoSubmitExam() {
-        const answers = {
-            q1: 'B',
-            q2: 'B',
-            q3: 'A',
-            q4: 'A',
-            q5: 'B',
-            q6: 'C',
-            q7: 'B',
-            q8: 'D',
-            q9: 'B',
-            q10: 'A',
-            q11: 'A',
-            q12: 'C',
-            q13: 'C',
-            q14: 'B',
-            q15: 'B',
-            q16: 'A',
-            q17: 'C',
-            q18: 'A',
-            q19: 'B',
-            q20: 'C',
-            q21: 'B',
-            q22: 'B',
-            q23: 'A',
-            q24: 'C',
-            q25: 'B',
-            q26: 'A',
-            q27: 'B',
-            q28: 'B',
-            q29: 'A',
-            q30: 'D'
-        };
-
-        let score = 0;
-        const totalQuestions = Object.keys(answers).length;
-
-        for (const [question, correctAnswer] of Object.entries(answers)) {
-            const selectedAnswer = document.querySelector(`input[name="${question}"]:checked`);
-            if (selectedAnswer && selectedAnswer.value === correctAnswer) {
-                score++;
+            // Check if the entered credentials match the valid ones
+            if (username === validUsername && password === validPassword) {
+                // Hide login section and show exam content
+                document.getElementById("loginFormSection").style.display = "none";
+                document.getElementById("rulesSection").style.display = "block";
+                document.getElementById("mcqForm").style.display = "block";
+            } else {
+                alert("Invalid username or password. Please try again.");
             }
         }
+    </script>
 
-        const passingMark = totalQuestions * 0.7; // Set 70% as the passing mark
-        const passed = score >= passingMark;
+    <script>
+        document.getElementById('mcqForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the form from refreshing the page
 
-        // Store the result in localStorage or pass it via URL parameters
-        localStorage.setItem('upschub_exam_attempted', 'true');
-        localStorage.setItem('upschub_exam_score', score);
-        localStorage.setItem('upschub_exam_total', totalQuestions);
-        localStorage.setItem('upschub_exam_result', passed ? 'Pass' : 'Fail');
+        const answers = {
+    q1: 'B',
+    q2: 'B',
+    q3: 'A',
+    q4: 'A',
+    q5: 'B',
+    q6: 'C',
+    q7: 'B',
+    q8: 'D',
+    q9: 'B',
+    q10: 'A',
+    q11: 'A',
+    q12: 'C',
+    q13: 'C',
+    q14: 'B',
+    q15: 'B',
+    q16: 'A',
+    q17: 'C',
+    q18: 'A',
+    q19: 'B',
+    q20: 'C',
+    q21: 'B',
+    q22: 'B',
+    q23: 'A',
+    q24: 'C',
+    q25: 'B',
+    q26: 'A',
+    q27: 'B',
+    q28: 'B',
+    q29: 'A',
+    q30: 'D'
+};
+ 
+  
 
-        // Redirect to the result page
-        window.location.href = `result.html?score=${score}&total=${totalQuestions}&result=${passed ? 'Pass' : 'Fail'}`;
-    }
+             let score = 0;
+            const totalQuestions = Object.keys(answers).length;
 
-    // Event listener for manual form submission
-    document.getElementById('mcqForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        isManuallySubmitted = true; // Mark the exam as manually submitted
-        autoSubmitExam(); // Submit the exam manually
-    });
-</script>
+            for (const [question, answer] of Object.entries(answers)) {
+                const userAnswer = document.querySelector(`input[name="${question}"]:checked`);
+                if (userAnswer && userAnswer.value === answer) {
+                    score++;
+                }
+            }
 
+            // Redirect to result.html with the score and total in the query string
+            window.location.href = `result.html?score=${score}&total=${totalQuestions}`;
+        });
+    </script>
+</body>
+</html>
