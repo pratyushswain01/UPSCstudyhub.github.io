@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPSC Hub Entrance Result Sheet</title>
-    <script type="text/javascript" src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -166,7 +165,7 @@
             <p>Please contact your admin.</p>
         </div>
         <div id="okButtonContainer">
-            <button id="okButton" class="ok-button" onclick="closeWindow()">OK</button>
+            <button id="okButton" class="ok-button" onclick="sendResultEmail()">OK</button>
         </div>
     </div>
 
@@ -176,9 +175,6 @@
     </footer>
 
     <script>
-        // Initialize EmailJS
-        emailjs.init("YOUR_USER_ID");
-
         // Get query parameters
         const params = new URLSearchParams(window.location.search);
         const score = params.get('score');
@@ -269,32 +265,33 @@
         document.getElementById('percentage').textContent = percentage.toFixed(2) + ' %';
 
         // Show the "OK" button or redirect based on percentage
-        const okButton = document.getElementById('okButton');
-        if (percentage < 60) {
-            okButton.style.display = 'block'; // Display "OK" button if percentage is below 60%
-        } else {
-            setTimeout(() => {
-                window.location.href = "index01.html"; // Redirect after 3 seconds
-            }, 3000);  // 3-second delay
-        }
+const okButton = document.getElementById('okButton');
+if (percentage < 60) {
+    okButton.style.display = 'block'; // Display "OK" button if percentage is below 60%
+} else {
+    setTimeout(() => {
+        window.location.href = "index.html"; // Redirect after 3 seconds if percentage is 60% or above
+    }, 3000);  // 3-second delay
+}
 
-        // Send email with the result
-        function sendEmailReport() {
-            const emailParams = {
-                to_email: "upscstudyhub01@gmail.com", // Replace this with your admin's email address
-                totalMarks: totalMarks + ' / ' + total,
-                percentage: percentage.toFixed(2) + ' %',
-                subject: 'UPSC Entrance Exam Result',
-                message: `The exam result for the student is as follows:
-                Total Marks: ${totalMarks} / ${total}
-                Percentage: ${percentage.toFixed(2)} %`
-            };
+// Send email with the result using mailto
+function sendResultEmail() {
+    const emailSubject = "UPSC Entrance Exam Result";
+    const emailBody = `The exam result for the student is as follows:
+    Total Marks: ${totalMarks} / ${total}
+    Percentage: ${percentage.toFixed(2)} %
+    \nPlease contact your admin.`;
 
-            
-        function closeWindow() {
-            sendEmailReport();
-            window.location.href = "index02.html"; // Close the current window or tab
-        }
-    </script>
+    const mailToLink = `mailto:upscstudyhub01@gmail.com?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    window.location.href = mailToLink;
+
+    // If percentage is below 60%, redirect to a different page
+    if (percentage < 60) {
+        setTimeout(() => {
+            window.location.href = "index02.html"; // Redirect to retry.html for below 60%
+        }, 3000); // 3-second delay after sending email
+    }
+}
+
 </body>
 </html>
