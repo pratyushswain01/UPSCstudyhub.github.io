@@ -130,7 +130,7 @@
             font-size: 0.9rem;
         }
 
-        /* Full-Screen Alert (Red Screen) */
+        /* Full-Screen Blinking Red Alert */
         #alert-popup {
             display: none;
             position: fixed;
@@ -138,12 +138,26 @@
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: rgba(255, 0, 0, 0.9);
+            background-color: rgba(255, 0, 0, 0.5); /* Semi-transparent red */
             color: white;
             text-align: center;
             padding-top: 20%;
             font-size: 2rem;
             z-index: 9999;
+            animation: blink 1s infinite; /* Blinking animation */
+        }
+
+        /* Blinking Effect */
+        @keyframes blink {
+            0% {
+                opacity: 0.8;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0.8;
+            }
         }
     </style>
 </head>
@@ -166,7 +180,7 @@
         </form>
     </div>
 
-    <!-- Full-Screen Red Alert -->
+    <!-- Full-Screen Blinking Red Alert -->
     <div id="alert-popup">
         <h2>Time is running out! Please submit your test.</h2>
     </div>
@@ -209,7 +223,7 @@
             }
         ];
 
-        let timerDuration = 1 * 30; // 5 minutes in seconds
+        let timerDuration = 1* 20; // 5 minutes in seconds
         let timerInterval;
         let alertPopup = document.getElementById('alert-popup');
 
@@ -261,7 +275,7 @@
                 document.getElementById('timer').innerText = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
                 if (timerDuration <= alertTime) {
-                    alertPopup.style.display = 'block'; // Show the red alert
+                    alertPopup.style.display = 'block'; // Show the blinking red alert
                 }
 
                 if (timerDuration <= 0) {
