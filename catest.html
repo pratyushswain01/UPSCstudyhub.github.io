@@ -120,51 +120,31 @@
             width: 50px;
         }
         footer {
-    background-color: #333;
-    color: white;
-    text-align: center;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    font-size: 0.8rem;
-    padding: 0.5rem 0;
-    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-    animation: slideUp 3s ease-in-out infinite; /* Adding animation */
-}
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
 
-.footer-text {
-    font-family: 'Arial', sans-serif;
-    font-weight: bold;
-    letter-spacing: 2px;
-    color: #f4f4f9;
-    display: inline-block;
-    font-size: 1rem;
-    text-transform: uppercase;
-    animation: textGlow 2s infinite alternate; /* Adding glowing effect */
-}
-
-@keyframes slideUp {
-    0% {
-        transform: translateY(10px);
-        opacity: 0.5;
-    }
-    100% {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-@keyframes textGlow {
-    0% {
-        color: #f4f4f9;
-        text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.7);
-    }
-    100% {
-        color: #d9534f;
-        text-shadow: 0 0 15px rgba(255, 0, 0, 0.7), 0 0 30px rgba(255, 0, 0, 0.9);
-    }
-}
-
+        /* Full-Screen Alert (Red Screen) */
+        #alert-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding-top: 20%;
+            font-size: 2rem;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
@@ -185,9 +165,16 @@
             </div>
         </form>
     </div>
+
+    <!-- Full-Screen Red Alert -->
+    <div id="alert-popup">
+        <h2>Time is running out! Please submit your test.</h2>
+    </div>
+
     <footer>
         <p>&copy; 2025 UPSChub. All rights reserved.</p>
     </footer>
+
     <script>
         const questions = [
             {
@@ -222,8 +209,9 @@
             }
         ];
 
-        let timerDuration = 5 * 60; // 5 minutes in seconds
+        let timerDuration = 1 * 30; // 5 minutes in seconds
         let timerInterval;
+        let alertPopup = document.getElementById('alert-popup');
 
         function loadQuestions() {
             const questionsContainer = document.getElementById('questionsContainer');
@@ -266,10 +254,15 @@
         }
 
         function startTimer() {
+            const alertTime = 10; // 10 seconds before the end
             timerInterval = setInterval(() => {
                 let minutes = Math.floor(timerDuration / 60);
                 let seconds = timerDuration % 60;
                 document.getElementById('timer').innerText = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+
+                if (timerDuration <= alertTime) {
+                    alertPopup.style.display = 'block'; // Show the red alert
+                }
 
                 if (timerDuration <= 0) {
                     clearInterval(timerInterval);
