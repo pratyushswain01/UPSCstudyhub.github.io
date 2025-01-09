@@ -62,12 +62,6 @@
         button:hover {
             background-color: #0056b3;
         }
-        .result {
-            margin-top: 1.5rem;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-        }
         .loader {
             display: none;
             text-align: center;
@@ -90,7 +84,6 @@
             <div class="loader" id="loader">
                 <img src="loader.gif" alt="Loading...">
             </div>
-            <div class="result" id="result"></div>
         </form>
     </div>
     <script>
@@ -150,18 +143,15 @@
         }
 
         function submitTest() {
-            document.getElementById('loader').style.display = 'block';
-            setTimeout(() => {
-                let score = 0;
-                questions.forEach((q, index) => {
-                    const selected = document.querySelector(`input[name="q${index + 1}"]:checked`);
-                    if (selected && selected.value === q.answer) {
-                        score++;
-                    }
-                });
-                document.getElementById('loader').style.display = 'none';
-                document.getElementById('result').innerText = `You scored ${score} out of ${questions.length}`;
-            }, 1000);
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index + 1}"]:checked`);
+                if (selected && selected.value === q.answer) {
+                    score++;
+                }
+            });
+            const resultUrl = `result.html?score=${score}&total=${questions.length}`;
+            window.location.href = resultUrl;
         }
 
         function displayDate() {
