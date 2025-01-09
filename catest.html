@@ -62,6 +62,14 @@
             font-weight: bold;
             text-align: center;
         }
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .loader img {
+            width: 50px;
+        }
     </style>
 </head>
 <body>
@@ -70,46 +78,86 @@
     </header>
     <div class="container">
         <form id="testForm">
-            <div class="question">
-                <h3>1. Who is the current chairman of the UN General Assembly?</h3>
-                <ul class="options">
-                    <li><label><input type="radio" name="q1" value="A"> António Guterres</label></li>
-                    <li><label><input type="radio" name="q1" value="B"> Csaba Kőrösi</label></li>
-                    <li><label><input type="radio" name="q1" value="C"> Abdullah Shahid</label></li>
-                    <li><label><input type="radio" name="q1" value="D"> Ban Ki-moon</label></li>
-                </ul>
-            </div>
-            <div class="question">
-                <h3>2. Which country recently launched the "Mission Artemis"?</h3>
-                <ul class="options">
-                    <li><label><input type="radio" name="q2" value="A"> China</label></li>
-                    <li><label><input type="radio" name="q2" value="B"> USA</label></li>
-                    <li><label><input type="radio" name="q2" value="C"> Russia</label></li>
-                    <li><label><input type="radio" name="q2" value="D"> India</label></li>
-                </ul>
-            </div>
+            <div id="questionsContainer"></div>
             <button type="button" onclick="submitTest()">Submit</button>
+            <div class="loader" id="loader">
+                <img src="loader.gif" alt="Loading...">
+            </div>
             <div class="result" id="result"></div>
         </form>
     </div>
     <script>
-        function submitTest() {
-            const answers = {
-                q1: 'C',
-                q2: 'B'
-            };
-            let score = 0;
-            let totalQuestions = Object.keys(answers).length;
-
-            for (let question in answers) {
-                const selected = document.querySelector(`input[name="${question}"]:checked`);
-                if (selected && selected.value === answers[question]) {
-                    score++;
-                }
+        const questions = [
+            {
+                question: "Who is the current chairman of the UN General Assembly?",
+                options: [
+                    { text: "António Guterres", value: "A" },
+                    { text: "Csaba Kőrösi", value: "B" },
+                    { text: "Abdullah Shahid", value: "C" },
+                    { text: "Ban Ki-moon", value: "D" }
+                ],
+                answer: "C"
+            },
+            {
+                question: "Which country recently launched the 'Mission Artemis'?",
+                options: [
+                    { text: "China", value: "A" },
+                    { text: "USA", value: "B" },
+                    { text: "Russia", value: "C" },
+                    { text: "India", value: "D" }
+                ],
+                answer: "B"
+            },
+            {
+                question: "What is the capital of Australia?",
+                options: [
+                    { text: "Sydney", value: "A" },
+                    { text: "Melbourne", value: "B" },
+                    { text: "Canberra", value: "C" },
+                    { text: "Perth", value: "D" }
+                ],
+                answer: "C"
             }
+        ];
 
-            document.getElementById('result').innerText = `You scored ${score} out of ${totalQuestions}`;
+        function loadQuestions() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <h3>${index + 1}. ${q.question}</h3>
+                    <ul class="options">
+                        ${q.options.map(option => `
+                            <li>
+                                <label>
+                                    <input type="radio" name="q${index + 1}" value="${option.value}">
+                                    ${option.text}
+                                </label>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                questionsContainer.appendChild(questionDiv);
+            });
         }
+
+        function submitTest() {
+            document.getElementById('loader').style.display = 'block';
+            setTimeout(() => {
+                let score = 0;
+                questions.forEach((q, index) => {
+                    const selected = document.querySelector(`input[name="q${index + 1}"]:checked`);
+                    if (selected && selected.value === q.answer) {
+                        score++;
+                    }
+                });
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('result').innerText = `You scored ${score} out of ${questions.length}`;
+            }, 1000);
+        }
+
+        document.addEventListener('DOMContentLoaded', loadQuestions);
     </script>
 </body>
 </html>
