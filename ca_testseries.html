@@ -9,6 +9,8 @@
             font-family: Arial, sans-serif;
             margin: 0;
             background-color: #f9f9f9;
+            border: 5px solid #ddd; /* Add border to the whole page */
+            padding: 20px;
         }
 
         header {
@@ -29,6 +31,7 @@
             font-size: 20px;
             margin-top: 10px;
             font-weight: bold;
+            transition: text-shadow 0.3s ease; /* Smooth transition for glowing effect */
         }
 
         table {
@@ -143,7 +146,7 @@
             window.location.href = `testhub.html?day=${day}&date=${date}`;
         }
 
-        // Update the clock dynamically
+        // Update the clock dynamically with glowing effect
         function updateClock() {
             const clockElement = document.getElementById('clock');
             const date = new Date();
@@ -154,6 +157,14 @@
             const dateString = date.toLocaleDateString();
 
             clockElement.textContent = `${day}, ${dateString} - ${hours}:${minutes}:${seconds}`;
+
+            // Dynamic glowing effect for day/night
+            const hour = date.getHours();
+            if (hour >= 6 && hour < 18) { // Daytime (6 AM - 6 PM)
+                clockElement.style.textShadow = '0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00';
+            } else { // Nighttime (6 PM - 6 AM)
+                clockElement.style.textShadow = '0 0 10px #1e90ff, 0 0 20px #1e90ff, 0 0 30px #1e90ff';
+            }
         }
 
         setInterval(updateClock, 1000);
@@ -230,7 +241,7 @@
     </div>
 
     <footer>
-        © 2025 TestHub - All rights reserved
+        © 2025 UPSCHub - All rights reserved
     </footer>
 </body>
 </html>
