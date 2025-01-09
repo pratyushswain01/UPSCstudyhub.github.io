@@ -50,14 +50,38 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        .weekly-table {
+            display: none;
+            margin-top: 20px;
+        }
     </style>
+    <script>
+        function showWeeklyTable() {
+            const datePicker = document.getElementById('date-picker');
+            const selectedDate = new Date(datePicker.value);
+
+            if (selectedDate.toString() !== 'Invalid Date') {
+                const weekNumber = Math.ceil((selectedDate.getDate() + new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay()) / 7);
+                const year = selectedDate.getFullYear();
+
+                if (year === 2025) {
+                    document.getElementById('weekly-table').style.display = 'block';
+                    document.getElementById('week-title').innerText = `Current Affairs Test - Week ${weekNumber}, 2025`;
+                } else {
+                    alert('Please select a date in 2025.');
+                }
+            } else {
+                alert('Please select a valid date.');
+            }
+        }
+    </script>
 </head>
 <body>
     <h1>Test Series</h1>
 
     <div class="calendar-container">
         <label for="date-picker">Select Date:</label>
-        <input type="date" id="date-picker" name="date-picker" />
+        <input type="date" id="date-picker" name="date-picker" onchange="showWeeklyTable()" />
     </div>
 
     <table>
@@ -98,6 +122,56 @@
         <button style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
             Start Current Affairs Test
         </button>
+    </div>
+
+    <div id="weekly-table" class="weekly-table">
+        <h2 id="week-title"></h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Topic</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Monday</td>
+                    <td>Topic 1</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+                <tr>
+                    <td>Tuesday</td>
+                    <td>Topic 2</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+                <tr>
+                    <td>Wednesday</td>
+                    <td>Topic 3</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+                <tr>
+                    <td>Thursday</td>
+                    <td>Topic 4</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+                <tr>
+                    <td>Friday</td>
+                    <td>Topic 5</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+                <tr>
+                    <td>Saturday</td>
+                    <td>Topic 6</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+                <tr>
+                    <td>Sunday</td>
+                    <td>Topic 7</td>
+                    <td><button>Take Test</button></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
