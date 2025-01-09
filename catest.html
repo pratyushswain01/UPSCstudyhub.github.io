@@ -18,6 +18,12 @@
             text-align: center;
             padding: 1rem 0;
         }
+        .date-display {
+            margin: 1rem auto;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #333;
+        }
         .container {
             max-width: 800px;
             margin: 2rem auto;
@@ -76,6 +82,7 @@
     <header>
         <h1>Daily Current Affairs Test</h1>
     </header>
+    <div class="date-display" id="testDate"></div>
     <div class="container">
         <form id="testForm">
             <div id="questionsContainer"></div>
@@ -99,7 +106,7 @@
                 answer: "C"
             },
             {
-                question: "Which country recently launched the 'Mission Artemis'?",
+                question: "Which country recently launched the 'Mission Artemis' ?",
                 options: [
                     { text: "China", value: "A" },
                     { text: "USA", value: "B" },
@@ -157,7 +164,16 @@
             }, 1000);
         }
 
-        document.addEventListener('DOMContentLoaded', loadQuestions);
+        function displayDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('testDate').innerText = `Today's Test Date: ${today.toLocaleDateString(undefined, options)}`;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuestions();
+            displayDate();
+        });
     </script>
 </body>
 </html>
