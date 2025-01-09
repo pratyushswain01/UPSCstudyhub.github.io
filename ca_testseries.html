@@ -7,28 +7,54 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
             background-color: #f9f9f9;
         }
+
+        header {
+            background: linear-gradient(135deg, #f4b41a, #ff7e5f);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-info {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .clock {
+            font-size: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            margin-top: 20px;
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
         }
+
         th {
             background-color: #f4b41a;
             color: white;
         }
+
         .test-options {
             display: flex;
             justify-content: center;
             gap: 10px;
         }
+
         .test-options button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -37,22 +63,36 @@
             border-radius: 5px;
             cursor: pointer;
         }
+
         .test-options button:hover {
             background-color: #0056b3;
         }
+
         .calendar-container {
             margin-bottom: 20px;
             text-align: center;
         }
+
         .calendar-container input {
             padding: 10px;
             font-size: 16px;
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+
         .weekly-table {
             display: none;
             margin-top: 20px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
         }
     </style>
     <script>
@@ -76,13 +116,11 @@
         }
 
         function adjustWeeklyDates(startDate) {
-            // Get the starting day (Monday) of the week
             const dayOfWeek = startDate.getDay();
-            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust for Monday start
+            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
             const weekStartDate = new Date(startDate);
-            weekStartDate.setDate(startDate.getDate() - daysToSubtract); // Set to Monday of the week
+            weekStartDate.setDate(startDate.getDate() - daysToSubtract);
 
-            // Update the weekly table with the new dates
             const tableRows = document.querySelectorAll('.weekly-table tbody tr');
             tableRows.forEach((row, index) => {
                 const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -90,16 +128,13 @@
                 const currentDate = new Date(weekStartDate);
                 currentDate.setDate(weekStartDate.getDate() + index);
 
-                // Set the date for the topic
-                const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                const formattedDate = currentDate.toISOString().split('T')[0];
                 dateCell.textContent = `${dayNames[index]} - ${formattedDate}`;
 
-                // Update the "Take Test" button to pass the new date
                 const button = row.querySelector('button');
                 button.setAttribute('onclick', `takeTest('${dayNames[index]}', '${formattedDate}')`);
             });
 
-            // Update the title of the week dynamically
             const weekNumber = Math.ceil((startDate.getDate() + daysToSubtract) / 7);
             document.getElementById('week-title').innerText = `Current Affairs Test - Week ${weekNumber}, 2025`;
         }
@@ -107,10 +142,29 @@
         function takeTest(day, date) {
             window.location.href = `testhub.html?day=${day}&date=${date}`;
         }
+
+        // Update the clock dynamically
+        function updateClock() {
+            const clockElement = document.getElementById('clock');
+            const date = new Date();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            const seconds = date.getSeconds().toString().padStart(2, '0');
+            const day = date.toLocaleString('en-US', { weekday: 'long' });
+            const dateString = date.toLocaleDateString();
+
+            clockElement.textContent = `${day}, ${dateString} - ${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateClock, 1000);
     </script>
 </head>
 <body>
-    <h1>Test Series</h1>
+    <header>
+        Test Series and Current Affairs
+        <div class="header-info">Stay updated and test your knowledge!</div>
+        <div id="clock" class="clock"></div>
+    </header>
 
     <div class="calendar-container">
         <label for="date-picker">Select Date:</label>
@@ -174,5 +228,9 @@
             </tbody>
         </table>
     </div>
+
+    <footer>
+        © 2025 TestHub - All rights reserved
+    </footer>
 </body>
 </html>
