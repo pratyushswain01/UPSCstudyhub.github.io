@@ -1,153 +1,283 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>courses</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Current Affairs Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures the footer stays at the bottom */
+        }
+        header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        .banner {
+            background-color: #d9534f; /* Red background */
+            color: white;
+            font-size: 1rem; /* Smaller font size */
+            text-align: center;
+            padding: 1rem 0; /* Increased padding for larger banner height */
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            width: 100%;
+        }
+        .banner-text {
+            position: absolute;
+            animation: scrollBanner 20s linear infinite; /* Slower speed */
+            font-family: 'Courier New', Courier, monospace; /* Coded style font */
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Text shadow for effect */
+        }
+        @keyframes scrollBanner {
+            0% {
+                left: 100%;
+            }
+            100% {
+                left: -100%;
+            }
+        }
+        .date-display {
+            margin: 1rem auto;
+            text-align: center;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        .timer {
+            text-align: center;
+            font-size: 2rem;
+            margin: 1rem 0;
+            color: #333;
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 2px;
+            background-color: #333;
+            color: #f4f4f9;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            border: 2px solid #007bff;
+            flex: 1; /* Ensures content takes up available space */
+        }
+        .question {
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .question h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+        .options {
+            list-style: none;
+            padding: 0;
+        }
+        .options li {
+            margin: 0.5rem 0;
+        }
+        .options input {
+            margin-right: 0.5rem;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 1rem;
+            border: 2px solid #007bff;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .loader {
+            display: none;
+            text-align: center;
+            margin-top: 1rem;
+        }
+        .loader img {
+            width: 50px;
+        }
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1rem 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
 
-   <!-- font awesome cdn link  -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
-
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
-
+        /* Full-Screen Alert (Red Screen) */
+        #alert-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(255, 0, 0, 0.9);
+            color: white;
+            text-align: center;
+            padding-top: 20%;
+            font-size: 2rem;
+            z-index: 9999;
+        }
+    </style>
 </head>
 <body>
-
-<header class="header">
-   
-   <section class="flex">
-
-      <a href="index.html" class="logo">UPSC hub</a>
-
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
-      </div>
-
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-        
-         </div>
-      </div>
-
-   </section>
-
-</header>   
-
-<div class="side-bar">
-
-   <div id="close-btn">
-      <i class="fas fa-times"></i>
-   </div>
-
-   <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   
-   </div>
-
-   <nav class="navbar">
-      <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>home</span></a>
-      <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-      <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-   </nav>
-
-</div>
-
-   </nav>
-
-</div>
-
-<section class="teachers">
-
-   <h1 class="heading">MOCK TEST SERIES</h1>
-
-   
-
-   <div class="box-container">
-
-      <div class="box offer">
-         <h3>TEST SERIES</h3>
-         <p>Practice makes a man perfect. The number of times you practice , the strongest you will </p>
-         <p><span>hello Champ...!!!<span></p>
-         <a href="examdeck.html" class="inline-btn">get started</a>
-      </div>
-
-     <div class="box offer">
-         <h3>TEST: current affairs </h3>
-         <p> Attempt todays test....& cheak your todays potential </p>
-         <p><span> Hello aspirant..!!!<span></p>
-         <a href="catest.html" class="inline-btn">get started</a>
-      </div>
-
-      <div class="box">
-         <div class="tutor">
-            <img src="images/geo.jpg" alt="">
-            <div>
-               <h3>INDIAN & WORLD GEOGRAPHY</h3>
-               <span>test series</span>
+    <header>
+        <h1>Daily Current Affairs Test</h1>
+    </header>
+    <div class="banner">
+        <div class="banner-text">Stay Updated with the Latest Current Affairs! Get Ready for Today's Test and Prepare for the UPSC Exams!</div>
+    </div>
+    <div class="date-display" id="testDate"></div>
+    <div class="timer" id="timer">Time Remaining: 05:00</div>
+    <div class="container">
+        <form id="testForm">
+            <div id="questionsContainer"></div>
+            <button type="button" onclick="submitTest()">Submit</button>
+            <div class="loader" id="loader">
+                <img src="loader.gif" alt="Loading...">
             </div>
-         </div>
-         <p> Test date : <span></span></p>
-         <p> Full mark : <span></span></p>
-         <p> Syllabus: <span></span></p>
-         <a href="testview.html" class="inline-btn"> View Test Details</a>
-      </div>
+        </form>
+    </div>
 
-      <div class="box">
-         <div class="tutor">
-            <img src="images/Indian-Polity.jpg" alt="">
-            <div>
-               <h3> PSIR</h3>
-               <p> Poltical Science & Internal Relations </p>
-               <span>test series</span>
-            </div>
-         </div>
-         <p> Test date : <span></span></p>
-         <p> Full mark : <span></span></p>
-         <p> Syllabus: <span></span></p>
-         <a href="politymock.html" class="inline-btn"> View Test Details</a>
-      </div>
-   </div>
+    <!-- Full-Screen Red Alert -->
+    <div id="alert-popup">
+        <h2>Time is running out! Please submit your test.</h2>
+    </div>
 
-</section>
+    <footer>
+        <p>&copy; 2025 UPSChub. All rights reserved.</p>
+    </footer>
 
+    <script>
+        const questions = [
+            {
+                question: "Who is the current chairman of the UN General Assembly?",
+                options: [
+                    { text: "António Guterres", value: "A" },
+                    { text: "Csaba Kőrösi", value: "B" },
+                    { text: "Abdullah Shahid", value: "C" },
+                    { text: "Ban Ki-moon", value: "D" }
+                ],
+                answer: "C"
+            },
+            {
+                question: "Which country recently launched the 'Mission Artemis' ?",
+                options: [
+                    { text: "China", value: "A" },
+                    { text: "USA", value: "B" },
+                    { text: "Russia", value: "C" },
+                    { text: "India", value: "D" }
+                ],
+                answer: "B"
+            },
+            {
+                question: "What is the capital of Australia?",
+                options: [
+                    { text: "Sydney", value: "A" },
+                    { text: "Melbourne", value: "B" },
+                    { text: "Canberra", value: "C" },
+                    { text: "Perth", value: "D" }
+                ],
+                answer: "C"
+            }
+        ];
 
+        let timerDuration = 5 * 60; // 5 minutes in seconds
+        let timerInterval;
+        let alertPopup = document.getElementById('alert-popup');
 
+        function loadQuestions() {
+            const questionsContainer = document.getElementById('questionsContainer');
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question';
+                questionDiv.innerHTML = `
+                    <h3>${index + 1}. ${q.question}</h3>
+                    <ul class="options">
+                        ${q.options.map(option => `
+                            <li>
+                                <label>
+                                    <input type="radio" name="q${index + 1}" value="${option.value}">
+                                    ${option.text}
+                                </label>
+                            </li>
+                        `).join('')}
+                    </ul>
+                `;
+                questionsContainer.appendChild(questionDiv);
+            });
+        }
 
+        function submitTest() {
+            let score = 0;
+            questions.forEach((q, index) => {
+                const selected = document.querySelector(`input[name="q${index + 1}"]:checked`);
+                if (selected && selected.value === q.answer) {
+                    score++;
+                }
+            });
+            const resultUrl = `result.html?score=${score}&total=${questions.length}`;
+            window.location.href = resultUrl;
+        }
 
+        function displayDate() {
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('testDate').innerText = `Today's Test Date: ${today.toLocaleDateString(undefined, options)}`;
+        }
 
+        function startTimer() {
+            const alertTime = 10; // 10 seconds before the end
+            timerInterval = setInterval(() => {
+                let minutes = Math.floor(timerDuration / 60);
+                let seconds = timerDuration % 60;
+                document.getElementById('timer').innerText = `Time Remaining: ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 
+                if (timerDuration <= alertTime) {
+                    alertPopup.style.display = 'block'; // Show the red alert
+                }
 
+                if (timerDuration <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest(); // Automatically submit the test when time is up
+                } else {
+                    timerDuration--;
+                }
+            }, 1000);
+        }
 
-
-
-
-
-
-<footer class="footer">
-
-   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved!(owner)
-
-</footer>
-
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
-
-   
+        document.addEventListener('DOMContentLoaded', () => {
+            loadQuestions();
+            displayDate();
+            startTimer();
+        });
+    </script>
 </body>
 </html>
