@@ -61,12 +61,12 @@
             const selectedDate = new Date(datePicker.value);
 
             if (selectedDate.toString() !== 'Invalid Date') {
-                const weekNumber = Math.ceil((selectedDate.getDate() + new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1).getDay()) / 7);
                 const year = selectedDate.getFullYear();
 
                 if (year === 2025) {
+                    // Display the weekly table and adjust the week dates
                     document.getElementById('weekly-table').style.display = 'block';
-                    document.getElementById('week-title').innerText = `Current Affairs Test - Week ${weekNumber}, 2025`;
+                    adjustWeeklyDates(selectedDate);
                 } else {
                     alert('Please select a date in 2025.');
                 }
@@ -75,8 +75,37 @@
             }
         }
 
+        function adjustWeeklyDates(startDate) {
+            // Get the starting day (Monday) of the week
+            const dayOfWeek = startDate.getDay();
+            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust for Monday start
+            const weekStartDate = new Date(startDate);
+            weekStartDate.setDate(startDate.getDate() - daysToSubtract); // Set to Monday of the week
+
+            // Update the weekly table with the new dates
+            const tableRows = document.querySelectorAll('.weekly-table tbody tr');
+            tableRows.forEach((row, index) => {
+                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+                const dateCell = row.cells[1];
+                const currentDate = new Date(weekStartDate);
+                currentDate.setDate(weekStartDate.getDate() + index);
+
+                // Set the date for the topic
+                const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
+                dateCell.textContent = `${dayNames[index]} - ${formattedDate}`;
+
+                // Update the "Take Test" button to pass the new date
+                const button = row.querySelector('button');
+                button.setAttribute('onclick', `takeTest('${dayNames[index]}', '${formattedDate}')`);
+            });
+
+            // Update the title of the week dynamically
+            const weekNumber = Math.ceil((startDate.getDate() + daysToSubtract) / 7);
+            document.getElementById('week-title').innerText = `Current Affairs Test - Week ${weekNumber}, 2025`;
+        }
+
         function takeTest(day, date) {
-            window.location.href = `testPage.html?day=${day}&date=${date}`;
+            window.location.href = `test.html?day=${day}&date=${date}`;
         }
     </script>
 </head>
@@ -88,30 +117,6 @@
         <input type="date" id="date-picker" name="date-picker" onchange="showWeeklyTable()" />
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Day</th>
-                <th>Test No.</th>
-                <th>Thought of the Day</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>Day 1</td>
-                <td>Test 1</td>
-                <td>"Success is the sum of small efforts, repeated day in and day out."</td>
-                <td class="test-options">
-                    <button onclick="takeTest('Day 1', '2025-01-01')">Take Test</button>
-                    <button>View Solutions</button>
-                </td>
-            </tr>
-            
-            <!-- Add more rows as needed -->
-        </tbody>
-    </table>
-
     <h1>Current Affairs Test</h1>
     <div>
         <p>Stay updated with the latest events around the world and test your knowledge with our current affairs quizzes.</p>
@@ -121,7 +126,7 @@
     </div>
 
     <div id="weekly-table" class="weekly-table">
-        <h2 id="week-title"></h2>
+        <h2 id="week-title">Current Affairs Test - Week 1, 2025</h2>
         <table>
             <thead>
                 <tr>
