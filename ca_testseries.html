@@ -9,7 +9,7 @@
             font-family: Arial, sans-serif;
             margin: 0;
             background-color: #f9f9f9;
-            border: 5px solid #ddd; /* Add border to the whole page */
+            border: 5px solid #ddd;
             padding: 20px;
         }
 
@@ -31,7 +31,7 @@
             font-size: 20px;
             margin-top: 10px;
             font-weight: bold;
-            transition: text-shadow 0.3s ease; /* Smooth transition for glowing effect */
+            transition: text-shadow 0.3s ease;
         }
 
         table {
@@ -74,6 +74,7 @@
         .calendar-container {
             margin-bottom: 20px;
             text-align: center;
+            margin-top: 40px; /* Adjusted margin to bring it down */
         }
 
         .calendar-container input {
@@ -119,11 +120,13 @@
         }
 
         function adjustWeeklyDates(startDate) {
+            // Get the starting day (Monday) of the week
             const dayOfWeek = startDate.getDay();
-            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust for Monday start
             const weekStartDate = new Date(startDate);
-            weekStartDate.setDate(startDate.getDate() - daysToSubtract);
+            weekStartDate.setDate(startDate.getDate() - daysToSubtract); // Set to Monday of the week
 
+            // Update the weekly table with the new dates
             const tableRows = document.querySelectorAll('.weekly-table tbody tr');
             tableRows.forEach((row, index) => {
                 const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -131,50 +134,47 @@
                 const currentDate = new Date(weekStartDate);
                 currentDate.setDate(weekStartDate.getDate() + index);
 
-                const formattedDate = currentDate.toISOString().split('T')[0];
+                // Set the date for the topic
+                const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
                 dateCell.textContent = `${dayNames[index]} - ${formattedDate}`;
 
+                // Update the "Take Test" button to pass the new date
                 const button = row.querySelector('button');
                 button.setAttribute('onclick', `takeTest('${dayNames[index]}', '${formattedDate}')`);
             });
 
+            // Update the title of the week dynamically
             const weekNumber = Math.ceil((startDate.getDate() + daysToSubtract) / 7);
-            document.getElementById('week-title').innerText = `Current Affairs Test - Week ${weekNumber}, 2025`;
+            const monthName = startDate.toLocaleString('default', { month: 'long' });
+            document.getElementById('week-title').innerText = `Current Affairs Test - ${monthName}, Week ${weekNumber}, 2025`;
         }
 
         function takeTest(day, date) {
             window.location.href = `testhub.html?day=${day}&date=${date}`;
         }
 
-        // Update the clock dynamically with glowing effect
+        // Digital clock function
         function updateClock() {
             const clockElement = document.getElementById('clock');
-            const date = new Date();
-            const hours = date.getHours().toString().padStart(2, '0');
-            const minutes = date.getMinutes().toString().padStart(2, '0');
-            const seconds = date.getSeconds().toString().padStart(2, '0');
-            const day = date.toLocaleString('en-US', { weekday: 'long' });
-            const dateString = date.toLocaleDateString();
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const date = now.toLocaleDateString();
 
-            clockElement.textContent = `${day}, ${dateString} - ${hours}:${minutes}:${seconds}`;
-
-            // Dynamic glowing effect for day/night
-            const hour = date.getHours();
-            if (hour >= 6 && hour < 18) { // Daytime (6 AM - 6 PM)
-                clockElement.style.textShadow = '0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00';
-            } else { // Nighttime (6 PM - 6 AM)
-                clockElement.style.textShadow = '0 0 10px #1e90ff, 0 0 20px #1e90ff, 0 0 30px #1e90ff';
-            }
+            clockElement.textContent = `${hours}:${minutes}:${seconds} ${date}`;
         }
 
-        setInterval(updateClock, 1000);
+        setInterval(updateClock, 1000); // Update the clock every second
     </script>
 </head>
 <body>
     <header>
-        Test Series and Current Affairs
-        <div class="header-info">Stay updated and test your knowledge!</div>
-        <div id="clock" class="clock"></div>
+        <h1>Test Series</h1>
+        <div class="header-info">
+            Stay on track with your study schedule for upcoming exams.
+        </div>
+        <div id="clock" class="clock">00:00:00 01/01/2025</div>
     </header>
 
     <div class="calendar-container">
@@ -191,7 +191,7 @@
     </div>
 
     <div id="weekly-table" class="weekly-table">
-        <h2 id="week-title">Current Affairs Test - Week 1, 2025</h2>
+        <h2 id="week-title">Current Affairs Test - January, Week 1, 2025</h2>
         <table>
             <thead>
                 <tr>
@@ -241,7 +241,7 @@
     </div>
 
     <footer>
-        © 2025 UPSCHub - All rights reserved
+        <p>Test Series - 2025 | All rights reserved.</p>
     </footer>
 </body>
 </html>
