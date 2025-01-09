@@ -4,7 +4,161 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Current Affairs Exam</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+        }
+
+        header {
+            background-color: #003366;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        .exam-intro {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .quiz-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .question {
+            margin-bottom: 20px;
+        }
+
+        .question h2 {
+            font-size: 18px;
+        }
+
+        .question ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .question li {
+            margin-bottom: 10px;
+        }
+
+        .instructions {
+            margin-top: 20px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: #003366;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #00509e;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const quizForm = document.getElementById('currentAffairsQuiz');
+            const questions = [
+                {
+                    question: "Who is the current president of the World Bank?",
+                    options: [
+                        "David Malpass",
+                        "Kristalina Georgieva",
+                        "Ajay Banga",
+                        "Ngozi Okonjo-Iweala"
+                    ],
+                    correct: 2
+                },
+                {
+                    question: "Which country hosted the G20 summit in 2023?",
+                    options: [
+                        "India",
+                        "Indonesia",
+                        "Italy",
+                        "Brazil"
+                    ],
+                    correct: 0
+                }
+            ];
+
+            const quizContainer = document.querySelector('.quiz-container');
+            quizContainer.innerHTML = '';
+
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question');
+
+                const questionTitle = document.createElement('h2');
+                questionTitle.textContent = `Question ${index + 1}`;
+                questionDiv.appendChild(questionTitle);
+
+                const questionText = document.createElement('p');
+                questionText.textContent = q.question;
+                questionDiv.appendChild(questionText);
+
+                const optionsList = document.createElement('ul');
+
+                q.options.forEach((option, optionIndex) => {
+                    const optionItem = document.createElement('li');
+
+                    const optionInput = document.createElement('input');
+                    optionInput.type = 'radio';
+                    optionInput.id = `q${index}a${optionIndex}`;
+                    optionInput.name = `q${index}`;
+                    optionInput.value = optionIndex;
+                    optionInput.required = true;
+
+                    const optionLabel = document.createElement('label');
+                    optionLabel.htmlFor = `q${index}a${optionIndex}`;
+                    optionLabel.textContent = option;
+
+                    optionItem.appendChild(optionInput);
+                    optionItem.appendChild(optionLabel);
+                    optionsList.appendChild(optionItem);
+                });
+
+                questionDiv.appendChild(optionsList);
+                quizContainer.appendChild(questionDiv);
+            });
+
+            quizForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let score = 0;
+                questions.forEach((q, index) => {
+                    const selected = quizForm[`q${index}`].value;
+                    if (parseInt(selected) === q.correct) {
+                        score++;
+                    }
+                });
+
+                alert(`You scored ${score} out of ${questions.length}`);
+            });
+        });
+    </script>
 </head>
 <body>
     <header>
@@ -17,33 +171,8 @@
         </section>
 
         <section class="quiz-container">
-            <form id="currentAffairsQuiz" action="submit-quiz" method="POST">
-                <!-- Example Question -->
-                <div class="question">
-                    <h2>Question 1</h2>
-                    <p>Who is the current president of the World Bank?</p>
-                    <ul>
-                        <li>
-                            <input type="radio" id="q1a1" name="q1" value="option1" required>
-                            <label for="q1a1">David Malpass</label>
-                        </li>
-                        <li>
-                            <input type="radio" id="q1a2" name="q1" value="option2">
-                            <label for="q1a2">Kristalina Georgieva</label>
-                        </li>
-                        <li>
-                            <input type="radio" id="q1a3" name="q1" value="option3">
-                            <label for="q1a3">Ajay Banga</label>
-                        </li>
-                        <li>
-                            <input type="radio" id="q1a4" name="q1" value="option4">
-                            <label for="q1a4">Ngozi Okonjo-Iweala</label>
-                        </li>
-                    </ul>
-                </div>
-
-                <!-- Add more questions as needed -->
-
+            <form id="currentAffairsQuiz" action="#" method="POST">
+                <!-- Quiz will be dynamically populated here -->
                 <button type="submit">Submit</button>
             </form>
         </section>
