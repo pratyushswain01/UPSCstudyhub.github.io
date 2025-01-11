@@ -11,7 +11,7 @@
             background-color: #f9f9f9;
             border: 5px solid #ddd;
             padding: 20px;
-            padding-bottom: 40px; /* Added space for footer */
+            padding-bottom: 40px;
         }
 
         header {
@@ -35,47 +35,10 @@
             transition: text-shadow 0.3s ease;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            margin-top: 20px;
-        }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-
-        th {
-            background-color: #f4b41a;
-            color: white;
-        }
-
-        .test-options {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .test-options button {
-            padding: 10px 20px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .test-options button:hover {
-            background-color: #0056b3;
-        }
-
         .calendar-container {
             margin-bottom: 20px;
             text-align: center;
-            margin-top: 40px; /* Adjusted margin to bring it down */
+            margin-top: 40px;
         }
 
         .calendar-container input {
@@ -85,15 +48,10 @@
             border-radius: 5px;
         }
 
-        .weekly-table {
-            display: none;
-            margin-top: 20px;
-        }
-
         footer {
             background-color: #333;
             color: white;
-            padding: 5px 0; /* Made footer smaller */
+            padding: 5px 0;
             text-align: center;
             position: fixed;
             width: 100%;
@@ -103,57 +61,27 @@
         }
     </style>
     <script>
-        function showWeeklyTable() {
+        function redirectToGoogleForm() {
             const datePicker = document.getElementById('date-picker');
             const selectedDate = new Date(datePicker.value);
 
             if (selectedDate.toString() !== 'Invalid Date') {
                 const year = selectedDate.getFullYear();
+                const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero
+                const day = selectedDate.getDate().toString().padStart(2, '0'); // Add leading zero
+                const formattedDate = `${year}-${month}-${day}`;
 
-                if (year === 2025) {
-                    // Display the weekly table and adjust the week dates
-                    document.getElementById('weekly-table').style.display = 'block';
-                    adjustWeeklyDates(selectedDate);
+                // Check if the selected date is the allowed one
+                const allowedDate = '2025-01-10'; // Replace with the specific date you want to allow
+                if (formattedDate === allowedDate) {
+                    const googleFormUrl = "https://forms.gle/UshLL6WsoTHWzjvm7"; // Replace with your Google Form URL
+                    window.location.href = googleFormUrl;
                 } else {
-                    alert('Please select a date in 2025.');
+                    alert(`The selected date (${formattedDate}) is not valid for redirection. Please select ${allowedDate}.`);
                 }
             } else {
                 alert('Please select a valid date.');
             }
-        }
-
-        function adjustWeeklyDates(startDate) {
-            // Get the starting day (Monday) of the week
-            const dayOfWeek = startDate.getDay();
-            const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Adjust for Monday start
-            const weekStartDate = new Date(startDate);
-            weekStartDate.setDate(startDate.getDate() - daysToSubtract); // Set to Monday of the week
-
-            // Update the weekly table with the new dates
-            const tableRows = document.querySelectorAll('.weekly-table tbody tr');
-            tableRows.forEach((row, index) => {
-                const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-                const dateCell = row.cells[1];
-                const currentDate = new Date(weekStartDate);
-                currentDate.setDate(weekStartDate.getDate() + index);
-
-                // Set the date for the topic
-                const formattedDate = currentDate.toISOString().split('T')[0]; // Format as YYYY-MM-DD
-                dateCell.textContent = `${dayNames[index]} - ${formattedDate}`;
-
-                // Update the "Take Test" button to pass the new date
-                const button = row.querySelector('button');
-                button.setAttribute('onclick', `takeTest('${dayNames[index]}', '${formattedDate}')`);
-            });
-
-            // Update the title of the week dynamically
-            const weekNumber = Math.ceil((startDate.getDate() + daysToSubtract) / 7);
-            const monthName = startDate.toLocaleString('default', { month: 'long' });
-            document.getElementById('week-title').innerText = `Current Affairs Test - ${monthName}, Week ${weekNumber}, 2025`;
-        }
-
-        function takeTest(day, date) {
-            window.location.href = `catest.html?day=${day}&date=${date}`;
         }
 
         // Digital clock function
@@ -182,61 +110,12 @@
 
     <div class="calendar-container">
         <label for="date-picker">Select Date:</label>
-        <input type="date" id="date-picker" name="date-picker" onchange="showWeeklyTable()" />
-    </div>
-
-    <div id="weekly-table" class="weekly-table">
-        <h2 id="week-title">Current Affairs Test - January, Week 1, 2025</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Day</th>
-                    <th>Topic</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>Monday</td>
-                    <td>Topic 1</td>
-                    <td><button onclick="takeTest('Monday', '2025-01-05')">Take Test</button></td>
-                </tr>
-                <tr>
-                    <td>Tuesday</td>
-                    <td>Topic 2</td>
-                    <td><button onclick="takeTest('Tuesday', '2025-01-06')">Take Test</button></td>
-                </tr>
-                <tr>
-                    <td>Wednesday</td>
-                    <td>Topic 3</td>
-                    <td><button onclick="takeTest('Wednesday', '2025-01-07')">Take Test</button></td>
-                </tr>
-                <tr>
-                    <td>Thursday</td>
-                    <td>Topic 4</td>
-                    <td><button onclick="takeTest('Thursday', '2025-01-08')">Take Test</button></td>
-                </tr>
-                <tr>
-                    <td>Friday</td>
-                    <td>Topic 5</td>
-                    <td><button onclick="takeTest('Friday', '2025-01-09')">Take Test</button></td>
-                </tr>
-                <tr>
-                    <td>Saturday</td>
-                    <td>Topic 6</td>
-                    <td><button onclick="takeTest('Saturday', '2025-01-10')">Take Test</button></td>
-                </tr>
-                <tr>
-                    <td>Sunday</td>
-                    <td>Topic 7</td>
-                    <td><button onclick="takeTest('Sunday', '2025-01-11')">Take Test</button></td>
-                </tr>
-            </tbody>
-        </table>
+        <input type="date" id="date-picker" name="date-picker" />
+        <button onclick="redirectToGoogleForm()">Take Test</button>
     </div>
 
     <footer>
-        <p> UPSChub 2025 | All rights reserved.</p>
+        <p>UPSChub 2025 | All rights reserved.</p>
     </footer>
 </body>
 </html>
