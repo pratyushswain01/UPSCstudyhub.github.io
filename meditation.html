@@ -3,31 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meditation Page</title>
+  <title>Meditation Page with Analog Clock</title>
   <style>
-    /* General Styles */
     body {
       margin: 0;
       font-family: 'Arial', sans-serif;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
+      justify-content: center;
       height: 100vh;
-      background: linear-gradient(135deg, #a1c4fd, #c2e9fb); /* Calming gradient */
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
       color: #fff;
+    }
+
+    .clock-container {
+      position: relative;
+      width: 200px;
+      height: 200px;
+      border: 8px solid #ffffff;
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.2);
+      margin-bottom: 20px;
+    }
+
+    .hand {
+      position: absolute;
+      width: 50%;
+      height: 2px;
+      background: #fff;
+      top: 50%;
+      left: 50%;
+      transform-origin: 100%;
+      transform: rotate(90deg);
+      transition: transform 0.1s linear;
+    }
+
+    .hand.hour {
+      height: 4px;
     }
 
     .meditation-container {
       text-align: center;
-      background: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
-      padding: 30px;
-      border-radius: 15px;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 10px;
       box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .current-time {
-      font-size: 1.5rem;
-      margin-bottom: 15px;
     }
 
     h1 {
@@ -49,6 +70,7 @@
       border-radius: 25px;
       cursor: pointer;
       transition: background 0.3s ease;
+      margin: 5px;
     }
 
     .button:hover {
@@ -61,10 +83,14 @@
   </style>
 </head>
 <body>
+  <div class="clock-container">
+    <div class="hand hour" id="hour-hand"></div>
+    <div class="hand minute" id="minute-hand"></div>
+    <div class="hand second" id="second-hand"></div>
+  </div>
+
   <div class="meditation-container">
-    <div class="current-time" id="current-time"></div>
-    <h1>Relax & Meditate</h1>
-    <p>Set a timer for your meditation and let the soothing sound guide you to calmness.</p>
+    <h1>Meditation Timer</h1>
     <div class="timer" id="timer">00:00</div>
     <button class="button" id="start-button">Start Meditation</button>
     <button class="button" id="reset-button" style="display: none;">Reset</button>
@@ -75,13 +101,27 @@
   </div>
 
   <script>
-    // Display Current Time
-    function updateCurrentTime() {
+    // Analog Clock
+    const hourHand = document.getElementById('hour-hand');
+    const minuteHand = document.getElementById('minute-hand');
+    const secondHand = document.getElementById('second-hand');
+
+    function updateClock() {
       const now = new Date();
-      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      document.getElementById('current-time').textContent = `Current Time: ${timeString}`;
+      const seconds = now.getSeconds();
+      const minutes = now.getMinutes();
+      const hours = now.getHours();
+
+      const secondsDeg = ((seconds / 60) * 360) + 90;
+      const minutesDeg = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
+      const hoursDeg = ((hours % 12) / 12 * 360) + ((minutes / 60) * 30) + 90;
+
+      secondHand.style.transform = `rotate(${secondsDeg}deg)`;
+      minuteHand.style.transform = `rotate(${minutesDeg}deg)`;
+      hourHand.style.transform = `rotate(${hoursDeg}deg)`;
     }
-    setInterval(updateCurrentTime, 1000);
+
+    setInterval(updateClock, 1000);
 
     // Timer Functionality
     let countdown;
