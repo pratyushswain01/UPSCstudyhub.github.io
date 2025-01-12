@@ -3,68 +3,217 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meditation Section</title>
+  <title>Meditation Page</title>
   <style>
-    /* General reset */
-    body, h1, p, button {
+    body {
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
       font-family: 'Arial', sans-serif;
-    }
-
-    /* Meditation Section Styles */
-    .meditation-section {
-      background: linear-gradient(135deg, #a1c4fd, #c2e9fb); /* Calming gradient */
-      height: 100vh;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
       align-items: center;
-      text-align: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
       color: #ffffff;
+      text-align: center;
     }
 
-    .meditation-content {
-      max-width: 600px;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.5); /* Transparent overlay for readability */
-      border-radius: 10px;
-    }
-
-    .meditation-content h1 {
+    .current-time {
       font-size: 2.5rem;
-      margin-bottom: 15px;
-    }
-
-    .meditation-content p {
-      font-size: 1.2rem;
       margin-bottom: 20px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
 
-    .meditation-button {
-      background: #6a11cb; /* Vibrant purple */
-      background: linear-gradient(to right, #6a11cb, #2575fc); /* Gradient button */
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .quote {
+      font-size: 1.5rem;
+      font-style: italic;
+      margin: 20px 0;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .timer {
+      font-size: 2rem;
+      margin: 20px 0;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .breathing-circle {
+      width: 150px;
+      height: 150px;
+      margin: 20px auto;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      animation: breathe 6s infinite;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(1);
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      50% {
+        transform: scale(1.5);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .button {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
       border: none;
-      color: #fff;
-      padding: 10px 20px;
-      font-size: 1rem;
+      padding: 15px 30px;
+      color: white;
+      font-size: 1.2rem;
       border-radius: 25px;
       cursor: pointer;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, transform 0.2s;
+      margin: 10px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
 
-    .meditation-button:hover {
+    .button:hover {
       background: linear-gradient(to right, #2575fc, #6a11cb);
+      transform: scale(1.05);
+    }
+
+    audio {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="meditation-section">
-    <div class="meditation-content">
-      <h1>Relax & Meditate</h1>
-      <p>Take a moment to pause and recharge. Follow guided meditation sessions to improve focus and calm your mind.</p>
-      <button class="meditation-button">Start Meditation</button>
-    </div>
-  </div>
+  <!-- Digital Clock -->
+  <div class="current-time" id="current-time">00:00:00</div>
+
+  <!-- Page Title -->
+  <h1>Meditation Page</h1>
+
+  <!-- Inspirational Quote -->
+  <div class="quote" id="quote">"Breathe in calmness, breathe out stress."</div>
+
+  <!-- Timer Display -->
+  <div class="timer" id="timer">00:00</div>
+
+  <!-- Breathing Exercise Animation -->
+  <div class="breathing-circle"></div>
+
+  <!-- Buttons -->
+  <button class="button" id="start-button">Start Meditation</button>
+  <button class="button" id="pause-button" style="display: none;">Pause</button>
+  <button class="button" id="reset-button" style="display: none;">Reset</button>
+  <button class="button" id="music-button">Play Music</button>
+
+  <!-- Meditation Sound -->
+  <audio id="meditation-sound" loop>
+    <source src="omm.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
+
+  <script>
+    // Digital Clock
+    function updateCurrentTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('current-time').textContent = timeString;
+    }
+    setInterval(updateCurrentTime, 1000);
+
+    // Meditation Quotes
+    const quotes = [
+      "Breathe in calmness, breathe out stress.",
+      "Find your inner peace.",
+      "Focus on the present moment.",
+      "Relax your body and clear your mind.",
+      "Breathe deeply and let go of worries."
+    ];
+    const quoteElement = document.getElementById('quote');
+    function showRandomQuote() {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      quoteElement.textContent = quotes[randomIndex];
+    }
+    setInterval(showRandomQuote, 10000); // Change quote every 10 seconds
+
+    // Timer Functionality
+    let countdown;
+    let isMeditating = false;
+    const timerDisplay = document.getElementById('timer');
+    const startButton = document.getElementById('start-button');
+    const pauseButton = document.getElementById('pause-button');
+    const resetButton = document.getElementById('reset-button');
+    const meditationSound = document.getElementById('meditation-sound');
+    const musicButton = document.getElementById('music-button');
+
+    let remainingSeconds = 300; // Default 5 minutes
+
+    startButton.addEventListener('click', () => {
+      if (!isMeditating) {
+        startMeditation(remainingSeconds);
+        startButton.style.display = 'none';
+        pauseButton.style.display = 'inline-block';
+        resetButton.style.display = 'inline-block';
+      }
+    });
+
+    pauseButton.addEventListener('click', () => {
+      if (isMeditating) {
+        clearInterval(countdown);
+        isMeditating = false;
+        pauseButton.textContent = 'Resume Meditation';
+      } else {
+        startMeditation(remainingSeconds);
+        pauseButton.textContent = 'Pause';
+      }
+    });
+
+    resetButton.addEventListener('click', () => {
+      clearInterval(countdown);
+      isMeditating = false;
+      remainingSeconds = 300;
+      displayTimeLeft(remainingSeconds);
+      startButton.style.display = 'inline-block';
+      pauseButton.style.display = 'none';
+      resetButton.style.display = 'none';
+      meditationSound.pause();
+      meditationSound.currentTime = 0;
+    });
+
+    function startMeditation(seconds) {
+      isMeditating = true;
+      meditationSound.play();
+      const endTime = Date.now() + seconds * 1000;
+
+      countdown = setInterval(() => {
+        remainingSeconds = Math.round((endTime - Date.now()) / 1000);
+        if (remainingSeconds <= 0) {
+          clearInterval(countdown);
+          resetButton.click();
+        } else {
+          displayTimeLeft(remainingSeconds);
+        }
+      }, 1000);
+    }
+
+    function displayTimeLeft(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainderSeconds = seconds % 60;
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(remainderSeconds).padStart(2, '0')}`;
+    }
+
+    // Music Toggle
+    musicButton.addEventListener('click', () => {
+      if (meditationSound.paused) {
+        meditationSound.play();
+        musicButton.textContent = 'Pause Music';
+      } else {
+        meditationSound.pause();
+        musicButton.textContent = 'Play Music';
+      }
+    });
+  </script>
 </body>
 </html>
