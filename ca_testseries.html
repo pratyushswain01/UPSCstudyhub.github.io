@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Series and Current Affairs</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f9f9f9;
+            border: 5px solid #ddd;
+            padding: 20px;
+            padding-bottom: 40px;
+        }
+
+        header {
+            background: linear-gradient(135deg, #f4b41a, #ff7e5f);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-info {
+            margin-top: 10px;
+            font-size: 18px;
+        }
+
+        .clock {
+            font-size: 20px;
+            margin-top: 10px;
+            font-weight: bold;
+            transition: text-shadow 0.3s ease;
+        }
+
+        .calendar-container {
+            margin-bottom: 20px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .calendar-container input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 5px 0;
+            text-align: center;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+    </style>
+    <script>
+        function redirectToGoogleForm() {
+            const datePicker = document.getElementById('date-picker');
+            const selectedDate = new Date(datePicker.value);
+
+            if (selectedDate.toString() !== 'Invalid Date') {
+                const year = selectedDate.getFullYear();
+                const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0'); // Add leading zero
+                const day = selectedDate.getDate().toString().padStart(2, '0'); // Add leading zero
+                const formattedDate = `${year}-${month}-${day}`;
+
+                // Check if the selected date is the allowed one
+                const allowedDate = '2025-01-10'; // Replace with the specific date you want to allow
+                if (formattedDate === allowedDate) {
+                    const googleFormUrl = "https://forms.gle/UshLL6WsoTHWzjvm7"; // Replace with your Google Form URL
+                    window.location.href = googleFormUrl;
+                } else {
+                    alert(`The selected date (${formattedDate}) is not valid for redirection. Please select ${allowedDate}.`);
+                }
+            } else {
+                alert('Please select a valid date.');
+            }
+        }
+
+        // Digital clock function
+        function updateClock() {
+            const clockElement = document.getElementById('clock');
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const date = now.toLocaleDateString();
+
+            clockElement.textContent = `${hours}:${minutes}:${seconds} ${date}`;
+        }
+
+        setInterval(updateClock, 1000); // Update the clock every second
+    </script>
+</head>
+<body>
+    <header>
+        <h1>Test Series</h1>
+        <div class="header-info">
+            Stay on track with your study schedule for upcoming exams.
+        </div>
+        <div id="clock" class="clock">00:00:00 01/01/2025</div>
+    </header>
+
+    <div class="calendar-container">
+        <label for="date-picker">Select Date:</label>
+        <input type="date" id="date-picker" name="date-picker" />
+        <button onclick="redirectToGoogleForm()">Take Test</button>
+    </div>
+
+    <footer>
+        <p>UPSChub 2025 | All rights reserved.</p>
+    </footer>
+</body>
+</html>
