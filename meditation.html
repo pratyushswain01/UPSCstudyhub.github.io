@@ -136,7 +136,6 @@
   </style>
 </head>
 <body>
-  <!-- Main Container -->
   <div class="container">
     <!-- Header -->
     <header>
@@ -155,7 +154,7 @@
       <div class="quote" id="quote">"Breathe in calmness, breathe out stress."</div>
 
       <!-- Timer -->
-      <div class="timer" id="timer">00:00</div>
+      <div class="timer" id="timer">05:00</div>
 
       <!-- Breathing Circle -->
       <div class="breathing-circle"></div>
@@ -190,19 +189,82 @@
     }
     setInterval(updateCurrentTime, 1000);
 
-    // Inspirational Quotes
-    const quotes = [
-      "Breathe in calmness, breathe out stress.",
-      "Find your inner peace.",
-      "Focus on the present moment.",
-      "Relax your body and clear your mind.",
-      "Breathe deeply and let go of worries."
-    ];
-    function showRandomQuote() {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      document.getElementById('quote').textContent = quotes[randomIndex];
+    // Timer Variables
+    let timerDuration = 300; // 5 minutes in seconds
+    let timerInterval;
+    let isTimerRunning = false;
+
+    const timerElement = document.getElementById('timer');
+    const startButton = document.getElementById('start-button');
+    const pauseButton = document.getElementById('pause-button');
+    const resetButton = document.getElementById('reset-button');
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
     }
-    setInterval(showRandomQuote, 10000);
+
+    function startTimer() {
+      if (!isTimerRunning) {
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+          if (timerDuration > 0) {
+            timerDuration--;
+            timerElement.textContent = formatTime(timerDuration);
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            alert("Meditation complete!");
+          }
+        }, 1000);
+
+        startButton.style.display = 'none';
+        pauseButton.style.display = 'inline-block';
+        resetButton.style.display = 'inline-block';
+      }
+    }
+
+    function pauseTimer() {
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerDuration = 300;
+      timerElement.textContent = formatTime(timerDuration);
+      startButton.style.display = 'inline-block';
+      pauseButton.style.display = 'none';
+      resetButton.style.display = 'none';
+    }
+
+    // Attach Timer Functions to Buttons
+    startButton.addEventListener('click', startTimer);
+    pauseButton.addEventListener('click', pauseTimer);
+    resetButton.addEventListener('click', resetTimer);
+
+    // Play Music Button
+    const musicButton = document.getElementById('music-button');
+    const meditationSound = document.getElementById('meditation-sound');
+    let isMusicPlaying = false;
+
+    musicButton.addEventListener('click', () => {
+      if (isMusicPlaying) {
+        meditationSound.pause();
+        musicButton.textContent = 'Play Music';
+      } else {
+        meditationSound.play();
+        musicButton.textContent = 'Pause Music';
+      }
+      isMusicPlaying = !isMusicPlaying;
+    });
+
+    // Update Timer Display
+    timerElement.textContent = formatTime(timerDuration);
   </script>
 </body>
 </html>
