@@ -3,68 +3,141 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meditation Section</title>
+  <title>Meditation Page</title>
   <style>
-    /* General reset */
-    body, h1, p, button {
+    /* General Styles */
+    body {
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
       font-family: 'Arial', sans-serif;
-    }
-
-    /* Meditation Section Styles */
-    .meditation-section {
-      background: linear-gradient(135deg, #a1c4fd, #c2e9fb); /* Calming gradient */
-      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb); /* Calming gradient */
+      color: #fff;
+    }
+
+    .meditation-container {
       text-align: center;
-      color: #ffffff;
+      background: rgba(0, 0, 0, 0.6); /* Semi-transparent overlay */
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
     }
 
-    .meditation-content {
-      max-width: 600px;
-      padding: 20px;
-      background: rgba(0, 0, 0, 0.5); /* Transparent overlay for readability */
-      border-radius: 10px;
+    .current-time {
+      font-size: 1.5rem;
+      margin-bottom: 15px;
     }
 
-    .meditation-content h1 {
+    h1 {
       font-size: 2.5rem;
       margin-bottom: 15px;
     }
 
-    .meditation-content p {
-      font-size: 1.2rem;
-      margin-bottom: 20px;
+    .timer {
+      font-size: 2rem;
+      margin: 20px 0;
     }
 
-    .meditation-button {
-      background: #6a11cb; /* Vibrant purple */
-      background: linear-gradient(to right, #6a11cb, #2575fc); /* Gradient button */
+    .button {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
       border: none;
-      color: #fff;
       padding: 10px 20px;
+      color: white;
       font-size: 1rem;
       border-radius: 25px;
       cursor: pointer;
       transition: background 0.3s ease;
     }
 
-    .meditation-button:hover {
+    .button:hover {
       background: linear-gradient(to right, #2575fc, #6a11cb);
+    }
+
+    audio {
+      display: none;
     }
   </style>
 </head>
 <body>
-  <div class="meditation-section">
-    <div class="meditation-content">
-      <h1>Relax & Meditate</h1>
-      <p>Take a moment to pause and recharge. Follow guided meditation sessions to improve focus and calm your mind.</p>
-      <button class="meditation-button">Start Meditation</button>
-    </div>
+  <div class="meditation-container">
+    <div class="current-time" id="current-time"></div>
+    <h1>Relax & Meditate</h1>
+    <p>Set a timer for your meditation and let the soothing sound guide you to calmness.</p>
+    <div class="timer" id="timer">00:00</div>
+    <button class="button" id="start-button">Start Meditation</button>
+    <button class="button" id="reset-button" style="display: none;">Reset</button>
+    <audio id="meditation-sound" loop>
+      <source src="omm.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
   </div>
+
+  <script>
+    // Display Current Time
+    function updateCurrentTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('current-time').textContent = `Current Time: ${timeString}`;
+    }
+    setInterval(updateCurrentTime, 1000);
+
+    // Timer Functionality
+    let countdown;
+    let isMeditating = false;
+    const timerDisplay = document.getElementById('timer');
+    const startButton = document.getElementById('start-button');
+    const resetButton = document.getElementById('reset-button');
+    const meditationSound = document.getElementById('meditation-sound');
+
+    startButton.addEventListener('click', () => {
+      if (!isMeditating) {
+        startMeditation(300); // 5-minute timer
+        startButton.textContent = 'Stop Meditation';
+        resetButton.style.display = 'inline-block';
+      } else {
+        stopMeditation();
+      }
+    });
+
+    resetButton.addEventListener('click', () => {
+      stopMeditation();
+      timerDisplay.textContent = "00:00";
+      startButton.textContent = 'Start Meditation';
+      resetButton.style.display = 'none';
+    });
+
+    function startMeditation(seconds) {
+      isMeditating = true;
+      meditationSound.play();
+      const endTime = Date.now() + seconds * 1000;
+      displayTimeLeft(seconds);
+
+      countdown = setInterval(() => {
+        const secondsLeft = Math.round((endTime - Date.now()) / 1000);
+        if (secondsLeft <= 0) {
+          clearInterval(countdown);
+          stopMeditation();
+        } else {
+          displayTimeLeft(secondsLeft);
+        }
+      }, 1000);
+    }
+
+    function stopMeditation() {
+      clearInterval(countdown);
+      isMeditating = false;
+      meditationSound.pause();
+      meditationSound.currentTime = 0;
+      startButton.textContent = 'Start Meditation';
+    }
+
+    function displayTimeLeft(seconds) {
+      const minutes = Math.floor(seconds / 60);
+      const remainderSeconds = seconds % 60;
+      timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(remainderSeconds).padStart(2, '0')}`;
+    }
+  </script>
 </body>
 </html>
