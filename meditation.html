@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Meditation Page with Analog Clock</title>
+  <title>Meditation Timer</title>
   <style>
     body {
       margin: 0;
@@ -14,67 +14,44 @@
       justify-content: center;
       height: 100vh;
       background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-      color: #fff;
-    }
-
-    .clock-container {
-      position: relative;
-      width: 200px;
-      height: 200px;
-      border: 8px solid #ffffff;
-      border-radius: 50%;
-      background: rgba(0, 0, 0, 0.2);
-      margin-bottom: 20px;
-    }
-
-    .hand {
-      position: absolute;
-      width: 50%;
-      height: 2px;
-      background: #fff;
-      top: 50%;
-      left: 50%;
-      transform-origin: 100%;
-      transform: rotate(90deg);
-      transition: transform 0.1s linear;
-    }
-
-    .hand.hour {
-      height: 4px;
-    }
-
-    .meditation-container {
+      color: #ffffff;
       text-align: center;
-      background: rgba(0, 0, 0, 0.6);
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .current-time {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
 
     h1 {
-      font-size: 2.5rem;
-      margin-bottom: 15px;
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
 
     .timer {
-      font-size: 2rem;
+      font-size: 2.5rem;
       margin: 20px 0;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
     }
 
     .button {
       background: linear-gradient(to right, #6a11cb, #2575fc);
       border: none;
-      padding: 10px 20px;
+      padding: 15px 30px;
       color: white;
-      font-size: 1rem;
+      font-size: 1.2rem;
       border-radius: 25px;
       cursor: pointer;
-      transition: background 0.3s ease;
-      margin: 5px;
+      transition: background 0.3s ease, transform 0.2s;
+      margin: 10px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .button:hover {
       background: linear-gradient(to right, #2575fc, #6a11cb);
+      transform: scale(1.05);
     }
 
     audio {
@@ -83,45 +60,33 @@
   </style>
 </head>
 <body>
-  <div class="clock-container">
-    <div class="hand hour" id="hour-hand"></div>
-    <div class="hand minute" id="minute-hand"></div>
-    <div class="hand second" id="second-hand"></div>
-  </div>
+  <!-- Digital Clock -->
+  <div class="current-time" id="current-time">00:00:00</div>
 
-  <div class="meditation-container">
-    <h1>Meditation Timer</h1>
-    <div class="timer" id="timer">00:00</div>
-    <button class="button" id="start-button">Start Meditation</button>
-    <button class="button" id="reset-button" style="display: none;">Reset</button>
-    <audio id="meditation-sound" loop>
-      <source src="omm.mp3" type="audio/mpeg">
-      Your browser does not support the audio element.
-    </audio>
-  </div>
+  <!-- Page Title -->
+  <h1>Meditation Timer</h1>
+
+  <!-- Timer Display -->
+  <div class="timer" id="timer">00:00</div>
+
+  <!-- Buttons -->
+  <button class="button" id="start-button">Start Meditation</button>
+  <button class="button" id="reset-button" style="display: none;">Reset</button>
+
+  <!-- Meditation Sound -->
+  <audio id="meditation-sound" loop>
+    <source src="omm.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+  </audio>
 
   <script>
-    // Analog Clock
-    const hourHand = document.getElementById('hour-hand');
-    const minuteHand = document.getElementById('minute-hand');
-    const secondHand = document.getElementById('second-hand');
-
-    function updateClock() {
+    // Digital Clock
+    function updateCurrentTime() {
       const now = new Date();
-      const seconds = now.getSeconds();
-      const minutes = now.getMinutes();
-      const hours = now.getHours();
-
-      const secondsDeg = ((seconds / 60) * 360) + 90;
-      const minutesDeg = ((minutes / 60) * 360) + ((seconds / 60) * 6) + 90;
-      const hoursDeg = ((hours % 12) / 12 * 360) + ((minutes / 60) * 30) + 90;
-
-      secondHand.style.transform = `rotate(${secondsDeg}deg)`;
-      minuteHand.style.transform = `rotate(${minutesDeg}deg)`;
-      hourHand.style.transform = `rotate(${hoursDeg}deg)`;
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('current-time').textContent = timeString;
     }
-
-    setInterval(updateClock, 1000);
+    setInterval(updateCurrentTime, 1000);
 
     // Timer Functionality
     let countdown;
