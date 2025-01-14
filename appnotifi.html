@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Notification Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            flex-direction: column;
+        }
+
+        .notification-container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+
+        .live-status {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .blinker {
+            color: red;
+            font-weight: bold;
+            font-size: 1.5em;
+            animation: blink 1s step-start infinite;
+        }
+
+        @keyframes blink {
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .timer {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+
+        .notification {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .reminder {
+            font-size: 1em;
+            color: #555;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .button-container button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 1em;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .button-container button:hover {
+            background-color: #45a049;
+        }
+
+        /* Signature and Owner Section */
+        .signature-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .signature-image {
+            width: 150px; /* Adjust the size of the signature image */
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .owner-text {
+            font-size: 1.2em;
+            color: #333;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="notification-container">
+        <!-- Live Status Blinker -->
+        <div class="live-status">
+            <span id="live-blinker" class="blinker">LIVE</span>
+        </div>
+
+        <!-- Reminder Section -->
+        <div class="reminder">
+            <h3>📢 Reminder: Polity Test Tonight!</h3>
+            <p><strong>📝 Topic:</strong> Indian polity (as per notification)</p>
+            <p><strong>📅 Date:</strong> 14th January 2025</p>
+            <p><strong>⏰ Time:</strong> 10:00 PM - 11:00 PM</p>
+            <p><strong>⏳ Duration:</strong> 1 hour</p>
+            <p><strong>🖋 Questions:</strong> 60 MCQs</p>
+            <p>Stay consistent and focused—every effort counts in your UPSC journey.</p>
+            <p>Good Luck!</p>
+            <p>— Team UPSChub</p>
+        </div>
+
+        <!-- Countdown Timer Section -->
+        <div class="timer">
+            <p>Time Remaining: <span id="timer">00:00</span></p>
+        </div>
+
+        <!-- Update Notification -->
+        <div class="notification">
+            <p>Important Exam Update! Stay updated for the next important announcement.</p>
+        </div>
+
+        <!-- Home Button -->
+        <div class="button-container">
+            <button onclick="goHome()">Go to Home</button>
+        </div>
+    </div>
+
+    <!-- Signature Section -->
+    <div class="signature-container">
+        <img src="your-signature-image-url.jpg" alt="Signature" class="signature-image"> <!-- Replace with your actual image URL -->
+        <div class="owner-text">Owner: UPSChub</div>
+    </div>
+
+    <script>
+        // Set the exam start time (10:00 PM on January 14, 2025)
+        const examStartDate = new Date('January 14, 2025 22:00:00').getTime();
+
+        // Timer functionality to count down to exam start time
+        function startTimer() {
+            const timerDisplay = document.getElementById('timer');
+            const interval = setInterval(() => {
+                const now = new Date().getTime();
+                const timeRemaining = examStartDate - now;
+
+                // If the countdown is finished, display an alert
+                if (timeRemaining <= 0) {
+                    clearInterval(interval);
+                    timerDisplay.textContent = "The exam has started!";
+                    alert("The exam has started!");
+                } else {
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                    // Display the countdown timer
+                    timerDisplay.textContent = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
+                }
+            }, 1000);
+        }
+
+        function formatTime(time) {
+            return time < 10 ? '0' + time : time;
+        }
+
+        // Home button function
+        function goHome() {
+            window.location.href = "homeUPSChub.html"; // Replace with your home page URL
+        }
+
+        // Start the timer when the page loads
+        window.onload = function() {
+            startTimer();
+        };
+    </script>
+
+</body>
+</html>
