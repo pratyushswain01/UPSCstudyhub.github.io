@@ -15,14 +15,14 @@
             background-color: #004080;
             color: white;
             text-align: center;
-            padding: 5px 0; /* Reduced padding */
+            padding: 10px 0;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
         footer {
             background-color: #004080;
             color: white;
             text-align: center;
-            padding: 2px 0; /* Reduced padding */
+            padding: 5px 0;
             position: fixed;
             bottom: 0;
             width: 100%;
@@ -93,11 +93,23 @@
         .examdeck-link a:hover {
             background-color: #002060;
         }
+        .exam-time {
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .timer {
+            font-size: 24px;
+            color: #ff0000;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <header>
-        <h1>UPSChub - Polity Test</h1>
+        <h1>UPSChub - Exam Details</h1>
     </header>
 
     <div class="container">
@@ -123,10 +135,18 @@
                 <li>Manage your time effectively to complete all questions.</li>
                 <li>Review your answers before submission.</li>
                 <li>The test consists of 60 multiple-choice questions.</li>
-                <li>Each question carries 1 marks, and there is no negetive mark for every incorrect answer.</li>
+                <li>Each question carries 1 marks, and there is no negetive mark for incorrect answer.</li>
                 <li>The duration of the test is 1 hour.</li>
                 <li>Make sure to have a stable internet connection while taking the test online.</li>
             </ul>
+        </div>
+
+        <div class="exam-time">
+            <p>Exam starts at <strong>10:00 PM Today</strong></p>
+        </div>
+
+        <div class="timer" id="timer">
+            <!-- Timer will be displayed here -->
         </div>
 
         <div class="examdeck-link">
@@ -135,16 +155,53 @@
 
         <div class="signature">
             <p>All the best!</p>
-             <img src="images\signature" alt="Owner's Signature">
-            <p><em>Signature:</em></p>
             <h4>- Owner, UPSChub</h4>
-           
-            
+            <p><em>Signature:</em></p>
+            <img src="images\signature" alt="Owner's Signature">
         </div>
     </div>
 
     <footer>
         <p>&copy; 2025 UPSChub. All Rights Reserved.</p>
     </footer>
+
+    <script>
+        // Set the exam start time to 10:00 PM today
+        var examStartTime = new Date();
+        examStartTime.setHours(22, 0, 0, 0); // Set to 10:00 PM today
+
+        // Function to update the timer every second
+        function updateTimer() {
+            var now = new Date();
+            var timeDifference = examStartTime - now;
+            
+            if (timeDifference <= 0) {
+                // If the exam time has passed, show the duration timer (1 hour countdown)
+                var durationEndTime = new Date(now.getTime() + 60 * 60 * 1000); // Add 1 hour
+                var durationTimerInterval = setInterval(function() {
+                    var durationTimeLeft = durationEndTime - new Date();
+                    if (durationTimeLeft <= 0) {
+                        clearInterval(durationTimerInterval);
+                        document.getElementById("timer").innerHTML = "Time's up!";
+                    } else {
+                        var hours = Math.floor(durationTimeLeft / (1000 * 60 * 60));
+                        var minutes = Math.floor((durationTimeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((durationTimeLeft % (1000 * 60)) / 1000);
+                        document.getElementById("timer").innerHTML = hours + "h " + minutes + "m " + seconds + "s";
+                    }
+                }, 1000);
+            } else {
+                // If the exam has not started yet, show the countdown to the exam
+                var hours = Math.floor(timeDifference / (1000 * 60 * 60));
+                var minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+                document.getElementById("timer").innerHTML = "Time remaining until exam: " + hours + "h " + minutes + "m " + seconds + "s";
+            }
+        }
+
+        // Update the timer every second
+        setInterval(updateTimer, 1000);
+        updateTimer(); // Initial call to set the timer immediately
+    </script>
 </body>
 </html>
