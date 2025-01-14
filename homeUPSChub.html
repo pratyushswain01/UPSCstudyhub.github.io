@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,20 +8,22 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>Home: UPSC Hub</title>
 
-   <!-- Font Awesome CDN Link -->
+   <!-- font awesome cdn link -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+
+   <!-- custom css file link -->
+   <link rel="stylesheet" href="css/style.css">
 
    <!-- Google Fonts -->
    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
 
-   <!-- Custom CSS -->
+   <!-- Custom Styles -->
    <style>
       /* Global Styling */
       body {
          font-family: 'Poppins', sans-serif;
          background-color: #f9f4e7;
-         margin: 0;
-         padding: 0;
+         overflow-x: hidden;
          display: flex;
          flex-direction: column;
          min-height: 100vh;
@@ -27,123 +31,191 @@
 
       /* Header Styling */
       .header {
-         background: linear-gradient(45deg, #FFB6C1, #FFD700);
-         color: #fff;
-         padding: 20px 0;
-         text-align: center;
+          background: linear-gradient(45deg, #FFB6C1, #FFD700); /* Gold and Pink gradient for New Year */
+          color: #fff;
+          padding: 20px 0;
+          text-align: center;
+          position: relative;
       }
 
       .header .logo {
-         font-size: 45px;
-         font-weight: 600;
-         letter-spacing: 2px;
-         color: #fff;
+          font-size: 45px;
+          font-weight: 600;
+          letter-spacing: 2px;
+          color: #fff;
       }
 
-      /* Notification Popup Styling */
-      .notification-popup {
-         position: fixed;
-         top: 20px;
-         right: 20px;
-         background-color: #1a73e8;
-         color: #fff;
-         padding: 15px 20px;
-         border-radius: 8px;
-         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-         z-index: 1000;
-         display: none; /* Initially hidden */
-         animation: fadeIn 0.5s ease-in-out;
-         width: 300px;
+      .header .new-year-message {
+          font-size: 22px;
+          color: #fff;
+          font-weight: 500;
+          margin-top: 10px;
       }
 
-      .notification-popup h3 {
-         margin: 0;
-         font-size: 18px;
+      /* Fullscreen Overlay for New Year Wishes */
+      .fullscreen-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background-color: rgba(0, 0, 0, 0.8);
+          z-index: 1000;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          color: white;
+          font-size: 3rem;
+          text-align: center;
+          visibility: hidden;
+          opacity: 0;
+          transition: visibility 0s, opacity 1s ease;
       }
 
-      .notification-popup p {
-         margin: 5px 0;
-         font-size: 14px;
+      .fullscreen-overlay.show {
+          visibility: visible;
+          opacity: 1;
       }
 
-      .notification-popup img {
-         max-width: 100%;
-         height: auto;
-         margin: 10px 0;
+      .fullscreen-overlay .message {
+          margin-bottom: 20px;
+          font-size: 40px;
+          animation: fireworks 1s infinite ease-in-out;
       }
 
-      .notification-popup a,
-      .notification-popup button {
-         background: #fff;
-         color: #1a73e8;
-         border: none;
-         border-radius: 5px;
-         padding: 5px 10px;
-         margin-top: 10px;
-         text-decoration: none;
-         font-size: 14px;
-         cursor: pointer;
+      .fullscreen-overlay .message span {
+          font-size: 50px;
+          color: #FFD700; /* Golden Text for the New Year */
       }
 
-      .notification-popup button:hover,
-      .notification-popup a:hover {
-         background: #145aaf;
-         color: #fff;
+      
+
+      
+
+      /* Flower Decoration for New Year */
+      .flower-decor {
+          position: absolute;
+          top: 20px;
+          right: 10px;
+          z-index: 10;
+          background: url('images/flowers.gif')no-repeat center;
+          background-size: contain;
+          width: 120px;
+          height: 120px;
       }
 
-      /* Animation */
-      @keyframes fadeIn {
-         from {
-            opacity: 0;
-            transform: translateY(-20px);
-         }
-         to {
-            opacity: 1;
-            transform: translateY(0);
-         }
-      }
-
-      /* Home Grid Section */
+      /* UPSC Hub Section Styling */
       .home-grid {
-         text-align: center;
-         padding: 50px 20px;
-         flex: 1;
+          margin-top: 50px;
+          text-align: center;
       }
 
-      .home-grid .heading {
-         font-size: 40px;
-         color: #FF6347;
-         font-weight: 600;
-         margin-bottom: 20px;
-         text-transform: uppercase;
-         text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+      .heading {
+          font-size: 40px;
+          color: #FF6347;
+          font-weight: 600;
+          margin-bottom: 20px;
+          text-transform: uppercase;
+          text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
       }
 
-      .home-grid .flower-text {
-         font-family: 'Raleway', sans-serif;
-         font-size: 50px;
-         color: #FF69B4;
-         letter-spacing: 5px;
-         margin-bottom: 50px;
+        .flower-text {
+          font-family: 'Raleway', sans-serif;
+          font-size: 50px;
+          color: #FF69B4; /* Beautiful Pink */
+          background-image: url('images/flowers-pattern.png'); /* You need a flower pattern image */
+          background-size: 100%;
+          text-align: center;
+          color: transparent;
+          background-clip: text;
+          display: inline-block;
+          letter-spacing: 5px;
+          text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+      }
+
+      .flower-text span {
+          font-size: 30px;
+          font-weight: 600;
+          color: #FF6347;
       }
 
       /* Footer */
       .footer {
-         background: #FFB6C1;
-         color: #fff;
-         text-align: center;
-         padding: 20px;
-         position: fixed;
-         bottom: 0;
-         left: 0;
-         width: 100%;
-         z-index: 10;
+          background: #FFB6C1;
+          color: #fff;
+          text-align: center;
+          padding: 20px;
+          width: 100%;
+          position: relative;
+          bottom: 0;
       }
 
       .footer span {
-         font-weight: bold;
-         font-size: 18px;
+          font-weight: bold;
+          font-size: 18px;
       }
+
+      .notification-popup {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #1a73e8;
+      color: #fff;
+      padding: 15px 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      display: none; /* Hidden by default */
+      animation: fadeIn 0.5s ease-in-out;
+      width: 300px;
+    }
+
+    .notification-popup h3 {
+      margin: 0;
+      font-size: 16px;
+    }
+
+    .notification-popup p {
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
+
+    .notification-popup button {
+      background: #fff;
+      color: #1a73e8;
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      margin-top: 10px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .notification-popup button:hover {
+      background: #145aaf;
+      color: #fff;
+    }
+
+    /* Image in Popup */
+    .notification-popup img {
+      width: 100%;
+      height: auto;
+      margin-top: 10px;
+      border-radius: 5px;
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
    </style>
 </head>
 <body>
@@ -297,14 +369,6 @@
    </div>   
 </section>
 
-   <div class="notification-popup" id="notificationPopup">
-   <h3>New Mock Test Available!</h3>
-   <p>Take the latest UPSC mock test to enhance your preparation. Click below to begin!</p>
-   <img src="images/mock-test-banner.jpg" alt="Mock Test Banner"> <!-- Add your test banner image -->
-   <a href="mock_test.html">Start Test</a>
-   <button onclick="dismissNotification()">Dismiss</button>
-</div>
-
 <footer class="footer">
    &copy; copyright @ 2025 by <span>Pratyush Swain</span> | All rights reserved!
 </footer>
@@ -339,6 +403,30 @@
            });
        }
    }
+
+   <div class="notification-popup" id="notificationPopup">
+    <h3>New Test Notification</h3>
+    <p>A new mock test is available. Click below to start!</p>
+    
+    <!-- Add an image to the notification -->
+    <img src="https://via.placeholder.com/250x100" alt="Test Banner"> <!-- Replace with your image URL -->
+
+    <button onclick="dismissNotification()">Dismiss</button>
+  </div>
+
+  <script>
+    // Show notification popup after 2 seconds
+    window.onload = function () {
+      setTimeout(function () {
+        document.getElementById("notificationPopup").style.display = "block";
+      }, 2000); // 2000ms = 2 seconds
+    };
+
+    // Function to dismiss notification
+    function dismissNotification() {
+      const popup = document.getElementById("notificationPopup");
+      popup.style.display = "none";
+    }
 </script>
 
 <!-- Custom JS file -->
