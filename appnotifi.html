@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APP Notification Page</title>
+    <title>App Notification Page</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,6 +14,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
+            flex-direction: column;
         }
 
         .notification-container {
@@ -77,6 +78,24 @@
         .button-container button:hover {
             background-color: #45a049;
         }
+
+        /* Signature and Owner Section */
+        .signature-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .signature-image {
+            width: 150px; /* Adjust the size of the signature image */
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .owner-text {
+            font-size: 1.2em;
+            color: #333;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -100,7 +119,7 @@
             <p>— Team UPSChub</p>
         </div>
 
-        <!-- Timer Section -->
+        <!-- Countdown Timer Section -->
         <div class="timer">
             <p>Time Remaining: <span id="timer">00:00</span></p>
         </div>
@@ -116,22 +135,35 @@
         </div>
     </div>
 
-    <script>
-        // Timer functionality
-        let countdownTime = 600; // 10 minutes in seconds (600 seconds)
+    <!-- Signature Section -->
+    <div class="signature-container">
+        <img src="your-signature-image-url.jpg" alt="Signature" class="signature-image"> <!-- Replace with your actual image URL -->
+        <div class="owner-text">Owner: UPSChub</div>
+    </div>
 
+    <script>
+        // Set the exam start time (10:00 PM on January 14, 2025)
+        const examStartDate = new Date('January 14, 2025 22:00:00').getTime();
+
+        // Timer functionality to count down to exam start time
         function startTimer() {
             const timerDisplay = document.getElementById('timer');
             const interval = setInterval(() => {
-                let minutes = Math.floor(countdownTime / 60);
-                let seconds = countdownTime % 60;
-                timerDisplay.textContent = `${formatTime(minutes)}:${formatTime(seconds)}`;
+                const now = new Date().getTime();
+                const timeRemaining = examStartDate - now;
 
-                if (countdownTime <= 0) {
+                // If the countdown is finished, display an alert
+                if (timeRemaining <= 0) {
                     clearInterval(interval);
-                    alert("Time is up!");
+                    timerDisplay.textContent = "The exam has started!";
+                    alert("The exam has started!");
                 } else {
-                    countdownTime--;
+                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
+
+                    // Display the countdown timer
+                    timerDisplay.textContent = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
                 }
             }, 1000);
         }
