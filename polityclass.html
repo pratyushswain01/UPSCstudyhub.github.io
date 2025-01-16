@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Polity Mind Map Series</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 1em 0;
+            text-align: center;
+        }
+        .container {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .video-container {
+            margin-bottom: 20px;
+        }
+        .playlist-container {
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+        .playlist-item {
+            text-decoration: none;
+            color: #003366;
+            font-size: 16px;
+        }
+        .playlist-item:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .back-button:hover {
+            background-color: #00509e;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Indian Polity Mind Map Series</h1>
+    </header>
+
+    <div class="container">
+        <h1>Video Lesson</h1>
+        <div class="video-container">
+            <iframe 
+                src="https://www.youtube.com/embed/{VIDEO_ID}" 
+                allowfullscreen>
+            </iframe>
+        </div>
+
+        <div class="playlist-container">
+            <h2>Playlist</h2>
+            <ul id="playlist">
+                <!-- Playlist items will be dynamically populated -->
+            </ul>
+        </div>
+
+        <a class="back-button" href="javascript:history.back()">Go Back</a>
+    </div>
+
+    <script>
+        // Replace {VIDEO_ID} dynamically based on the page context
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+        const iframe = document.querySelector('iframe');
+        if (videoId) {
+            iframe.src = `https://www.youtube.com/embed/${videoId}`;
+        } else {
+            document.querySelector('.container').innerHTML = '<p>Video ID is missing. Please select a valid video.</p>';
+        }
+
+        // Polity Mind Map Playlist
+        const playlistUrl = 'https://www.youtube.com/playlist?list=PLgYU73cZA0Cjin0FolAN_ZmR-KGogdG9o';
+        const playlist = [
+            { id: 'x1x2x3x4x5', title: 'Introduction to Indian Polity' },
+            { id: 'y1y2y3y4y5', title: 'Fundamental Rights' },
+            { id: 'z1z2z3z4z5', title: 'Directive Principles of State Policy' },
+            { id: 'a1a2a3a4a5', title: 'Union and State Governments' }
+        ];
+
+        // Display playlist link
+        const playlistContainer = document.getElementById('playlist');
+        const playlistLink = document.createElement('li');
+        playlistLink.innerHTML = `<a href="${playlistUrl}" target="_blank" class="playlist-item">View Full Playlist on YouTube</a>`;
+        playlistContainer.appendChild(playlistLink);
+
+        // Populate playlist
+        playlist.forEach(video => {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `?id=${video.id}`;
+            link.className = 'playlist-item';
+            link.textContent = video.title;
+            listItem.appendChild(link);
+            playlistContainer.appendChild(listItem);
+        });
+    </script>
+</body>
+</html>
