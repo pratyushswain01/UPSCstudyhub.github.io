@@ -3,185 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APP Notification Page</title>
+    <title>UPSChub - Knowledge Hub</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            flex-direction: column;
-        }
-
-        .notification-container {
-            background-color: #fff;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            width: 300px;
-        }
-
-        .live-status {
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-
-        .blinker {
-            color: red;
-            font-weight: bold;
-            font-size: 1.5em;
-            animation: blink 1s step-start infinite;
-        }
-
-        @keyframes blink {
-            50% {
-                opacity: 0;
-            }
-        }
-
-        .timer {
-            font-size: 1.2em;
-            margin-bottom: 20px;
-        }
-
-        .notification {
-            font-size: 1em;
+            background-color: #f4f4f9;
             color: #333;
-            margin-bottom: 20px;
         }
-
-        .reminder {
-            font-size: 1em;
-            color: #555;
-            background-color: #f9f9f9;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .button-container button {
-            background-color: #4CAF50;
+        header {
+            background-color: #003366;
             color: white;
-            border: none;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 1em;
-            border-radius: 5px;
-            transition: background-color 0.3s;
-        }
-
-        .button-container button:hover {
-            background-color: #45a049;
-        }
-
-        /* Signature and Owner Section */
-        .signature-container {
-            margin-top: 20px;
+            padding: 1em 0;
             text-align: center;
         }
-
-        .signature-image {
-            width: 100px; /* Smaller image size */
-            height: auto;
+        .container {
+            margin: 20px;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
             margin-bottom: 10px;
         }
-
-        .owner-text {
-            font-size: 1.2em;
-            color: #333;
-            font-weight: bold;
+        iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .video-container {
+            margin-bottom: 20px;
+        }
+        .playlist-container {
+            margin-top: 20px;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        li {
+            margin: 10px 0;
+        }
+        .playlist-item {
+            text-decoration: none;
+            color: #003366;
+            font-size: 16px;
+        }
+        .playlist-item:hover {
+            text-decoration: underline;
+        }
+        .back-button {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #003366;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .back-button:hover {
+            background-color: #00509e;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>UPSChub - Knowledge Hub</h1>
+        <p><a href="https://youtube.com/UPSChub" target="_blank" style="color: #FFD700; text-decoration: none;">Visit our channel at UPSChub.in</a></p>
+    </header>
 
-    <div class="notification-container">
-        <!-- Live Status Blinker -->
-        <div class="live-status">
-            <span id="live-blinker" class="blinker">LIVE</span>
+    <div class="container">
+        <h1>Video Lesson</h1>
+        <div class="video-container">
+            <iframe 
+                src="https://www.youtube.com/embed/{VIDEO_ID}" 
+                allowfullscreen>
+            </iframe>
         </div>
 
-        <!-- Reminder Section -->
-        <div class="reminder">
-            <h3>📢 Reminder: Polity Test Tonight!</h3>
-            <p><strong>📝 Topic:</strong> Indian polity (as per notification)</p>
-            <p><strong>📅 Date:</strong> 16th January 2025</p>
-            <p><strong>⏰ Time:</strong> 10:00 PM - 11:00 PM</p>
-            <p><strong>⏳ Duration:</strong> 1 hour</p>
-            <p><strong>🖋 Questions:</strong> 60 MCQs</p>
-            <p>Stay consistent and focused—every effort counts in your UPSC journey.</p>
-            <p>Good Luck!</p>
-            <p>— Team UPSChub</p>
+        <div class="playlist-container">
+            <h2>Topics</h2>
+            <ul id="playlist">
+                <!-- Playlist items will be dynamically populated -->
+            </ul>
         </div>
 
-        <!-- Countdown Timer Section -->
-        <div class="timer">
-            <p>Time Remaining: <span id="timer">00:00</span></p>
-        </div>
-
-        <!-- Update Notification -->
-        <div class="notification">
-            <p>Important Exam Update! Stay updated for the next important announcement.</p>
-        </div>
-
-        <!-- Home Button -->
-        <div class="button-container">
-            <button onclick="goHome()">Go to Home</button>
-        </div>
-    </div>
-
-    <!-- Signature Section -->
-    <div class="signature-container">
-        <img src="images\signature" alt="Signature" class="signature-image"> <!-- Replace with your actual image URL -->
-        <div class="owner-text">Owner: UPSChub</div>
+        <a class="back-button" href="javascript:history.back()">Go Back</a>
     </div>
 
     <script>
-        // Set the exam start time (10:00 PM on January 14, 2025)
-        const examStartDate = new Date('January 16, 2025 22:00:00').getTime();
-
-        // Timer functionality to count down to exam start time
-        function startTimer() {
-            const timerDisplay = document.getElementById('timer');
-            const interval = setInterval(() => {
-                const now = new Date().getTime();
-                const timeRemaining = examStartDate - now;
-
-                // If the countdown is finished, display an alert
-                if (timeRemaining <= 0) {
-                    clearInterval(interval);
-                    timerDisplay.textContent = "The exam has started!";
-                    alert("The exam has started!");
-                } else {
-                    const hours = Math.floor((timeRemaining % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                    const minutes = Math.floor((timeRemaining % (1000 * 60 * 60)) / (1000 * 60));
-                    const seconds = Math.floor((timeRemaining % (1000 * 60)) / 1000);
-
-                    // Display the countdown timer
-                    timerDisplay.textContent = `${formatTime(hours)}:${formatTime(minutes)}:${formatTime(seconds)}`;
-                }
-            }, 1000);
+        // Replace {VIDEO_ID} dynamically based on the page context
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+        const iframe = document.querySelector('iframe');
+        if (videoId) {
+            iframe.src = `https://www.youtube.com/embed/${videoId}`;
+        } else {
+            document.querySelector('.container').innerHTML = '<p>Video ID is missing. Please select a valid video.</p>';
         }
 
-        function formatTime(time) {
-            return time < 10 ? '0' + time : time;
-        }
+        // UPSChub Playlist Data
+        const playlist = [
+            { id: 'x1x2x3x4x5', title: 'Indian Polity Mind Maps' },
+            { id: 'a6b7c8d9e0', title: 'Geography Simplified' },
+            { id: 'y1y2y3y4y5', title: 'Economics for Beginners' },
+            { id: 'b1b2b3b4b5', title: 'History in Timelines' },
+            { id: 'c1c2c3c4c5', title: 'Science and Technology Overview' }
+        ];
 
-        // Home button function
-        function goHome() {
-            window.location.href = "homeUPSChub.html"; // Replace with your home page URL
-        }
-
-        // Start the timer when the page loads
-        window.onload = function() {
-            startTimer();
-        };
+        // Populate playlist
+        const playlistContainer = document.getElementById('playlist');
+        playlist.forEach(video => {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = `?id=${video.id}`;
+            link.className = 'playlist-item';
+            link.textContent = video.title;
+            listItem.appendChild(link);
+            playlistContainer.appendChild(listItem);
+        });
     </script>
-
 </body>
 </html>
