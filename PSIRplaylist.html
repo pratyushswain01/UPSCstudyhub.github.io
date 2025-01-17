@@ -55,6 +55,10 @@
         table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        table .active {
+            background-color: #ffcc00;
+            color: white;
+        }
         .video-link {
             color: #003366;
             text-decoration: none;
@@ -93,6 +97,7 @@
             allowfullscreen
             src="https://www.youtube.com/embed/OyWB6zd1rO0?si=TOkaY4ncKyb4qoe8">
         </iframe>
+        <p id="current-video-title">Currently playing: Polity Mindmap</p>
     </div>
 
     <!-- Table Section -->
@@ -105,15 +110,15 @@
             </tr>
         </thead>
         <tbody>
-            <tr>
+            <tr id="video-1">
                 <td>1</td>
                 <td>Polity Mindmap</td>
-                <td><a class="video-link" data-video="https://www.youtube.com/embed/OyWB6zd1rO0?si=TOkaY4ncKyb4qoe8">Watch Here</a></td>
+                <td><a class="video-link" data-video="https://www.youtube.com/embed/OyWB6zd1rO0?si=TOkaY4ncKyb4qoe8" data-title="Polity Mindmap">Watch Here</a></td>
             </tr>
-            <tr>
+            <tr id="video-2">
                 <td>2</td>
                 <td>History Overview</td>
-                <td><a class="video-link" data-video="https://www.youtube.com/embed/MAeYvNla6zk?si=LF3dhmGQdZSKyasy">Watch Here</a></td>
+                <td><a class="video-link" data-video="https://www.youtube.com/embed/MAeYvNla6zk?si=LF3dhmGQdZSKyasy" data-title="History Overview">Watch Here</a></td>
             </tr>
             <!-- Add more rows with valid video URLs -->
         </tbody>
@@ -128,13 +133,22 @@
     // Select all video links and the iframe
     const videoLinks = document.querySelectorAll('.video-link');
     const iframe = document.getElementById('video-player');
+    const currentVideoTitle = document.getElementById('current-video-title');
 
     // Add click event listeners to each link
     videoLinks.forEach(link => {
         link.addEventListener('click', (event) => {
             event.preventDefault(); // Prevent the default anchor behavior
             const videoSrc = link.getAttribute('data-video'); // Get the video URL
+            const videoTitle = link.getAttribute('data-title'); // Get the video title
             iframe.src = videoSrc; // Update the iframe source
+            currentVideoTitle.textContent = `Currently playing: ${videoTitle}`; // Update the title text
+
+            // Remove 'active' class from all rows
+            document.querySelectorAll('tr').forEach(row => row.classList.remove('active'));
+
+            // Add 'active' class to the clicked row
+            link.closest('tr').classList.add('active');
         });
     });
 </script>
