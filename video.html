@@ -36,38 +36,29 @@
             border: none;
             border-radius: 8px;
         }
-        .playlist-section {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
         }
-        .playlist-item {
-            display: flex;
-            align-items: center;
+        table th, table td {
             padding: 10px;
-            border-bottom: 1px solid #ddd;
-            cursor: pointer;
-            text-decoration: none;
-            color: black;
+            text-align: left;
+            border: 1px solid #ddd;
         }
-        .playlist-item:hover {
+        table th {
+            background-color: #003366;
+            color: white;
+        }
+        table tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        .playlist-item img {
-            width: 120px;
-            height: 70px;
-            border-radius: 4px;
-            margin-right: 15px;
+        .video-link {
+            color: #003366;
+            text-decoration: none;
         }
-        .playlist-item div {
-            flex: 1;
-        }
-        .playlist-item h4 {
-            margin: 0 0 5px;
-            font-size: 1rem;
-        }
-        .playlist-item p {
-            margin: 0;
-            font-size: 0.9rem;
-            color: #555;
+        .video-link:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -88,10 +79,41 @@
         </iframe>
     </div>
 
-    <!-- Playlist Section -->
-    <div class="playlist-section" id="playlist-container">
-        <!-- Playlist items will be dynamically loaded here -->
-    </div>
+    <!-- Table Section -->
+    <table>
+        <thead>
+            <tr>
+                <th>Sr. No.</th>
+                <th>Topic Name</th>
+                <th>YouTube Link</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Add rows for remaining videos here -->
+            <tr>
+                <td>1</td>
+                <td>Polity Mindmap</td>
+                <td><a class="video-link" href="https://youtube.com/video1" target="_blank">Watch Here</a></td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>History Overview</td>
+                <td><a class="video-link" href="https://youtube.com/video2" target="_blank">Watch Here</a></td>
+            </tr>
+            <!-- Repeat similar rows for all 44 videos -->
+            <tr>
+                <td>3</td>
+                <td>Geography Simplified</td>
+                <td><a class="video-link" href="https://youtube.com/video3" target="_blank">Watch Here</a></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Current Affairs</td>
+                <td><a class="video-link" href="https://youtube.com/video4" target="_blank">Watch Here</a></td>
+            </tr>
+            <!-- Add up to 44 rows -->
+        </tbody>
+    </table>
 </div>
 
 <footer>
@@ -110,50 +132,7 @@
     } else {
         document.querySelector('.video-section').innerHTML = '<p>Playlist not found. Please go back and select a valid playlist.</p>';
     }
-
-    // Fetch and display the playlist videos
-    async function fetchPlaylistVideos(playlistId) {
-        const apiKey = 'YOUR_YOUTUBE_API_KEY'; // Replace with your YouTube API key
-        const apiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`;
-
-        try {
-            const response = await fetch(apiUrl);
-            const data = await response.json();
-            const playlistContainer = document.getElementById('playlist-container');
-
-            if (data.items) {
-                data.items.forEach(item => {
-                    const videoId = item.snippet.resourceId.videoId;
-                    const title = item.snippet.title;
-                    const thumbnail = item.snippet.thumbnails.medium.url;
-
-                    const videoLink = document.createElement('a');
-                    videoLink.className = 'playlist-item';
-                    videoLink.href = `video.html?playlist=${playlistId}&video=${videoId}`;
-                    videoLink.innerHTML = `
-                        <img src="${thumbnail}" alt="${title}">
-                        <div>
-                            <h4>${title}</h4>
-                            <p>${item.snippet.channelTitle}</p>
-                        </div>
-                    `;
-
-                    playlistContainer.appendChild(videoLink);
-                });
-            } else {
-                playlistContainer.innerHTML = '<p>No videos found in this playlist.</p>';
-            }
-        } catch (error) {
-            console.error('Error fetching playlist:', error);
-            document.getElementById('playlist-container').innerHTML = '<p>Unable to load playlist videos.</p>';
-        }
-    }
-
-    if (playlistId) {
-        fetchPlaylistVideos(playlistId);
-    }
 </script>
 
 </body>
 </html>
-
