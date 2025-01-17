@@ -9,42 +9,88 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f7fc;
+            background-color: #f4f4f4;
         }
         header, footer {
-            text-align: center;
-            padding: 20px;
             background-color: #003366;
             color: white;
+            text-align: center;
+            padding: 10px 0;
+            font-size: 0.9rem;
         }
-        .video-container {
-            width: 100%;
-            height: calc(100vh - 160px); /* Full height minus header and footer */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-top: 20px;
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .video-section {
+            margin-bottom: 20px;
         }
         iframe {
-            width: 80%;
-            height: 100%;
+            width: 100%;
+            height: 450px;
             border: none;
             border-radius: 8px;
+        }
+        .playlist-section {
+            margin-top: 20px;
+        }
+        .playlist-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+            text-decoration: none;
+            color: black;
+        }
+        .playlist-item:hover {
+            background-color: #f9f9f9;
+        }
+        .playlist-item img {
+            width: 120px;
+            height: 70px;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+        .playlist-item div {
+            flex: 1;
+        }
+        .playlist-item h4 {
+            margin: 0 0 5px;
+            font-size: 1rem;
+        }
+        .playlist-item p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #555;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>Watch Video - UPSChub</h1>
+    <h1>UPSChub</h1>
 </header>
 
-<div class="video-container">
-    <iframe id="video-player" title="YouTube video player"></iframe>
+<div class="container">
+    <!-- Video Section -->
+    <div class="video-section">
+        <iframe id="video-player" title="YouTube video player"></iframe>
+    </div>
+
+    <!-- Playlist Section -->
+    <div class="playlist-section" id="playlist-container">
+        <!-- Playlist items will be dynamically loaded here -->
+    </div>
 </div>
 
 <footer>
-    <p>&copy; 2025 UPSChub. All Rights Reserved.</p>
+    <p>&copy; 2025 UPSChub</p>
 </footer>
 
 <script>
@@ -52,11 +98,54 @@
     const params = new URLSearchParams(window.location.search);
     const playlistId = params.get('playlist');
 
-    // Set the iframe source dynamically
+    // Set the iframe source for the main video
+    const iframe = document.getElementById('video-player');
     if (playlistId) {
-        document.getElementById('video-player').src = `https://www.youtube.com/embed/videoseries?list=${playlistId}`;
+        iframe.src = `https://www.youtube.com/embed/videoseries?list=${playlistId}`;
     } else {
-        document.querySelector('.video-container').innerHTML = '<p>Playlist not found. Please go back and select a valid playlist.</p>';
+        document.querySelector('.video-section').innerHTML = '<p>Playlist not found. Please go back and select a valid playlist.</p>';
+    }
+
+    // Fetch and display the playlist videos
+    async function fetchPlaylistVideos(playlistId) {
+        const apiKey = 'YOUR_YOUTUBE_API_KEY'; // Replace with your YouTube API key
+        const apiUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${apiKey}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            const playlistContainer = document.getElementById('playlist-container');
+
+            if (data.items) {
+                data.items.forEach(item => {
+                    const videoId = item.snippet.resourceId.videoId;
+                    const title = item.snippet.title;
+                    const thumbnail = item.snippet.thumbnails.medium.url;
+
+                    const videoLink = document.createElement('a');
+                    videoLink.className = 'playlist-item';
+                    videoLink.href = `video.html?playlist=${playlistId}&video=${videoId}`;
+                    videoLink.innerHTML = `
+                        <img src="${thumbnail}" alt="${title}">
+                        <div>
+                            <h4>${title}</h4>
+                            <p>${item.snippet.channelTitle}</p>
+                        </div>
+                    `;
+
+                    playlistContainer.appendChild(videoLink);
+                });
+            } else {
+                playlistContainer.innerHTML = '<p>No videos found in this playlist.</p>';
+            }
+        } catch (error) {
+            console.error('Error fetching playlist:', error);
+            document.getElementById('playlist-container').innerHTML = '<p>Unable to load playlist videos.</p>';
+        }
+    }
+
+    if (playlistId) {
+        fetchPlaylistVideos(playlistId);
     }
 </script>
 
