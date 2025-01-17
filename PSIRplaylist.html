@@ -56,8 +56,8 @@
             background-color: #f9f9f9;
         }
         table .active {
-            background-color: #ffcc00;
-            color: white;
+            background-color: #e0f7fa;  /* Soft light blue */
+            color: black;
         }
         .video-link {
             color: #003366;
@@ -77,14 +77,22 @@
         .nav-arrows {
             text-align: center;
             margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         .nav-arrows span {
-            font-size: 1.5rem;
+            font-size: 2rem;
             margin: 0 20px;
             cursor: pointer;
         }
         .nav-arrows span:hover {
             text-decoration: underline;
+        }
+        .topic-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #003366;
         }
     </style>
 </head>
@@ -109,13 +117,14 @@
             allowfullscreen
             src="https://www.youtube.com/embed/OyWB6zd1rO0?si=TOkaY4ncKyb4qoe8">
         </iframe>
-        <p id="current-video-title">Currently playing: Polity Mindmap</p>
+        <p id="current-video-title" class="topic-name">Currently playing: Polity Mindmap</p>
     </div>
 
     <!-- Navigation Arrows -->
     <div class="nav-arrows">
-        <span id="prev-video">← Previous</span>
-        <span id="next-video">Next →</span>
+        <span id="prev-video">←</span>
+        <p id="current-video-name" class="topic-name">Polity Mindmap</p>
+        <span id="next-video">→</span>
     </div>
 
     <!-- Table Section -->
@@ -151,6 +160,7 @@
     const videoLinks = document.querySelectorAll('.video-link');
     const iframe = document.getElementById('video-player');
     const currentVideoTitle = document.getElementById('current-video-title');
+    const currentVideoName = document.getElementById('current-video-name');
     const prevBtn = document.getElementById('prev-video');
     const nextBtn = document.getElementById('next-video');
     let videoList = [
@@ -163,6 +173,7 @@
     function loadVideo(index) {
         iframe.src = videoList[index].src;
         currentVideoTitle.textContent = `Currently playing: ${videoList[index].title}`;
+        currentVideoName.textContent = videoList[index].title;
         document.querySelectorAll('tr').forEach(row => row.classList.remove('active'));
         document.getElementById(`video-${videoList[index].id}`).classList.add('active');
     }
