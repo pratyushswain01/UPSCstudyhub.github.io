@@ -9,145 +9,132 @@
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f9f9f9;
         }
-
         header {
-            background-color: #222;
-            color: white;
-            padding: 10px 20px;
-        }
-
-        nav {
             display: flex;
             align-items: center;
             justify-content: space-between;
-        }
-
-        .logo {
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        nav input {
-            width: 300px;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-        }
-
-        nav button {
             padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
             background-color: #ff0000;
             color: white;
+        }
+        header .search-bar {
+            flex-grow: 1;
+            margin: 0 20px;
+        }
+        header input {
+            width: 60%;
+            padding: 5px;
+        }
+        .container {
+            display: flex;
+        }
+        aside {
+            width: 240px;
+            background: white;
+            padding: 20px;
+            height: 100vh;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        aside ul {
+            list-style: none;
+            padding: 0;
+        }
+        aside ul li {
+            padding: 10px;
             cursor: pointer;
         }
-
         main {
-            display: flex;
+            flex: 1;
             padding: 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
         }
-
+        .video {
+            background: white;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            cursor: pointer;
+        }
+        .video img {
+            width: 100%;
+            border-radius: 5px;
+        }
         .video-player {
-            flex: 2;
-            margin-right: 20px;
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            z-index: 1000;
         }
-
         .video-player video {
             width: 100%;
-            height: auto;
         }
-
-        .video-info {
-            margin-top: 10px;
-        }
-
-        .video-list {
-            flex: 1;
-        }
-
-        .video-item {
-            margin-bottom: 20px;
-        }
-
-        .video-item img {
-            width: 100%;
-            height: auto;
-        }
-
-        .video-item .video-info {
-            margin-top: 5px;
-        }
-
-        footer {
-            background-color: #222;
+        .close-btn {
+            background: red;
             color: white;
-            text-align: center;
-            padding: 10px 0;
-            position: fixed;
-            width: 100%;
-            bottom: 0;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <header>
-        <nav>
-            <div class="logo">YouTube Clone</div>
+        <div class="logo">YouTube Clone</div>
+        <div class="search-bar">
             <input type="text" placeholder="Search...">
             <button>Search</button>
-        </nav>
+        </div>
     </header>
-
-    <main>
-        <section class="video-player">
-            <video controls>
-                <source src="video.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            <div class="video-info">
-                <h2>Sample Video Title</h2>
-                <p>Sample video description...</p>
+    <div class="container">
+        <aside>
+            <ul>
+                <li>Home</li>
+                <li>Trending</li>
+                <li>Subscriptions</li>
+                <li>Library</li>
+                <li>History</li>
+                <li>Your Videos</li>
+                <li>Watch Later</li>
+            </ul>
+        </aside>
+        <main>
+            <div class="video" onclick="openVideo('video1.mp4')">
+                <img src="thumbnail.jpg" alt="Video Thumbnail">
+                <h3>Sample Video Title</h3>
+                <p>Channel Name</p>
             </div>
-        </section>
-
-        <section class="video-list">
-            <div class="video-item">
-                <img src="thumbnail1.jpg" alt="Thumbnail">
-                <div class="video-info">
-                    <h3>Video Title 1</h3>
-                    <p>Video description...</p>
-                </div>
+            <div class="video" onclick="openVideo('video2.mp4')">
+                <img src="thumbnail2.jpg" alt="Video Thumbnail">
+                <h3>Another Video Title</h3>
+                <p>Channel Name</p>
             </div>
-            <div class="video-item">
-                <img src="thumbnail2.jpg" alt="Thumbnail">
-                <div class="video-info">
-                    <h3>Video Title 2</h3>
-                    <p>Video description...</p>
-                </div>
-            </div>
-            <!-- Add more video items as needed -->
-        </section>
-    </main>
-
-    <footer>
-        <p>&copy; 2025 YouTube Clone</p>
-    </footer>
-
+        </main>
+    </div>
+    <div class="video-player" id="videoPlayer">
+        <button class="close-btn" onclick="closeVideo()">Close</button>
+        <video id="mainVideo" controls>
+            <source id="videoSource" src="" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const videoPlayer = document.querySelector('.video-player video');
-            const videoItems = document.querySelectorAll('.video-item');
-
-            videoItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const videoSrc = item.querySelector('img').getAttribute('src').replace('thumbnail', 'video');
-                    videoPlayer.src = videoSrc;
-                    videoPlayer.play();
-                });
-            });
-        });
+        function openVideo(videoSrc) {
+            document.getElementById('videoSource').src = videoSrc;
+            document.getElementById('mainVideo').load();
+            document.getElementById('videoPlayer').style.display = 'block';
+        }
+        function closeVideo() {
+            document.getElementById('videoPlayer').style.display = 'none';
+            document.getElementById('mainVideo').pause();
+        }
     </script>
 </body>
 </html>
