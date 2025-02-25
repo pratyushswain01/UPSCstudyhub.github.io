@@ -57,16 +57,81 @@
             margin-bottom: 10px;
         }
 
-        .syllabus-box ul {
-            list-style: none;
-            padding-left: 10px;
-        }
-
         .key-points {
             background: #fff3cd;
             padding: 10px;
             border-radius: 5px;
             margin-top: 10px;
+        }
+
+        .read-more {
+            color: #007bff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease-in-out;
+            margin-left: 5px;
+        }
+
+        .expanded .arrow {
+            transform: rotate(180deg);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .btn i {
+            margin-right: 5px;
+        }
+
+        /* Download Animation */
+        .download-animation {
+            display: none;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #007bff;
+            border-top: 5px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         .footer {
@@ -78,11 +143,6 @@
             position: relative;
             bottom: 0;
             width: 100%;
-        }
-
-        .disabled {
-            background-color: gray;
-            cursor: not-allowed;
         }
     </style>
 </head>
@@ -101,7 +161,6 @@
             <p><strong>Test Name:</strong> Historical Background Test</p>
             <p><strong>Time:</strong> 10:00 PM - 11:00 PM</p>
             <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
-            <button id="startExamButton" class="disabled" disabled onclick="startExam()">Start Exam</button>
         </div>
 
         <!-- Syllabus Details -->
@@ -109,20 +168,7 @@
             <h4>Exam Syllabus</h4>
             <ul>
                 <li><strong>Chapter 1: Historical Background</strong></li>
-                <li><strong>Key Points:</strong> Evolution of the Indian Constitution, important historical events, the role of key figures.</li>
-                <li><strong>Number of Questions:</strong> 30 | <strong>Marks:</strong> 30</li>
-            </ul>
-            <hr>
-            <ul>
-                <li><strong>Company Rule</strong></li>
-                <li><strong>Key Points:</strong> Establishment of British rule, East India Company, Regulating Act 1773, Charter Acts.</li>
-                <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
-            </ul>
-            <hr>
-            <ul>
-                <li><strong>Crown Rule</strong></li>
-                <li><strong>Key Points:</strong> End of Company Rule (1858), British Crown’s direct control, Government of India Act 1858.</li>
-                <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
+                <li><strong>Key Points:</strong> Evolution of the Indian Constitution, important historical events.</li>
             </ul>
         </div>
 
@@ -130,73 +176,77 @@
         <div class="key-points">
             <h4>Key Points for Revision</h4>
             <ul id="keyPointsList"></ul>
+            <div class="read-more" onclick="toggleReadMore()">
+                Read More <span class="arrow">▼</span>
+            </div>
+            <ul id="extraKeyPoints" class="hidden">
+                <li>Government of India Act 1858 & Direct British Rule.</li>
+                <li>Impact of British policies on India.</li>
+                <li>Major Revolts against the British.</li>
+            </ul>
         </div>
 
-        <!-- Next Test Info -->
-        <div class="test-box">
-            <h4>Next Test Details</h4>
-            <p><strong>Date:</strong> <span id="nextTestDate"></span></p>
-            <p><strong>Syllabus:</strong> <span id="nextTestSyllabus"></span></p>
+        <!-- PDF Options -->
+        <div class="button-container">
+            <button class="btn" onclick="viewPDF()">
+                <i>📄</i> View PDF
+            </button>
+            <button class="btn" onclick="downloadPDF()">
+                <i>⬇️</i> Download PDF
+            </button>
         </div>
+
+        <!-- Download Animation -->
+        <div class="download-animation" id="downloadAnimation"></div>
+
     </div>
 
     <!-- Footer -->
     <div class="footer">© 2025 UPSChub - All Rights Reserved</div>
 
     <script>
-        // Set today's test date & time (YYYY, MM (0-based), DD, HH, MM, SS)
-        const testDate = new Date(2025, 1, 25, 22, 0, 0); // February 24, 2025, at 10:00 PM
+        // Set Test Date
+        const testDate = new Date(2025, 1, 25, 22, 0, 0);
         document.getElementById("testDateDisplay").innerText = testDate.toDateString();
 
         function updateCountdown() {
             const now = new Date();
             const diff = testDate - now;
-            const startButton = document.getElementById("startExamButton");
 
             if (diff <= 0) {
                 document.getElementById("countdown").innerText = "Exam Started!";
-                startButton.classList.remove("disabled");
-                startButton.disabled = false;
                 return;
             }
 
             const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
-            document.getElementById("countdown").innerText = 
-                `${hours}h ${minutes}m ${seconds}s`;
+            document.getElementById("countdown").innerText = `${hours}h ${minutes}m ${seconds}s`;
         }
 
-        // Update countdown every second
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // Start Exam Function (Only allows when countdown reaches 0)
-        function startExam() {
-            alert("The exam has started! Good luck!");
-            window.location.href = 'testlogin.html';
+        function toggleReadMore() {
+            const extraKeyPoints = document.getElementById("extraKeyPoints");
+            extraKeyPoints.classList.toggle("hidden");
+            document.querySelector(".read-more").classList.toggle("expanded");
         }
 
-        // Next Test Details
-        const nextTestDate = new Date(2025, 1, 26, 20, 0, 0); // February 26, 2025, at 8:00 PM
-        document.getElementById("nextTestDate").innerText = nextTestDate.toDateString();
-        document.getElementById("nextTestSyllabus").innerText = "Indian National Movement - Leaders and Events";
+        function viewPDF() {
+            window.open("test.pdf", "_blank");
+        }
 
-        // Key Points for Revision
-        const keyPoints = [
-            "Indian Constitution: Evolution & Important Features",
-            "British Rule & Major Policies of East India Company",
-            "Regulating Act 1773, Pitt’s India Act 1784",
-            "Government of India Act 1858 & Direct British Rule"
-        ];
+        function downloadPDF() {
+            const animation = document.getElementById("downloadAnimation");
+            animation.style.display = "block";
 
-        const keyPointsList = document.getElementById("keyPointsList");
-        keyPoints.forEach(point => {
-            const li = document.createElement("li");
-            li.textContent = point;
-            keyPointsList.appendChild(li);
-        });
+            setTimeout(() => {
+                animation.style.display = "none";
+                alert("Download Complete!");
+                window.location.href = "test.pdf";
+            }, 3000);
+        }
     </script>
 
 </body>
