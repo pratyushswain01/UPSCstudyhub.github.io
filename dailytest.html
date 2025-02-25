@@ -30,7 +30,12 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        .test-box, .read-more-box {
+        h2, h4 {
+            color: #007bff;
+            text-align: center;
+        }
+
+        .test-box {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 5px;
@@ -57,6 +62,13 @@
             padding-left: 10px;
         }
 
+        .key-points {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
         .footer {
             text-align: center;
             padding: 10px;
@@ -68,69 +80,10 @@
             width: 100%;
         }
 
-        .read-more-content {
-            display: none;
-            padding: 10px;
-            background: #fff3cd;
-            border-radius: 5px;
-        }
-
-        .read-more-btn {
-            background: #007bff;
-            color: white;
-            border: none;
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-
-        .read-more-btn:hover {
-            background: #0056b3;
-        }
-
-        /* Download Button Animation */
-        .botao {
-            width: 125px;
-            height: 45px;
-            border-radius: 20px;
-            border: none;
-            box-shadow: 1px 1px rgba(107, 221, 215, 0.37);
-            padding: 5px 10px;
-            background: linear-gradient(160deg, rgba(47,93,197,1) 0%, rgba(46,86,194,1) 5%, rgba(47,93,197,1) 11%, rgba(59,190,230,1) 57%, rgba(0,212,255,1) 71%);
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
-            transition: .5s linear;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .botao .mysvg {
-            display: none;
-        }
-
-        .botao:hover {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            transition: .5s linear;
-        }
-
-        .botao:hover .texto {
-            display: none;
-        }
-
-        .botao:hover .mysvg {
-            display: inline;
-        }
-
-        .botao:disabled {
+        .disabled {
             background-color: gray;
             cursor: not-allowed;
         }
-
     </style>
 </head>
 <body>
@@ -144,37 +97,46 @@
 
         <!-- Test Box -->
         <div class="test-box">
-            <p><strong>Date:</strong> February 24, 2025</p>
+            <p><strong>Date:</strong> <span id="testDateDisplay"></span></p>
             <p><strong>Test Name:</strong> Historical Background Test</p>
             <p><strong>Time:</strong> 10:00 PM - 11:00 PM</p>
             <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
             <button id="startExamButton" class="disabled" disabled onclick="startExam()">Start Exam</button>
         </div>
 
-        <!-- Read More Section -->
-        <div class="read-more-box">
-            <h4>Key Information</h4>
-            <p>Click below to read more about the exam details.</p>
-            <button class="read-more-btn" onclick="toggleReadMore()">Read More</button>
-            <div id="readMoreContent" class="read-more-content">
-                <p>The exam covers historical aspects of the Indian Constitution, Company Rule, and Crown Rule.</p>
-                <p>Focus on the Regulating Act 1773 and Government of India Act 1858.</p>
-            </div>
+        <!-- Syllabus Details -->
+        <div class="syllabus-box">
+            <h4>Exam Syllabus</h4>
+            <ul>
+                <li><strong>Chapter 1: Historical Background</strong></li>
+                <li><strong>Key Points:</strong> Evolution of the Indian Constitution, important historical events, the role of key figures.</li>
+                <li><strong>Number of Questions:</strong> 30 | <strong>Marks:</strong> 30</li>
+            </ul>
+            <hr>
+            <ul>
+                <li><strong>Company Rule</strong></li>
+                <li><strong>Key Points:</strong> Establishment of British rule, East India Company, Regulating Act 1773, Charter Acts.</li>
+                <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
+            </ul>
+            <hr>
+            <ul>
+                <li><strong>Crown Rule</strong></li>
+                <li><strong>Key Points:</strong> End of Company Rule (1858), British Crown’s direct control, Government of India Act 1858.</li>
+                <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
+            </ul>
         </div>
 
-        <!-- Download Button -->
+        <!-- Key Points to Read -->
+        <div class="key-points">
+            <h4>Key Points for Revision</h4>
+            <ul id="keyPointsList"></ul>
+        </div>
+
+        <!-- Next Test Info -->
         <div class="test-box">
-            <h4>Download Study Material</h4>
-            <button class="botao" id="downloadButton" onclick="startDownload()">
-                <svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="mysvg">
-                    <g id="SVGRepo_iconCarrier">
-                        <g id="Interface / Download">
-                            <path id="Vector" d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12" stroke="#f1f1f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
-                        </g>
-                    </g>
-                </svg>
-                <span class="texto">Download</span>
-            </button>
+            <h4>Next Test Details</h4>
+            <p><strong>Date:</strong> <span id="nextTestDate"></span></p>
+            <p><strong>Syllabus:</strong> <span id="nextTestSyllabus"></span></p>
         </div>
     </div>
 
@@ -182,7 +144,9 @@
     <div class="footer">© 2025 UPSChub - All Rights Reserved</div>
 
     <script>
-        const testDate = new Date(2025, 1, 24, 22, 0, 0); // Feb 24, 2025, 10:00 PM
+        // Set today's test date & time (YYYY, MM (0-based), DD, HH, MM, SS)
+        const testDate = new Date(2025, 1, 25, 22, 0, 0); // February 24, 2025, at 10:00 PM
+        document.getElementById("testDateDisplay").innerText = testDate.toDateString();
 
         function updateCountdown() {
             const now = new Date();
@@ -200,32 +164,39 @@
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-            document.getElementById("countdown").innerText = `${hours}h ${minutes}m ${seconds}s`;
+            document.getElementById("countdown").innerText = 
+                `${hours}h ${minutes}m ${seconds}s`;
         }
 
+        // Update countdown every second
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
+        // Start Exam Function (Only allows when countdown reaches 0)
         function startExam() {
             alert("The exam has started! Good luck!");
             window.location.href = 'testlogin.html';
         }
 
-        function toggleReadMore() {
-            const content = document.getElementById("readMoreContent");
-            content.style.display = content.style.display === "none" ? "block" : "none";
-        }
+        // Next Test Details
+        const nextTestDate = new Date(2025, 1, 26, 20, 0, 0); // February 26, 2025, at 8:00 PM
+        document.getElementById("nextTestDate").innerText = nextTestDate.toDateString();
+        document.getElementById("nextTestSyllabus").innerText = "Indian National Movement - Leaders and Events";
 
-        function startDownload() {
-            const btn = document.getElementById("downloadButton");
-            btn.disabled = true;
-            btn.innerHTML = "Downloading...";
-            
-            setTimeout(() => {
-                btn.innerHTML = "Download Successful ✅";
-                btn.disabled = false;
-            }, 3000);
-        }
+        // Key Points for Revision
+        const keyPoints = [
+            "Indian Constitution: Evolution & Important Features",
+            "British Rule & Major Policies of East India Company",
+            "Regulating Act 1773, Pitt’s India Act 1784",
+            "Government of India Act 1858 & Direct British Rule"
+        ];
+
+        const keyPointsList = document.getElementById("keyPointsList");
+        keyPoints.forEach(point => {
+            const li = document.createElement("li");
+            li.textContent = point;
+            keyPointsList.appendChild(li);
+        });
     </script>
 
 </body>
