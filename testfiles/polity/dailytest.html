@@ -1,0 +1,187 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        /* Header */
+        .header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #007bff;
+            text-align: center;
+        }
+
+        .test-box {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            border-left: 5px solid #007bff;
+        }
+
+        .countdown {
+            font-size: 18px;
+            font-weight: bold;
+            color: #d9534f;
+        }
+
+        .pdf-box {
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .pdf-box a {
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+
+        .key-points {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 10px;
+            background: #343a40;
+            color: white;
+            font-size: 14px;
+            position: relative;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header">Daily Test Hub</div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <h2>Today's Test</h2>
+
+        <!-- Test Box -->
+        <div class="test-box">
+            <p><strong>Test Name:</strong> General Knowledge Test</p>
+            <p><strong>Time:</strong> 10:00 PM - 11:00 PM</p>
+            <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
+            <button onclick="startExam()">Start Exam</button>
+        </div>
+
+        <!-- PDF to Read -->
+        <div class="pdf-box">
+            <p><strong>Read Before the Test:</strong></p>
+            <a href="sample.pdf" target="_blank">Download Study PDF</a>
+        </div>
+
+        <!-- Key Points to Read -->
+        <div class="key-points">
+            <h4>Key Points to Study:</h4>
+            <ul id="keyPointsList">
+                <!-- Key points will be dynamically added here -->
+            </ul>
+        </div>
+
+        <!-- Next Test Info -->
+        <div class="test-box">
+            <h4>Next Test Details</h4>
+            <p><strong>Date:</strong> <span id="nextTestDate"></span></p>
+            <p><strong>Syllabus:</strong> <span id="nextTestSyllabus"></span></p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">© 2025 UPSChub - All Rights Reserved</div>
+
+    <script>
+        // Set today's test date & time (YYYY, MM (0-based), DD, HH, MM, SS)
+        const testDate = new Date(2025, 1, 24, 22, 0, 0); // Example: February 24, 2025, at 10:00 PM
+
+        function updateCountdown() {
+            const now = new Date();
+            const diff = testDate - now;
+
+            if (diff <= 0) {
+                document.getElementById("countdown").innerText = "Exam Started!";
+                return;
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById("countdown").innerText = 
+                `${days}d ${hours}h ${minutes}m ${seconds}s`;
+        }
+
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+
+        // Start Exam Function
+        function startExam() {
+            const now = new Date();
+            if (now < testDate) {
+                alert("You cannot start the exam now. Exam begins in:\n\n" + document.getElementById("countdown").innerText);
+            } else {
+                alert("The exam has started! Good luck!");
+                window.location.href = 'testlogin.html';
+            }
+        }
+
+        // Next Test Details (Dynamic)
+        const nextTestDate = new Date(2025, 1, 26, 20, 0, 0); // February 26, 2025, at 8:00 PM
+        document.getElementById("nextTestDate").innerText = nextTestDate.toDateString();
+        document.getElementById("nextTestSyllabus").innerText = "History - Revolt of 1857, Indian Constitution Basics";
+
+        // Dynamic Key Points
+        const keyPoints = [
+            "Indian Constitution: Fundamental Rights & Duties",
+            "British Rule & Indian Revolt of 1857",
+            "Important Freedom Fighters & Their Contributions",
+            "Current Affairs: Latest National & International News"
+        ];
+
+        const keyPointsList = document.getElementById("keyPointsList");
+        keyPoints.forEach(point => {
+            const li = document.createElement("li");
+            li.textContent = point;
+            keyPointsList.appendChild(li);
+        });
+    </script>
+
+</body>
+</html>
