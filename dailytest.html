@@ -11,7 +11,6 @@
             padding: 0;
             background-color: #f4f4f4;
         }
-
         .header {
             background-color: #007bff;
             color: white;
@@ -20,7 +19,6 @@
             font-size: 20px;
             font-weight: bold;
         }
-
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -29,135 +27,133 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
-        h2 {
-            color: #007bff;
-            text-align: center;
-        }
-
-        .test-box {
+        .test-box, .syllabus-box {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 5px;
             margin-bottom: 15px;
             border-left: 5px solid #007bff;
+            position: relative;
         }
-
-        .countdown {
-            font-size: 18px;
-            font-weight: bold;
-            color: #d9534f;
-        }
-
         .pdf-box {
             padding: 10px;
             background: #e9ecef;
             border-radius: 5px;
             text-align: center;
         }
-
         .pdf-box a {
             text-decoration: none;
             color: #007bff;
             font-weight: bold;
+            display: block;
+            padding: 5px;
+            transition: all 0.3s;
         }
-
+        .pdf-box a:hover {
+            transform: scale(1.1);
+        }
         .key-points {
             background: #fff3cd;
             padding: 10px;
             border-radius: 5px;
             margin-top: 10px;
+            cursor: pointer;
         }
-
+        .key-content {
+            display: none;
+            padding: 10px;
+            background: #fff;
+            border-radius: 5px;
+        }
+        .arrow {
+            float: right;
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+        .rotate {
+            transform: rotate(90deg);
+        }
         .footer {
             text-align: center;
             padding: 10px;
             background: #343a40;
             color: white;
             font-size: 14px;
-            position: relative;
-            bottom: 0;
             width: 100%;
         }
     </style>
 </head>
 <body>
-
     <div class="header">Daily Test Hub</div>
-
     <div class="container">
         <h2>Today's Test</h2>
-
         <div class="test-box">
             <p><strong>Test Name:</strong> General Knowledge Test</p>
             <p><strong>Time:</strong> 10:00 PM - 11:00 PM</p>
-            <p><strong>Syllabus:</strong> Historical Background - Company Rule & Crown Rule</p>
             <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
             <button onclick="startExam()">Start Exam</button>
         </div>
-
+        <div class="syllabus-box">
+            <h4>Syllabus</h4>
+            <p>Historical Background - Company Rule & Crown Rule</p>
+        </div>
+        <div class="key-points" onclick="toggleContent()">
+            <h4>Key Points to Study <span class="arrow">▶</span></h4>
+        </div>
+        <div class="key-content" id="keyContent">
+            <ul>
+                <li>Company Rule (1600-1857)</li>
+                <li>Crown Rule (1858-1947)</li>
+                <li>Major Acts and Reforms</li>
+                <li>Impact on Indian Society</li>
+            </ul>
+        </div>
         <div class="pdf-box">
-            <p><strong>Read Before the Test:</strong></p>
-            <a href="UPSChub test 1.pdf" target="_blank">Download Study PDF</a>
+            <p><strong>Study Material:</strong></p>
+            <a href="UPSChub test 1.pdf" target="_blank">📄 View File</a>
+            <a href="UPSChub test 1.pdf" download>⬇ Download File</a>
         </div>
-
-        <div class="key-points">
-            <h4>Key Points to Study:</h4>
-            <ul id="keyPointsList"></ul>
-        </div>
-
         <div class="test-box">
             <h4>Next Test Details</h4>
             <p><strong>Date:</strong> <span id="nextTestDate"></span></p>
             <p><strong>Syllabus:</strong> <span id="nextTestSyllabus"></span></p>
         </div>
     </div>
-
     <div class="footer">© 2025 UPSChub - All Rights Reserved</div>
-
     <script>
         const testDate = new Date(2025, 1, 25, 22, 0, 0);
-
         function updateCountdown() {
             const now = new Date();
             const diff = testDate - now;
-
             if (diff <= 0) {
                 document.getElementById("countdown").innerText = "Exam Started!";
                 return;
             }
-
             const hours = Math.floor(diff / (1000 * 60 * 60));
             const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-
             document.getElementById("countdown").innerText = `${hours}h ${minutes}m ${seconds}s`;
         }
-
         setInterval(updateCountdown, 1000);
         updateCountdown();
-
         function startExam() {
             const now = new Date();
             if (now < testDate) {
-                alert("You cannot start the exam now. Exam begins in:\n\n" + document.getElementById("countdown").innerText);
+                alert("Exam starts in: " + document.getElementById("countdown").innerText);
                 return;
             }
             alert("The exam has started! Good luck!");
             window.location.href = 'testlogin.html';
         }
-
         const nextTestDate = new Date(2025, 1, 26, 20, 0, 0);
         document.getElementById("nextTestDate").innerText = nextTestDate.toDateString();
         document.getElementById("nextTestSyllabus").innerText = "History - Revolt of 1857, Indian Constitution Basics";
-
-       
-        const keyPointsList = document.getElementById("keyPointsList");
-        keyPoints.forEach(point => {
-            const li = document.createElement("li");
-            li.textContent = point;
-            keyPointsList.appendChild(li);
-        });
+        function toggleContent() {
+            const content = document.getElementById("keyContent");
+            const arrow = document.querySelector(".arrow");
+            content.style.display = content.style.display === "none" ? "block" : "none";
+            arrow.classList.toggle("rotate");
+        }
     </script>
 </body>
 </html>
