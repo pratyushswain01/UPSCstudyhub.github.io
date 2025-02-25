@@ -37,19 +37,6 @@
             background: #e9ecef;
             border-radius: 5px;
         }
-        .syllabus-content, .key-points-content {
-            display: none;
-            padding: 10px;
-            background: white;
-            border-radius: 5px;
-        }
-        .toggle-arrow {
-            float: right;
-            transition: transform 0.3s;
-        }
-        .expanded .toggle-arrow {
-            transform: rotate(180deg);
-        }
         .button-container {
             display: flex;
             justify-content: center;
@@ -63,6 +50,7 @@
             cursor: pointer;
             font-size: 16px;
             color: white;
+            position: relative;
         }
         .view-button {
             background-color: #28a745;
@@ -96,57 +84,65 @@
         <h2>Today's Test</h2>
         <div class="test-box">
             <p><strong>Date:</strong> <span id="testDateDisplay"></span></p>
-            <p><strong>Test Name:</strong> Historical Background Test</p>
-            <p><strong>Time:</strong> 10:00 PM - 11:00 PM</p>
+            <p><strong>Test Name:</strong> <span id="testName"></span></p>
+            <p><strong>Time:</strong> <span id="testTime"></span></p>
             <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
             <button id="startExamButton" class="start-exam-btn" disabled onclick="startExam()">Start Exam</button>
         </div>
         
-        <div class="section" onclick="toggleSection('key-points-content')">
-            <h4>Key Points <span class="toggle-arrow">▼</span></h4>
-            <div class="key-points-content">
-                <ul>
-                    <li>Evolution of the Indian Constitution</li>
-                    <li>Important historical events</li>
-                    <li>Key figures</li>
-                    <li>British rule and East India Company</li>
-                    <li>Regulating Act 1773, Charter Acts</li>
-                    <li>End of Company Rule (1858)</li>
-                    <li>British Crown’s direct control</li>
-                    <li>Government of India Act 1858</li>
-                </ul>
-                <div class="button-container">
-                    <button class="button view-button">📄 View PDF</button>
-                    <button class="button download-button" onclick="startDownload()">⬇ Download PDF <span class="loading"></span></button>
-                </div>
+        <div class="section">
+            <h4>Key Points</h4>
+            <ul id="keyPointsList"></ul>
+            <div class="button-container">
+                <a href="sample.pdf" target="_blank" class="button view-button">📄 View PDF</a>
+                <button class="button download-button" onclick="startDownload()">⬇ Download PDF <span class="loading"></span></button>
             </div>
         </div>
         
-        <div class="section" onclick="toggleSection('syllabus-content')">
-            <h4>Exam Syllabus <span class="toggle-arrow">▼</span></h4>
-            <div class="syllabus-content">
-                <ul>
-                    <li><strong>Chapter 1: Historical Background</strong></li>
-                    <li><strong>Number of Questions:</strong> 30 | <strong>Marks:</strong> 30</li>
-                </ul>
-                <hr>
-                <ul>
-                    <li><strong>Company Rule</strong></li>
-                    <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
-                </ul>
-                <hr>
-                <ul>
-                    <li><strong>Crown Rule</strong></li>
-                    <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
-                </ul>
-            </div>
+        <div class="section">
+            <h4>Exam Syllabus</h4>
+            <ul id="examSyllabusList"></ul>
         </div>
     </div>
     <script>
-        function toggleSection(sectionId) {
-            const section = document.querySelector(`.${sectionId}`);
-            section.style.display = section.style.display === "block" ? "none" : "block";
-        }
+        const testDetails = {
+            name: "Historical Background Test",
+            time: "10:00 PM - 11:00 PM",
+            keyPoints: [
+                "Evolution of the Indian Constitution",
+                "Important historical events",
+                "Key figures",
+                "British rule and East India Company",
+                "Regulating Act 1773, Charter Acts",
+                "End of Company Rule (1858)",
+                "British Crown’s direct control",
+                "Government of India Act 1858"
+            ],
+            syllabus: [
+                { chapter: "Chapter 1: Historical Background", questions: 30, marks: 30 },
+                { chapter: "Company Rule", questions: 15, marks: 15 },
+                { chapter: "Crown Rule", questions: 15, marks: 15 }
+            ]
+        };
+        
+        document.getElementById("testDateDisplay").textContent = new Date().toLocaleDateString();
+        document.getElementById("testName").textContent = testDetails.name;
+        document.getElementById("testTime").textContent = testDetails.time;
+        
+        const keyPointsList = document.getElementById("keyPointsList");
+        testDetails.keyPoints.forEach(point => {
+            const li = document.createElement("li");
+            li.textContent = point;
+            keyPointsList.appendChild(li);
+        });
+        
+        const examSyllabusList = document.getElementById("examSyllabusList");
+        testDetails.syllabus.forEach(item => {
+            const li = document.createElement("li");
+            li.innerHTML = `<strong>${item.chapter}</strong> - Questions: ${item.questions} | Marks: ${item.marks}`;
+            examSyllabusList.appendChild(li);
+        });
+        
         function startDownload() {
             const button = document.querySelector(".download-button");
             const loading = document.querySelector(".loading");
@@ -155,9 +151,18 @@
             setTimeout(() => {
                 loading.style.display = "none";
                 button.disabled = false;
-                alert("Download Successful!");
+                const link = document.createElement("a");
+                link.href = "sample.pdf";
+                link.download = "sample.pdf";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                setTimeout(() => {
+                    window.open("sample.pdf", "_blank");
+                }, 500);
             }, 2000);
         }
+        
         let countdownTime = 60;
         function updateCountdown() {
             document.getElementById("countdown").textContent = countdownTime + " seconds";
@@ -173,7 +178,6 @@
         }
         window.onload = function() {
             updateCountdown();
-            document.getElementById("testDateDisplay").textContent = new Date().toLocaleDateString();
         }
     </script>
 </body>
