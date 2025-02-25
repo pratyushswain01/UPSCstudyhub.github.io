@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,7 +12,6 @@
             background-color: #f4f4f4;
         }
 
-        /* Header */
         .header {
             background-color: #007bff;
             color: white;
@@ -22,7 +21,6 @@
             font-weight: bold;
         }
 
-        /* Main Container */
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -32,7 +30,7 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
-        h2 {
+        h2, h4 {
             color: #007bff;
             text-align: center;
         }
@@ -43,6 +41,7 @@
             border-radius: 5px;
             margin-bottom: 15px;
             border-left: 5px solid #007bff;
+            text-align: center;
         }
 
         .countdown {
@@ -81,6 +80,11 @@
             bottom: 0;
             width: 100%;
         }
+
+        .disabled {
+            background-color: gray;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
@@ -94,10 +98,11 @@
 
         <!-- Test Box -->
         <div class="test-box">
+            <p><strong>Date:</strong> <span id="testDateDisplay"></span></p>
             <p><strong>Test Name:</strong> General Knowledge Test</p>
             <p><strong>Time:</strong> 10:00 PM - 11:00 PM</p>
             <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
-            <button onclick="startExam()">Start Exam</button>
+            <button id="startExamButton" class="disabled" disabled onclick="startExam()">Start Exam</button>
         </div>
 
         <!-- PDF to Read -->
@@ -109,9 +114,7 @@
         <!-- Key Points to Read -->
         <div class="key-points">
             <h4>Key Points to Study:</h4>
-            <ul id="keyPointsList">
-                <!-- Key points will be dynamically added here -->
-            </ul>
+            <ul id="keyPointsList"></ul>
         </div>
 
         <!-- Next Test Info -->
@@ -127,14 +130,18 @@
 
     <script>
         // Set today's test date & time (YYYY, MM (0-based), DD, HH, MM, SS)
-        const testDate = new Date(2025, 1, 24, 22, 0, 0); // Example: February 24, 2025, at 10:00 PM
+        const testDate = new Date(2025, 1, 24, 22, 0, 0); // February 24, 2025, at 10:00 PM
+        document.getElementById("testDateDisplay").innerText = testDate.toDateString();
 
         function updateCountdown() {
             const now = new Date();
             const diff = testDate - now;
+            const startButton = document.getElementById("startExamButton");
 
             if (diff <= 0) {
                 document.getElementById("countdown").innerText = "Exam Started!";
+                startButton.classList.remove("disabled");
+                startButton.disabled = false;
                 return;
             }
 
@@ -151,15 +158,10 @@
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
-        // Start Exam Function
+        // Start Exam Function (Only allows when countdown reaches 0)
         function startExam() {
-            const now = new Date();
-            if (now < testDate) {
-                alert("You cannot start the exam now. Exam begins in:\n\n" + document.getElementById("countdown").innerText);
-            } else {
-                alert("The exam has started! Good luck!");
-                window.location.href = 'testlogin.html';
-            }
+            alert("The exam has started! Good luck!");
+            window.location.href = 'testlogin.html';
         }
 
         // Next Test Details (Dynamic)
