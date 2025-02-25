@@ -11,7 +11,6 @@
             padding: 0;
             background-color: #f4f4f4;
         }
-
         .header {
             background-color: #007bff;
             color: white;
@@ -20,7 +19,6 @@
             font-size: 20px;
             font-weight: bold;
         }
-
         .container {
             max-width: 800px;
             margin: 20px auto;
@@ -29,127 +27,63 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-
         h2, h4 {
             color: #007bff;
             text-align: center;
         }
-
-        .test-box {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            border-left: 5px solid #007bff;
-            text-align: center;
-        }
-
-        .countdown {
-            font-size: 18px;
-            font-weight: bold;
-            color: #d9534f;
-        }
-
-        .syllabus-box {
+        .section {
+            margin-bottom: 20px;
             padding: 10px;
             background: #e9ecef;
             border-radius: 5px;
-            margin-bottom: 10px;
         }
-
-        .syllabus-box ul {
-            list-style: none;
-            padding-left: 10px;
-        }
-
-        .key-points {
-            background: #fff3cd;
+        .syllabus-content, .key-points-content {
+            display: none;
             padding: 10px;
+            background: white;
             border-radius: 5px;
+        }
+        .toggle-arrow {
+            float: right;
+            transition: transform 0.3s;
+        }
+        .expanded .toggle-arrow {
+            transform: rotate(180deg);
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
         }
-
-        .footer {
-            text-align: center;
+        .button {
             padding: 10px;
-            background: #343a40;
-            color: white;
-            font-size: 14px;
-            position: relative;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .start-exam-btn {
-            padding: 10px;
-            font-size: 16px;
-            background-color: gray;
-            color: white;
             border: none;
-            cursor: not-allowed;
             border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            color: white;
         }
-
-        .start-exam-btn.enabled {
+        .view-button {
             background-color: #28a745;
-            cursor: pointer;
         }
-
-        .read-more {
-            cursor: pointer;
-            font-size: 16px;
-            color: #007bff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .read-more span {
-            margin-left: 5px;
-            transition: transform 0.3s ease;
-        }
-
-        .expanded .read-more span {
-            transform: rotate(90deg);
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .download-btn {
-            width: 125px;
-            height: 45px;
-            border-radius: 20px;
-            border: none;
-            background: linear-gradient(160deg, rgba(47,93,197,1) 0%, rgba(46,86,194,1) 5%, rgba(47,93,197,1) 11%, rgba(59,190,230,1) 57%, rgba(0,212,255,1) 71%);
-            color: #fff;
-            font-size: 16px;
-            cursor: pointer;
+        .download-button {
+            background-color: #007bff;
             position: relative;
-            overflow: hidden;
-            transition: 0.5s;
         }
-
-        .download-btn:after {
-            content: '';
-            position: absolute;
-            top: -3px;
-            left: -3px;
-            width: 100%;
-            height: 100%;
-            border: 3px solid transparent;
-            border-top: 3px solid #fff;
-            border-right: 3px solid #fff;
-            border-radius: 50%;
-            animation: spin 2s linear infinite;
+        .loading {
             display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid white;
+            border-top: 3px solid transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
         }
-
-        .downloading .download-btn:after {
-            display: block;
-        }
-
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -157,12 +91,9 @@
     </style>
 </head>
 <body>
-
     <div class="header">Daily Test Hub - UPSChub</div>
-
     <div class="container">
         <h2>Today's Test</h2>
-
         <div class="test-box">
             <p><strong>Date:</strong> <span id="testDateDisplay"></span></p>
             <p><strong>Test Name:</strong> Historical Background Test</p>
@@ -170,77 +101,80 @@
             <p><strong>Time Remaining:</strong> <span id="countdown" class="countdown"></span></p>
             <button id="startExamButton" class="start-exam-btn" disabled onclick="startExam()">Start Exam</button>
         </div>
-
-        <div class="syllabus-box">
-            <h4>Exam Syllabus</h4>
-            <ul>
-                <li><strong>Chapter 1: Historical Background</strong></li>
-                <li>Evolution of the Indian Constitution, important historical events, the role of key figures.</li>
-            </ul>
-            <hr>
-            <ul>
-                <li><strong>Company Rule</strong></li>
-                <li>Establishment of British rule, East India Company, Regulating Act 1773, Charter Acts.</li>
-            </ul>
-            <hr>
-            <ul>
-                <li><strong>Crown Rule</strong></li>
-                <li>End of Company Rule (1858), British Crown’s direct control, Government of India Act 1858.</li>
-            </ul>
+        
+        <div class="section" onclick="toggleSection('key-points-content')">
+            <h4>Key Points <span class="toggle-arrow">▼</span></h4>
+            <div class="key-points-content">
+                <ul>
+                    <li>Evolution of the Indian Constitution</li>
+                    <li>Important historical events</li>
+                    <li>Key figures</li>
+                    <li>British rule and East India Company</li>
+                    <li>Regulating Act 1773, Charter Acts</li>
+                    <li>End of Company Rule (1858)</li>
+                    <li>British Crown’s direct control</li>
+                    <li>Government of India Act 1858</li>
+                </ul>
+                <div class="button-container">
+                    <button class="button view-button">📄 View PDF</button>
+                    <button class="button download-button" onclick="startDownload()">⬇ Download PDF <span class="loading"></span></button>
+                </div>
+            </div>
         </div>
-
-        <div class="key-points">
-            <h4>Key Points for Revision</h4>
-            <ul>
-                <li>Indian Constitution: Evolution & Important Features</li>
-                <li>British Rule & Major Policies of East India Company</li>
-                <li>Regulating Act 1773, Pitt’s India Act 1784</li>
-                <li>Government of India Act 1858 & Direct British Rule</li>
-            </ul>
-            <div class="read-more" onclick="toggleReadMore()">Read More <span>➜</span></div>
-            <div id="extraContent" class="hidden">
-                <button class="download-btn" onclick="startDownload()">Download PDF</button>
-                <a href="syllabus.pdf" target="_blank"><button class="download-btn">View PDF</button></a>
+        
+        <div class="section" onclick="toggleSection('syllabus-content')">
+            <h4>Exam Syllabus <span class="toggle-arrow">▼</span></h4>
+            <div class="syllabus-content">
+                <ul>
+                    <li><strong>Chapter 1: Historical Background</strong></li>
+                    <li><strong>Number of Questions:</strong> 30 | <strong>Marks:</strong> 30</li>
+                </ul>
+                <hr>
+                <ul>
+                    <li><strong>Company Rule</strong></li>
+                    <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
+                </ul>
+                <hr>
+                <ul>
+                    <li><strong>Crown Rule</strong></li>
+                    <li><strong>Number of Questions:</strong> 15 | <strong>Marks:</strong> 15</li>
+                </ul>
             </div>
         </div>
     </div>
-
-    <div class="footer">© 2025 UPSChub - All Rights Reserved</div>
-
     <script>
-        const testDate = new Date();
-        testDate.setHours(22, 0, 0, 0);
-        document.getElementById("testDateDisplay").innerText = testDate.toDateString();
-
-        function updateCountdown() {
-            const now = new Date();
-            const diff = testDate - now;
-            const button = document.getElementById("startExamButton");
-
-            if (diff <= 0) {
-                document.getElementById("countdown").innerText = "Exam Started!";
-                button.classList.add("enabled");
-                button.disabled = false;
-                return;
-            }
-
-            const hours = Math.floor(diff / 3600000);
-            const minutes = Math.floor((diff % 3600000) / 60000);
-            const seconds = Math.floor((diff % 60000) / 1000);
-            document.getElementById("countdown").innerText = `${hours}h ${minutes}m ${seconds}s`;
+        function toggleSection(sectionId) {
+            const section = document.querySelector(`.${sectionId}`);
+            section.style.display = section.style.display === "block" ? "none" : "block";
         }
-
-        setInterval(updateCountdown, 1000);
-        function startExam() { alert("Exam started!"); }
-
-        function toggleReadMore() {
-            document.getElementById("extraContent").classList.toggle("hidden");
-        }
-
         function startDownload() {
-            alert("Downloading...");
+            const button = document.querySelector(".download-button");
+            const loading = document.querySelector(".loading");
+            button.disabled = true;
+            loading.style.display = "inline-block";
+            setTimeout(() => {
+                loading.style.display = "none";
+                button.disabled = false;
+                alert("Download Successful!");
+            }, 2000);
+        }
+        let countdownTime = 60;
+        function updateCountdown() {
+            document.getElementById("countdown").textContent = countdownTime + " seconds";
+            if (countdownTime > 0) {
+                countdownTime--;
+                setTimeout(updateCountdown, 1000);
+            } else {
+                const startButton = document.getElementById("startExamButton");
+                startButton.disabled = false;
+                startButton.classList.add("enabled");
+                startButton.textContent = "Start Exam";
+            }
+        }
+        window.onload = function() {
+            updateCountdown();
+            document.getElementById("testDateDisplay").textContent = new Date().toLocaleDateString();
         }
     </script>
-
 </body>
 </html>
