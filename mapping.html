@@ -13,67 +13,62 @@
     html, body {
       height: 100%;
       font-family: 'Segoe UI', sans-serif;
-      background: #f2f5fa;
+      background: linear-gradient(to right, #e0eafc, #cfdef3);
+      color: #222;
     }
 
-    header {
+    header, footer {
       background-color: #2a4365;
       color: white;
-      padding: 16px 20px;
-      font-size: 24px;
-      font-weight: bold;
       text-align: center;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 10;
+      padding: 16px;
+      font-size: 20px;
+      font-weight: bold;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
     footer {
-      background-color: #2a4365;
-      color: white;
-      padding: 10px;
       font-size: 14px;
-      text-align: center;
       position: sticky;
       bottom: 0;
     }
 
     main {
-      padding: 20px;
-      min-height: calc(100vh - 120px);
+      padding: 30px 20px;
+      min-height: calc(100vh - 130px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow-y: auto;
+      gap: 20px;
     }
 
     h1 {
-      font-size: 26px;
-      margin-bottom: 15px;
-      color: #1d3557;
+      font-size: 28px;
+      color: #1a202c;
+      margin-bottom: 10px;
     }
 
     select, button {
-      padding: 10px 16px;
+      padding: 12px 18px;
       font-size: 16px;
-      margin-bottom: 20px;
-      margin-right: 10px;
-      border: 1px solid #aaa;
-      border-radius: 5px;
-      background-color: white;
-      cursor: pointer;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      background-color: #ffffff;
+      transition: all 0.2s ease-in-out;
+      margin: 0 5px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
 
-    button:hover {
-      background-color: #eee;
+    select:hover, button:hover {
+      background-color: #f0f0f0;
+      border-color: #888;
     }
 
     #continent-name {
-      font-size: 22px;
-      font-weight: bold;
-      margin-bottom: 12px;
+      font-size: 24px;
+      font-weight: 600;
       color: #333;
+      margin-bottom: 5px;
     }
 
     #map-box {
@@ -81,12 +76,14 @@
       width: 95%;
       max-width: 1200px;
       height: 80vh;
-      border: 4px solid #ccc;
-      background: white;
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      padding: 16px;
       overflow: hidden;
+      background-color: white;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     #map-container {
@@ -104,18 +101,19 @@
       width: 4px;
       height: 4px;
       background-color: red;
-      border-radius: 30%;
+      border-radius: 50%;
       position: absolute;
       transform: translate(-50%, -50%);
       pointer-events: none;
+      box-shadow: 0 0 4px red;
     }
 
     .compass {
       position: absolute;
-      top: 10px;
-      left: 10px;
+      top: 12px;
+      left: 12px;
       font-size: 14px;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255, 255, 255, 0.85);
       padding: 8px;
       border-radius: 50%;
       width: 60px;
@@ -124,7 +122,8 @@
       line-height: 1.2;
       font-weight: bold;
       color: #444;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      z-index: 2;
     }
 
     .compass span {
@@ -136,10 +135,19 @@
       bottom: 10px;
       right: 10px;
       font-size: 14px;
-      background: rgba(255,255,255,0.9);
-      padding: 4px 12px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 5px 14px;
       border-radius: 5px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+      z-index: 2;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -150,7 +158,7 @@
   <main>
     <h1>World Map on Fingertips – UPSC Mapping Practice</h1>
 
-    <div>
+    <div class="controls">
       <select id="continent-select">
         <option value="">Select a Continent</option>
         <option value="africa">Africa</option>
@@ -192,44 +200,33 @@
 
       if (!continent) return;
 
-      let mapPath = "";
-      switch (continent) {
-        case "africa":
-          mapPath = "maps/africa.svg";
-          continentName.textContent = "Africa";
-          break;
-        case "asia":
-          mapPath = "maps/asia.svg";
-          continentName.textContent = "Asia";
-          break;
-        case "europe":
-          mapPath = "maps/europe.svg";
-          continentName.textContent = "Europe";
-          break;
-        case "north-america":
-          mapPath = "maps/northAmerica.svg";
-          continentName.textContent = "North America";
-          break;
-        case "south-america":
-          mapPath = "maps/southAmerica.svg";
-          continentName.textContent = "South America";
-          break;
-        case "australia":
-          mapPath = "maps/australia.svg";
-          continentName.textContent = "Australia";
-          break;
-        case "antarctica":
-          mapPath = "maps/antarctica.svg";
-          continentName.textContent = "Antarctica";
-          break;
-      }
+      const mapFiles = {
+        "africa": "maps/africa.svg",
+        "asia": "maps/asia.svg",
+        "europe": "maps/europe.svg",
+        "north-america": "maps/northAmerica.svg",
+        "south-america": "maps/southAmerica.svg",
+        "australia": "maps/australia.svg",
+        "antarctica": "maps/antarctica.svg"
+      };
 
-      fetch(mapPath)
+      const names = {
+        "africa": "Africa",
+        "asia": "Asia",
+        "europe": "Europe",
+        "north-america": "North America",
+        "south-america": "South America",
+        "australia": "Australia",
+        "antarctica": "Antarctica"
+      };
+
+      fetch(mapFiles[continent])
         .then(res => res.text())
         .then(svg => {
           container.innerHTML = svg;
-          const mapSvg = container.querySelector("svg");
+          continentName.textContent = names[continent];
 
+          const mapSvg = container.querySelector("svg");
           mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
           mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
 
