@@ -5,16 +5,15 @@
   <title>World Map Practice - UPSC</title>
   <style>
     * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
     }
 
     html, body {
       height: 100%;
-      width: 100%;
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #eef2f3;
       overflow: hidden;
     }
 
@@ -22,30 +21,52 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: flex-start;
-      padding: 10px;
+      padding: 20px;
     }
 
     h1 {
-      margin: 10px 0;
-      font-size: 24px;
-      color: #222;
+      margin-bottom: 10px;
+      font-size: 28px;
+      color: #1d3557;
     }
 
     select {
-      padding: 10px;
+      padding: 10px 16px;
       font-size: 16px;
-      margin-bottom: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      background-color: white;
+    }
+
+    #continent-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: #333;
+    }
+
+    #map-box {
+      position: relative;
+      width: 90%;
+      height: 80%;
+      border: 4px solid #ccc;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 16px;
+      overflow: hidden;
     }
 
     #map-container {
       position: relative;
-      flex-grow: 1;
       width: 100%;
       height: 100%;
-      overflow: hidden;
-      border: 2px solid #ccc;
-      background-color: #fff;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
     }
 
     .marker {
@@ -69,9 +90,36 @@
       pointer-events: none;
     }
 
-    svg {
-      width: 100%;
-      height: 100%;
+    .compass {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.8);
+      padding: 8px;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      text-align: center;
+      line-height: 1.2;
+      font-weight: bold;
+      color: #444;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .compass span {
+      display: block;
+    }
+
+    .scale {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 12px;
+      border-radius: 5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
   </style>
 </head>
@@ -89,52 +137,68 @@
     <option value="antarctica">Antarctica</option>
   </select>
 
-  <div id="map-container">
-    <!-- Map loads here -->
+  <div id="continent-name"></div>
+
+  <div id="map-box">
+    <div class="compass">
+      <span>N</span>
+      <span>W E</span>
+      <span>S</span>
+    </div>
+    <div id="map-container"></div>
+    <div class="scale">Scale: ~1000 km</div>
   </div>
 
   <script>
     const container = document.getElementById("map-container");
     const select = document.getElementById("continent-select");
+    const continentName = document.getElementById("continent-name");
 
     select.addEventListener("change", () => {
       const continent = select.value;
       container.innerHTML = "";
+      continentName.textContent = "";
 
+      if (!continent) return;
+
+      let mapPath = "";
       switch (continent) {
         case "africa":
-          loadMap("maps/africa.svg");
+          mapPath = "maps/africa.svg";
+          continentName.textContent = "Africa";
           break;
         case "asia":
-          loadMap("maps/asia.svg");
+          mapPath = "maps/asia.svg";
+          continentName.textContent = "Asia";
           break;
         case "europe":
-          loadMap("maps/europe.svg");
+          mapPath = "maps/europe.svg";
+          continentName.textContent = "Europe";
           break;
         case "north-america":
-          loadMap("maps/northAmerica.svg");
+          mapPath = "maps/northAmerica.svg";
+          continentName.textContent = "North America";
           break;
         case "south-america":
-          loadMap("maps/southAmerica.svg");
+          mapPath = "maps/southAmerica.svg";
+          continentName.textContent = "South America";
           break;
         case "australia":
-          loadMap("maps/australia.svg");
+          mapPath = "maps/australia.svg";
+          continentName.textContent = "Australia";
           break;
         case "antarctica":
-          loadMap("maps/antarctica.svg");
+          mapPath = "maps/antarctica.svg";
+          continentName.textContent = "Antarctica";
           break;
-        default:
-          container.innerHTML = "";
       }
-    });
 
-    function loadMap(path) {
-      fetch(path)
+      fetch(mapPath)
         .then(res => res.text())
         .then(svg => {
           container.innerHTML = svg;
-
           const mapSvg = container.querySelector("svg");
+
           mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
           mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
 
@@ -158,8 +222,7 @@
             container.appendChild(tooltip);
           });
         });
-    }
+    });
   </script>
 </body>
 </html>
-
