@@ -13,62 +13,68 @@
     html, body {
       height: 100%;
       font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(to right, #e0eafc, #cfdef3);
-      color: #222;
+      background: #f0f4f8;
     }
 
-    header, footer {
+    header {
       background-color: #2a4365;
       color: white;
-      text-align: center;
-      padding: 16px;
-      font-size: 20px;
+      padding: 16px 20px;
+      font-size: 24px;
       font-weight: bold;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
     footer {
+      background-color: #2a4365;
+      color: white;
+      padding: 10px;
       font-size: 14px;
+      text-align: center;
       position: sticky;
       bottom: 0;
     }
 
     main {
-      padding: 30px 20px;
-      min-height: calc(100vh - 130px);
+      padding: 20px;
+      min-height: calc(100vh - 120px);
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 20px;
+      overflow-y: auto;
     }
 
     h1 {
       font-size: 28px;
+      margin-bottom: 20px;
       color: #1a202c;
-      margin-bottom: 10px;
     }
 
     select, button {
-      padding: 12px 18px;
+      padding: 10px 16px;
       font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-      background-color: #ffffff;
-      transition: all 0.2s ease-in-out;
-      margin: 0 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+      margin-right: 10px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      background-color: white;
+      cursor: pointer;
+      transition: background 0.2s;
     }
 
-    select:hover, button:hover {
-      background-color: #f0f0f0;
-      border-color: #888;
+    button:hover {
+      background-color: #e2e8f0;
     }
 
     #continent-name {
-      font-size: 24px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 5px;
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #2d3748;
     }
 
     #map-box {
@@ -76,14 +82,13 @@
       width: 95%;
       max-width: 1200px;
       height: 80vh;
+      border: 4px solid #ccc;
+      background: white;
       border-radius: 16px;
-      overflow: hidden;
-      background-color: white;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       padding: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      overflow: hidden;
+      margin-bottom: 30px;
     }
 
     #map-container {
@@ -98,22 +103,28 @@
     }
 
     .marker {
-      width: 4px;
-      height: 4px;
+      width: 18px;
+      height: 18px;
       background-color: red;
       border-radius: 50%;
       position: absolute;
       transform: translate(-50%, -50%);
       pointer-events: none;
-      box-shadow: 0 0 4px red;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
     }
 
     .compass {
       position: absolute;
-      top: 12px;
-      left: 12px;
+      top: 10px;
+      left: 10px;
       font-size: 14px;
-      background: rgba(255, 255, 255, 0.85);
+      background: rgba(255,255,255,0.85);
       padding: 8px;
       border-radius: 50%;
       width: 60px;
@@ -122,8 +133,7 @@
       line-height: 1.2;
       font-weight: bold;
       color: #444;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-      z-index: 2;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 
     .compass span {
@@ -135,40 +145,49 @@
       bottom: 10px;
       right: 10px;
       font-size: 14px;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 5px 14px;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 12px;
       border-radius: 5px;
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-      z-index: 2;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    #questions {
-      margin-top: 20px;
+    #question-box {
       width: 95%;
-      max-width: 1000px;
+      max-width: 1200px;
       background: #ffffff;
-      padding: 20px;
+      border: 2px solid #ccc;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
     }
 
-    #questions h2 {
-      font-size: 22px;
-      color: #2a4365;
-      margin-bottom: 12px;
-    }
-
-    .question {
+    #question-box h2 {
+      font-size: 20px;
       margin-bottom: 10px;
-      font-size: 16px;
+      color: #2a4365;
+    }
+
+    #question-box ul {
+      list-style: disc;
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    #screenshot-reminder {
+      display: none;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: red;
+      animation: blinker 1.2s linear infinite;
+      text-align: center;
+    }
+
+    @keyframes blinker {
+      50% {
+        opacity: 0;
+      }
     }
   </style>
 </head>
@@ -179,7 +198,7 @@
   <main>
     <h1>World Map on Fingertips – UPSC Mapping Practice</h1>
 
-    <div class="controls">
+    <div>
       <select id="continent-select">
         <option value="">Select a Continent</option>
         <option value="africa">Africa</option>
@@ -205,8 +224,8 @@
       <div class="scale">Scale: ~1000 km</div>
     </div>
 
-    <div id="questions">
-  <div id="questions">
+    <div id="question-box">
+      <div id="questions">
   <h2>Mapping Questions (One-Dot – South America Only):</h2>
 
   <div class="question">1. Mark Brasília, the capital of Brazil.</div>
@@ -221,7 +240,11 @@
   <div class="question">10. Mark the Iguaçu Falls near Foz do Iguaçu (Brazil-Argentina border).</div>
 </div>
 
+  
 
+    <div id="screenshot-reminder">
+      📸 Don't forget to take a screenshot of your markings after completing the questions!
+    </div>
   </main>
 
   <footer>© 2025 UPSChub. All Rights Reserved.</footer>
@@ -231,41 +254,57 @@
     const select = document.getElementById("continent-select");
     const continentName = document.getElementById("continent-name");
     const clearBtn = document.getElementById("clear-markers");
+    const reminder = document.getElementById("screenshot-reminder");
+
+    let markerCount = 0;
 
     select.addEventListener("change", () => {
       const continent = select.value;
       container.innerHTML = "";
       continentName.textContent = "";
+      markerCount = 0;
+      reminder.style.display = "none";
 
       if (!continent) return;
 
-      const mapFiles = {
-        "africa": "maps/africa.svg",
-        "asia": "maps/asia.svg",
-        "europe": "maps/europe.svg",
-        "north-america": "maps/northAmerica.svg",
-        "south-america": "maps/southAmerica.svg",
-        "australia": "maps/australia.svg",
-        "antarctica": "maps/antarctica.svg"
-      };
+      let mapPath = "";
+      switch (continent) {
+        case "africa":
+          mapPath = "maps/africa.svg";
+          continentName.textContent = "Africa";
+          break;
+        case "asia":
+          mapPath = "maps/asia.svg";
+          continentName.textContent = "Asia";
+          break;
+        case "europe":
+          mapPath = "maps/europe.svg";
+          continentName.textContent = "Europe";
+          break;
+        case "north-america":
+          mapPath = "maps/northAmerica.svg";
+          continentName.textContent = "North America";
+          break;
+        case "south-america":
+          mapPath = "maps/southAmerica.svg";
+          continentName.textContent = "South America";
+          break;
+        case "australia":
+          mapPath = "maps/australia.svg";
+          continentName.textContent = "Australia";
+          break;
+        case "antarctica":
+          mapPath = "maps/antarctica.svg";
+          continentName.textContent = "Antarctica";
+          break;
+      }
 
-      const names = {
-        "africa": "Africa",
-        "asia": "Asia",
-        "europe": "Europe",
-        "north-america": "North America",
-        "south-america": "South America",
-        "australia": "Australia",
-        "antarctica": "Antarctica"
-      };
-
-      fetch(mapFiles[continent])
+      fetch(mapPath)
         .then(res => res.text())
         .then(svg => {
           container.innerHTML = svg;
-          continentName.textContent = names[continent];
-
           const mapSvg = container.querySelector("svg");
+
           mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
           mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
 
@@ -274,12 +313,18 @@
             const x = e.clientX - rect.left;
             const y = e.clientY - rect.top;
 
+            markerCount++;
             const marker = document.createElement("div");
             marker.className = "marker";
             marker.style.left = `${x}px`;
             marker.style.top = `${y}px`;
+            marker.innerText = markerCount;
 
             container.appendChild(marker);
+
+            if (markerCount === 3) {
+              reminder.style.display = "block";
+            }
           });
         });
     });
@@ -287,8 +332,9 @@
     clearBtn.addEventListener("click", () => {
       const markers = container.querySelectorAll(".marker");
       markers.forEach(marker => marker.remove());
+      markerCount = 0;
+      reminder.style.display = "none";
     });
   </script>
 </body>
 </html>
-
