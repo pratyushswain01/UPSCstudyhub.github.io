@@ -81,12 +81,37 @@
 
     select.addEventListener("change", () => {
       const continent = select.value;
-      if (!continent) {
-        container.innerHTML = "";
-        return;
-      }
+      container.innerHTML = "";
 
-      fetch(`maps/${continent}.svg`)
+      switch (continent) {
+        case "africa":
+          loadMap("maps/africa.svg");
+          break;
+        case "asia":
+          loadMap("maps/asia.svg");
+          break;
+        case "europe":
+          loadMap("maps/europe.svg");
+          break;
+        case "north-america":
+          loadMap("maps/northAmerica.svg");
+          break;
+        case "south-america":
+          loadMap("maps/southAmerica.svg");
+          break;
+        case "australia":
+          loadMap("maps/australia.svg");
+          break;
+        case "antarctica":
+          loadMap("maps/antarctica.svg");
+          break;
+        default:
+          container.innerHTML = "";
+      }
+    });
+
+    function loadMap(path) {
+      fetch(path)
         .then(res => res.text())
         .then(svg => {
           container.innerHTML = svg;
@@ -112,7 +137,7 @@
             container.appendChild(tooltip);
           });
         });
-    });
+    }
   </script>
 </body>
 </html>
