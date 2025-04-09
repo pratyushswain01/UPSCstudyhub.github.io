@@ -85,19 +85,21 @@
       background: white;
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-      padding: 16px;
+      padding: 0;
       overflow: hidden;
     }
 
     #map-container {
-      position: relative;
       width: 100%;
       height: 100%;
+      position: relative;
     }
 
     svg {
       width: 100%;
       height: 100%;
+      object-fit: contain;
+      display: block;
     }
 
     .marker {
@@ -125,6 +127,7 @@
       font-weight: bold;
       color: #444;
       box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      z-index: 10;
     }
 
     .compass span {
@@ -140,6 +143,7 @@
       padding: 4px 12px;
       border-radius: 5px;
       box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+      z-index: 10;
     }
   </style>
 </head>
@@ -193,34 +197,30 @@
       if (!continent) return;
 
       let mapPath = "";
+      let displayName = continent.replace("-", " ");
+      continentName.textContent = displayName[0].toUpperCase() + displayName.slice(1);
+
       switch (continent) {
         case "africa":
           mapPath = "maps/africa.svg";
-          continentName.textContent = "Africa";
           break;
         case "asia":
           mapPath = "maps/asia.svg";
-          continentName.textContent = "Asia";
           break;
         case "europe":
           mapPath = "maps/europe.svg";
-          continentName.textContent = "Europe";
           break;
         case "north-america":
           mapPath = "maps/northAmerica.svg";
-          continentName.textContent = "North America";
           break;
         case "south-america":
           mapPath = "maps/southAmerica.svg";
-          continentName.textContent = "South America";
           break;
         case "australia":
           mapPath = "maps/australia.svg";
-          continentName.textContent = "Australia";
           break;
         case "antarctica":
           mapPath = "maps/antarctica.svg";
-          continentName.textContent = "Antarctica";
           break;
       }
 
@@ -231,7 +231,9 @@
           const mapSvg = container.querySelector("svg");
 
           mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
-          mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
+          mapSvg.setAttribute("width", "100%");
+          mapSvg.setAttribute("height", "100%");
+          mapSvg.style.display = "block";
 
           mapSvg.addEventListener("click", function (e) {
             const rect = mapSvg.getBoundingClientRect();
