@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>World Map Practice - UPSC</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #222;
+      margin-bottom: 20px;
+    }
+
+    select {
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    #map-container {
+      position: relative;
+      display: inline-block;
+      border: 2px solid #ccc;
+      background-color: #fff;
+      padding: 10px;
+    }
+
+    .marker {
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    .tooltip {
+      position: absolute;
+      background: black;
+      color: white;
+      padding: 4px 8px;
+      font-size: 12px;
+      border-radius: 4px;
+      transform: translate(-50%, -120%);
+      pointer-events: none;
+    }
+
+    svg {
+      width: 800px;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>World Map on Fingertips – UPSC Mapping Practice</h1>
+
+  <select id="continent-select">
+    <option value="">Select a Continent</option>
+    <option value="africa">Africa</option>
+    <option value="asia">Asia</option>
+    <option value="europe">Europe</option>
+    <option value="north-america">North America</option>
+    <option value="south-america">South America</option>
+    <option value="australia">Australia</option>
+    <option value="antarctica">Antarctica</option>
+  </select>
+
+  <div id="map-container">
+    <!-- Map loads here -->
+  </div>
+
+  <script>
+    const container = document.getElementById("map-container");
+    const select = document.getElementById("continent-select");
+
+    select.addEventListener("change", () => {
+      const continent = select.value;
+      if (!continent) {
+        container.innerHTML = "";
+        return;
+      }
+
+      fetch(`maps/${continent}.svg`)
+        .then(res => res.text())
+        .then(svg => {
+          container.innerHTML = svg;
+
+          const mapSvg = container.querySelector("svg");
+          mapSvg.addEventListener("click", function (e) {
+            const rect = mapSvg.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            const marker = document.createElement("div");
+            marker.className = "marker";
+            marker.style.left = `${x}px`;
+            marker.style.top = `${y}px`;
+
+            const tooltip = document.createElement("div");
+            tooltip.className = "tooltip";
+            tooltip.style.left = `${x}px`;
+            tooltip.style.top = `${y}px`;
+            tooltip.innerText = `(${Math.round(x)}, ${Math.round(y)})`;
+
+            container.appendChild(marker);
+            container.appendChild(tooltip);
+          });
+        });
+    });
+  </script>
+</body>
+</html>
