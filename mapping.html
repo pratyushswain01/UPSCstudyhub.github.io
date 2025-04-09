@@ -4,35 +4,53 @@
   <meta charset="UTF-8">
   <title>World Map Practice - UPSC</title>
   <style>
-    body {
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
       font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
-      text-align: center;
-      padding: 20px;
+      background-color: #f0f0f0;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 10px;
     }
 
     h1 {
+      margin: 10px 0;
+      font-size: 24px;
       color: #222;
-      margin-bottom: 20px;
     }
 
     select {
       padding: 10px;
       font-size: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     #map-container {
       position: relative;
-      display: inline-block;
+      flex-grow: 1;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
       border: 2px solid #ccc;
       background-color: #fff;
-      padding: 10px;
     }
 
     .marker {
-      width: 10px;
-      height: 10px;
+      width: 12px;
+      height: 12px;
       background-color: red;
       border-radius: 50%;
       position: absolute;
@@ -52,8 +70,8 @@
     }
 
     svg {
-      width: 800px;
-      height: auto;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
@@ -117,6 +135,9 @@
           container.innerHTML = svg;
 
           const mapSvg = container.querySelector("svg");
+          mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+          mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
+
           mapSvg.addEventListener("click", function (e) {
             const rect = mapSvg.getBoundingClientRect();
             const x = e.clientX - rect.left;
@@ -141,3 +162,4 @@
   </script>
 </body>
 </html>
+
