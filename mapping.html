@@ -54,13 +54,19 @@
       color: #1d3557;
     }
 
-    select {
+    select, button {
       padding: 10px 16px;
       font-size: 16px;
       margin-bottom: 20px;
+      margin-right: 10px;
       border: 1px solid #aaa;
       border-radius: 5px;
       background-color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #eee;
     }
 
     #continent-name {
@@ -95,23 +101,12 @@
     }
 
     .marker {
-      width: 12px;
-      height: 12px;
+      width: 8px;
+      height: 8px;
       background-color: red;
       border-radius: 50%;
       position: absolute;
       transform: translate(-50%, -50%);
-      pointer-events: none;
-    }
-
-    .tooltip {
-      position: absolute;
-      background: black;
-      color: white;
-      padding: 4px 8px;
-      font-size: 12px;
-      border-radius: 4px;
-      transform: translate(-50%, -120%);
       pointer-events: none;
     }
 
@@ -155,16 +150,19 @@
   <main>
     <h1>World Map on Fingertips – UPSC Mapping Practice</h1>
 
-    <select id="continent-select">
-      <option value="">Select a Continent</option>
-      <option value="africa">Africa</option>
-      <option value="asia">Asia</option>
-      <option value="europe">Europe</option>
-      <option value="north-america">North America</option>
-      <option value="south-america">South America</option>
-      <option value="australia">Australia</option>
-      <option value="antarctica">Antarctica</option>
-    </select>
+    <div>
+      <select id="continent-select">
+        <option value="">Select a Continent</option>
+        <option value="africa">Africa</option>
+        <option value="asia">Asia</option>
+        <option value="europe">Europe</option>
+        <option value="north-america">North America</option>
+        <option value="south-america">South America</option>
+        <option value="australia">Australia</option>
+        <option value="antarctica">Antarctica</option>
+      </select>
+      <button id="clear-markers">Refresh Map</button>
+    </div>
 
     <div id="continent-name"></div>
 
@@ -185,6 +183,7 @@
     const container = document.getElementById("map-container");
     const select = document.getElementById("continent-select");
     const continentName = document.getElementById("continent-name");
+    const clearBtn = document.getElementById("clear-markers");
 
     select.addEventListener("change", () => {
       const continent = select.value;
@@ -231,7 +230,6 @@
           container.innerHTML = svg;
           const mapSvg = container.querySelector("svg");
 
-          // Make sure the map is responsive and fills space
           mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
           mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
 
@@ -245,16 +243,14 @@
             marker.style.left = `${x}px`;
             marker.style.top = `${y}px`;
 
-            const tooltip = document.createElement("div");
-            tooltip.className = "tooltip";
-            tooltip.style.left = `${x}px`;
-            tooltip.style.top = `${y}px`;
-            tooltip.innerText = `(${Math.round(x)}, ${Math.round(y)})`;
-
             container.appendChild(marker);
-            container.appendChild(tooltip);
           });
         });
+    });
+
+    clearBtn.addEventListener("click", () => {
+      const markers = container.querySelectorAll(".marker");
+      markers.forEach(marker => marker.remove());
     });
   </script>
 </body>
