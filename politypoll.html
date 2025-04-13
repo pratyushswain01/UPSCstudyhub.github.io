@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPSChub Live Poll - Polity</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .live-badge {
+      background: #ef4444;
+      color: #fff;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      display: inline-block;
+      margin: 10px auto;
+      animation: blink 1.2s infinite;
+      font-size: 14px;
+      text-align: center;
+      max-width: 100px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    main {
+      flex: 1;
+      max-width: 800px;
+      margin: 20px auto 80px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .question-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .options {
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: #f1f5f9;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option:hover {
+      background: #e2e8f0;
+    }
+
+    .correct { background: #d1fae5; border: 1px solid #10b981; }
+    .wrong { background: #fee2e2; border: 1px solid #ef4444; }
+
+    .explanation {
+      background: #fff7ed;
+      padding: 10px 15px;
+      border-left: 5px solid #f97316;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .result-screen {
+      text-align: center;
+      padding: 30px;
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .result-screen h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>UPSChub Live Poll - Polity</h1>
+</header>
+
+<div class="live-badge">🔴 LIVE</div>
+
+<main>
+  <!-- Quiz Section -->
+  <div id="quizSection" class="section active">
+    <div class="question-title" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="explanation" id="explanation"></div>
+    <button onclick="nextQuestion()">Next</button>
+  </div>
+
+  <!-- Result Section -->
+  <div id="resultSection" class="section">
+    <div class="result-screen">
+      <h2>🎉 Quiz Complete!</h2>
+      <p id="resultText"></p>
+      <button onclick="location.reload()">🔁 Restart Quiz</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 UPSChub | Master UPSC Smarter
+</footer>
+
+<script>
+  const quiz = [
+    {
+      question: "What is the supreme law of India?",
+      options: ["Parliament", "President", "The Constitution", "Supreme Court"],
+      correct: 2,
+      explanation: "The Constitution is the supreme law of India that lays down the framework of governance."
+    },
+    {
+      question: "When did the Constitution of India come into effect?",
+      options: ["15th August 1947", "26th November 1949", "26th January 1950", "2nd October 1950"],
+      correct: 2,
+      explanation: "The Constitution came into effect on 26th January 1950, celebrated as Republic Day."
+    },
+    {
+      question: "Who is considered the chief architect of the Indian Constitution?",
+      options: ["Mahatma Gandhi", "Jawaharlal Nehru", "Dr. B.R. Ambedkar", "Sardar Patel"],
+      correct: 2,
+      explanation: "Dr. B.R. Ambedkar is known as the chief architect of the Indian Constitution."
+    },
+    {
+      question: "Which body drafted the Indian Constitution?",
+      options: ["Lok Sabha", "Rajya Sabha", "Supreme Court", "Constituent Assembly"],
+      correct: 3,
+      explanation: "The Constituent Assembly was responsible for drafting the Indian Constitution."
+    },
+    {
+      question: "How many articles were originally there in the Constitution?",
+      options: ["395", "444", "370", "299"],
+      correct: 0,
+      explanation: "Originally, the Constitution had 395 Articles divided into 22 Parts and 8 Schedules."
+    },
+    {
+      question: "Which part of the Constitution deals with Fundamental Rights?",
+      options: ["Part I", "Part II", "Part III", "Part IV"],
+      correct: 2,
+      explanation: "Part III of the Constitution (Articles 12 to 35) deals with Fundamental Rights."
+    },
+    {
+      question: "The Preamble of the Constitution declares India as a?",
+      options: ["Democratic Republic", "Sovereign Socialist Secular Democratic Republic", "Secular Federal Union", "Democratic Socialist State"],
+      correct: 1,
+      explanation: "The Preamble declares India as a Sovereign, Socialist, Secular, Democratic Republic."
+    },
+    {
+      question: "How many schedules are there in the Indian Constitution currently?",
+      options: ["10", "8", "12", "14"],
+      correct: 2,
+      explanation: "There are currently 12 Schedules in the Indian Constitution."
+    },
+    {
+      question: "Which article of the Constitution deals with the 'Right to Equality'?",
+      options: ["Article 14", "Article 19", "Article 21", "Article 32"],
+      correct: 0,
+      explanation: "Article 14 guarantees 'Right to Equality' for all citizens."
+    },
+    {
+      question: "What is the minimum age to become the President of India?",
+      options: ["25 years", "30 years", "35 years", "40 years"],
+      correct: 2,
+      explanation: "The minimum age to become President of India is 35 years."
+    }
+  ];
+
+  let current = 0, score = 0;
+
+  function switchSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+  }
+
+  function loadQuestion() {
+    const q = quiz[current];
+    document.getElementById('question').textContent = `Q${current + 1}: ${q.question}`;
+    const optionsContainer = document.getElementById('options');
+    const explanationBox = document.getElementById('explanation');
+    explanationBox.style.display = 'none';
+    explanationBox.innerHTML = '';
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.textContent = opt;
+      div.onclick = () => handleAnswer(div, i === q.correct, q.correct, i);
+      optionsContainer.appendChild(div);
+    });
+  }
+
+  function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
+    const all = document.querySelectorAll('.option');
+    all.forEach((opt, idx) => {
+      opt.classList.remove('correct', 'wrong');
+      opt.onclick = null;
+      if (idx === correctIndex) opt.classList.add('correct');
+      else if (idx === selectedIndex) opt.classList.add('wrong');
+    });
+    if (isCorrect) score++;
+    document.getElementById('explanation').style.display = 'block';
+    document.getElementById('explanation').innerHTML =
+      `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
+  }
+
+  function nextQuestion() {
+    if (current < quiz.length - 1) {
+      current++;
+      loadQuestion();
+    } else {
+      document.getElementById('resultText').textContent = `You scored ${score} out of ${quiz.length}.`;
+      switchSection('resultSection');
+    }
+  }
+
+  window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
