@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UPSChub Live Poll - Polity Section</title>
+  <title>UPSChub Live Poll</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; }
@@ -124,7 +124,6 @@
       margin-bottom: 15px;
     }
 
-    /* Progress Bar Style */
     .progress-container {
       width: 100%;
       height: 10px;
@@ -137,7 +136,7 @@
 
     .progress-bar {
       height: 100%;
-      width: 0%;
+      width: 100%;
       background-color: #3b82f6;
       position: absolute;
       top: 0;
@@ -172,16 +171,14 @@
 <body>
 
 <header>
-  <h1>UPSChub Live Poll - Polity Section</h1>
+  <h1>UPSChub Live Poll</h1>
 </header>
 
 <div class="live-badge">🔴 LIVE</div>
 
 <main>
-  <!-- Quiz Section -->
   <div id="quizSection" class="section active">
     <div class="timer" id="timer">Time: 10s</div>
-    <!-- Progress Bar -->
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
@@ -191,7 +188,6 @@
     <button onclick="nextQuestion()">Next</button>
   </div>
 
-  <!-- Result Section -->
   <div id="resultSection" class="section">
     <div class="result-screen">
       <h2>🎉 Quiz Complete!</h2>
@@ -270,19 +266,23 @@
   ];
 
   let current = 0, score = 0;
-  let timerValue = 10; // 10-second timer for each question
+  let timerValue = 10;
   let timerInterval;
 
   function startTimer() {
-    timerInterval = setInterval(function () {
+    clearInterval(timerInterval);
+    timerValue = 10;
+    document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+    document.getElementById('progressBar').style.width = "100%";
+
+    timerInterval = setInterval(() => {
+      timerValue--;
       document.getElementById('timer').textContent = `Time: ${timerValue}s`;
-      let progress = (timerValue / 10) * 100;
-      document.getElementById('progressBar').style.width = progress + "%";
+      document.getElementById('progressBar').style.width = (timerValue / 10) * 100 + "%";
+
       if (timerValue <= 0) {
         clearInterval(timerInterval);
         nextQuestion();
-      } else {
-        timerValue--;
       }
     }, 1000);
   }
@@ -293,6 +293,7 @@
   }
 
   function loadQuestion() {
+    clearInterval(timerInterval);
     const q = quiz[current];
     document.getElementById('question').textContent = `Q${current + 1}: ${q.question}`;
     const optionsContainer = document.getElementById('options');
@@ -309,11 +310,11 @@
       optionsContainer.appendChild(div);
     });
 
-    timerValue = 10; // reset the timer for each question
-    startTimer(); // start the timer
+    startTimer();
   }
 
   function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
+    clearInterval(timerInterval);
     const all = document.querySelectorAll('.option');
     all.forEach((opt, idx) => {
       opt.classList.remove('correct', 'wrong');
@@ -322,12 +323,13 @@
       else if (idx === selectedIndex) opt.classList.add('wrong');
     });
     if (isCorrect) score++;
-    document.getElementById('explanation').style.display = 'block';
-    document.getElementById('explanation').innerHTML =
-      `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
+    const exp = document.getElementById('explanation');
+    exp.style.display = 'block';
+    exp.innerHTML = `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
   }
 
   function nextQuestion() {
+    clearInterval(timerInterval);
     if (current < quiz.length - 1) {
       current++;
       loadQuestion();
