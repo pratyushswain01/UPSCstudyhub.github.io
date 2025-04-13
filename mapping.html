@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>World Map Practice - UPSC</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f0f4f8;
+    }
+
+    header {
+      background-color: #2a4365;
+      color: white;
+      padding: 16px 20px;
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    footer {
+      background-color: #2a4365;
+      color: white;
+      padding: 10px;
+      font-size: 14px;
+      text-align: center;
+      position: sticky;
+      bottom: 0;
+    }
+
+    main {
+      padding: 20px;
+      min-height: calc(100vh - 120px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow-y: auto;
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #1a202c;
+    }
+
+    select, button {
+      padding: 10px 16px;
+      font-size: 16px;
+      margin-bottom: 20px;
+      margin-right: 10px;
+      border: 1px solid #aaa;
+      border-radius: 5px;
+      background-color: white;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #e2e8f0;
+    }
+
+    #continent-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 12px;
+      color: #2d3748;
+    }
+
+    #map-box {
+      position: relative;
+      width: 95%;
+      max-width: 1200px;
+      height: 80vh;
+      border: 4px solid #ccc;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      padding: 16px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    #map-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .marker {
+      width: 5px;
+      height: 5px;
+      background-color: red;
+      border-radius: 50%;
+      position: absolute;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      box-shadow: 0 0 5px rgba(0,0,0,0.3);
+    }
+
+    .compass {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.85);
+      padding: 8px;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      text-align: center;
+      line-height: 1.2;
+      font-weight: bold;
+      color: #444;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .compass span {
+      display: block;
+    }
+
+    .scale {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.9);
+      padding: 4px 12px;
+      border-radius: 5px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    #question-box {
+      width: 95%;
+      max-width: 1200px;
+      background: #ffffff;
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      margin-bottom: 20px;
+    }
+
+    #question-box h2 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #2a4365;
+    }
+
+    #question-box ul {
+      list-style: disc;
+      padding-left: 20px;
+      text-align: left;
+    }
+
+    #screenshot-reminder {
+      display: none;
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: red;
+      animation: blinker 1.2s linear infinite;
+      text-align: center;
+    }
+
+    @keyframes blinker {
+      50% {
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>UPSChub - Mapping Practice</header>
+
+  <main>
+    <h1>World Map on Fingertips – UPSC Mapping Practice</h1>
+
+    <div>
+      <select id="continent-select">
+        <option value="">Select a Continent</option>
+        <option value="africa">Africa</option>
+        <option value="asia">Asia</option>
+        <option value="europe">Europe</option>
+        <option value="north-america">North America</option>
+        <option value="south-america">South America</option>
+        <option value="australia">Australia</option>
+        <option value="antarctica">Antarctica</option>
+      </select>
+      <button id="clear-markers">Refresh Map</button>
+    </div>
+
+    <div id="continent-name"></div>
+
+    <div id="map-box">
+      <div class="compass">
+        <span>N</span>
+        <span>W E</span>
+        <span>S</span>
+      </div>
+      <div id="map-container"></div>
+      <div class="scale">Scale: ~1000 km</div>
+    </div>
+
+    <div id="question-box">
+      <div id="questions">
+  <h2>Mapping Questions (One-Dot – South America Only):</h2>
+
+  <div class="question">1. Mark Brasília, the capital of Brazil.</div>
+  <div class="question">2. Mark Asunción, the capital of Paraguay.</div>
+  <div class="question">3. Mark Sucre, the constitutional capital of Bolivia.</div>
+  <div class="question">4. Mark Buenos Aires, the capital of Argentina.</div>
+  <div class="question">5. Mark Santiago, the capital of Chile.</div>
+  <div class="question">6. Mark Quito, the capital of Ecuador.</div>
+  <div class="question">7. Mark the city of Manaus along the Amazon River.</div>
+  <div class="question">8. Mark a point in the Atacama Desert near San Pedro de Atacama (Chile).</div>
+  <div class="question">9. Mark Mount Aconcagua in the Andes (Argentina).</div>
+  <div class="question">10. Mark the Iguaçu Falls near Foz do Iguaçu (Brazil-Argentina border).</div>
+</div>
+
+  
+
+    <div id="screenshot-reminder">
+      📸 Don't forget to take a screenshot of your markings after completing the questions!
+    </div>
+  </main>
+
+  <footer>© 2025 UPSChub. All Rights Reserved.</footer>
+
+  <script>
+    const container = document.getElementById("map-container");
+    const select = document.getElementById("continent-select");
+    const continentName = document.getElementById("continent-name");
+    const clearBtn = document.getElementById("clear-markers");
+    const reminder = document.getElementById("screenshot-reminder");
+
+    let markerCount = 0;
+
+    select.addEventListener("change", () => {
+      const continent = select.value;
+      container.innerHTML = "";
+      continentName.textContent = "";
+      markerCount = 0;
+      reminder.style.display = "none";
+
+      if (!continent) return;
+
+      let mapPath = "";
+      switch (continent) {
+        case "africa":
+          mapPath = "maps/africa.svg";
+          continentName.textContent = "Africa";
+          break;
+        case "asia":
+          mapPath = "maps/asia.svg";
+          continentName.textContent = "Asia";
+          break;
+        case "europe":
+          mapPath = "maps/europe.svg";
+          continentName.textContent = "Europe";
+          break;
+        case "north-america":
+          mapPath = "maps/northAmerica.svg";
+          continentName.textContent = "North America";
+          break;
+        case "south-america":
+          mapPath = "maps/southAmerica.svg";
+          continentName.textContent = "South America";
+          break;
+        case "australia":
+          mapPath = "maps/australia.svg";
+          continentName.textContent = "Australia";
+          break;
+        case "antarctica":
+          mapPath = "maps/antarctica.svg";
+          continentName.textContent = "Antarctica";
+          break;
+      }
+
+      fetch(mapPath)
+        .then(res => res.text())
+        .then(svg => {
+          container.innerHTML = svg;
+          const mapSvg = container.querySelector("svg");
+
+          mapSvg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+          mapSvg.setAttribute("viewBox", mapSvg.getAttribute("viewBox") || "0 0 1000 500");
+
+          mapSvg.addEventListener("click", function (e) {
+            const rect = mapSvg.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            markerCount++;
+            const marker = document.createElement("div");
+            marker.className = "marker";
+            marker.style.left = `${x}px`;
+            marker.style.top = `${y}px`;
+            marker.innerText = markerCount;
+
+            container.appendChild(marker);
+
+            if (markerCount === 3) {
+              reminder.style.display = "block";
+            }
+          });
+        });
+    });
+
+    clearBtn.addEventListener("click", () => {
+      const markers = container.querySelectorAll(".marker");
+      markers.forEach(marker => marker.remove());
+      markerCount = 0;
+      reminder.style.display = "none";
+    });
+  </script>
+</body>
+</html>
