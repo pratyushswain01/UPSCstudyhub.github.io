@@ -124,6 +124,27 @@
       margin-bottom: 15px;
     }
 
+    /* Progress Bar Style */
+    .progress-container {
+      width: 100%;
+      height: 10px;
+      background-color: #e5e7eb;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #3b82f6;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: width 1s linear;
+    }
+
     .result-screen {
       text-align: center;
       padding: 30px;
@@ -157,9 +178,13 @@
 <div class="live-badge">🔴 LIVE</div>
 
 <main>
-  <!-- Polity Quiz Section -->
+  <!-- Quiz Section -->
   <div id="quizSection" class="section active">
-    <div class="timer" id="timer">Time: 30s</div>
+    <div class="timer" id="timer">Time: 10s</div>
+    <!-- Progress Bar -->
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
     <div class="question-title" id="question"></div>
     <div class="options" id="options"></div>
     <div class="explanation" id="explanation"></div>
@@ -245,12 +270,14 @@
   ];
 
   let current = 0, score = 0;
-  let timerValue = 30;
+  let timerValue = 10; // 10-second timer for each question
   let timerInterval;
 
   function startTimer() {
     timerInterval = setInterval(function () {
       document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+      let progress = (timerValue / 10) * 100;
+      document.getElementById('progressBar').style.width = progress + "%";
       if (timerValue <= 0) {
         clearInterval(timerInterval);
         nextQuestion();
@@ -282,8 +309,8 @@
       optionsContainer.appendChild(div);
     });
 
-    timerValue = 30; // reset timer for each question
-    startTimer(); // start countdown timer
+    timerValue = 10; // reset the timer for each question
+    startTimer(); // start the timer
   }
 
   function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
