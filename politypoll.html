@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>UPSChub Live Poll - Polity</title>
+  <title>UPSChub Live Poll - Polity Section</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing: border-box; }
@@ -117,6 +117,13 @@
       background: #2563eb;
     }
 
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ef4444;
+      margin-bottom: 15px;
+    }
+
     .result-screen {
       text-align: center;
       padding: 30px;
@@ -144,14 +151,15 @@
 <body>
 
 <header>
-  <h1>UPSChub Live Poll - Polity</h1>
+  <h1>UPSChub Live Poll - Polity Section</h1>
 </header>
 
 <div class="live-badge">🔴 LIVE</div>
 
 <main>
-  <!-- Quiz Section -->
+  <!-- Polity Quiz Section -->
   <div id="quizSection" class="section active">
+    <div class="timer" id="timer">Time: 30s</div>
     <div class="question-title" id="question"></div>
     <div class="options" id="options"></div>
     <div class="explanation" id="explanation"></div>
@@ -237,6 +245,20 @@
   ];
 
   let current = 0, score = 0;
+  let timerValue = 30;
+  let timerInterval;
+
+  function startTimer() {
+    timerInterval = setInterval(function () {
+      document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+      if (timerValue <= 0) {
+        clearInterval(timerInterval);
+        nextQuestion();
+      } else {
+        timerValue--;
+      }
+    }, 1000);
+  }
 
   function switchSection(sectionId) {
     document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -259,6 +281,9 @@
       div.onclick = () => handleAnswer(div, i === q.correct, q.correct, i);
       optionsContainer.appendChild(div);
     });
+
+    timerValue = 30; // reset timer for each question
+    startTimer(); // start countdown timer
   }
 
   function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
