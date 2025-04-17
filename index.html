@@ -33,23 +33,29 @@
 </head>
 <body>
 
-  <video id="bgVideo" autoplay playsinline>
-    <source src="images\intro.mp4" type="video/mp4" />
+  <video id="bgVideo" autoplay muted playsinline>
+    <source src="950ecd3c-51e0-450d-8420-70416a2e5ae8.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
   <script>
     const video = document.getElementById('bgVideo');
-    // Allow video to play with sound
-    video.muted = false;
-    video.volume = 1.0; // Set volume if needed
-
-    // Autoplay fix for some browsers that require interaction for sound
+    
+    // Allow video to play muted first for autoplay to work
+    video.muted = true;
     video.play().catch(error => {
-      console.log("Autoplay with sound blocked. Showing controls.");
+      console.log("Autoplay blocked, enabling controls.");
       video.setAttribute("controls", "true");
     });
 
+    // After a brief delay, unmute the video
+    video.onplay = () => {
+      setTimeout(() => {
+        video.muted = false; // Unmute after video starts playing
+      }, 500); // Delay in ms before unmuting
+    };
+
+    // Redirect to home after video ends
     video.addEventListener('ended', () => {
       window.location.href = 'homeUPSChub.html';
     });
