@@ -5,33 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Welcome Video</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      background-color: #000000; /* Black background */
+      padding: 0;
+      background-color: #000000;
       color: white;
+      height: 100vh;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      min-height: 100vh;
+      justify-content: flex-start;
       position: relative;
     }
 
-    .video-container {
-      border-left: 5px solid white;
-      border-right: 5px solid white;
-      padding: 0 10px;
-      box-sizing: border-box;
-    }
-
-    video {
-      max-width: 100%;
-      height: auto;
-      display: block;
+    .welcome-section {
+      text-align: center;
+      margin-top: 30px;
+      z-index: 2;
     }
 
     .tagline {
-      margin-top: 20px;
       font-size: 2rem;
       font-weight: bold;
       white-space: nowrap;
@@ -39,6 +37,22 @@
       border-right: 2px solid white;
       width: 0;
       animation: typing 3s steps(22) 1s forwards, blink 0.7s step-end infinite;
+    }
+
+    .subtagline, .description {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      opacity: 0;
+      animation: fadeIn 1.5s ease-in-out forwards;
+    }
+
+    .subtagline {
+      animation-delay: 4s;
+    }
+
+    .description {
+      font-size: 1rem;
+      animation-delay: 5.5s;
     }
 
     @keyframes typing {
@@ -50,32 +64,66 @@
       50% { border-color: transparent }
     }
 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .video-container {
+      border-left: 5px solid white;
+      border-right: 5px solid white;
+      padding: 0 10px;
+      box-sizing: border-box;
+      margin-top: 20px;
+      max-height: 60vh;
+      overflow: hidden;
+    }
+
+    video {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+
     footer {
-      position: absolute;
-      bottom: 10px;
+      position: fixed;
+      bottom: 20px;
       width: 100%;
       text-align: center;
       color: white;
       font-size: 0.9rem;
+      z-index: 2;
     }
 
     @media (max-width: 600px) {
       .tagline {
         font-size: 1.2rem;
       }
+
+      .subtagline, .description {
+        font-size: 0.9rem;
+      }
+
+      .video-container {
+        max-height: 55vh;
+      }
     }
   </style>
 </head>
 <body>
 
+  <div class="welcome-section">
+    <div class="tagline">Welcome to UPSChub</div>
+    <div class="subtagline">A Unique Way of Learning</div>
+    <div class="description">Your Companion in the UPSC Journey</div>
+  </div>
+
   <div class="video-container">
     <video id="introVideo" autoplay muted playsinline>
-      <source src="images/intro.mp4" type="video/mp4" />
+      <source src="images\intro.mp4" type="video/mp4" />
       Your browser does not support the video tag.
     </video>
   </div>
-
-  <div class="tagline">Welcome to UPSChub</div>
 
   <footer>
     UPSChub | Pratyush Swain
@@ -84,7 +132,7 @@
   <script>
     const video = document.getElementById('introVideo');
     video.addEventListener('ended', () => {
-      window.location.href = 'homeUPSChub.html'; // Redirect after video ends
+      window.location.href = 'homeUPSChub.html';
     });
   </script>
 
