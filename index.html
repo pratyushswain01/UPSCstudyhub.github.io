@@ -1,200 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> UPSChub : Protected</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Welcome Video</title>
   <style>
     body {
-      font-family: 'Poppins', sans-serif;
       margin: 0;
-      padding: 0;
+      background-color: #ffffff; /* White background */
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      background: radial-gradient(circle, #ff7e5f, #feb47b); /* New Year-themed gradient */
-      color: white;
     }
-    .container {
-      text-align: center;
-      width: 100%;
-      max-width: 500px; /* Limiting max width */
-      padding: 40px;
-      background-color: rgba(255, 255, 255, 0.1); /* Slight transparency for the container */
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    video {
+      max-width: 100%;
+      height: auto;
     }
-    .logo {
-      margin-bottom: 20px;
-      animation: bounce 2s infinite;
-    }
-    .logo img {
-      max-width: 100px; /* Adjust the logo size */
-    }
-    .app-name {
-      font-size: 32px;
-      font-weight: bold;
-      margin-top: 10px;
-      letter-spacing: 2px;
-      color: #FFD700;
-      animation: glow 1.5s ease-in-out infinite;
-    }
-    .message {
-      font-size: 24px;
-      color: #FF1493; /* Vibrant Pink for the New Year message */
-      margin-top: 20px;
-      opacity: 0;
-      animation: fadeIn 3s forwards;
-    }
-    .happy-new-year {
-      font-size: 28px;
-      color: #FFD700; /* Golden text */
-      margin-top: 20px;
-      opacity: 0;
-      animation: fadeIn 3s 2s forwards; /* Delay for this animation */
-    }
-    .password-container {
-      margin-top: 30px;
-    }
-    .password-container input {
-      padding: 12px;
-      margin-top: 20px;
-      width: 100%;
-      max-width: 350px;
-      border: none;
-      border-radius: 30px;
-      font-size: 18px;
-      outline: none;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    }
-    .password-container input:focus {
-      border: 2px solid #FFD700;
-    }
-    .password-container button {
-      padding: 8px 16px; /* Smaller padding */
-      margin-top: 20px;
-      width: auto; /* Allow the width to adjust based on the content */
-      max-width: 250px; /* Set a maximum width */
-      background-color: #FF1493; /* Vibrant Pink */
-      color: white;
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      font-size: 14px; /* Smaller font size */
-      transition: background-color 0.3s;
-    }
-    .password-container button:hover {
-      background-color: #FF69B4; /* Lighter pink on hover */
-    }
-    .error-message {
-      color: red;
-      display: none;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    .hidden-content {
-      display: none;
-      margin-top: 20px;
-      font-size: 20px;
-    }
-
-    /* Animations */
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-15px);
-      }
-      60% {
-        transform: translateY(-7px);
-      }
-    }
-
-    @keyframes glow {
-      0% {
-        text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FF1493;
-      }
-      50% {
-        text-shadow: 0 0 15px #FFD700, 0 0 25px #FFD700, 0 0 35px #FFD700, 0 0 45px #FF1493;
-      }
-      100% {
-        text-shadow: 0 0 10px #FFD700, 0 0 20px #FFD700, 0 0 30px #FFD700, 0 0 40px #FF1493;
-      }
-    }
-
-    @keyframes fadeIn {
-      0% {
-        opacity: 0;
-      }
-      100% {
-        opacity: 1;
-      }
-    }
-
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- Logo and App Name Section -->
-    <div class="logo">
-      <img src="images/LOGO.jpg" alt="App Logo" /> <!-- Replace with your logo image -->
-    </div>
-    <div class="app-name">
-      UPSC Hub
-    </div>
 
-    <!-- Dynamic Welcome Message Section -->
-    <div class="message" id="welcome-message">
-      Welcome to UPSC Hub
-    </div>
-    <div class="happy-new-year" id="new-year-message">
-      Happy New Year 2025!
-    </div>
-
-    <!-- Password Protection Section -->
-    <div class="password-container">
-      <h2>Enter Password to Access</h2>
-      <input type="password" id="password" placeholder="Enter password" />
-      <button onclick="checkPassword()">Submit</button>
-      <p id="error-message" class="error-message">Incorrect password. Please try again.</p>
-    </div>
-
-    <!-- Protected Content Section -->
-    <div class="hidden-content" id="protected-content">
-      <h1>Welcome to the protected content!</h1>
-      <p>This content is protected and you have successfully logged in.</p>
-    </div>
-  </div>
+  <video id="introVideo" autoplay muted playsinline>
+    <source src="images\intro.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
   <script>
-    const correctPassword = '2013'; // Change this to your desired password
-
-    // Function to check the password and redirect
-    function checkPassword() {
-      const passwordInput = document.getElementById('password').value;
-      const errorMessage = document.getElementById('error-message');
-      const protectedContent = document.getElementById('protected-content');
-      const passwordContainer = document.querySelector('.password-container');
-
-      if (passwordInput === correctPassword) {
-        // Redirect to home.html
-        window.location.href = 'homeUPSChub.html'; // Redirect to home.html page
-      } else {
-        errorMessage.style.display = 'block'; // Show error message if password is incorrect
-      }
-    }
-
-    // JavaScript for dynamically showing New Year messages
-    window.onload = () => {
-      const welcomeMessage = document.getElementById('welcome-message');
-      const newYearMessage = document.getElementById('new-year-message');
-
-      // Make the messages appear with animation
-      welcomeMessage.style.animation = "fadeIn 2s forwards";
-      newYearMessage.style.animation = "fadeIn 3s 2s forwards"; // Delayed for New Year message
-    };
+    const video = document.getElementById('introVideo');
+    video.addEventListener('ended', () => {
+      window.location.href = 'homeUPSChub.html'; // Redirect after video ends
+    });
   </script>
+
 </body>
 </html>
