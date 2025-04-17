@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Intro Video</title>
+  <title>UPSChub</title>
   <style>
     * {
       margin: 0;
@@ -11,54 +11,100 @@
       box-sizing: border-box;
     }
 
-    html, body {
+    body, html {
       height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: black;
       overflow: hidden;
     }
 
-    body {
-      background-color: #fff;
+    .video-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
     }
 
     video {
-      position: fixed;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .overlay {
+      position: absolute;
       top: 0;
       left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -1;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+    }
+
+    .logo {
+      width: 120px;
+      height: 120px;
+      background: url('logo.png') no-repeat center/contain;
+      margin-bottom: 20px;
+    }
+
+    .tagline {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .skip-btn {
+      position: absolute;
+      bottom: 30px;
+      background: white;
+      color: black;
+      padding: 10px 20px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      border: none;
+      transition: all 0.3s ease;
+    }
+
+    .skip-btn:hover {
+      background-color: #f1f1f1;
+    }
+
+    @media (max-width: 600px) {
+      .tagline {
+        font-size: 1.2rem;
+      }
     }
   </style>
 </head>
 <body>
 
-  <video id="bgVideo" autoplay muted playsinline>
-    <source src="images\intro.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
+  <div class="video-container">
+    <video id="introVideo" autoplay playsinline>
+      <source src="videos/intro.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <div class="overlay">
+      <div class="logo"></div>
+      <div class="tagline">Your UPSC Journey Starts Here</div>
+      <button class="skip-btn" onclick="redirect()">Skip Intro</button>
+    </div>
+  </div>
 
   <script>
-    const video = document.getElementById('bgVideo');
-    
-    // Allow video to play muted first for autoplay to work
-    video.muted = true;
-    video.play().catch(error => {
-      console.log("Autoplay blocked, enabling controls.");
-      video.setAttribute("controls", "true");
-    });
+    const video = document.getElementById('introVideo');
+    video.onended = () => redirect();
 
-    // After a brief delay, unmute the video
-    video.onplay = () => {
-      setTimeout(() => {
-        video.muted = false; // Unmute after video starts playing
-      }, 500); // Delay in ms before unmuting
-    };
-
-    // Redirect to home after video ends
-    video.addEventListener('ended', () => {
-      window.location.href = 'homeUPSChub.html';
-    });
+    function redirect() {
+      window.location.href = 'homeUPSChub.html'; // Update this if your home file has another name
+    }
   </script>
 
 </body>
