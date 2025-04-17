@@ -7,34 +7,118 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <style>
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      margin: 0; padding: 0; box-sizing: border-box;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
 
     body {
       background: #f5f5f5;
       color: #333;
-      transition: filter 0.3s ease;
+      transition: background-color 0.3s, color 0.3s;
     }
 
+    /* Dark Mode Styles */
+    body.dark {
+      background: #121212;
+      color: #e0e0e0;
+    }
+
+    body.dark .header {
+      background: #333;
+    }
+
+    body.dark .runner-line {
+      background: #444;
+    }
+
+    body.dark .home-grid .box {
+      background-color: #333;
+      border: 1px solid #555;
+    }
+
+    body.dark .home-grid .box:hover {
+      background-color: #444;
+    }
+
+    body.dark .sidebar {
+      background: #1f1f1f;
+    }
+
+    body.dark .sidebar a {
+      color: #e0e0e0;
+    }
+
+    body.dark footer {
+      background: #1f1f1f;
+      color: #e0e0e0;
+    }
+
+    body.dark .top-buttons button {
+      background-color: #444;
+      color: #fff;
+    }
+
+    body.dark .top-buttons button:hover {
+      background-color: #666;
+    }
+
+    body.dark .contact-icons a {
+      color: #fff;
+    }
+
+    /* For Light Mode */
+    h3 {
+      color: #333; /* Dark color for light mode */
+    }
+
+    /* For Dark Mode */
+    body.dark h3 {
+      color: #fff; /* Light color for dark mode */
+    }
+
+    /* Top Buttons - Positioned at top right above header */
+    .top-buttons {
+      position: fixed;
+      top: 10px;
+      right: 25px;
+      display: flex;
+      gap: 15px;
+      z-index: 100;
+    }
+
+    .top-buttons button {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .top-buttons button i {
+      font-size: 1.2rem;
+    }
+
+    /* Header Style */
     .header {
       background: #4a4a4a;
       color: white;
       padding: 15px 25px;
       text-align: center;
+      margin-top: 50px;
       position: relative;
     }
 
     .header h1 {
       font-size: 2.2em;
+      text-align: center;
     }
 
     .subheading {
-      font-size: 1em;
+      font-size: 1.2em;
       margin-top: 5px;
       color: #ccc;
+      text-align: center;
+      font-weight: 400;
     }
 
     .runner-line {
@@ -47,47 +131,35 @@
 
     /* Home Grid Section */
     .home-grid {
-      margin-left: 0;
-      margin-right: 0;
-      padding: 50px 0;
+      margin-left: 260px;
+      padding: 50px;
       text-align: center;
-      width: 100%;
-    }
-
-    .home-grid h1 {
-      font-size: 2.2rem;
-      margin-bottom: 10px;
-    }
-
-    .home-grid h2 {
-      font-size: 1.5rem;
-      margin-bottom: 20px;
-      color: #007bff;
-    }
-
-    .home-grid .box-container {
-      display: block;
-      margin-top: 20px;
-      width: 100%; /* Ensure the box container covers the full width */
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      justify-content: space-between;
     }
 
     .home-grid .box {
       background-color: #fff;
-      padding: 25px;
+      padding: 25px 20px;
       border-radius: 12px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
       transition: 0.3s ease;
       text-align: center;
       transform: translateY(0);
+      font-size: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 200px;
+      margin: 10px;
       overflow: hidden;
-      width: 100%;
-      box-sizing: border-box; /* Ensure padding is included in width */
-      margin-bottom: 20px; /* Add space between boxes */
     }
 
     .home-grid .box i {
-      font-size: 3rem;
-      margin-bottom: 12px;
+      font-size: 2.2rem;
+      margin-bottom: 15px;
       color: #007bff;
     }
 
@@ -97,13 +169,13 @@
     }
 
     .home-grid .box h3 {
-      font-size: 1.3rem;
+      font-size: 1.1rem;
       margin-bottom: 10px;
       color: #333;
     }
 
     .home-grid .box p {
-      font-size: 0.85rem;
+      font-size: 0.9rem;
       color: #666;
       margin-bottom: 12px;
     }
@@ -113,9 +185,10 @@
       text-decoration: none;
       font-weight: bold;
       border: 2px solid #007bff;
-      padding: 7px 12px;
+      padding: 5px 10px;
       border-radius: 25px;
       transition: 0.3s ease;
+      font-size: 0.85rem;
     }
 
     .home-grid .box a:hover {
@@ -123,33 +196,10 @@
       color: #fff;
     }
 
-    .top-buttons {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      gap: 10px;
-      z-index: 5;
-    }
-
-    .top-buttons button {
-      padding: 8px 12px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 0.9em;
-    }
-
-    .dark-mode {
-      background: #111;
-      color: white;
-    }
-
-    /* Sidebar menu */
+    /* Sidebar Style */
     .sidebar {
       position: fixed;
-      top: 0;
-      left: -280px;
+      top: 0; left: -280px;
       width: 260px;
       height: 100%;
       background: #2d2d2d;
@@ -180,24 +230,13 @@
       width: 25px;
     }
 
-    .contact-icons {
-      display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-    }
-
-    .contact-icons a {
-      color: white;
-      font-size: 1.2em;
-    }
-
     .sidebar-footer {
       text-align: center;
       margin-top: 40px;
     }
 
     .sidebar-footer img {
-      width: 60px;
+      width: 50px;
       margin-bottom: 5px;
     }
 
@@ -213,23 +252,38 @@
       font-style: italic;
     }
 
-    .blurred {
-      filter: blur(4px);
-    }
-
     /* Footer */
     footer {
-      background-color: #333;
-      color: #fff;
+      background: #2d2d2d;
+      color: white;
+      padding: 10px;
       text-align: center;
-      padding: 20px 0;
-      position: relative;
-      bottom: 0;
-      width: 100%;
+      font-size: 0.9rem;
     }
 
-    footer p {
-      font-size: 0.9rem;
+    footer a {
+      color: #007bff;
+      text-decoration: none;
+      margin: 0 10px;
+    }
+
+    footer a:hover {
+      color: #0056b3;
+    }
+
+    .contact-icons a {
+      color: #fff;
+      font-size: 1.5rem;
+      margin: 0 10px;
+    }
+
+    .contact-icons a:hover {
+      color: #007bff;
+    }
+
+    /* Blur effect applied only to the content when menu is open */
+    #main-content.blurred {
+      filter: blur(4px);
     }
 
   </style>
@@ -238,13 +292,14 @@
 
   <!-- Top Buttons -->
   <div class="top-buttons">
-    <button onclick="toggleMenu()">☰ More</button>
-    <button onclick="toggleDarkMode()">🌙 Light/Dark</button>
-    <button>👤 Profile</button>
+    <button onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+    <button><i class="fas fa-user"></i></button>
   </div>
 
   <!-- Sidebar Menu -->
   <div class="sidebar" id="sidebar">
+    <button class="cancel-btn" onclick="toggleMenu()">X</button>
     <nav>
       <a href="index.html"><i class="fas fa-home"></i>Home</a>
       <a href="about.html"><i class="fas fa-question"></i>About</a>
@@ -256,18 +311,16 @@
       <a href="contact.html"><i class="fas fa-headset"></i>Contact Us</a>
     </nav>
 
-    <div>
-      <div class="contact-icons">
-        <a href="mailto:info@example.com"><i class="fas fa-envelope"></i></a>
-        <a href="tel:+919000000000"><i class="fas fa-phone"></i></a>
-        <a href="https://wa.me/919000000000"><i class="fab fa-whatsapp"></i></a>
-      </div>
+    <div class="contact-icons">
+      <a href="mailto:info@example.com"><i class="fas fa-envelope"></i></a>
+      <a href="tel:+919000000000"><i class="fas fa-phone"></i></a>
+      <a href="https://wa.me/919000000000"><i class="fab fa-whatsapp"></i></a>
+    </div>
 
-      <div class="sidebar-footer">
-        <img src="your-logo.png" alt="UPSChub Logo" />
-        <h2>UPSC Hub</h2>
-        <p>An initiative by Pratyush Swain</p>
-      </div>
+    <div class="sidebar-footer">
+      <img src="images\LOGO.jpg" alt="UPSChub Logo" />
+      <h2>UPSC Hub</h2>
+      <p>An initiative by Pratyush Swain</p>
     </div>
   </div>
 
@@ -280,104 +333,74 @@
 
     <div class="runner-line">Welcome to UPSC Hub – One stop solution for your UPSC Journey</div>
 
+    <!-- Full Home Grid Section -->
     <section class="home-grid">
-      <h1>Quick Options</h1>
-      <div class="box-container">
-        <!-- Full-width Home Grid Box 1 for UPSC Syllabus -->
-        <div class="box">
-          <i class="fas fa-book"></i>
-          <h3 class="title">UPSC Syllabus</h3>
-          <a href="syllabus.html" class="inline-btn">View Syllabus</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 2 -->
-        <div class="box">
-          <i class="fas fa-book-open"></i>
-          <h3 class="title">Polity : M.laxhmikant : File</h3>
-          <p class="likes">Accelerate Potential</p>
-          <a href="Polity_Laxhmikant.html" class="inline-btn">Ready to Boost...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 3 -->
-        <div class="box">
-          <i class="fas fa-spa"></i>
-          <h3 class="title">Meditation time</h3>
-          <p class="likes">Boost up your mind:</p>
-          <a href="yoga_meditation.html" class="inline-btn">Ready to meditate...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 4 -->
-        <div class="box">
-          <i class="fas fa-file-alt"></i>
-          <h3 class="title">UPSChub/file section</h3>
-          <p class="likes">Test file (Confidential)</p>
-          <a href="TESTseries-daily.html" class="inline-btn">View...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 5 -->
-        <div class="box">
-          <i class="fas fa-video"></i>
-          <h3 class="title">UPSChub/video</h3>
-          <p class="likes">This is the Video section</p>
-          <a href="UPSChubvid.html" class="inline-btn">Open it...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 6 -->
-        <div class="box">
-          <i class="fas fa-clock"></i>
-          <h3 class="title">Focus Timer</h3>
-          <p class="likes">Track your consistency & streak:</p>
-          <a href="focustimer.html" class="inline-btn">Ready to FOCUS...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 7 -->
-        <div class="box">
-          <i class="fas fa-newspaper"></i>
-          <h3 class="title">Today's News Update</h3>
-          <p class="likes">Top news: daily:</p>
-          <a href="newsupdate.html" class="inline-btn">View...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 8 -->
-        <div class="box">
-          <i class="fas fa-newspaper"></i>
-          <h3 class="title">Newspaper</h3>
-          <p class="likes">Daily</p>
-          <a href="newspaper.html" class="inline-btn">Read news...</a>
-        </div>
-
-        <!-- Full-width Home Grid Box 9 -->
-        <div class="box">
-          <i class="fas fa-tags"></i>
-          <h3 class="title">Top Categories</h3>
-          <div class="flex">
-            <a href="#"><i class=""></i><span>Geography</span></a>
-            <a href="#"><i class=""></i><span>Polity</span></a>
-            <a href="#"><i class=""></i><span>History</span></a>
-            <a href="#"><i class=""></i><span>Mapping</span></a>
-            <a href="#"><i class=""></i><span>Science & tech</span></a>
-            <a href="#"><i class=""></i><span>General studies</span></a>
-          </div>
-        </div>
+      <div class="box">
+        <i class="fas fa-university"></i>
+        <h3>UPSC</h3>
+        <p>UPSC Syllabus:</p>
+        <a href="syllabus.html">View Syllabus</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-book"></i>
+        <h3>Polity: M. Laxmikanth</h3>
+        <p>Accelerate Potential</p>
+        <a href="Polity_Laxhmikant.html">Ready to Boost...</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-brain"></i>
+        <h3>Meditation Time</h3>
+        <p>Boost up your mind:</p>
+        <a href="yoga_meditation.html">Ready to Meditate...</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-video"></i>
+        <h3>UPSChub/Video</h3>
+        <p>This is the Video section</p>
+        <a href="UPSChubvid.html">Open it...</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-clock"></i>
+        <h3>Focus Timer</h3>
+        <p>Track your consistency</p>
+        <a href="focustimer.html">Ready to Focus...</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-newspaper"></i>
+        <h3>Today's News Update</h3>
+        <p>Top News: Daily</p>
+        <a href="newsupdate.html">View...</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-file-alt"></i>
+        <h3>Upload Written Files</h3>
+        <p>UPSC Mains is fully based on writing skills, so let’s practice daily....</p>
+        <a href="drive.doc.html">Upload Doc</a>
+      </div>
+      <div class="box">
+        <i class="fas fa-clipboard-check"></i>
+        <h3>Mock Test Series</h3>
+        <p>Let's test our brain!</p>
+        <a href="test.html">Go to Test</a>
       </div>
     </section>
   </div>
 
-  <!-- Footer -->
   <footer>
-    <p>&copy; 2025 UPSChub | All Rights Reserved</p>
+    <p>&copy; 2025 UPSChub, All Rights Reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms & Conditions</a></p>
   </footer>
 
   <script>
     function toggleMenu() {
-      const sidebar = document.getElementById('sidebar');
-      sidebar.classList.toggle('show');
+      const sidebar = document.getElementById("sidebar");
+      sidebar.classList.toggle("show");
+      document.getElementById("main-content").classList.toggle("blurred");
     }
 
     function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
+      document.body.classList.toggle("dark");
     }
   </script>
+
 </body>
 </html>
-
