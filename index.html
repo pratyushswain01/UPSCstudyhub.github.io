@@ -3,103 +3,65 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>UPSChub</title>
+  <title>Welcome Video</title>
   <style>
-    * {
+    body {
       margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body, html {
-      height: 100%;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: black;
-      overflow: hidden;
-    }
-
-    .video-container {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-    }
-
-    video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.4);
+      background-color: #000000; /* Black background */
+      color: white;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: white;
-      text-align: center;
-      padding: 1rem;
+      height: 100vh;
     }
 
-    .logo {
-      width: 100px;
-      height: 100px;
-      background: url('logo.png') no-repeat center/contain;
-      margin-bottom: 15px;
+    video {
+      max-width: 100%;
+      height: auto;
     }
 
     .tagline {
-      font-size: 1.5rem;
-      font-weight: 600;
-      margin-bottom: 15px;
-      animation: typing 3s steps(20) 1s 1 normal both;
+      margin-top: 20px;
+      font-size: 2rem;
+      font-weight: bold;
       white-space: nowrap;
       overflow: hidden;
+      border-right: 2px solid white;
+      width: 0;
+      animation: typing 3s steps(22) 1s forwards, blink 0.7s step-end infinite;
     }
 
     @keyframes typing {
-      from {
-        width: 0;
-      }
-      to {
-        width: 20ch;
-      }
+      from { width: 0 }
+      to { width: 22ch }
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent }
     }
 
     @media (max-width: 600px) {
       .tagline {
-        font-size: 1rem;
+        font-size: 1.2rem;
       }
     }
   </style>
 </head>
 <body>
 
-  <div class="video-container">
-    <!-- Intro Video -->
-    <video id="introVideo" autoplay playsinline>
-      <source src="images\intro.mp4" type="video\mp4">
-      
-      Your browser does not support the video tag.
-    </video>
+  <video id="introVideo" autoplay muted playsinline>
+    <source src="images/intro.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
 
-    <!-- Overlay with animated text -->
-    <div class="overlay">
-      <div class="logo"></div>
-      <div class="tagline">Welcome to UPSChub</div>
-    </div>
-  </div>
+  <div class="tagline">Welcome to UPSChub</div>
 
   <script>
     const video = document.getElementById('introVideo');
-    video.onended = () => {
-      window.location.href = 'homeUPSChub.html'; // Redirect to home after video ends
-    };
+    video.addEventListener('ended', () => {
+      window.location.href = 'homeUPSChub.html'; // Redirect after video ends
+    });
   </script>
 
 </body>
