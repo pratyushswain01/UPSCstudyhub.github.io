@@ -3,33 +3,55 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome Video</title>
+  <title>Intro Video</title>
   <style>
-    body {
+    * {
       margin: 0;
-      background-color: #ffffff; /* White background */
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      padding: 0;
+      box-sizing: border-box;
     }
+
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      background-color: #fff;
+    }
+
     video {
-      max-width: 100%;
-      height: auto;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
     }
   </style>
 </head>
 <body>
 
-  <video id="introVideo" autoplay muted playsinline>
+  <video id="bgVideo" autoplay playsinline>
     <source src="images\intro.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
   <script>
-    const video = document.getElementById('introVideo');
+    const video = document.getElementById('bgVideo');
+    // Allow video to play with sound
+    video.muted = false;
+    video.volume = 1.0; // Set volume if needed
+
+    // Autoplay fix for some browsers that require interaction for sound
+    video.play().catch(error => {
+      console.log("Autoplay with sound blocked. Showing controls.");
+      video.setAttribute("controls", "true");
+    });
+
     video.addEventListener('ended', () => {
-      window.location.href = 'homeUPSChub.html'; // Redirect after video ends
+      window.location.href = 'homeUPSChub.html';
     });
   </script>
 
