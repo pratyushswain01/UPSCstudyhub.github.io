@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPSChub Live Poll</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .live-badge {
+      background: #ef4444;
+      color: #fff;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      display: inline-block;
+      margin: 10px auto;
+      animation: blink 1.2s infinite;
+      font-size: 14px;
+      text-align: center;
+      max-width: 100px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    main {
+      flex: 1;
+      max-width: 800px;
+      margin: 20px auto 80px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .question-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .options {
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: #f1f5f9;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option:hover {
+      background: #e2e8f0;
+    }
+
+    .correct { background: #d1fae5; border: 1px solid #10b981; }
+    .wrong { background: #fee2e2; border: 1px solid #ef4444; }
+
+    .explanation {
+      background: #fff7ed;
+      padding: 10px 15px;
+      border-left: 5px solid #f97316;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ef4444;
+      margin-bottom: 15px;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 10px;
+      background-color: #e5e7eb;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background-color: #3b82f6;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: width 1s linear;
+    }
+
+    .result-screen {
+      text-align: center;
+      padding: 30px;
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .result-screen h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>UPSChub Live Poll</h1>
+</header>
+
+<div class="live-badge">🔴 LIVE</div>
+
+<main>
+  <div id="quizSection" class="section active">
+    <div class="timer" id="timer">Time: 10s</div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="question-title" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="explanation" id="explanation"></div>
+    <button onclick="nextQuestion()">Next</button>
+  </div>
+
+  <div id="resultSection" class="section">
+    <div class="result-screen">
+      <h2>🎉 Quiz Complete!</h2>
+      <p id="resultText"></p>
+      <button onclick="location.reload()">🔁 Restart Quiz</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 UPSChub | Master UPSC Smarter
+</footer>
+
+<script>
+ const quiz = [
+  {
+    question: "Which of the following countries is NOT part of the Andes mountain range?",
+    options: ["Chile", "Argentina", "Brazil", "Peru"],
+    correct: 2,
+    explanation: "Brazil does not have the Andes mountain range, which mainly runs through Chile, Argentina, and Peru."
+  },
+  {
+    question: "The Amazon River flows primarily through which country?",
+    options: ["Brazil", "Argentina", "Venezuela", "Colombia"],
+    correct: 0,
+    explanation: "The Amazon River primarily flows through Brazil, along with some parts of other countries."
+  },
+  {
+    question: "Which is the southernmost country in South America?",
+    options: ["Chile", "Argentina", "Uruguay", "Bolivia"],
+    correct: 0,
+    explanation: "Chile is the southernmost country in South America, extending far down to the southern tip of the continent."
+  },
+  {
+    question: "The Falkland Islands are located in the waters of which country?",
+    options: ["Argentina", "Chile", "Uruguay", "Peru"],
+    correct: 0,
+    explanation: "The Falkland Islands are located in the waters of Argentina, though they are a British overseas territory."
+  },
+  {
+    question: "Which South American country does not have a coastline?",
+    options: ["Bolivia", "Paraguay", "Ecuador", "Colombia"],
+    correct: 1,
+    explanation: "Paraguay is a landlocked country in South America, without any coastline."
+  },
+  {
+    question: "The Atacama Desert, one of the driest deserts in the world, is located in which country?",
+    options: ["Argentina", "Chile", "Peru", "Bolivia"],
+    correct: 1,
+    explanation: "The Atacama Desert is located in northern Chile, known for its extreme aridity."
+  },
+  {
+    question: "Which of the following countries is landlocked in South America?",
+    options: ["Brazil", "Paraguay", "Ecuador", "Suriname"],
+    correct: 1,
+    explanation: "Paraguay is landlocked in South America, with no access to the ocean."
+  },
+  {
+    question: "The Pantanal, the world’s largest tropical wetland, is found in which two countries?",
+    options: ["Brazil and Argentina", "Brazil and Paraguay", "Brazil and Bolivia", "Brazil and Peru"],
+    correct: 1,
+    explanation: "The Pantanal is primarily located in Brazil and Paraguay, with a small portion in Bolivia."
+  },
+  {
+    question: "Which is the largest country in South America by area?",
+    options: ["Brazil", "Argentina", "Peru", "Colombia"],
+    correct: 0,
+    explanation: "Brazil is the largest country in South America, covering a vast area."
+  },
+  {
+    question: "Which country is home to the city of La Paz, the highest capital city in the world?",
+    options: ["Peru", "Bolivia", "Ecuador", "Colombia"],
+    correct: 1,
+    explanation: "La Paz, located in Bolivia, is the highest capital city in the world."
+  },
+  {
+    question: "Which of the following countries does not share a border with Brazil?",
+    options: ["Argentina", "Peru", "Ecuador", "Bolivia"],
+    correct: 2,
+    explanation: "Ecuador does not share a border with Brazil, unlike the other countries listed."
+  },
+  {
+    question: "Which river forms part of the border between Argentina and Uruguay?",
+    options: ["Paraná River", "Amazon River", "Orinoco River", "Rio de la Plata"],
+    correct: 0,
+    explanation: "The Paraná River forms part of the border between Argentina and Uruguay."
+  },
+  {
+    question: "Which of these countries is located to the north of Brazil?",
+    options: ["Chile", "Venezuela", "Argentina", "Uruguay"],
+    correct: 1,
+    explanation: "Venezuela lies to the north of Brazil in South America."
+  },
+  {
+    question: "Which of the following countries is not part of the Southern Cone of South America?",
+    options: ["Chile", "Argentina", "Bolivia", "Uruguay"],
+    correct: 2,
+    explanation: "Bolivia is not considered part of the Southern Cone, which includes Chile, Argentina, and Uruguay."
+  },
+  {
+    question: "The Galápagos Islands are part of which country?",
+    options: ["Colombia", "Peru", "Ecuador", "Chile"],
+    correct: 2,
+    explanation: "The Galápagos Islands are part of Ecuador, located in the Pacific Ocean."
+  },
+  {
+    question: "Which country does NOT share a border with the Pacific Ocean?",
+    options: ["Ecuador", "Colombia", "Brazil", "Chile"],
+    correct: 2,
+    explanation: "Brazil does not share a border with the Pacific Ocean, unlike the other countries listed."
+  },
+  {
+    question: "The Iguazu Falls are located on the border between which two countries?",
+    options: ["Brazil and Argentina", "Brazil and Uruguay", "Argentina and Chile", "Bolivia and Paraguay"],
+    correct: 0,
+    explanation: "The Iguazu Falls are located on the border between Brazil and Argentina."
+  },
+  {
+    question: "The Andes mountains stretch through how many countries in South America?",
+    options: ["4", "6", "7", "5"],
+    correct: 1,
+    explanation: "The Andes mountain range stretches through 6 countries: Venezuela, Colombia, Ecuador, Peru, Bolivia, and Chile."
+  },
+  {
+    question: "Which South American country has the highest peak, Aconcagua?",
+    options: ["Chile", "Argentina", "Bolivia", "Peru"],
+    correct: 1,
+    explanation: "Aconcagua is the highest peak in South America, located in Argentina."
+  },
+  {
+    question: "Which of these rivers does NOT flow through South America?",
+    options: ["Amazon River", "Orinoco River", "Nile River", "Paraná River"],
+    correct: 2,
+    explanation: "The Nile River does not flow through South America; it is located in Africa."
+  },
+  {
+    question: "Which is the largest country in Africa by area?",
+    options: ["Nigeria", "Democratic Republic of the Congo", "Algeria", "Sudan"],
+    correct: 2,
+    explanation: "Algeria is the largest country in Africa by area."
+  },
+  {
+    question: "Which desert is the largest in Africa?",
+    options: ["Sahara Desert", "Kalahari Desert", "Namib Desert", "Atacama Desert"],
+    correct: 0,
+    explanation: "The Sahara Desert is the largest desert in Africa, covering much of North Africa."
+  },
+  {
+    question: "Which of the following African countries does NOT have a coastline?",
+    options: ["Mali", "Senegal", "Ghana", "Tanzania"],
+    correct: 0,
+    explanation: "Mali is landlocked and does not have a coastline."
+  },
+  {
+    question: "Which mountain range is located in North Africa?",
+    options: ["Atlas Mountains", "Drakensberg Mountains", "Kilimanjaro Mountains", "Ethiopian Highlands"],
+    correct: 0,
+    explanation: "The Atlas Mountains are located in North Africa, stretching across Morocco, Algeria, and Tunisia."
+  },
+  {
+    question: "Lake Victoria is bordered by which three African countries?",
+    options: ["Kenya, Uganda, Tanzania", "Uganda, Rwanda, Tanzania", "Kenya, Uganda, South Sudan", "Tanzania, Mozambique, Uganda"],
+    correct: 0,
+    explanation: "Lake Victoria is bordered by Kenya, Uganda, and Tanzania."
+  },
+  {
+    question: "Which of the following African countries is landlocked?",
+    options: ["Ghana", "Uganda", "Mozambique", "Somalia"],
+    correct: 1,
+    explanation: "Uganda is a landlocked country in East Africa."
+  },
+  {
+    question: "Which country has the longest coastline in Africa?",
+    options: ["South Africa", "Egypt", "Somalia", "Nigeria"],
+    correct: 2,
+    explanation: "Somalia has the longest coastline in Africa, stretching over 3,000 km."
+  },
+  {
+    question: "The Suez Canal connects which two seas?",
+    options: ["Mediterranean Sea and Red Sea", "Atlantic Ocean and Mediterranean Sea", "Arabian Sea and Red Sea", "Gulf of Guinea and Atlantic Ocean"],
+    correct: 0,
+    explanation: "The Suez Canal connects the Mediterranean Sea to the Red Sea."
+  },
+  {
+    question: "Which mountain is located in Tanzania and is the highest peak in Africa?",
+    options: ["Mount Kenya", "Mount Kilimanjaro", "Mount Ruinsori", "Table Mountain"],
+    correct: 1,
+    explanation: "Mount Kilimanjaro, located in Tanzania, is the highest peak in Africa."
+  },
+  {
+    question: "Which African country shares a border with the Mediterranean Sea?",
+    options: ["Kenya", "Nigeria", "Egypt", "Ethiopia"],
+    correct: 2,
+    explanation: "Egypt shares a border with the Mediterranean Sea to the north."
+  },
+   
+  {
+    question: "Which African river is the longest?",
+    options: ["Congo River", "Nile River", "Zambezi River", "Orange River"],
+    correct: 1,
+    explanation: "The Nile River is the longest river in Africa, flowing through 11 countries in northeastern Africa."
+  },
+  {
+    question: "Which country in Africa has a coastline along the Red Sea?",
+    options: ["Ethiopia", "Egypt", "Sudan", "Uganda"],
+    correct: 1,
+    explanation: "Egypt has a coastline along the Red Sea."
+  },
+  {
+    question: "The Congo River flows primarily through which country?",
+    options: ["Angola", "Democratic Republic of the Congo", "Cameroon", "Mozambique"],
+    correct: 1,
+    explanation: "The Congo River flows through the Democratic Republic of the Congo."
+  },
+  {
+    question: "Which country is located to the southeast of South Africa?",
+    options: ["Namibia", "Botswana", "Lesotho", "Swaziland"],
+    correct: 1,
+    explanation: "Botswana is located to the southeast of South Africa."
+  },
+  {
+    question: "Which of these African countries is an island nation?",
+    options: ["Uganda", "Madagascar", "Niger", "Zambia"],
+    correct: 1,
+    explanation: "Madagascar is an island nation located off the southeastern coast of Africa."
+  },
+  {
+    question: "Which of these lakes is located in Central Africa?",
+    options: ["Lake Victoria", "Lake Tanganyika", "Lake Chad", "Lake Albert"],
+    correct: 1,
+    explanation: "Lake Tanganyika is located in Central Africa and is bordered by four countries: Tanzania, the Democratic Republic of the Congo, Burundi, and Rwanda."
+  },
+  {
+    question: "Which of these African countries is known for its extensive desert region?",
+    options: ["Egypt", "Nigeria", "Ethiopia", "South Africa"],
+    correct: 0,
+    explanation: "Egypt is known for its desert region, particularly the Sahara Desert in the north."
+  },
+  {
+    question: "Which of the following countries is located in the Horn of Africa?",
+    options: ["Kenya", "Ethiopia", "Djibouti", "All of the above"],
+    correct: 3,
+    explanation: "Kenya, Ethiopia, and Djibouti are all countries located in the Horn of Africa."
+  },
+  {
+    question: "The Gulf of Guinea is located on the coast of which part of Africa?",
+    options: ["Western Africa", "Central Africa", "Eastern Africa", "Southern Africa"],
+    correct: 0,
+    explanation: "The Gulf of Guinea is located on the coast of West Africa."
+  },
+  {
+    question: "Which country in Africa has a coastline on the Mediterranean Sea and the Atlantic Ocean?",
+    options: ["Morocco", "Algeria", "Tunisia", "Libya"],
+    correct: 0,
+    explanation: "Morocco has coastlines along both the Mediterranean Sea and the Atlantic Ocean."
+  },
+  {
+    question: "Which of the following African countries is an archipelago?",
+    options: ["Seychelles", "Chad", "Niger", "Kenya"],
+    correct: 0,
+    explanation: "Seychelles is an archipelago located in the Indian Ocean off the east coast of Africa."
+  },
+  {
+    question: "Which country is home to Mount Kilimanjaro?",
+    options: ["Kenya", "Tanzania", "Uganda", "Rwanda"],
+    correct: 1,
+    explanation: "Mount Kilimanjaro is located in Tanzania and is the highest mountain in Africa."
+  },
+  {
+    question: "Which African country is the largest producer of cocoa?",
+    options: ["Ghana", "Nigeria", "Ivory Coast", "Cameroon"],
+    correct: 2,
+    explanation: "The Ivory Coast (Côte d'Ivoire) is the largest producer of cocoa in Africa."
+  },
+  {
+    question: "Which of the following rivers forms part of the border between South Africa and Namibia?",
+    options: ["Orange River", "Zambezi River", "Congo River", "Nile River"],
+    correct: 0,
+    explanation: "The Orange River forms part of the border between South Africa and Namibia."
+  },
+  {
+    question: "Which African country is home to the Bantu people?",
+    options: ["South Africa", "Ethiopia", "Nigeria", "Kenya"],
+    correct: 0,
+    explanation: "The Bantu people are predominantly found in Southern and Central Africa, with South Africa being a key part."
+  },
+  {
+    question: "The Sahara Desert extends into which of the following African countries?",
+    options: ["Nigeria", "Chad", "Mozambique", "Kenya"],
+    correct: 1,
+    explanation: "The Sahara Desert extends into several countries, including Chad, in Northern Africa."
+  },
+  {
+    question: "Which of these countries is landlocked?",
+    options: ["Zambia", "Nigeria", "Tanzania", "South Africa"],
+    correct: 0,
+    explanation: "Zambia is a landlocked country in Southern Africa."
+  },
+  {
+    question: "Lake Victoria is shared by which three countries?",
+    options: ["Uganda, Kenya, Tanzania", "Kenya, Uganda, Ethiopia", "Uganda, Tanzania, Rwanda", "Kenya, Tanzania, Sudan"],
+    correct: 0,
+    explanation: "Lake Victoria is shared by Uganda, Kenya, and Tanzania."
+  },
+  {
+    question: "Which of the following countries is known for the Serengeti National Park?",
+    options: ["Kenya", "Tanzania", "Uganda", "Ethiopia"],
+    correct: 1,
+    explanation: "The Serengeti National Park is located in Tanzania and is famous for its wildlife and annual migration of animals."
+  },
+  {
+    question: "Which African country is home to the Pyramids of Giza?",
+    options: ["Sudan", "Egypt", "Algeria", "Morocco"],
+    correct: 1,
+    explanation: "The Pyramids of Giza are located in Egypt and are one of the most iconic landmarks of Ancient Egypt."
+  },
+  {
+    question: "Which of the following African countries is part of the Great Rift Valley?",
+    options: ["Ethiopia", "Kenya", "Tanzania", "All of the above"],
+    correct: 3,
+    explanation: "The Great Rift Valley stretches through Ethiopia, Kenya, and Tanzania."
+  },
+  {
+    question: "Which country is home to the largest city in Africa by population?",
+    options: ["Nigeria", "South Africa", "Egypt", "Kenya"],
+    correct: 0,
+    explanation: "Lagos, Nigeria, is the largest city in Africa by population."
+  },
+  {
+    question: "Which country is the largest in Central Africa by area?",
+    options: ["Gabon", "Republic of the Congo", "Democratic Republic of the Congo", "Cameroon"],
+    correct: 2,
+    explanation: "The Democratic Republic of the Congo is the largest country in Central Africa by area."
+  }
+];
+
+
+
+  let current = 0, score = 0;
+  let timerValue = 15;
+  let timerInterval;
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerValue = 15;
+    document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+    document.getElementById('progressBar').style.width = "100%";
+
+    timerInterval = setInterval(() => {
+      timerValue--;
+      document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+      document.getElementById('progressBar').style.width = (timerValue / 15) * 100 + "%";
+
+      if (timerValue <= 0) {
+        clearInterval(timerInterval);
+        nextQuestion();
+      }
+    }, 1000);
+  }
+
+  function switchSection(sectionId) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(sectionId).classList.add('active');
+  }
+
+  function loadQuestion() {
+    clearInterval(timerInterval);
+    const q = quiz[current];
+    document.getElementById('question').textContent = `Q${current + 1}: ${q.question}`;
+    const optionsContainer = document.getElementById('options');
+    const explanationBox = document.getElementById('explanation');
+    explanationBox.style.display = 'none';
+    explanationBox.innerHTML = '';
+    optionsContainer.innerHTML = '';
+
+    q.options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'option';
+      div.textContent = opt;
+      div.onclick = () => handleAnswer(div, i === q.correct, q.correct, i);
+      optionsContainer.appendChild(div);
+    });
+
+    startTimer();
+  }
+
+  function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
+    clearInterval(timerInterval);
+    const all = document.querySelectorAll('.option');
+    all.forEach((opt, idx) => {
+      opt.classList.remove('correct', 'wrong');
+      opt.onclick = null;
+      if (idx === correctIndex) opt.classList.add('correct');
+      else if (idx === selectedIndex) opt.classList.add('wrong');
+    });
+    if (isCorrect) score++;
+    const exp = document.getElementById('explanation');
+    exp.style.display = 'block';
+    exp.innerHTML = `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
+  }
+
+  function nextQuestion() {
+    clearInterval(timerInterval);
+    if (current < quiz.length - 1) {
+      current++;
+      loadQuestion();
+    } else {
+      document.getElementById('resultText').textContent = `You scored ${score} out of ${quiz.length}.`;
+      switchSection('resultSection');
+    }
+  }
+
+  window.onload = loadQuestion;
+</script>
+
+</body>
+</html>
