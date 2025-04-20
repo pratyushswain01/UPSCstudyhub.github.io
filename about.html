@@ -6,182 +6,259 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>courses</title>
 
-   <!-- font awesome cdn link  -->
+   <!-- Font Awesome CDN -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
-   <!-- custom css file link  -->
+   <!-- Custom CSS -->
    <link rel="stylesheet" href="css/style.css">
 
    <style>
+      * {
+         box-sizing: border-box;
+         margin: 0;
+         padding: 0;
+      }
+
+      body {
+         font-family: 'Segoe UI', sans-serif;
+         background: #f0f0f0;
+         color: #333;
+      }
+
       .top-buttons {
-        position: fixed;
-        top: 10px;
-        right: 25px;
-        display: flex;
-        gap: 15px;
-        z-index: 100;
+         position: fixed;
+         top: 10px;
+         right: 25px;
+         display: flex;
+         gap: 15px;
+         z-index: 100;
       }
 
       .top-buttons button {
-        padding: 10px 16px;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 1.5rem;
+         padding: 10px 16px;
+         border: none;
+         border-radius: 5px;
+         cursor: pointer;
+         font-size: 1.5rem;
+         background-color: #fff;
       }
 
       .top-buttons button i {
-        font-size: 1.5rem;
+         font-size: 1.5rem;
       }
 
       .sidebar {
-    position: fixed;
-    top: 0;
-    left: -280px;
-    width: 240px;
-    height: 100%;
-    background: #2d2d2d;
-    color: white;
-    padding: 20px 10px;
-    transition: 0.3s ease;
-    z-index: 110;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
-    font-family: 'Segoe UI', sans-serif;
-}
+         position: fixed;
+         top: 0;
+         left: 0;
+         width: 240px;
+         height: 100%;
+         background: #2d2d2d;
+         color: white;
+         padding: 20px 10px;
+         transition: transform 0.3s ease;
+         z-index: 110;
+         display: flex;
+         flex-direction: column;
+         justify-content: space-between;
+         box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
+         transform: translateX(-100%);
+      }
 
-.sidebar.show {
-    left: 0;
-}
+      .sidebar.show {
+         transform: translateX(0);
+      }
 
-.sidebar .cancel-btn {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    font-size: 1.4rem;
-    color: white;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
+      .sidebar .cancel-btn {
+         position: absolute;
+         top: 10px;
+         right: 12px;
+         font-size: 1.4rem;
+         color: white;
+         background: none;
+         border: none;
+         cursor: pointer;
+      }
 
-.sidebar nav {
-    margin-top: 40px;
-    padding-left: 10px;
-}
+      .sidebar nav {
+         margin-top: 40px;
+         padding-left: 10px;
+      }
 
-.sidebar nav a {
-    color: white;
-    display: flex;
-    align-items: center;
-    padding: 14px 0; /* taller touch area */
-    font-size: 1rem; /* matches screenshot size */
-    font-weight: 500;
-    text-decoration: none;
-    border-bottom: 1px solid #444;
-    transition: background-color 0.2s ease;
-    margin-bottom: 8px;
-    padding-left: 18px;
-    border-radius: 4px;
-}
+      /* Slightly smaller Sidebar link styles */
+      .sidebar nav a {
+         color: white;
+         display: flex;
+         align-items: center;
+         padding: 8px 0; /* Slightly reduced padding */
+         font-size: 1.1rem; /* Slightly reduced font size */
+         font-weight: 500;
+         text-decoration: none;
+         border-bottom: 1px solid #444;
+         transition: background-color 0.2s ease;
+         margin-bottom: 4px; /* Slightly reduced margin-bottom */
+         padding-left: 18px;
+         border-radius: 4px;
+      }
 
-.sidebar nav a:hover {
-    background-color: #444;
-}
+      .sidebar nav a:hover {
+         background-color: #444;
+      }
 
-.sidebar nav a i {
-    width: 26px;
-    margin-right: 14px;
-    font-size: 1.2rem; /* icon size like screenshot */
-    text-align: center;
-}
+      .sidebar nav a i {
+         width: 26px;
+         margin-right: 14px;
+         font-size: 1.4rem; /* Slightly reduced icon size */
+         text-align: center;
+      }
 
-.sidebar-footer {
-    text-align: center;
-    margin-top: 30px;
-    padding: 10px;
-}
+      .sidebar-footer {
+         text-align: center;
+         margin-top: 30px;
+         padding: 10px;
+      }
 
-.sidebar-footer img {
-    width: 60px;
-    margin-bottom: 10px;
-}
+      .sidebar-footer img {
+         width: 60px;
+         margin-bottom: 10px;
+      }
 
-.sidebar-footer h2 {
-    font-size: 1.1rem;
-    color: #fff;
-    margin-bottom: 5px;
-}
+      .sidebar-footer h2 {
+         font-size: 1.1rem;
+         color: #fff;
+         margin-bottom: 5px;
+      }
 
-.sidebar-footer p {
-    font-size: 0.9rem;
-    color: #aaa;
-    font-style: italic;
-}
-
-
+      .sidebar-footer p {
+         font-size: 0.9rem;
+         color: #aaa;
+         font-style: italic;
+      }
 
       body.dark-mode {
-        background-color: #1e1e1e;
-        color: #f5f5f5;
+         background-color: #1e1e1e;
+         color: #f5f5f5;
       }
 
       body.dark-mode .header {
-        background-color: #333;
+         background-color: #333;
       }
 
       body.dark-mode .sidebar {
-        background-color: #1f1f1f;
+         background-color: #1f1f1f;
       }
 
       body.dark-mode .top-buttons button {
-        background-color: #444;
-        color: white;
+         background-color: #444;
+         color: white;
       }
 
       .header {
-        position: relative;
-        z-index: 10;
+         padding: 20px;
+         background: #fff;
+         position: relative;
+         z-index: 10;
+         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .header .logo {
+         font-size: 1.4rem;
+         font-weight: bold;
+         color: #2d2d2d;
+         text-decoration: none;
       }
 
       .footer {
-        position: relative;
-        z-index: 10;
+         padding: 20px;
+         background: #222;
+         color: #fff;
+         text-align: center;
+         position: relative;
+         z-index: 10;
+      }
+
+      .contact-icons {
+         display: flex;
+         justify-content: center;
+         margin-bottom: 20px;
       }
 
       .contact-icons a {
-        font-size: 1.5rem;
-        color: white;
-        margin-right: 20px;
-        transition: transform 0.2s ease;
+         font-size: 1.5rem;
+         color: white;
+         margin: 0 15px;
+         transition: transform 0.2s ease;
       }
 
       .contact-icons a:hover {
-        transform: scale(1.1);
+         transform: scale(1.1);
       }
 
-      /* Blur effect applied only to the content when menu is open */
-    #main-content.blurred {
-      filter: blur(4px);
-    }
+      #main-content {
+         width: 100%;
+         padding: 30px;
+         transition: filter 0.3s ease;
+      }
+
+      #main-content.blurred {
+         filter: blur(4px);
+      }
+
+      .about {
+         padding: 20px;
+      }
+
+      .about .row {
+         display: flex;
+         flex-wrap: wrap;
+         margin-bottom: 30px;
+         align-items: center;
+      }
+
+      .about .row .image {
+         flex: 1 1 250px;
+         padding: 10px;
+      }
+
+      .about .row .image img {
+         width: 100%;
+         border-radius: 8px;
+      }
+
+      .about .row .content {
+         flex: 2 1 400px;
+         padding: 10px;
+      }
+
+      .about .row .content h3 {
+         font-size: 1.5rem;
+         margin-bottom: 10px;
+      }
+
+      .about .row .content p {
+         margin-bottom: 10px;
+         font-size: 1rem;
+         line-height: 1.6;
+      }
+
+      .inline-btn {
+         background: #2d2d2d;
+         color: white;
+         padding: 8px 14px;
+         text-decoration: none;
+         border-radius: 4px;
+         display: inline-block;
+         margin-top: 10px;
+      }
+
+      .inline-btn:hover {
+         background: #444;
+      }
    </style>
 </head>
 <body>
 
-<header class="header">
-   <section class="flex">
-      <a href="index.html" class="logo">UPSC hub</a>
-      
-      <div class="top-buttons">
-         <button onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-         <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
-         <button><i class="fas fa-user"></i></button>
-      </div>
-   </section>
-</header>
-
+<!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <button class="cancel-btn" onclick="toggleMenu()">X</button>
   <nav>
@@ -206,35 +283,53 @@
   </div>
 </div>
 
-<section class="about">
-   <div class="row">
-      <div class="image">
-         <img src="images/LOGO.jpg" alt="">
-      </div>
-      <div class="content">
-         <h3> about <span> UPSC hub </span></h3>
-         <p>An integrated platform to develop all the skills for UPSC. #upscstudyhub created and designed by <span>Pratyush Swain</span></p>
-         <p>Check out COURSES</p>
-         <a href="courses.html" class="inline-btn">courses</a>
-         <p><span>THOUGHT OF THE DAY</span></p>
-      </div>
-   </div>
-   <div class="row">
-      <div class="image">
-         <img src="images/thoughtofday.jpg" alt="THOUGHT OF THE DAY">
-      </div>
-   </div>
-</section>
+<!-- Main Content -->
+<div id="main-content">
+   <header class="header">
+      <section class="flex">
+         <a href="index.html" class="logo">UPSC hub</a>
+         <div class="top-buttons">
+            <button onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+            <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
+            <button><i class="fas fa-user"></i></button>
+         </div>
+      </section>
+   </header>
 
-<footer class="footer">
-   &copy; copyright @ 2024 by <span> Pratyush Swain </span> | all rights reserved! (owner)
-</footer>
+   <section class="about">
+      <div class="row">
+         <div class="image">
+            <img src="images/LOGO.jpg" alt="">
+         </div>
+         <div class="content">
+            <h3> about <span> UPSC hub </span></h3>
+            <p>An integrated platform to develop all the skills for UPSC. #upscstudyhub created and designed by <span>Pratyush Swain</span></p>
+            <p>Check out COURSES</p>
+            <a href="courses.html" class="inline-btn">courses</a>
+            <p><span>THOUGHT OF THE DAY</span></p>
+         </div>
+      </div>
+      <div class="row">
+         <div class="image">
+            <img src="images/thoughtofday.jpg" alt="THOUGHT OF THE DAY">
+         </div>
+      </div>
+   </section>
 
-<script src="js/script.js"></script>
+   <footer class="footer">
+      &copy; copyright @ 2024 by <span> Pratyush Swain </span> | all rights reserved!
+   </footer>
+</div>
+
+<!-- Scripts -->
 <script>
    function toggleMenu() {
-      document.getElementById("sidebar").classList.toggle("show");
+      const sidebar = document.getElementById("sidebar");
+      const content = document.getElementById("main-content");
+      sidebar.classList.toggle("show");
+      content.classList.toggle("blurred");
    }
+
    function toggleDarkMode() {
       document.body.classList.toggle("dark-mode");
    }
@@ -242,3 +337,4 @@
 
 </body>
 </html>
+
