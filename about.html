@@ -6,408 +6,160 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
    <title>courses</title>
 
-   <!-- Font Awesome CDN -->
+   <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
-   <!-- Custom CSS -->
+   <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
 
-   <style>
-      * {
-         box-sizing: border-box;
-         margin: 0;
-         padding: 0;
-      }
-
-      body {
-         font-family: 'Segoe UI', sans-serif;
-         background: #f0f0f0;
-         color: #333;
-         height: 100%;
-         display: flex;
-         flex-direction: column;
-      }
-
-      /* Top Buttons (App Menu Bar) */
-      .top-buttons {
-         position: fixed;
-         top: 10px;
-         right: 10px;  /* Changed from left to right */
-         display: flex;
-         gap: 15px;
-         z-index: 100;
-      }
-
-      .top-buttons button {
-         padding: 12px 18px;
-         border: none;
-         border-radius: 5px;
-         cursor: pointer;
-         font-size: 1.8rem;
-         background-color: #fff;
-         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-      }
-
-      .top-buttons button i {
-         font-size: 1.8rem;
-      }
-
-      /* Sidebar (App-Style Menu) */
-      .sidebar {
-         position: fixed;
-         top: 0;
-         left: -250px;
-         width: 250px;
-         height: 100%;
-         background: #2d2d2d;
-         color: white;
-         padding: 20px 10px;
-         transition: left 0.3s ease;
-         z-index: 110;
-         display: flex;
-         flex-direction: column;
-         justify-content: flex-start;
-         box-shadow: 2px 0px 10px rgba(0, 0, 0, 0.2);
-      }
-
-      .sidebar.show {
-         left: 0;
-      }
-
-      .sidebar .cancel-btn {
-         position: absolute;
-         top: 10px;
-         right: 12px;
-         font-size: 1.4rem;
-         color: white;
-         background: none;
-         border: none;
-         cursor: pointer;
-      }
-
-      .sidebar nav {
-         margin-top: 40px;
-         padding-left: 10px;
-      }
-
-      /* Increased Font Size for Sidebar */
-      .sidebar nav a {
-         color: white;
-         display: flex;
-         align-items: center;
-         padding: 15px 0;
-         font-size: 1.5rem;
-         font-weight: 500;
-         text-decoration: none;
-         border-bottom: 1px solid #444;
-         transition: background-color 0.2s ease;
-         margin-bottom: 12px;
-         padding-left: 20px;
-         border-radius: 4px;
-      }
-
-      .sidebar nav a:hover {
-         background-color: #444;
-      }
-
-      .sidebar nav a i {
-         width: 30px;
-         margin-right: 16px;
-         font-size: 1.8rem;
-         text-align: center;
-      }
-
-      .sidebar-footer {
-         text-align: center;
-         margin-top: 30px;
-         padding: 10px;
-      }
-
-      .sidebar-footer img {
-         width: 60px;
-         margin-bottom: 10px;
-      }
-
-      .sidebar-footer h2 {
-         font-size: 1.2rem;
-         color: #fff;
-         margin-bottom: 5px;
-      }
-
-      .sidebar-footer p {
-         font-size: 1rem;
-         color: #aaa;
-         font-style: italic;
-      }
-
-      body.dark-mode {
-         background-color: #1e1e1e;
-         color: #f5f5f5;
-      }
-
-      body.dark-mode .header {
-         background-color: #333;
-      }
-
-      body.dark-mode .sidebar {
-         background-color: #1f1f1f;
-      }
-
-      body.dark-mode .top-buttons button {
-         background-color: #444;
-         color: white;
-      }
-
-      /* Header */
-      .header {
-         padding: 20px;
-         background: #fff;
-         position: relative;
-         z-index: 10;
-         box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
-         margin-top: 60px;
-      }
-
-      .header .logo {
-         font-size: 1.6rem;
-         font-weight: bold;
-         color: #2d2d2d;
-         text-decoration: none;
-      }
-
-      /* Main content */
-      #main-content {
-         width: 100%; 
-         margin-left: 0; 
-         padding: 50px 20px;
-         transition: filter 0.3s ease;
-         flex-grow: 1;
-         background: #fff;
-      }
-
-      #main-content.blurred {
-         filter: blur(4px);
-      }
-
-      /* Footer */
-      .footer {
-         padding: 20px;
-         background: #222;
-         color: #fff;
-         text-align: center;
-         position: relative;
-         z-index: 10;
-      }
-
-      /* Contact icons */
-      .contact-icons {
-         display: flex;
-         justify-content: center;
-         margin-bottom: 20px;
-      }
-
-      .contact-icons a {
-         font-size: 1.7rem;
-         color: white;
-         margin: 0 20px;
-         transition: transform 0.2s ease;
-      }
-
-      .contact-icons a:hover {
-         transform: scale(1.2);
-      }
-
-      /* About section */
-      .about {
-         padding: 40px;
-      }
-
-      .about .row {
-         display: flex;
-         flex-wrap: wrap;
-         margin-bottom: 40px;
-         align-items: center;
-      }
-
-      .about .row .image {
-         flex: 1 1 250px;
-         padding: 10px;
-      }
-
-      .about .row .image img {
-         width: 100%;
-         border-radius: 8px;
-      }
-
-      .about .row .content {
-         flex: 2 1 400px;
-         padding: 10px;
-      }
-
-      .about .row .content h3 {
-         font-size: 2rem;
-         margin-bottom: 15px;
-      }
-
-      .about .row .content p {
-         margin-bottom: 15px;
-         font-size: 1.2rem;
-         line-height: 1.8;
-      }
-
-      .inline-btn {
-         background: #2d2d2d;
-         color: white;
-         padding: 10px 18px;
-         text-decoration: none;
-         border-radius: 5px;
-         display: inline-block;
-         margin-top: 15px;
-      }
-
-      .inline-btn:hover {
-         background: #444;
-      }
-
-      /* Responsive Design */
-      @media (max-width: 768px) {
-         .sidebar {
-            width: 230px;
-         }
-
-         .top-buttons button {
-            font-size: 1.5rem;
-         }
-
-         .sidebar nav a {
-            font-size: 1.3rem;
-         }
-
-         #main-content {
-            padding: 30px;
-         }
-
-         .about .row .content h3 {
-            font-size: 1.8rem;
-         }
-
-         .about .row .content p {
-            font-size: 1.1rem;
-         }
-
-         .footer {
-            font-size: 1rem;
-         }
-      }
-
-      @media (max-width: 480px) {
-         .sidebar {
-            width: 200px;
-         }
-
-         .top-buttons button {
-            font-size: 1.4rem;
-         }
-
-         .sidebar nav a {
-            font-size: 1.2rem;
-         }
-
-         #main-content {
-            padding: 20px;
-         }
-
-         .about .row .content h3 {
-            font-size: 1.6rem;
-         }
-
-         .about .row .content p {
-            font-size: 1rem;
-         }
-      }
-   </style>
 </head>
 <body>
 
-<!-- Top Buttons -->
-<div class="top-buttons">
-   <button onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-   <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
-   <button><i class="fas fa-user"></i></button>
-</div>
+<header class="header">
+   
+   <section class="flex">
 
-<!-- Sidebar -->
-<div class="sidebar" id="sidebar">
-   <button class="cancel-btn" onclick="toggleMenu()">X</button>
-   <nav>
-      <a href="homeUPSChub.html"><i class="fas fa-home"></i>Home</a>
-      <a href="about.html"><i class="fas fa-question"></i>About</a>
-      <a href="courses.html"><i class="fas fa-graduation-cap"></i>Courses</a>
-      <a href="test.html"><i class="fas fa-chalkboard-user"></i>Test</a>
-      <a href="poll.html"><i class="fas fa-poll"></i>Live Poll</a>
-      <a href="preplibrary.html"><i class="fas fa-book-reader"></i>PrepLibrary</a>
-      <a href="revision.html"><i class="fas fa-sync-alt"></i>Revision Tools</a>
-      <a href="contact.html"><i class="fas fa-headset"></i>Contact Us</a>
-   </nav>
-   <div class="contact-icons">
-      <a href="mailto:info@example.com"><i class="fas fa-envelope"></i></a>
-      <a href="tel:+919000000000"><i class="fas fa-phone"></i></a>
-      <a href="https://wa.me/919000000000"><i class="fab fa-whatsapp"></i></a>
-   </div>
-   <div class="sidebar-footer">
-      <img src="images/LOGO.jpg" alt="UPSChub Logo" />
-      <h2>UPSC Hub</h2>
-      <p>An initiative by Pratyush Swain</p>
-   </div>
-</div>
+      <a href="index.html" class="logo">UPSC hub</a>
 
-<!-- Main Content -->
-<div id="main-content">
-   <header class="header">
-      <section class="flex">
-         <a href="index.html" class="logo">UPSC hub</a>
-      </section>
-   </header>
+      <form action="search.html" method="post" class="search-form">
+         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
+         <button type="submit" class="fas fa-search"></button>
+      </form>
 
-   <section class="about">
-      <div class="row">
-         <div class="image">
-            <img src="images/LOGO.jpg" alt="">
-         </div>
-         <div class="content">
-            <h3> about <span> UPSC hub </span></h3>
-            <p>An integrated platform to develop all the skills for UPSC. #upscstudyhub created and designed by <span>Pratyush Swain</span></p>
-            <p>Check out COURSES</p>
-            <a href="courses.html" class="inline-btn">courses</a>
-            <p><span>THOUGHT OF THE DAY</span></p>
+      <div class="icons">
+         <div id="menu-btn" class="fas fa-bars"></div>
+         <div id="search-btn" class="fas fa-search"></div>
+         <div id="user-btn" class="fas fa-user"></div>
+         <div id="toggle-btn" class="fas fa-sun"></div>
+      </div>
+
+      <div class="profile">
+         <img src="images/LOGO.jpg" class="image" alt="">
+         <h3 class="name">UPSC hub</h3>
+         <p class="role">ADMIN & HOST</p>
+        
          </div>
       </div>
-      <div class="row">
-         <div class="image">
-            <img src="images/thoughtofday.jpg" alt="THOUGHT OF THE DAY">
-         </div>
-      </div>
+
    </section>
 
-   <footer class="footer">
-      &copy; copyright @ 2024 by <span> Pratyush Swain </span> | all rights reserved!
-   </footer>
+</header>   
+
+<div class="side-bar">
+
+   <div id="close-btn">
+      <i class="fas fa-times"></i>
+   </div>
+
+   <div class="profile">
+      <img src="images/LOGO.jpg" class="image" alt="">
+      <h3 class="name">UPSC hub</h3>
+      <p class="role">ADMIN & HOST</p>
+   
+   </div>
+
+<nav class="navbar">
+   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
+   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
+   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
+   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
+   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+</nav>
+
+
+</div>
+   
+<a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+   </nav>
+
 </div>
 
-<!-- Scripts -->
-<script>
-   function toggleMenu() {
-      const sidebar = document.getElementById("sidebar");
-      const content = document.getElementById("main-content");
-      sidebar.classList.toggle("show");
-      content.classList.toggle("blurred");
-   }
+<section class="about">
 
-   function toggleDarkMode() {
-      document.body.classList.toggle("dark-mode");
-   }
-</script>
+   <div class="row">
 
+      <div class="image">
+         <img src="images/LOGO.jpg" alt="">
+      </div>
+
+      <div class="content">
+         <h3> about <span> UPSC hub </span></h3>
+         <p>An integrated platform to develop all the skills for UPSC . #upscstudyhub created and designed by <span>Pratyush Swain</span> </p>
+         <p> Cheakout COURSES </p>
+         <a href="courses.html" class="inline-btn">courses</a>
+
+         <p> <span> THOUGHT OF THE DAY </span> </p>
+         
+      </div>
+   </div>
+   </div>
+
+   
+   <div class="row">
+      
+    <div class="image">
+         <img src="images/thoughtofday.jpg" alt=" THOUGHT OF THE DAY ">
+      </div>
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      
+      
+             
+
+      
+        
+     
+
+
+
+
+
+
+
+
+
+
+   
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+<footer class="footer">
+
+   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved! (owner)
+
+</footer>
+
+<!-- custom js file link  -->
+<script src="js/script.js"></script>
+
+   
 </body>
 </html>
-
