@@ -9,9 +9,6 @@
    <!-- Font Awesome -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
-   <!-- Custom CSS -->
-   <link rel="stylesheet" href="css/style.css">
-
    <style>
      :root {
        --white: #ffffff;
@@ -97,37 +94,177 @@
        transform: translateX(6px);
      }
 
-     /* Simple footer style (no background box, not fixed) */
      footer {
        text-align: center;
        font-size: 14px;
        color: #666;
        padding: 20px 0;
      }
+
+     /* Sidebar */
+     .side-bar {
+       position: fixed;
+       top: 0;
+       left: -250px;
+       width: 250px;
+       height: 100%;
+       background-color: #fff;
+       box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+       padding: 20px;
+       transition: 0.3s;
+       z-index: 1000;
+     }
+
+     .side-bar.active {
+       left: 0;
+     }
+
+     #close-btn {
+       font-size: 22px;
+       text-align: right;
+       cursor: pointer;
+       margin-bottom: 20px;
+     }
+
+     .side-bar .profile {
+       text-align: center;
+       margin-bottom: 20px;
+     }
+
+     .side-bar .profile img {
+       width: 80px;
+       height: 80px;
+       border-radius: 50%;
+     }
+
+     .side-bar .profile .name {
+       font-size: 18px;
+       margin-top: 10px;
+     }
+
+     .side-bar .profile .role {
+       font-size: 14px;
+       color: gray;
+     }
+
+     .navbar a {
+       display: block;
+       margin: 10px 0;
+       color: #333;
+       text-decoration: none;
+       font-size: 18px;
+     }
+
+     .navbar a i {
+       margin-right: 10px;
+     }
+
+     .search-form,
+     .profile {
+       display: none;
+     }
+
+     .search-form.active,
+     .profile.active {
+       display: block;
+     }
+
+     /* Header */
+     .header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       background: #fff;
+       padding: 10px 20px;
+       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+       position: sticky;
+       top: 0;
+       z-index: 999;
+     }
+
+     .header .logo {
+       font-size: 24px;
+       color: var(--main-color);
+       text-decoration: none;
+       font-weight: bold;
+     }
+
+     .header .search-form {
+       position: relative;
+     }
+
+     .header .search-form input {
+       padding: 6px 10px;
+       border: 1px solid #ccc;
+       border-radius: 4px;
+     }
+
+     .header .search-form button {
+       background: none;
+       border: none;
+       cursor: pointer;
+       position: absolute;
+       right: 8px;
+       top: 6px;
+       font-size: 16px;
+       color: #555;
+     }
+
+     .icons {
+       display: flex;
+       gap: 15px;
+       font-size: 20px;
+       cursor: pointer;
+     }
+
+     /* Dark Mode */
+     .dark-mode {
+       background-color: #121212;
+       color: #ffffff;
+     }
+
+     .dark-mode .poll-box {
+       background-color: #1e1e1e;
+       color: #fff;
+       border-left: 6px solid #555;
+     }
+
+     .dark-mode header,
+     .dark-mode footer {
+       background-color: #1a1a1a;
+       color: #ccc;
+     }
+
+     .dark-mode .poll-box:hover {
+       background-color: #292929;
+       border-left: 6px solid #888;
+     }
    </style>
 </head>
+
 <body>
 
 <!-- Header -->
 <header class="header">
-   <section class="flex">
-      <a href="index.html" class="logo">UPSC hub</a>
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
-      </div>
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-      </div>
-   </section>
+   <a href="index.html" class="logo">UPSC hub</a>
+
+   <form action="search.html" method="post" class="search-form">
+     <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
+     <button type="submit" class="fas fa-search"></button>
+   </form>
+
+   <div class="icons">
+     <div id="menu-btn" class="fas fa-bars"></div>
+     <div id="search-btn" class="fas fa-search"></div>
+     <div id="user-btn" class="fas fa-user"></div>
+     <div id="toggle-btn" class="fas fa-sun"></div>
+   </div>
+
+   <div class="profile">
+     <img src="images/LOGO.jpg" class="image" alt="">
+     <h3 class="name">UPSC hub</h3>
+     <p class="role">ADMIN & HOST</p>
+   </div>
 </header>
 
 <!-- Sidebar -->
@@ -135,25 +272,23 @@
    <div id="close-btn">
       <i class="fas fa-times"></i>
    </div>
+
    <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
+     <img src="images/LOGO.jpg" class="image" alt="">
+     <h3 class="name">UPSC hub</h3>
+     <p class="role">ADMIN & HOST</p>
    </div>
- 
 
-<nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-</nav>
-
-
+   <nav class="navbar">
+      <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
+      <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
+      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
+      <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
+      <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+      <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+      <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+   </nav>
 </div>
 
 <!-- Poll Section -->
@@ -175,7 +310,7 @@
          </div>
          <div class="poll-box" onclick="goToPoll('mapping')">
             <div class="poll-topic">🗺️ Mapping <span class="live-indicator">LIVE</span></div>
-            <div class="arrow-icon">➡️ </div>
+            <div class="arrow-icon">➡️</div>
          </div>
          <div class="poll-box" onclick="goToPoll('current-affairs')">
             <div class="poll-topic">📰 Current Affairs</div>
@@ -202,27 +337,64 @@
   setInterval(updateClock, 1000);
   updateClock();
 
- function goToPoll(topic) {
-      switch(topic) {
-         case 'polity':
-            window.location.href = 'politypoll.html';
-            break;
-         case 'geography':
-            window.location.href = 'geographypoll.html';
-            break;
-         case 'mapping':
-            window.location.href = 'mappingpoll.html';
-            break;
-         case 'current-affairs':
-            window.location.href = 'currentaffairspoll.html';
-            break;
-         default:
-            alert('Poll not found');
-      }
+  function goToPoll(topic) {
+    switch(topic) {
+      case 'polity':
+        window.location.href = 'politypoll.html';
+        break;
+      case 'geography':
+        window.location.href = 'geographypoll.html';
+        break;
+      case 'mapping':
+        window.location.href = 'mappingpoll.html';
+        break;
+      case 'current-affairs':
+        window.location.href = 'currentaffairspoll.html';
+        break;
+      default:
+        alert('Poll not found');
+    }
   }
 
+  // Toggle Functionality
+  let menuBtn = document.querySelector('#menu-btn');
+  let closeBtn = document.querySelector('#close-btn');
+  let sideBar = document.querySelector('.side-bar');
+  let searchBtn = document.querySelector('#search-btn');
+  let searchForm = document.querySelector('.search-form');
+  let userBtn = document.querySelector('#user-btn');
+  let profile = document.querySelector('.profile');
+  let toggleBtn = document.querySelector('#toggle-btn');
+  let body = document.body;
+
+  menuBtn.onclick = () => {
+    sideBar.classList.toggle('active');
+    searchForm.classList.remove('active');
+    profile.classList.remove('active');
+  }
+
+  closeBtn.onclick = () => {
+    sideBar.classList.remove('active');
+  }
+
+  searchBtn.onclick = () => {
+    searchForm.classList.toggle('active');
+    profile.classList.remove('active');
+    sideBar.classList.remove('active');
+  }
+
+  userBtn.onclick = () => {
+    profile.classList.toggle('active');
+    searchForm.classList.remove('active');
+    sideBar.classList.remove('active');
+  }
+
+  toggleBtn.onclick = () => {
+    body.classList.toggle('dark-mode');
+    toggleBtn.classList.toggle('fa-sun');
+    toggleBtn.classList.toggle('fa-moon');
+  }
 </script>
 
-<script src="js/script.js"></script>
 </body>
 </html>
