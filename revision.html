@@ -20,7 +20,6 @@
       background-color: #e9f5ff;
       color: #333;
       font-size: 14px;
-      transition: background-color 0.4s, color 0.4s;
     }
 
     header {
@@ -32,7 +31,6 @@
       font-size: 1.3em;
       position: relative;
       animation: fadeSlideDown 1s ease-out forwards;
-      transition: background-color 0.4s;
     }
 
     @keyframes fadeSlideDown {
@@ -53,7 +51,6 @@
       overflow: hidden;
       white-space: nowrap;
       font-size: 0.85em;
-      transition: background-color 0.4s;
     }
 
     .runner-text {
@@ -97,7 +94,7 @@
       margin: 10px 0;
       text-align: center;
       cursor: pointer;
-      transition: transform 0.3s, box-shadow 0.3s, background-color 0.4s, border-color 0.4s;
+      transition: transform 0.3s, box-shadow 0.3s;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
       font-size: 0.95em;
       font-weight: 600;
@@ -137,7 +134,6 @@
       margin-top: 25px;
       font-size: 0.8em;
       color: #777;
-      transition: background-color 0.4s;
     }
 
     /* Dots Loader */
@@ -187,23 +183,70 @@
       }
     }
 
+    /* Sidebar + Search + Profile Toggle Styles */
+    .side-bar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: #fff;
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .side-bar.active { left: 0; }
+
+    .search-form {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 250px;
+    }
+
+    .search-form.active { display: block; }
+
+    .header .profile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 200px;
+      text-align: center;
+    }
+
+    .header .profile.active { display: block; }
+
     /* Dark Mode */
     .dark-mode {
       background-color: #121212;
-      color: #e0e0e0;
+      color: #eee;
     }
     .dark-mode header {
-      background-color: #1f1f1f;
+      background-color: #222;
     }
     .dark-mode .runner-strip {
       background-color: #333;
     }
     .dark-mode .box {
-      background-color: #1f1f1f;
-      border-color: #333;
+      background-color: #1e1e1e;
+      color: #eee;
     }
     .dark-mode footer {
-      background-color: #1f1f1f;
+      background-color: #1e1e1e;
+      color: #aaa;
     }
   </style>
 </head>
@@ -234,33 +277,29 @@
 
 <!-- Sidebar -->
 <div class="side-bar">
-   <div id="close-btn">
-      <i class="fas fa-times"></i>
-   </div>
+   <div id="close-btn"><i class="fas fa-times"></i></div>
    <div class="profile">
       <img src="images/LOGO.jpg" class="image" alt="">
       <h3 class="name">UPSC hub</h3>
       <p class="role">ADMIN & HOST</p>
    </div>
 
-<nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-</nav>
-
+   <nav class="navbar">
+      <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
+      <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
+      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
+      <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
+      <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+      <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+      <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+   </nav>
 </div>
 
 <!-- Revision Section -->
 <section class="revision-section">
-   <header>
+  <header>
     <h1>UPSChub Revision Page</h1>
-
     <section class="dots-container">
       <div class="dot"></div>
       <div class="dot"></div>
@@ -281,7 +320,6 @@
   </div>
 
   <div class="container">
-
     <h2 class="section-title">Revision Content</h2>
 
     <div class="box" onclick="redirectTo('mindmap.html')">Mind Map</div>
@@ -298,24 +336,24 @@
       <h2 class="section-title">Revision Test</h2>
       <button onclick="redirectToPoll()">Take Revision Test</button>
     </div>
-
   </div>
+</section>
 
-  <footer>
-    <p>&copy; 2025 UPSChub. All rights reserved.</p>
-  </footer>
+<footer>
+  <p>&copy; 2025 UPSChub. All rights reserved.</p>
+</footer>
 
 <script>
     function updateDateTime() {
       const now = new Date();
       const options = {
-         weekday: 'long',
-         year: 'numeric',
-         month: 'long',
-         day: 'numeric',
-         hour: '2-digit',
-         minute: '2-digit',
-         second: '2-digit'
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
       };
       document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
     }
@@ -328,6 +366,7 @@
       window.location.href = "revision-test.html";
     }
 
+    // Dark mode toggle
     function toggleDarkMode() {
       document.body.classList.toggle('dark-mode');
       const toggleBtn = document.getElementById('toggle-btn');
@@ -340,11 +379,42 @@
       }
     }
 
+    // Menu, Search, User functionality
+    const menuBtn = document.querySelector('#menu-btn');
+    const searchBtn = document.querySelector('#search-btn');
+    const userBtn = document.querySelector('#user-btn');
+    const sideBar = document.querySelector('.side-bar');
+    const searchForm = document.querySelector('.search-form');
+    const profile = document.querySelector('.header .profile');
+    const closeBtn = document.querySelector('#close-btn');
+
+    menuBtn.onclick = () => {
+      sideBar.classList.toggle('active');
+      searchForm.classList.remove('active');
+      profile.classList.remove('active'); 
+    
+    };
+
+    searchBtn.onclick = () => {
+      searchForm.classList.toggle('active');
+      sideBar.classList.remove('active');
+      profile.classList.remove('active');
+    };
+
+    userBtn.onclick = () => {
+      profile.classList.toggle('active');
+      searchForm.classList.remove('active');
+      sideBar.classList.remove('active');
+    };
+
+    closeBtn.onclick = () => {
+      sideBar.classList.remove('active');
+    };
+
+    document.getElementById('toggle-btn').addEventListener('click', toggleDarkMode);
+
     setInterval(updateDateTime, 1000);
     updateDateTime();
-
-    // Dark mode click function
-    document.getElementById('toggle-btn').addEventListener('click', toggleDarkMode);
 </script>
 
 </body>
