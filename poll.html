@@ -19,21 +19,13 @@
        --light-bg: #f0f0f0;
        --light-color: #888888;
        --main-color: #3498db;
-       --dark-bg: #121212;
-       --dark-color: #e0e0e0;
      }
 
      body {
        margin: 0;
        font-family: 'Segoe UI', sans-serif;
-       background-color: var(--light-bg);
-       color: var(--black);
-       transition: background-color 0.3s, color 0.3s;
-     }
-
-     .dark-mode {
-       background-color: var(--dark-bg);
-       color: var(--dark-color);
+       background-color: #f4f7fb;
+       color: #333;
      }
 
      .poll-section header {
@@ -112,7 +104,7 @@
        padding: 20px 0;
      }
 
-     /* Sidebar styles */
+     /* Sidebar */
      .side-bar {
        position: fixed;
        top: 0;
@@ -122,56 +114,56 @@
        background-color: #fff;
        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
        transition: left 0.3s ease;
-       padding-top: 0; /* Removed any padding at the top */
-     }
-
-     .side-bar .profile {
-       text-align: center;
-       padding: 20px 10px; /* Added some padding to the profile section, if needed */
+       padding-top: 20px; /* Adjusted space above profile and close button */
      }
 
      #close-btn {
        position: absolute;
-       top: 20px; /* Ensure it's at the top */
-       right: 20px; /* Adjust if necessary */
+       top: 20px;
+       right: 20px;
        cursor: pointer;
+     }
+
+     .side-bar .profile {
+       text-align: center;
+       padding: 20px 10px;
      }
 
      #close-btn i {
        font-size: 24px;
      }
 
-     .side-bar nav a {
-       display: block;
-       padding: 15px;
-       color: #333;
-       text-decoration: none;
-       font-size: 16px;
-       transition: background-color 0.3s;
+     .side-bar .profile + #close-btn {
+       margin-top: 10px;
      }
 
-     .side-bar nav a:hover {
-       background-color: #f0f7ff;
-     }
-
-     /* Hidden elements */
-     .search-form input {
-       display: none;
-     }
-
+     /* User Profile */
      .profile-details {
        display: none;
-       padding: 20px;
-       background-color: #f0f0f0;
-       border-radius: 10px;
+       text-align: center;
      }
 
-     .profile-details.active {
-       display: block;
+     /* Dark Mode */
+     .dark-mode {
+       background-color: #333;
+       color: #fff;
      }
 
-     .search-form.active input {
-       display: block;
+     .dark-mode header {
+       background-color: #555;
+     }
+
+     .dark-mode .poll-section {
+       background-color: #444;
+     }
+
+     .dark-mode .side-bar {
+       background-color: #222;
+     }
+
+     .dark-mode .poll-box {
+       background-color: #444;
+       color: #fff;
      }
 
    </style>
@@ -182,7 +174,7 @@
 <header class="header">
    <section class="flex">
       <a href="index.html" class="logo">UPSC hub</a>
-      <form action="search.html" method="post" class="search-form">
+      <form action="search.html" method="post" class="search-form" style="display: none;">
          <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
          <button type="submit" class="fas fa-search"></button>
       </form>
@@ -268,33 +260,53 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Toggle Sidebar
-  const menuBtn = document.getElementById('menu-btn');
-  const sideBar = document.querySelector('.side-bar');
-  const closeBtn = document.getElementById('close-btn');
-  menuBtn.addEventListener('click', () => sideBar.style.left = '0');
-  closeBtn.addEventListener('click', () => sideBar.style.left = '-250px');
-
-  // Toggle Search Bar
-  const searchBtn = document.getElementById('search-btn');
-  const searchForm = document.querySelector('.search-form');
-  searchBtn.addEventListener('click', () => searchForm.classList.toggle('active'));
-
-  // Toggle User Profile Details
-  const userBtn = document.getElementById('user-btn');
-  const profileDetails = document.querySelector('.profile-details');
-  userBtn.addEventListener('click', () => profileDetails.classList.toggle('active'));
-
-  // Toggle Dark Mode
-  const toggleBtn = document.getElementById('toggle-btn');
-  toggleBtn.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
-
-  // Navigate to Poll
   function goToPoll(topic) {
-      window.location.href = `${topic}.html`;
+      switch(topic) {
+         case 'polity':
+            window.location.href = 'politypoll.html';
+            break;
+         case 'geography':
+            window.location.href = 'geographypoll.html';
+            break;
+         case 'mapping':
+            window.location.href = 'mappingpoll.html';
+            break;
+         case 'current-affairs':
+            window.location.href = 'currentaffairspoll.html';
+            break;
+         default:
+            alert('Poll not found');
+      }
   }
-</script>
 
-<script src="js/script.js"></script>
+  // Toggle Sidebar
+  document.getElementById('menu-btn').addEventListener('click', function() {
+      const sidebar = document.querySelector('.side-bar');
+      sidebar.style.left = '0';
+  });
+
+  document.getElementById('close-btn').addEventListener('click', function() {
+      const sidebar = document.querySelector('.side-bar');
+      sidebar.style.left = '-250px';
+  });
+
+  // Show Search Bar
+  document.getElementById('search-btn').addEventListener('click', function() {
+      const searchForm = document.querySelector('.search-form');
+      searchForm.style.display = searchForm.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Toggle User Profile
+  document.getElementById('user-btn').addEventListener('click', function() {
+      const profileDetails = document.querySelector('.profile-details');
+      profileDetails.style.display = profileDetails.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Toggle Dark/Light Mode
+  document.getElementById('toggle-btn').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+  });
+
+</script>
 </body>
 </html>
