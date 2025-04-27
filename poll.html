@@ -31,7 +31,7 @@
        transition: background-color 0.3s, color 0.3s;
      }
 
-     .dark-mode body {
+     .dark-mode {
        background-color: var(--dark-bg);
        color: var(--dark-color);
      }
@@ -121,17 +121,24 @@
        height: 100%;
        background-color: #fff;
        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-       padding-top: 50px;
        transition: left 0.3s ease;
-     }
-
-     .side-bar.active {
-       left: 0;
+       padding-top: 0; /* Removed any padding at the top */
      }
 
      .side-bar .profile {
        text-align: center;
-       padding: 20px;
+       padding: 20px 10px; /* Added some padding to the profile section, if needed */
+     }
+
+     #close-btn {
+       position: absolute;
+       top: 20px; /* Ensure it's at the top */
+       right: 20px; /* Adjust if necessary */
+       cursor: pointer;
+     }
+
+     #close-btn i {
+       font-size: 24px;
      }
 
      .side-bar nav a {
@@ -265,15 +272,15 @@
   const menuBtn = document.getElementById('menu-btn');
   const sideBar = document.querySelector('.side-bar');
   const closeBtn = document.getElementById('close-btn');
-  menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
-  closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+  menuBtn.addEventListener('click', () => sideBar.style.left = '0');
+  closeBtn.addEventListener('click', () => sideBar.style.left = '-250px');
 
   // Toggle Search Bar
   const searchBtn = document.getElementById('search-btn');
   const searchForm = document.querySelector('.search-form');
   searchBtn.addEventListener('click', () => searchForm.classList.toggle('active'));
 
-  // Toggle Profile
+  // Toggle User Profile Details
   const userBtn = document.getElementById('user-btn');
   const profileDetails = document.querySelector('.profile-details');
   userBtn.addEventListener('click', () => profileDetails.classList.toggle('active'));
@@ -283,9 +290,11 @@
   toggleBtn.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
 
   // Navigate to Poll
-  function goToPoll(pollType) {
-    window.location.href = `${pollType}.html`;
+  function goToPoll(topic) {
+      window.location.href = `${topic}.html`;
   }
 </script>
+
+<script src="js/script.js"></script>
 </body>
 </html>
