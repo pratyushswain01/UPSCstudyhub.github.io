@@ -176,14 +176,11 @@
     <a href="#" class="nav-option" tabindex="0"><i class="fas fa-book"></i> English Comprehension</a>
   </nav>
   <main>
-    <div class="search-bar">
-      <input type="text" placeholder="Search CSAT topics..." aria-label="Search CSAT topics" />
-      <button type="button"><i class="fas fa-search"></i></button>
-    </div>
+   
 
   <section class="section" aria-labelledby="syllabus-heading">
     <h2 id="syllabus-heading" class="mb-4 font-bold text-xl">Syllabus Overview</h2>
-    <div class="overflow-x-auto scrollbar-hide">
+    <div class="overflow-x-auto scrollbar-hide max-w-full" style="scroll-behavior: smooth; overscroll-behavior-x: contain;">
       <div class="flex gap-4 min-w-max">
         <div class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full cursor-pointer whitespace-nowrap shadow-md hover:bg-blue-200 transition">
           Quantitative Aptitude
@@ -286,3 +283,23 @@
         if (!isDeleting) {
           typedSyllabus.textContent = currentText.substring(0, charIndex + 1);
           charIndex++;
+          if (charIndex === currentText.length) {
+            isDeleting = true;
+            setTimeout(type, 1500);
+            return;
+          }
+        } else {
+          typedSyllabus.textContent = currentText.substring(0, charIndex - 1);
+          charIndex--;
+          if (charIndex === 0) {
+            isDeleting = false;
+            index++;
+          }
+        }
+        setTimeout(type, isDeleting ? 50 : 100);
+      }
+      type();
+    });
+  </script>
+</body>
+</html>
