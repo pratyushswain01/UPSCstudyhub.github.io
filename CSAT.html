@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en" >
 <head>
@@ -27,6 +26,10 @@
       position: sticky;
       top: 0;
       z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
     }
     main {
       flex-grow: 1;
@@ -56,6 +59,36 @@
     }
     .search-bar button:hover {
       background-color: #2563eb;
+    }
+    .nav-options {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 2rem;
+    }
+    .nav-option {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-size: 1.125rem;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgb(0 0 0 / 0.1);
+      background-color: #e0e7ff;
+      color: #3730a3;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      text-decoration: none;
+    }
+    .nav-option:hover, .nav-option:focus {
+      background-color: #c7d2fe;
+      transform: scale(1.05);
+      outline: none;
+    }
+    .nav-option i {
+      font-size: 1.5rem;
     }
     .categories {
       display: flex;
@@ -133,29 +166,81 @@
     }
   </style>
 </head>
-  <body>
-  <header>UPSChub - CSAT Section</header>
-  <main>
-   
-    <div class="categories" aria-label="CSAT categories">
-      <div class="category-card" tabindex="0">
-        <i class="fas fa-calculator"></i>
-        <h3>Quantitative Aptitude</h3>
-      </div>
-      <div class="category-card" tabindex="0">
-        <i class="fas fa-brain"></i>
-        <h3>Reasoning</h3>
-      </div>
-      <div class="category-card" tabindex="0">
-        <i class="fas fa-book"></i>
-        <h3>English Comprehension</h3>
+<body>
+  <header>
+    <i class="fas fa-utensils text-blue-600 mr-2"></i> UPSChub - CSAT Section
+  </header>
+  <nav class="nav-options flex flex-wrap justify-center gap-2 mt-2 mb-8 max-w-[900px] mx-auto" role="navigation" aria-label="CSAT navigation options">
+    <a href="#" class="nav-option text-xs px-2 py-1" tabindex="0"><i class="fas fa-calculator"></i> Quantitative Aptitude</a>
+    <a href="#" class="nav-option text-xs px-2 py-1" tabindex="0"><i class="fas fa-brain"></i> Reasoning</a>
+    <a href="#" class="nav-option text-xs px-2 py-1" tabindex="0"><i class="fas fa-book"></i> English Comprehension</a>
+  </nav>
+  <main class="max-w-[900px] mx-auto">
+    
+
+  <section class="section" aria-labelledby="syllabus-heading">
+    <h2 id="syllabus-heading" class="mb-4 font-bold text-xl">Syllabus Overview</h2>
+    <div class="overflow-x-auto scrollbar-hide max-w-full" style="scroll-behavior: smooth; overscroll-behavior-x: contain;">
+      <div class="flex gap-4 min-w-max">
+        <div class="px-4 py-2 bg-blue-100 text-blue-700 rounded-full cursor-pointer whitespace-nowrap shadow-md hover:bg-blue-200 transition">
+          Quantitative Aptitude
+        </div>
+        <div class="px-4 py-2 bg-green-100 text-green-700 rounded-full cursor-pointer whitespace-nowrap shadow-md hover:bg-green-200 transition">
+          Reasoning
+        </div>
+        <div class="px-4 py-2 bg-purple-100 text-purple-700 rounded-full cursor-pointer whitespace-nowrap shadow-md hover:bg-purple-200 transition">
+          English Comprehension
+        </div>
+        <div class="px-4 py-2 bg-yellow-100 text-yellow-700 rounded-full cursor-pointer whitespace-nowrap shadow-md hover:bg-yellow-200 transition">
+          Current Affairs
+        </div>
+        <div class="px-4 py-2 bg-pink-100 text-pink-700 rounded-full cursor-pointer whitespace-nowrap shadow-md hover:bg-pink-200 transition">
+          Mock Tests
+        </div>
       </div>
     </div>
+    <p id="typed-syllabus" class="text-gray-700 min-h-[3rem] mt-4"></p>
+  </section>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const typedSyllabus = document.getElementById('typed-syllabus');
+      const syllabusTexts = [
+        'Quantitative Aptitude: Number Systems, Algebra, Geometry, Data Interpretation.',
+        'Reasoning: Logical Reasoning, Analytical Ability, Decision Making.',
+        'English Comprehension: Reading Comprehension, Vocabulary, Grammar.',
+        'Practice regularly to improve speed and accuracy.'
+      ];
+      let index = 0;
+      let charIndex = 0;
+      let currentText = '';
+      let isDeleting = false;
 
-    <section class="section" aria-labelledby="syllabus-heading">
-      <h2 id="syllabus-heading" class="mb-4 font-bold text-xl">Syllabus Overview</h2>
-      <p id="typed-syllabus" class="text-gray-700 min-h-[3rem]"></p>
-    </section>
+      function type() {
+        if (index >= syllabusTexts.length) {
+          index = 0;
+        }
+        currentText = syllabusTexts[index];
+        if (!isDeleting) {
+          typedSyllabus.textContent = currentText.substring(0, charIndex + 1);
+          charIndex++;
+          if (charIndex === currentText.length) {
+            isDeleting = true;
+            setTimeout(type, 1500);
+            return;
+          }
+        } else {
+          typedSyllabus.textContent = currentText.substring(0, charIndex - 1);
+          charIndex--;
+          if (charIndex === 0) {
+            isDeleting = false;
+            index++;
+          }
+        }
+        setTimeout(type, isDeleting ? 50 : 100);
+      }
+      type();
+    });
+  </script>
 
     <section class="section" aria-labelledby="study-materials-heading">
       <h2 id="study-materials-heading">Study Materials</h2>
@@ -217,42 +302,44 @@
     &copy; 2024 UPSChub. All rights reserved.
   </footer>
   <script>
-    const typedSyllabus = document.getElementById('typed-syllabus');
-    const syllabusTexts = [
-      'Quantitative Aptitude: Number Systems, Algebra, Geometry, Data Interpretation.',
-      'Reasoning: Logical Reasoning, Analytical Ability, Decision Making.',
-      'English Comprehension: Reading Comprehension, Vocabulary, Grammar.',
-      'Practice regularly to improve speed and accuracy.'
-    ];
-    let index = 0;
-    let charIndex = 0;
-    let currentText = '';
-    let isDeleting = false;
+    document.addEventListener('DOMContentLoaded', () => {
+      const typedSyllabus = document.getElementById('typed-syllabus');
+      const syllabusTexts = [
+        'Quantitative Aptitude: Number Systems, Algebra, Geometry, Data Interpretation.',
+        'Reasoning: Logical Reasoning, Analytical Ability, Decision Making.',
+        'English Comprehension: Reading Comprehension, Vocabulary, Grammar.',
+        'Practice regularly to improve speed and accuracy.'
+      ];
+      let index = 0;
+      let charIndex = 0;
+      let currentText = '';
+      let isDeleting = false;
 
-    function type() {
-      if (index >= syllabusTexts.length) {
-        index = 0;
-      }
-      currentText = syllabusTexts[index];
-      if (!isDeleting) {
-        typedSyllabus.textContent = currentText.substring(0, charIndex + 1);
-        charIndex++;
-        if (charIndex === currentText.length) {
-          isDeleting = true;
-          setTimeout(type, 1500);
-          return;
+      function type() {
+        if (index >= syllabusTexts.length) {
+          index = 0;
         }
-      } else {
-        typedSyllabus.textContent = currentText.substring(0, charIndex - 1);
-        charIndex--;
-        if (charIndex === 0) {
-          isDeleting = false;
-          index++;
+        currentText = syllabusTexts[index];
+        if (!isDeleting) {
+          typedSyllabus.textContent = currentText.substring(0, charIndex + 1);
+          charIndex++;
+          if (charIndex === currentText.length) {
+            isDeleting = true;
+            setTimeout(type, 1500);
+            return;
+          }
+        } else {
+          typedSyllabus.textContent = currentText.substring(0, charIndex - 1);
+          charIndex--;
+          if (charIndex === 0) {
+            isDeleting = false;
+            index++;
+          }
         }
+        setTimeout(type, isDeleting ? 50 : 100);
       }
-      setTimeout(type, isDeleting ? 50 : 100);
-    }
-    type();
+      type();
+    });
   </script>
 </body>
 </html>
