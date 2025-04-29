@@ -170,14 +170,13 @@
   <header>
     <i class="fas fa-utensils text-blue-600 mr-2"></i> UPSChub - CSAT Section
   </header>
-  <nav class="nav-options" role="navigation" aria-label="CSAT navigation options">
-    <a href="#" class="nav-option" tabindex="0"><i class="fas fa-calculator"></i> Quantitative Aptitude</a>
-    <a href="#" class="nav-option" tabindex="0"><i class="fas fa-brain"></i> Reasoning</a>
-    <a href="#" class="nav-option" tabindex="0"><i class="fas fa-book"></i> English Comprehension</a>
+  <nav class="nav-options flex flex-wrap justify-center gap-3 mt-2 mb-8" role="navigation" aria-label="CSAT navigation options">
+    <a href="#" class="nav-option text-sm px-3 py-1" tabindex="0"><i class="fas fa-calculator"></i> Quantitative Aptitude</a>
+    <a href="#" class="nav-option text-sm px-3 py-1" tabindex="0"><i class="fas fa-brain"></i> Reasoning</a>
+    <a href="#" class="nav-option text-sm px-3 py-1" tabindex="0"><i class="fas fa-book"></i> English Comprehension</a>
   </nav>
   <main>
    
-
   <section class="section" aria-labelledby="syllabus-heading">
     <h2 id="syllabus-heading" class="mb-4 font-bold text-xl">Syllabus Overview</h2>
     <div class="overflow-x-auto scrollbar-hide max-w-full" style="scroll-behavior: smooth; overscroll-behavior-x: contain;">
@@ -201,6 +200,46 @@
     </div>
     <p id="typed-syllabus" class="text-gray-700 min-h-[3rem] mt-4"></p>
   </section>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const typedSyllabus = document.getElementById('typed-syllabus');
+      const syllabusTexts = [
+        'Quantitative Aptitude: Number Systems, Algebra, Geometry, Data Interpretation.',
+        'Reasoning: Logical Reasoning, Analytical Ability, Decision Making.',
+        'English Comprehension: Reading Comprehension, Vocabulary, Grammar.',
+        'Practice regularly to improve speed and accuracy.'
+      ];
+      let index = 0;
+      let charIndex = 0;
+      let currentText = '';
+      let isDeleting = false;
+
+      function type() {
+        if (index >= syllabusTexts.length) {
+          index = 0;
+        }
+        currentText = syllabusTexts[index];
+        if (!isDeleting) {
+          typedSyllabus.textContent = currentText.substring(0, charIndex + 1);
+          charIndex++;
+          if (charIndex === currentText.length) {
+            isDeleting = true;
+            setTimeout(type, 1500);
+            return;
+          }
+        } else {
+          typedSyllabus.textContent = currentText.substring(0, charIndex - 1);
+          charIndex--;
+          if (charIndex === 0) {
+            isDeleting = false;
+            index++;
+          }
+        }
+        setTimeout(type, isDeleting ? 50 : 100);
+      }
+      type();
+    });
+  </script>
 
     <section class="section" aria-labelledby="study-materials-heading">
       <h2 id="study-materials-heading">Study Materials</h2>
