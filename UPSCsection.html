@@ -1,362 +1,145 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>UPSC</title>
-
-   <!-- Font Awesome -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
-
-   <!-- Custom CSS -->
-   <link rel="stylesheet" href="css/style.css">
-
-   <style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Prelims - UPSChub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
     body {
       font-family: 'Roboto', sans-serif;
       color: #1f2937;
-      font-size: 18px;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background-color: #f9fafb;
     }
-    .btn {
-      background-color: #2563eb;
-      color: white;
-      padding: 0.75rem 1.5rem;
-      border-radius: 0.5rem;
-      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
-      font-size: 1.3rem; /* increased from 1.1rem */
-      transition: background-color 0.3s ease;
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
-    .btn:hover {
-      background-color: #1e40af;
-    }
-    header.small-header, footer {
-      background: transparent;
-      text-align: center;
-      color: #4b5563;
-      font-size: 1rem;
-      padding: 0.75rem 0;
-    }
-    main {
-      flex-grow: 1;
-      padding: 2rem;
-      display: flex;
-      flex-direction: column;
-      gap: 2.5rem;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-    section {
-      border: 1px solid #d1d5db;
-      border-radius: 1rem;
-      padding: 2rem;
-      text-align: center;
-      background-color: #ffffff;
-    }
-    h1.main-header {
-      font-size: 3rem;
-      font-weight: 700;
-      text-align: center;
-      margin: 2rem 0;
-    }
-    h2.section-header {
-      font-size: 2rem;
-      font-weight: 600;
-      margin-bottom: 1.25rem;
-    }
-    .date-time {
-      text-align: center;
-      margin: 16px 0;
-      font-size: 2rem;
-      color: #555;
-    }
-
-    .side-bar {
-      position: fixed;
-      top: 0;
-      left: -300px;
-      width: 250px;
-      height: 100%;
-      background: #fff;
-      padding: 20px;
-      transition: left 0.3s ease;
-      z-index: 1000;
-      overflow-y: auto;
-    }
-
-    .side-bar.active { left: 0; }
-
-    .search-form {
-      display: none;
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      width: 250px;
-    }
-
-    .search-form.active { display: block; }
-
-    .header .profile {
-      display: none;
-      position: absolute;
-      top: 100%;
-      right: 20px;
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      width: 200px;
-      text-align: center;
-    }
-
-    .header .profile.active { display: block; }
-
-    .dark-mode {
-      background-color: #121212;
-      color: #eee;
-    }
-    .dark-mode header {
-      background-color: #222;
-    }
-    .dark-mode .runner-strip {
-      background-color: #333;
-    }
-    .dark-mode .box {
-      background-color: #1e1e1e;
-      color: #eee;
-    }
-    .dark-mode footer {
-      background-color: #1e1e1e;
-      color: #aaa;
-    }
-
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Loader Card */
-    .card {
-      padding: 1rem 2rem;
-      margin: 2rem auto;
-      max-width: 600px;
-      color: white;
-      background: transparent;
-      box-shadow: none;
-      border: none;
-    }
-
-    .loader {
-      color: rgb(124, 124, 124);
-      font-family: "Poppins", sans-serif;
-      font-weight: 500;
-      font-size: 18px; /* reduced from 28px */
-      height: 40px;
-      padding: 10px 10px;
-      display: flex;
-      border-radius: 8px;
-    }
-
-    .words {
-      overflow: hidden;
-      position: relative;
-    }
-
-    .words::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(transparent 10%, transparent 30%, transparent 70%, transparent 90%);
-      z-index: 20;
-    }
-
-    .word {
-      display: block;
-      height: 100%;
-      padding-left: 6px;
-      color: #956afa;
-      animation: spin_4991 7s infinite;
-    }
-
-    @keyframes spin_4991 {
-       100% { transform: translateY(-500%); }
-       0%   { transform: translateY(0%); } 
-      20%  { transform: translateY(-100%); }
-      40%  { transform: translateY(-200%); }
-      60%  { transform: translateY(-300%); }
-      80%  { transform: translateY(-400%); }
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
     }
   </style>
 </head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
 
-<body>
+  <header class="text-2xl font-bold text-center py-4 border-b border-gray-300 bg-white shadow fade-in-up">UPSChub
+  
+<div class="absolute top-4 left-4 z-50">
+  <a href="javascript:history.back()" class="text-blue-600 hover:text-blue-800 text-2xl">
+    <i class="fas fa-arrow-left"></i>
+  </a>
+</div>
 
-<!-- Header -->
-<header class="header">
-   <section class="flex">
-      <a href="index.html" class="logo">UPSC hub</a>
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow p-4 max-w-5xl mx-auto space-y-6 fade-in-up pb-32">
+
+    <!-- Welcome -->
+    <div class="bg-white shadow rounded-xl p-6">
+      <h1 class="text-2xl font-bold mb-2 animate-pulse">Welcome back, Aspirant! ✨</h1>
+      <p class="text-gray-600 mb-2">58 days to Prelims. Let's conquer it!</p>
+      <div class="text-sm text-gray-500">Last login: Just now</div>
+    </div>
+
+    <!-- Progress Cards -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-blue-100 p-4 rounded-xl text-center hover:scale-105 transition duration-200">
+        <p class="text-lg font-bold">62%</p>
+        <p class="text-sm text-gray-700">GS Covered</p>
       </div>
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
+      <div class="bg-green-100 p-4 rounded-xl text-center hover:scale-105 transition duration-200">
+        <p class="text-lg font-bold">74%</p>
+        <p class="text-sm text-gray-700">CSAT Accuracy</p>
       </div>
-   </section>
-</header>
-
-<!-- Sidebar -->
-<div class="side-bar">
-   <div id="close-btn"><i class="fas fa-times"></i></div>
-   <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   </div>
-  <nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-  </nav>
-</div>
-
-<h1 class="main-header">UPSC</h1>
-
-
-<div class="card">
-  <div class="loader">
-    <div class="words">
-      <span class="word">UPSChub</span>
-      <span class="word">Loading Prelims</span>
-      <span class="word">Loading Mains</span>
-      <span class="word">Loading Interview</span>
-      <span class="word">UPSChub Ready</span>
-      <span class="word">Let's Begin</span>
+      <div class="bg-yellow-100 p-4 rounded-xl text-center hover:scale-105 transition duration-200">
+        <p class="text-lg font-bold">68</p>
+        <p class="text-sm text-gray-700">Mock Avg Score</p>
+      </div>
+      <div class="bg-purple-100 p-4 rounded-xl text-center hover:scale-105 transition duration-200">
+        <p class="text-lg font-bold">7 Days</p>
+        <p class="text-sm text-gray-700">Study Streak</p>
+      </div>
     </div>
-  </div>
-</div>
 
-<div class="date-time">
-    <p id="currentDate"></p>
-</div>
-
-<main>
-  <section id="prelims">
-    <h2 class="section-header">Prelims</h2>
-    <p>Prepare for the UPSC Prelims exam with curated resources and practice tests.</p>
-    <div class="bg-gray-100 p-4 rounded-md shadow-sm inline-block">
-      <a href="prelims.html" class="btn">Go to Prelims</a>
+    <!-- Smart Plan -->
+    <div class="bg-white shadow rounded-xl p-6">
+      <h2 class="text-xl font-semibold mb-4">Today's Smart Plan ✅</h2>
+      <ul class="list-disc list-inside text-gray-700 space-y-2">
+        <li>Revise Environment Chapter 3</li>
+        <li>Solve 20 MCQs on Budget 2025</li>
+        <li>Watch: Parliament Basics (12 min)</li>
+      </ul>
     </div>
-  </section>
 
-  <section id="mains">
-    <h2 class="section-header">Mains</h2>
-    <p>Access study materials and answer writing practice for UPSC Mains.</p>
-    <div class="bg-gray-100 p-4 rounded-md shadow-sm inline-block">
-      <a href="mains.html" class="btn">Go to Mains</a>
+    <!-- Quick Start Buttons -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <a href="#" class="bg-white shadow p-4 rounded-xl text-center hover:bg-blue-100 transition-all transform hover:-translate-y-1 duration-300">
+        <i class="fas fa-pen text-xl text-blue-600 animate-bounce"></i>
+        <p class="mt-2 text-sm font-semibold">Start GS</p>
+      </a>
+      <a href="#" class="bg-white shadow p-4 rounded-xl text-center hover:bg-green-100 transition-all transform hover:-translate-y-1 duration-300">
+        <i class="fas fa-calculator text-xl text-green-600 animate-bounce"></i>
+        <p class="mt-2 text-sm font-semibold">CSAT Test</p>
+      </a>
+      <a href="#" class="bg-white shadow p-4 rounded-xl text-center hover:bg-yellow-100 transition-all transform hover:-translate-y-1 duration-300">
+        <i class="fas fa-clipboard-list text-xl text-yellow-600 animate-bounce"></i>
+        <p class="mt-2 text-sm font-semibold">Full Mock</p>
+      </a>
+      <a href="#" class="bg-white shadow p-4 rounded-xl text-center hover:bg-purple-100 transition-all transform hover:-translate-y-1 duration-300">
+        <i class="fas fa-book-open text-xl text-purple-600 animate-bounce"></i>
+        <p class="mt-2 text-sm font-semibold">PYQs</p>
+      </a>
     </div>
-  </section>
 
-  <section id="interview">
-    <h2 class="section-header">Interview</h2>
-    <p>Get tips and mock interview sessions to prepare for the UPSC Interview.</p>
-    <div class="bg-gray-100 p-4 rounded-md shadow-sm inline-block">
-      <a href="interview.html" class="btn">Go to Interview</a>
+    <!-- Resume & Recommendations -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white shadow rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-2">Resume Where You Left Off</h3>
+        <p class="text-gray-700">Polity MCQ Test - 14/20 ✅</p>
+        <a href="#" class="text-blue-600 hover:underline text-sm">Resume from Q15</a>
+      </div>
+      <div class="bg-white shadow rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-2">Recommended For You 💡</h3>
+        <ul class="list-disc list-inside text-gray-700 space-y-1">
+          <li>Improve Environment accuracy with 10-min test</li>
+          <li>Start untouched topic: Ancient India</li>
+        </ul>
+      </div>
     </div>
-  </section>
-</main>
 
-<!-- Loader Card -->
+    <!-- Quote & Calendar -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="bg-white shadow rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-2">Daily Quote 🕊️</h3>
+        <p class="italic text-gray-700">"Consistency beats intensity." – UPSC Topper 2022</p>
+      </div>
+      <div class="bg-white shadow rounded-xl p-6">
+        <h3 class="text-lg font-semibold mb-2">Your Study Calendar</h3>
+        <p class="text-gray-500 text-sm">(Coming soon...)</p>
+      </div>
+    </div>
 
+  </main>
 
-<!-- Footer -->
-<footer>
-  &copy; 2024 UPSChub. All rights reserved.
-</footer>
-
-<script>
-    function updateDateTime() {
-      const now = new Date();
-      const options = {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      };
-      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-      const toggleBtn = document.getElementById('toggle-btn');
-      if(document.body.classList.contains('dark-mode')){
-         toggleBtn.classList.remove('fa-sun');
-         toggleBtn.classList.add('fa-moon');
-      } else {
-         toggleBtn.classList.remove('fa-moon');
-         toggleBtn.classList.add('fa-sun');
-      }
-    }
-
-    const menuBtn = document.querySelector('#menu-btn');
-    const searchBtn = document.querySelector('#search-btn');
-    const userBtn = document.querySelector('#user-btn');
-    const sideBar = document.querySelector('.side-bar');
-    const searchForm = document.querySelector('.search-form');
-    const profile = document.querySelector('.header .profile');
-    const closeBtn = document.querySelector('#close-btn');
-
-    menuBtn.onclick = () => {
-      sideBar.classList.toggle('active');
-      searchForm.classList.remove('active');
-      profile.classList.remove('active'); 
-    };
-
-    searchBtn.onclick = () => {
-      searchForm.classList.toggle('active');
-      sideBar.classList.remove('active');
-      profile.classList.remove('active');
-    };
-
-    userBtn.onclick = () => {
-      profile.classList.toggle('active');
-      searchForm.classList.remove('active');
-      sideBar.classList.remove('active');
-    };
-
-    closeBtn.onclick = () => {
-      sideBar.classList.remove('active');
-    };
-
-    document.getElementById('toggle-btn').addEventListener('click', toggleDarkMode);
-    setInterval(updateDateTime, 1000);
-    updateDateTime();
-</script>
+  <!-- Footer -->
+  <footer class="fixed bottom-0 left-0 w-full border-t border-gray-300 bg-white shadow-lg flex justify-center gap-24 py-4 z-50">
+    <a href="CSAT.html"
+       class="flex items-center gap-2 text-blue-700 hover:text-white hover:bg-blue-600 transition-all duration-300 ease-in-out px-4 py-2 rounded-xl shadow-sm hover:shadow-lg">
+      <i class="fas fa-calculator"></i> <span class="font-semibold">CSAT</span>
+    </a>
+    <a href="GS.html"
+       class="flex items-center gap-2 text-blue-700 hover:text-white hover:bg-blue-600 transition-all duration-300 ease-in-out px-4 py-2 rounded-xl shadow-sm hover:shadow-lg">
+      <i class="fas fa-globe"></i> <span class="font-semibold">GS</span>
+    </a>
+  </footer>
 
 </body>
 </html>
