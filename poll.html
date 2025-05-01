@@ -334,49 +334,49 @@
     'polity': new Date().setHours(20, 18, 0, 0),
     'geography': new Date().setHours(22, 0, 0, 0),
     'mapping': new Date().setHours(22, 30, 0, 0),
-    'current': new Date().setHours(23, 0, 0, 0)
+    'current-affairs': new Date().setHours(23, 0, 0, 0)
   };
 
   function updateStatus() {
     const now = new Date().getTime();
+
     for (let key in unlockTimes) {
       const timeLeft = unlockTimes[key] - now;
       const box = document.getElementById(`poll-${key}`);
       const icon = document.getElementById(`icon-${key}`);
 
+      if (!box || !icon) continue;
+
       if (timeLeft <= 0) {
-  box.classList.remove('locked');
-  box.classList.add('unlocked');
-  icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
+        box.classList.remove('locked');
+        box.classList.add('unlocked');
+        icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
 
-  // Set redirection per section
-  let redirectPage = '';
-  switch (key) {
-    case 'polity':
-      redirectPage = 'politypoll.html';
-      break;
-    case 'geography':
-      redirectPage = 'geographypoll.html';
-      break;
-    case 'mapping':
-      redirectPage = 'mappingpoll.html';
-      break;
-    case 'current-affairs':
-      redirectPage = 'currentaffairspoll.html';
-      break;
-    default:
-      redirectPage = '#'; // fallback or error
-  }
+        let redirectPage = '';
+        switch (key) {
+          case 'polity':
+            redirectPage = 'politypoll.html';
+            break;
+          case 'geography':
+            redirectPage = 'geographypoll.html';
+            break;
+          case 'mapping':
+            redirectPage = 'mappingpoll.html';
+            break;
+          case 'current-affairs':
+            redirectPage = 'currentaffairspoll.html';
+            break;
+          default:
+            redirectPage = '#';
+        }
 
-  box.onclick = () => {
-    if (redirectPage !== '#') {
-      window.location.href = redirectPage;
-    } else {
-      alert('Poll not found');
-    }
-  };
-}
-
+        box.onclick = () => {
+          if (redirectPage !== '#') {
+            window.location.href = redirectPage;
+          } else {
+            alert('Poll not found');
+          }
+        };
 
         if (!box.querySelector('.live-indicator')) {
           const liveIndicator = document.createElement('div');
@@ -384,15 +384,19 @@
           liveIndicator.textContent = 'LIVE';
           box.appendChild(liveIndicator);
         }
+
       } else {
         box.classList.add('locked');
+        box.onclick = () => handleClick(key); // show popup for locked
         const liveIndicator = box.querySelector('.live-indicator');
         if (liveIndicator) {
           liveIndicator.remove();
         }
+        icon.innerHTML = '<i class="fas fa-lock"></i>';
       }
     }
   }
+
   setInterval(updateStatus, 1000);
   updateStatus();
 
@@ -415,31 +419,27 @@
     document.getElementById('overlay').style.display = 'none';
   }
 
-  // Toggle Sidebar
-  const menuBtn = document.getElementById('menu-btn');
-  const sideBar = document.querySelector('.side-bar');
-  const closeBtn = document.getElementById('close-btn');
-  menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
-  closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+  // Sidebar toggle
+  document.getElementById('menu-btn').addEventListener('click', () =>
+    document.querySelector('.side-bar').classList.add('active'));
+  document.getElementById('close-btn').addEventListener('click', () =>
+    document.querySelector('.side-bar').classList.remove('active'));
 
-  // Toggle Search Bar
-  const searchBtn = document.getElementById('search-btn');
-  const searchForm = document.querySelector('.search-form');
-  searchBtn.addEventListener('click', () => searchForm.classList.toggle('active'));
+  // Search toggle
+  document.getElementById('search-btn').addEventListener('click', () =>
+    document.querySelector('.search-form').classList.toggle('active'));
 
-  // Toggle Profile
-  const userBtn = document.getElementById('user-btn');
-  const profileDetails = document.querySelector('.profile-details');
-  userBtn.addEventListener('click', () => profileDetails.classList.toggle('active'));
+  // Profile toggle
+  document.getElementById('user-btn').addEventListener('click', () =>
+    document.querySelector('.profile-details').classList.toggle('active'));
 
-  // Toggle Dark Mode
-  const toggleBtn = document.getElementById('toggle-btn');
-  toggleBtn.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
+  // Dark mode toggle
+  document.getElementById('toggle-btn').addEventListener('click', () =>
+    document.body.classList.toggle('dark-mode'));
 
-  // Navigate to Poll
+  // Optional: Use this to navigate programmatically
   function goToPoll(pollType) {
     window.location.href = `${pollType}.html`;
   }
 </script>
-</body>
-</html>
+
