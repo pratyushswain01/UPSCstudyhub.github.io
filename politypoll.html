@@ -178,7 +178,7 @@
 
 <main>
   <div id="quizSection" class="section active">
-    <div class="timer" id="timer">Time: 10s</div>
+    <div class="timer" id="timer">Time: 15s</div>
     <div class="progress-container">
       <div class="progress-bar" id="progressBar"></div>
     </div>
@@ -192,7 +192,7 @@
     <div class="result-screen">
       <h2>🎉 Quiz Complete!</h2>
       <p id="resultText"></p>
-     
+      <button id="shareButton">Share Result on WhatsApp</button>
     </div>
   </div>
 </main>
@@ -632,81 +632,101 @@ const quiz = [
 ];
 
 
-  let current = 0, score = 0;
-  let timerValue = 15;
-  let timerInterval;
+let current = 0, score = 0;
+let startTime, endTime, timeTaken;
+let timerValue = 15;
+let timerInterval;
 
-  function startTimer() {
-    clearInterval(timerInterval);
-    timerValue = 15;
+const testDetails = {
+  testName: "UPSChub Live Poll",
+  totalQuestions: quiz.length,
+  quizDuration: 15 // Duration for each question (in minutes)
+};
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerValue = 15;
+  document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+  document.getElementById('progressBar').style.width = "100%";
+
+  timerInterval = setInterval(() => {
+    timerValue--;
     document.getElementById('timer').textContent = `Time: ${timerValue}s`;
-    document.getElementById('progressBar').style.width = "100%";
+    document.getElementById('progressBar').style.width = (timerValue / 15) * 100 + "%";
 
-    timerInterval = setInterval(() => {
-      timerValue--;
-      document.getElementById('timer').textContent = `Time: ${timerValue}s`;
-      document.getElementById('progressBar').style.width = (timerValue / 15) * 100 + "%";
-
-      if (timerValue <= 0) {
-        clearInterval(timerInterval);
-        nextQuestion();
-      }
-    }, 1000);
-  }
-
-  function switchSection(sectionId) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(sectionId).classList.add('active');
-  }
-
-  function loadQuestion() {
-    clearInterval(timerInterval);
-    const q = quiz[current];
-    document.getElementById('question').textContent = `Q${current + 1}: ${q.question}`;
-    const optionsContainer = document.getElementById('options');
-    const explanationBox = document.getElementById('explanation');
-    explanationBox.style.display = 'none';
-    explanationBox.innerHTML = '';
-    optionsContainer.innerHTML = '';
-
-    q.options.forEach((opt, i) => {
-      const div = document.createElement('div');
-      div.className = 'option';
-      div.textContent = opt;
-      div.onclick = () => handleAnswer(div, i === q.correct, q.correct, i);
-      optionsContainer.appendChild(div);
-    });
-
-    startTimer();
-  }
-
-  function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
-    clearInterval(timerInterval);
-    const all = document.querySelectorAll('.option');
-    all.forEach((opt, idx) => {
-      opt.classList.remove('correct', 'wrong');
-      opt.onclick = null;
-      if (idx === correctIndex) opt.classList.add('correct');
-      else if (idx === selectedIndex) opt.classList.add('wrong');
-    });
-    if (isCorrect) score++;
-    const exp = document.getElementById('explanation');
-    exp.style.display = 'block';
-    exp.innerHTML = `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
-  }
-
-  function nextQuestion() {
-    clearInterval(timerInterval);
-    if (current < quiz.length - 1) {
-      current++;
-      loadQuestion();
-    } else {
-      document.getElementById('resultText').textContent = `You scored ${score} out of ${quiz.length}.`;
-      switchSection('resultSection');
+    if (timerValue <= 0) {
+      clearInterval(timerInterval);
+      nextQuestion();
     }
-  }
+  }, 1000);
+}
 
-  window.onload = loadQuestion;
+function switchSection(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+}
+
+function loadQuestion() {
+  clearInterval(timerInterval);
+  if (current === 0) startTime = new Date().toLocaleTimeString();
+
+  const q = quiz[current];
+  document.getElementById('question').textContent = `Q${current + 1}: ${q.question}`;
+  const optionsContainer = document.getElementById('options');
+  const explanationBox = document.getElementById('explanation');
+  explanationBox.style.display = 'none';
+  explanationBox.innerHTML = '';
+  optionsContainer.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt;
+    div.onclick = () => handleAnswer(div, i === q.correct, q.correct, i);
+    optionsContainer.appendChild(div);
+  });
+
+  startTimer();
+}
+
+function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
+  clearInterval(timerInterval);
+  const all = document.querySelectorAll('.option');
+  all.forEach((opt, idx) => {
+    opt.classList.remove('correct', 'wrong');
+    opt.onclick = null;
+    if (idx === correctIndex) opt.classList.add('correct');
+    else if (idx === selectedIndex) opt.classList.add('wrong');
+  });
+  if (isCorrect) score++;
+  const exp = document.getElementById('explanation');
+  exp.style.display = 'block';
+  exp.innerHTML = `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
+}
+
+function nextQuestion() {
+  clearInterval(timerInterval);
+  if (current < quiz.length - 1) {
+    current++;
+    loadQuestion();
+  } else {
+    endTime = new Date().toLocaleTimeString();
+    timeTaken = (15 - timerValue); // Time taken for the last question
+    
+    const resultText = `🎉 I just completed the **${testDetails.testName}** quiz! 📝 Test Name: **${testDetails.testName}**. ⏰ Started at **${startTime}** and completed at **${endTime}**. I scored **${score}** out of **${testDetails.totalQuestions}** in **${timeTaken}** seconds. Test Details: **Total Questions**: ${testDetails.totalQuestions}, **Quiz Duration**: ${testDetails.quizDuration} minutes. Check it out and try it yourself!`;
+
+    document.getElementById('resultText').textContent = `You scored ${score} out of ${testDetails.totalQuestions}.`;
+
+    document.getElementById('shareButton').onclick = function () {
+      const whatsappURL = `whatsapp://send?text=${encodeURIComponent(resultText)}`;
+      window.location.href = whatsappURL;
+    };
+
+    switchSection('resultSection');
+  }
+}
+
+window.onload = loadQuestion;
 </script>
 
 </body>
