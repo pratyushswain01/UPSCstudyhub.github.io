@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -95,7 +96,7 @@
        border-left: 6px solid #28a745;
      }
 
-     /* New Sidebar CSS */
+ /* New Sidebar CSS */
      .side-bar {
        position: fixed;
        top: 0;
@@ -285,71 +286,125 @@
 
 <!-- JavaScript -->
 <script>
+  function updateClock() {
+    const now = new Date();
+    const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+    const dateStr = now.toLocaleDateString(undefined, options);
+    const timeStr = now.toLocaleTimeString();
+    document.getElementById('clock').textContent = `${dateStr} | ${timeStr}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
 
-  document.addEventListener('DOMContentLoaded', function() {
-    // Toggle Sidebar
-    document.getElementById('menu-btn').addEventListener('click', function() {
-        const sideBar = document.querySelector('.side-bar');
-        sideBar.classList.toggle('active');
-        document.querySelector('.search-form').classList.remove('active');
-        document.querySelector('.header .profile').classList.remove('active');
-    });
+  const unlockTimes = {
+    'polity': new Date().setHours(20, 18, 0, 0),
+    'geography': new Date().setHours(22, 0, 0, 0),
+    'mapping': new Date().setHours(22, 30, 0, 0),
+    'current': new Date().setHours(23, 0, 0, 0)
+  };
 
-    // Close Sidebar
-    document.getElementById('close-btn').addEventListener('click', function() {
-        const sideBar = document.querySelector('.side-bar');
-        sideBar.classList.remove('active');
-    });
+  function updateStatus() {
+    const now = new Date().getTime();
+    for (let key in unlockTimes) {
+      const timeLeft = unlockTimes[key] - now;
+      const box = document.getElementById(`poll-${key}`);
+      const icon = document.getElementById(`icon-${key}`);
 
-    // Show Search Form
-    document.getElementById('search-btn').addEventListener('click', function() {
-        const searchForm = document.querySelector('.search-form');
-        searchForm.classList.toggle('active');
-        document.querySelector('.side-bar').classList.remove('active');
-        document.querySelector('.header .profile').classList.remove('active');
-    });
+      if (timeLeft <= 0) {
+        box.classList.remove('locked');
+        box.classList.add('unlocked');
+        icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
+        box.onclick = () => window.location.href = `${key}poll.html`;
 
-    // Toggle User Profile
-    document.getElementById('user-btn').addEventListener('click', function() {
-        document.querySelector('.header .profile').classList.toggle('active');
-        document.querySelector('.search-form').classList.remove('active');
-        document.querySelector('.side-bar').classList.remove('active');
-    });
-
-    // Toggle Dark/Light Mode
-    document.getElementById('toggle-btn').addEventListener('click', function() {
-        document.body.classList.toggle('dark-mode');
-    });
-
-    // Display Time Below Header
-    function updateClock() {
-      const clock = document.getElementById('clock');
-      const currentTime = new Date();
-      
-      const dayOfWeek = currentTime.toLocaleString('en-us', { weekday: 'short' });
-      const month = currentTime.toLocaleString('en-us', { month: 'short' });
-      const day = currentTime.getDate();
-      const year = currentTime.getFullYear();
-      
-      let hours = currentTime.getHours();
-      const minutes = currentTime.getMinutes().toString().padStart(2, '0');
-      const seconds = currentTime.getSeconds().toString().padStart(2, '0');
-      const ampm = hours >= 12 ? 'PM' : 'AM';
-      
-      // Convert to 12-hour format
-      hours = hours % 12;
-      hours = hours ? hours : 12; // the hour '0' should be '12'
-      
-      // Format time as `Thu, May 1, 2025 | 9:06:47 PM`
-      const timeString = `${dayOfWeek}, ${month} ${day}, ${year} | ${hours}:${minutes}:${seconds} ${ampm}`;
-      clock.textContent = timeString;
+        if (!box.querySelector('.live-indicator')) {
+          const liveIndicator = document.createElement('div');
+          liveIndicator.classList.add('live-indicator');
+          liveIndicator.textContent = 'LIVE';
+          box.appendChild(liveIndicator);
+        }
+      } else {
+        box.classList.add('locked');
+        const liveIndicator = box.querySelector('.live-indicator');
+        if (liveIndicator) {
+          liveIndicator.remove();
+        }
+      }
     }
+  }
+  setInterval(updateStatus, 1000);
+  updateStatus();
 
-    // Update time every second
-    setInterval(updateClock, 1000);
+  function handleClick(section) {
+    const now = new Date().getTime();
+    const timeLeft = unlockTimes[section] - now;
+    if (timeLeft > 0) {
+      const mins = Math.floor(timeLeft / 60000);
+      const secs = Math.floor((timeLeft % 60000) / 1000);
+      document.getElementById('popup-title').textContent = `Section: ${section.toUpperCase()}`;
+      document.getElementById('popup-status').textContent = 'Status: LOCKED';
+      document.getElementById('popup-timer').textContent = `Time Remaining: ${mins}m ${secs}s`;
+      document.getElementById('popup').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+  }
+
+  function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+  }
+
+  // Icons Functionality
+  document.getElementById('menu-btn').onclick = () => {
+    document.querySelector('.side-bar').classList.toggle('active');
+    document.querySelector('.search-form').classList.remove('active');
+    document.querySelector('.header .profile').classList.remove('active');
+  };
+
+  document.getElementById('search-btn').onclick = () => {
+    document.querySelector('.search-form').classList.toggle('active');
+    document.querySelector('.side-bar').classList.remove('active');
+    document.querySelector('.header .profile').classList.remove('active');
+  };
+
+  document.getElementById('user-btn').onclick = () => {
+    document.querySelector('.header .profile').classList.toggle('active');
+    document.querySelector('.search-form').classList.remove('active');
+    document.querySelector('.side-bar').classList.remove('active');
+  };
+
+  document.getElementById('toggle-btn').onclick = () => {
+    document.body.classList.toggle('dark-mode');
+  };
+
+ // Toggle Sidebar
+  document.getElementById('menu-btn').addEventListener('click', function() {
+      const sideBar = document.querySelector('.side-bar');
+      sideBar.classList.add('active');
+  });
+
+  // Close Sidebar
+  document.getElementById('close-btn').addEventListener('click', function() {
+      const sideBar = document.querySelector('.side-bar');
+      sideBar.classList.remove('active');
+  });
+
+  // Show Search Form
+  document.getElementById('search-btn').addEventListener('click', function() {
+      const searchForm = document.querySelector('.search-form');
+      searchForm.classList.toggle('active');
+  });
+
+  // Toggle User Profile
+  document.getElementById('user-btn').addEventListener('click', function() {
+      const profileDetails = document.querySelector('.profile-details');
+      profileDetails.style.display = profileDetails.style.display === 'block' ? 'none' : 'block';
+  });
+
+  // Toggle Dark/Light Mode
+  document.getElementById('toggle-btn').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
   });
 </script>
 
 </body>
 </html>
-
