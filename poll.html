@@ -367,19 +367,61 @@
   setInterval(updateStatus, 1000);
   updateStatus();
 
-  function handleClick(section) {
-    const now = new Date().getTime();
-    const timeLeft = unlockTimes[section] - now;
-    if (timeLeft > 0) {
-      const mins = Math.floor(timeLeft / 60000);
-      const secs = Math.floor((timeLeft % 60000) / 1000);
-      document.getElementById('popup-title').textContent = `Section: ${section.toUpperCase()}`;
-      document.getElementById('popup-status').textContent = 'Status: LOCKED';
-      document.getElementById('popup-timer').textContent = `Time Remaining: ${mins}m ${secs}s`;
-      document.getElementById('popup').style.display = 'block';
-      document.getElementById('overlay').style.display = 'block';
+  <script>
+  const unlockTimes = {
+    polity: new Date().getTime() + 30000, // example: unlocks after 30 seconds
+    geography: new Date().getTime() + 60000,
+    mapping: new Date().getTime() + 90000,
+    'current-affairs': new Date().getTime() + 120000
+  };
+
+  function goToPoll(topic) {
+    switch(topic) {
+      case 'polity':
+        window.location.href = 'politypoll.html';
+        break;
+      case 'geography':
+        window.location.href = 'geographypoll.html';
+        break;
+      case 'mapping':
+        window.location.href = 'mappingpoll.html';
+        break;
+      case 'current-affairs':
+        window.location.href = 'currentaffairspoll.html';
+        break;
+      default:
+        alert('Poll not found');
     }
   }
+
+  function handleClick(section) {
+    const now = new Date().getTime();
+    let timeLeft = unlockTimes[section] - now;
+
+    document.getElementById('popup-title').textContent = `Section: ${section.toUpperCase()}`;
+    document.getElementById('popup').style.display = 'block';
+    document.getElementById('overlay').style.display = 'block';
+
+    if (timeLeft > 0) {
+      document.getElementById('popup-status').textContent = 'Status: LOCKED';
+
+      const interval = setInterval(() => {
+        const mins = Math.floor(timeLeft / 60000);
+        const secs = Math.floor((timeLeft % 60000) / 1000);
+        document.getElementById('popup-timer').textContent = `Time Remaining: ${mins}m ${secs}s`;
+
+        timeLeft -= 1000;
+
+        if (timeLeft <= 0) {
+          clearInterval(interval);
+          goToPoll(section);
+        }
+      }, 1000);
+    } else {
+      goToPoll(section); // If already unlocked
+    }
+  }
+</script>
 
   function closePopup() {
     document.getElementById('popup').style.display = 'none';
