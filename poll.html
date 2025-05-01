@@ -216,31 +216,38 @@
 </div>
 
 <!-- Poll Section -->
-<section class="poll-section">
+
+  <section class="poll-section">
    <header>
       <h1>📚 UPSChub - Live Polls</h1>
       <div id="clock">Loading time...</div>
    </header>
 
-   <div class="container">
-      <div class="poll-grid">
-         <div class="poll-box" onclick="goToPoll('polity')">
-            <div class="poll-topic">🏛️ Polity</div>
-            <div class="arrow-icon">➡️</div>
-         </div>
-         <div class="poll-box" onclick="goToPoll('geography')">
-            <div class="poll-topic">🌍 Geography</div>
-            <div class="arrow-icon">➡️</div>
-         </div>
-         <div class="poll-box" onclick="goToPoll('mapping')">
-            <div class="poll-topic">🗺️ Mapping <span class="live-indicator">LIVE</span></div>
-            <div class="arrow-icon">➡️ </div>
-         </div>
-         <div class="poll-box" onclick="goToPoll('current-affairs')">
-            <div class="poll-topic">📰 Current Affairs</div>
-            <div class="arrow-icon">➡️</div>
-         </div>
-      </div>
+   <div class="poll-grid">
+     <div class="poll-box locked" id="poll-polity" onclick="handleClick('polity')">
+       <div class="poll-topic">🏛️ Polity</div>
+       <div class="lock-icon" id="icon-polity"><i class="fas fa-lock"></i></div>
+     </div>
+     <div class="poll-box locked" id="poll-geography" onclick="handleClick('geography')">
+       <div class="poll-topic">🌍 Geography</div>
+       <div class="lock-icon" id="icon-geography"><i class="fas fa-lock"></i></div>
+     </div>
+     <div class="poll-box locked" id="poll-mapping" onclick="handleClick('mapping')">
+       <div class="poll-topic">🗺️ Mapping</div>
+       <div class="lock-icon" id="icon-mapping"><i class="fas fa-lock"></i></div>
+     </div>
+     <div class="poll-box locked" id="poll-current" onclick="handleClick('current')">
+       <div class="poll-topic">📰 Current Affairs</div>
+       <div class="lock-icon" id="icon-current"><i class="fas fa-lock"></i></div>
+     </div>
+   </div>
+
+   <div class="overlay" id="overlay"></div>
+   <div class="popup" id="popup">
+     <h3 id="popup-title"></h3>
+     <p id="popup-status"></p>
+     <p id="popup-timer"></p>
+     <button onclick="closePopup()">Close</button>
    </div>
 </section>
 
@@ -260,6 +267,63 @@
   }
   setInterval(updateClock, 1000);
   updateClock();
+
+  const unlockTimes = {
+    'polity': new Date().setHours(20, 18, 0, 0),
+    'geography': new Date().setHours(22, 0, 0, 0),
+    'mapping': new Date().setHours(22, 30, 0, 0),
+    'current': new Date().setHours(23, 0, 0, 0)
+  };
+
+  function updateStatus() {
+    const now = new Date().getTime();
+    for (let key in unlockTimes) {
+      const timeLeft = unlockTimes[key] - now;
+      const box = document.getElementById(`poll-${key}`);
+      const icon = document.getElementById(`icon-${key}`);
+
+      if (timeLeft <= 0) {
+        box.classList.remove('locked');
+        box.classList.add('unlocked');
+        icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
+        box.onclick = () => window.location.href = `${key}poll.html`;
+
+        if (!box.querySelector('.live-indicator')) {
+          const liveIndicator = document.createElement('div');
+          liveIndicator.classList.add('live-indicator');
+          liveIndicator.textContent = 'LIVE';
+          box.appendChild(liveIndicator);
+        }
+      } else {
+        box.classList.add('locked');
+        const liveIndicator = box.querySelector('.live-indicator');
+        if (liveIndicator) {
+          liveIndicator.remove();
+        }
+      }
+    }
+  }
+  setInterval(updateStatus, 1000);
+  updateStatus();
+
+  function handleClick(section) {
+    const now = new Date().getTime();
+    const timeLeft = unlockTimes[section] - now;
+    if (timeLeft > 0) {
+      const mins = Math.floor(timeLeft / 60000);
+      const secs = Math.floor((timeLeft % 60000) / 1000);
+      document.getElementById('popup-title').textContent = `Section: ${section.toUpperCase()}`;
+      document.getElementById('popup-status').textContent = 'Status: LOCKED';
+      document.getElementById('popup-timer').textContent = `Time Remaining: ${mins}m ${secs}s`;
+      document.getElementById('popup').style.display = 'block';
+      document.getElementById('overlay').style.display = 'block';
+    }
+  }
+
+  function closePopup() {
+    document.getElementById('popup').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
+  }
 
   // Toggle Sidebar
   const menuBtn = document.getElementById('menu-btn');
