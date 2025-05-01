@@ -319,6 +319,35 @@
 </footer>
 
 <!-- JavaScript -->
+<!-- Overlay and Popup -->
+<div id="overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:999;"></div>
+
+<div id="popup" class="popup">
+  <h2 id="popup-title">Section</h2>
+  <p id="popup-status">Status</p>
+  <p id="popup-timer">Time Remaining</p>
+  <button onclick="closePopup()">Close</button>
+</div>
+
+<!-- Styles for Popup -->
+<style>
+  .popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    padding: 30px;
+    width: 320px;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+  }
+</style>
+
+<!-- Full JavaScript -->
 <script>
   function updateClock() {
     const now = new Date();
@@ -339,19 +368,19 @@
 
   function updateStatus() {
     const now = new Date().getTime();
-
     for (let key in unlockTimes) {
       const timeLeft = unlockTimes[key] - now;
       const box = document.getElementById(`poll-${key}`);
       const icon = document.getElementById(`icon-${key}`);
 
-      if (!box || !icon) continue;
+      if (!box) continue;
 
       if (timeLeft <= 0) {
         box.classList.remove('locked');
         box.classList.add('unlocked');
         icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
 
+        // Set redirection per section
         let redirectPage = '';
         switch (key) {
           case 'polity':
@@ -384,19 +413,16 @@
           liveIndicator.textContent = 'LIVE';
           box.appendChild(liveIndicator);
         }
-
       } else {
         box.classList.add('locked');
-        box.onclick = () => handleClick(key); // show popup for locked
+        box.onclick = () => handleClick(key);
         const liveIndicator = box.querySelector('.live-indicator');
         if (liveIndicator) {
           liveIndicator.remove();
         }
-        icon.innerHTML = '<i class="fas fa-lock"></i>';
       }
     }
   }
-
   setInterval(updateStatus, 1000);
   updateStatus();
 
@@ -419,27 +445,29 @@
     document.getElementById('overlay').style.display = 'none';
   }
 
-  // Sidebar toggle
-  document.getElementById('menu-btn').addEventListener('click', () =>
-    document.querySelector('.side-bar').classList.add('active'));
-  document.getElementById('close-btn').addEventListener('click', () =>
-    document.querySelector('.side-bar').classList.remove('active'));
+  // Optional: Sidebar & UI Toggles (adjust if you have them)
+  const menuBtn = document.getElementById('menu-btn');
+  const sideBar = document.querySelector('.side-bar');
+  const closeBtn = document.getElementById('close-btn');
+  const searchBtn = document.getElementById('search-btn');
+  const searchForm = document.querySelector('.search-form');
+  const userBtn = document.getElementById('user-btn');
+  const profileDetails = document.querySelector('.profile-details');
+  const toggleBtn = document.getElementById('toggle-btn');
 
-  // Search toggle
-  document.getElementById('search-btn').addEventListener('click', () =>
-    document.querySelector('.search-form').classList.toggle('active'));
-
-  // Profile toggle
-  document.getElementById('user-btn').addEventListener('click', () =>
-    document.querySelector('.profile-details').classList.toggle('active'));
-
-  // Dark mode toggle
-  document.getElementById('toggle-btn').addEventListener('click', () =>
-    document.body.classList.toggle('dark-mode'));
-
-  // Optional: Use this to navigate programmatically
-  function goToPoll(pollType) {
-    window.location.href = `${pollType}.html`;
+  if (menuBtn && closeBtn && sideBar) {
+    menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
+    closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+  }
+  if (searchBtn && searchForm) {
+    searchBtn.addEventListener('click', () => searchForm.classList.toggle('active'));
+  }
+  if (userBtn && profileDetails) {
+    userBtn.addEventListener('click', () => profileDetails.classList.toggle('active'));
+  }
+  if (toggleBtn) {
+    toggleBtn.addEventListener('click', () => document.body.classList.toggle('dark-mode'));
   }
 </script>
+
 
