@@ -345,10 +345,38 @@
       const icon = document.getElementById(`icon-${key}`);
 
       if (timeLeft <= 0) {
-        box.classList.remove('locked');
-        box.classList.add('unlocked');
-        icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
-        box.onclick = () => window.location.href = `${key}poll.html`;
+  box.classList.remove('locked');
+  box.classList.add('unlocked');
+  icon.innerHTML = '<i class="fas fa-arrow-right"></i>';
+
+  // Set redirection per section
+  let redirectPage = '';
+  switch (key) {
+    case 'polity':
+      redirectPage = 'politypoll.html';
+      break;
+    case 'geography':
+      redirectPage = 'geographypoll.html';
+      break;
+    case 'mapping':
+      redirectPage = 'mappingpoll.html';
+      break;
+    case 'current-affairs':
+      redirectPage = 'currentaffairspoll.html';
+      break;
+    default:
+      redirectPage = '#'; // fallback or error
+  }
+
+  box.onclick = () => {
+    if (redirectPage !== '#') {
+      window.location.href = redirectPage;
+    } else {
+      alert('Poll not found');
+    }
+  };
+}
+
 
         if (!box.querySelector('.live-indicator')) {
           const liveIndicator = document.createElement('div');
