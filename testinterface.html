@@ -224,8 +224,8 @@
     }
 
     .question-number {
-      width: 100%;
-      aspect-ratio: 1;
+      width: 30px;
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -234,8 +234,8 @@
       cursor: pointer;
       font-weight: 500;
       transition: all 0.2s;
-      font-size: 0.8em;
-      min-width: 30px;
+      font-size: 12px;
+      margin: 0 auto;
     }
 
     .question-number:hover {
@@ -259,6 +259,13 @@
 
     .current {
       border: 2px solid #3f51b5;
+      background: #3f51b5;
+      color: white;
+    }
+
+    .not-visited {
+      background: #e9ecef;
+      color: #333;
     }
 
     /* Legend Section */
@@ -307,6 +314,7 @@
 
     .legend-not-visited {
       background: #e9ecef;
+      border: 1px solid #ccc;
     }
 
     .legend-current {
@@ -419,6 +427,11 @@
       color: #eee;
     }
 
+    .dark .not-visited {
+      background: #3d3d4a;
+      color: #eee;
+    }
+
     .dark .legend {
       border-top-color: #444;
     }
@@ -433,7 +446,7 @@
 
     .dark .legend-not-visited {
       background: #3d3d4a;
-      box-shadow: 0 0 0 2px #555;
+      border: 1px solid #555;
     }
 
     .dark .fixed-action-area {
@@ -854,19 +867,26 @@
       questions.forEach((_, i) => {
         const btn = document.createElement('div');
         btn.className = 'question-number';
-        btn.textContent = i + 1;
         
+        // Set base class
+        if (state.visited[i]) {
+          if (state.answers[i] !== null) {
+            btn.classList.add('answered');
+          } else if (state.marked[i]) {
+            btn.classList.add('marked');
+          } else {
+            btn.classList.add('not-answered');
+          }
+        } else {
+          btn.classList.add('not-visited');
+        }
+        
+        // Highlight current question
         if (i === state.current) {
           btn.classList.add('current');
-          btn.style.backgroundColor = '#3f51b5';
-          btn.style.color = 'white';
-        } else if (state.marked[i]) {
-          btn.classList.add('marked');
-        } else if (state.answers[i] !== null) {
-          btn.classList.add('answered');
-        } else if (state.visited[i]) {
-          btn.classList.add('not-answered');
         }
+        
+        btn.textContent = i + 1;
         
         btn.onclick = () => {
           loadQuestion(i);
