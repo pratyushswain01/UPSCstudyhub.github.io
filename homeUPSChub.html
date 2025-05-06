@@ -13,159 +13,445 @@
    <link rel="stylesheet" href="css/style.css">
 
    <!-- Google Fonts -->
-   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Raleway:wght@300;400&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
    <!-- Custom Styles -->
    <style>
       /* Global Styling */
+      :root {
+         --primary: #3a86ff;
+         --secondary: #8338ec;
+         --accent: #ff006e;
+         --light: #f8f9fa;
+         --dark: #212529;
+         --success: #06d6a0;
+         --warning: #ffbe0b;
+      }
+      
       body {
-         font-family: 'Poppins', sans-serif;
-         background-color: #f9f4e7;
+         font-family: 'Open Sans', sans-serif;
+         background-color: #f5f7fa;
+         color: var(--dark);
          overflow-x: hidden;
          display: flex;
          flex-direction: column;
          min-height: 100vh;
+         line-height: 1.6;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+         font-family: 'Montserrat', sans-serif;
+         font-weight: 600;
       }
 
       /* Header Styling */
       .header {
-          background: linear-gradient(45deg, #FFB6C1, #FFD700); /* Gold and Pink gradient for New Year */
-          color: #fff;
-          padding: 20px 0;
-          text-align: center;
+          background: linear-gradient(135deg, var(--primary), var(--secondary));
+          color: white;
+          padding: 15px 0;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.1);
           position: relative;
+          z-index: 100;
+      }
+
+      .header .flex {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         max-width: 1200px;
+         margin: 0 auto;
+         padding: 0 20px;
       }
 
       .header .logo {
-          font-size: 45px;
-          font-weight: 600;
-          letter-spacing: 2px;
-          color: #fff;
-      }
-
-      .header .new-year-message {
-          font-size: 22px;
-          color: #fff;
-          font-weight: 500;
-          margin-top: 10px;
-      }
-
-      /* Fullscreen Overlay for New Year Wishes */
-      .fullscreen-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background-color: rgba(0, 0, 0, 0.8);
-          z-index: 1000;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
+          font-size: 28px;
+          font-weight: 700;
           color: white;
-          font-size: 3rem;
-          text-align: center;
-          visibility: hidden;
-          opacity: 0;
-          transition: visibility 0s, opacity 1s ease;
+          text-decoration: none;
+          display: flex;
+          align-items: center;
       }
 
-      .fullscreen-overlay.show {
-          visibility: visible;
-          opacity: 1;
+      .header .logo i {
+         margin-right: 10px;
+         font-size: 24px;
       }
 
-      .fullscreen-overlay .message {
-          margin-bottom: 20px;
-          font-size: 40px;
-          animation: fireworks 1s infinite ease-in-out;
+      .header .search-form {
+         display: flex;
+         align-items: center;
+         background: rgba(255,255,255,0.2);
+         border-radius: 30px;
+         padding: 5px 15px;
+         width: 40%;
+         max-width: 500px;
+         transition: all 0.3s ease;
       }
 
-      .fullscreen-overlay .message span {
-          font-size: 50px;
-          color: #FFD700; /* Golden Text for the New Year */
+      .header .search-form:hover {
+         background: rgba(255,255,255,0.3);
       }
 
-      
-
-      
-
-      /* Flower Decoration for New Year */
-      .flower-decor {
-          position: absolute;
-          top: 20px;
-          right: 10px;
-          z-index: 10;
-          background: url('images/flowers.gif')no-repeat center;
-          background-size: contain;
-          width: 120px;
-          height: 120px;
+      .header .search-form input {
+         background: transparent;
+         border: none;
+         color: white;
+         width: 100%;
+         padding: 8px 0;
+         font-size: 14px;
       }
 
-      /* UPSC Hub Section Styling */
+      .header .search-form input::placeholder {
+         color: rgba(255,255,255,0.8);
+      }
+
+      .header .search-form button {
+         background: transparent;
+         border: none;
+         color: white;
+         cursor: pointer;
+         font-size: 16px;
+      }
+
+      .header .icons {
+         display: flex;
+         gap: 15px;
+      }
+
+      .header .icons div {
+         color: white;
+         font-size: 18px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+      }
+
+      .header .icons div:hover {
+         transform: translateY(-2px);
+      }
+
+      .header .profile {
+         position: absolute;
+         top: 100%;
+         right: 20px;
+         background: white;
+         border-radius: 10px;
+         padding: 15px;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+         width: 250px;
+         display: none;
+         z-index: 1000;
+      }
+
+      .header .profile.active {
+         display: block;
+      }
+
+      .header .profile img {
+         width: 60px;
+         height: 60px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-bottom: 10px;
+         border: 3px solid var(--primary);
+      }
+
+      .header .profile h3 {
+         font-size: 16px;
+         color: var(--dark);
+         margin-bottom: 5px;
+      }
+
+      .header .profile .role {
+         font-size: 13px;
+         color: #6c757d;
+         margin-bottom: 15px;
+      }
+
+      /* Sidebar */
+      .side-bar {
+         position: fixed;
+         top: 0;
+         left: -300px;
+         width: 300px;
+         height: 100vh;
+         background: white;
+         box-shadow: 0 0 20px rgba(0,0,0,0.1);
+         z-index: 1000;
+         transition: all 0.3s ease;
+         overflow-y: auto;
+      }
+
+      .side-bar.active {
+         left: 0;
+      }
+
+      .side-bar #close-btn {
+         position: absolute;
+         top: 15px;
+         right: 15px;
+         font-size: 20px;
+         color: #6c757d;
+         cursor: pointer;
+      }
+
+      .side-bar .profile {
+         padding: 30px 20px;
+         text-align: center;
+         border-bottom: 1px solid #eee;
+      }
+
+      .side-bar .profile img {
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-bottom: 15px;
+         border: 3px solid var(--primary);
+      }
+
+      .side-bar .profile h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 5px;
+      }
+
+      .side-bar .profile .role {
+         font-size: 14px;
+         color: #6c757d;
+      }
+
+      .side-bar .navbar {
+         padding: 20px 0;
+      }
+
+      .side-bar .navbar a {
+         display: flex;
+         align-items: center;
+         padding: 12px 25px;
+         color: #495057;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      .side-bar .navbar a:hover {
+         background: #f8f9fa;
+         color: var(--primary);
+      }
+
+      .side-bar .navbar a i {
+         margin-right: 10px;
+         font-size: 18px;
+         width: 24px;
+         text-align: center;
+      }
+
+      .side-bar .navbar a span {
+         font-size: 15px;
+      }
+
+      /* Main Content */
       .home-grid {
-          margin-top: 50px;
-          text-align: center;
+         max-width: 1200px;
+         margin: 30px auto;
+         padding: 0 20px;
+         flex: 1;
       }
 
       .heading {
-          font-size: 40px;
-          color: #FF6347;
-          font-weight: 600;
-          margin-bottom: 20px;
-          text-transform: uppercase;
-          text-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+         font-size: 36px;
+         color: var(--primary);
+         margin-bottom: 30px;
+         text-align: center;
+         position: relative;
+         padding-bottom: 15px;
       }
 
-        .flower-text {
-          font-family: 'Raleway', sans-serif;
-          font-size: 50px;
-          color: #FF69B4; /* Beautiful Pink */
-          background-image: url('images/flowers-pattern.png'); /* You need a flower pattern image */
-          background-size: 100%;
-          text-align: center;
-          color: transparent;
-          background-clip: text;
-          display: inline-block;
-          letter-spacing: 5px;
-          text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.3);
+      .heading:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 80px;
+         height: 4px;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         border-radius: 2px;
       }
 
-      .flower-text span {
-          font-size: 30px;
-          font-weight: 600;
-          color: #FF6347;
+      .box-container {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+         gap: 25px;
+         margin-top: 40px;
+      }
+
+      .box {
+         background: white;
+         border-radius: 10px;
+         padding: 25px;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+         transition: all 0.3s ease;
+         border-top: 3px solid var(--primary);
+      }
+
+      .box:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      }
+
+      .box h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 15px;
+         position: relative;
+         padding-bottom: 10px;
+      }
+
+      .box h3:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 0;
+         width: 40px;
+         height: 2px;
+         background: var(--primary);
+      }
+
+      .box .likes, .box .tutor {
+         font-size: 14px;
+         color: #6c757d;
+         margin-bottom: 15px;
+      }
+
+      .inline-btn {
+         display: inline-block;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         color: white;
+         padding: 8px 20px;
+         border-radius: 30px;
+         text-decoration: none;
+         font-size: 14px;
+         font-weight: 500;
+         transition: all 0.3s ease;
+         border: none;
+         cursor: pointer;
+      }
+
+      .inline-btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
+      }
+
+      .flex {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 10px;
+      }
+
+      .flex a {
+         display: inline-block;
+         background: #f1f3f5;
+         color: var(--dark);
+         padding: 6px 12px;
+         border-radius: 5px;
+         font-size: 13px;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      .flex a:hover {
+         background: var(--primary);
+         color: white;
       }
 
       /* Footer */
       .footer {
-    background: #FFB6C1;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    width: 100%;
-    position: fixed; /* Fixes the footer to the bottom */
-    bottom: 0; /* Positions it at the very bottom of the screen */
-    left: 0; /* Ensures the footer spans the full width */
-    z-index: 1000; /* Keeps the footer above other content */
-}
+         background: var(--dark);
+         color: white;
+         text-align: center;
+         padding: 15px;
+         margin-top: 50px;
+      }
 
-.footer span {
-    font-weight: bold;
-    font-size: 14px;
-}
+      .footer span {
+         font-weight: 600;
+         color: var(--primary);
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+         .header .search-form {
+            display: none;
+         }
+         
+         .header .icons #search-btn {
+            display: block;
+         }
+         
+         .box-container {
+            grid-template-columns: 1fr;
+         }
+      }
+
+      /* Notification */
+      .notification {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         background: white;
+         border-radius: 10px;
+         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+         padding: 15px;
+         max-width: 300px;
+         display: none;
+         z-index: 1000;
+         border-left: 4px solid var(--primary);
+      }
+
+      .notification.show {
+         display: block;
+         animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
+      }
+
+      @keyframes slideIn {
+         from { transform: translateX(100%); }
+         to { transform: translateX(0); }
+      }
+
+      @keyframes fadeOut {
+         from { opacity: 1; }
+         to { opacity: 0; }
+      }
+
+      .notification h3 {
+         font-size: 16px;
+         margin-bottom: 10px;
+         color: var(--dark);
+      }
+
+      .notification p {
+         font-size: 14px;
+         color: #6c757d;
+         margin-bottom: 10px;
+      }
+
+      .notification .close {
+         position: absolute;
+         top: 10px;
+         right: 10px;
+         font-size: 14px;
+         color: #6c757d;
+         cursor: pointer;
+      }
    </style>
 </head>
 <body>
 
-
-
 <header class="header">
    <section class="flex">
-      <a href="index.html" class="logo">UPSC Hub</a>
+      <a href="index.html" class="logo"><i class="fas fa-graduation-cap"></i> UPSC Hub</a>
       <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
+         <input type="text" name="search_box" required placeholder="Search courses..." maxlength="100">
          <button type="submit" class="fas fa-search"></button>
       </form>
 
@@ -180,18 +466,11 @@
          <img src="images/LOGO.jpg" class="image" alt="">
          <h3 class="name">UPSC hub</h3>
          <p class="role">ADMIN & HOST</p>
-        
-         </div>
-
-      
-
       </div>
-
    </section>
 </header>
 
-   <div class="side-bar">
-
+<div class="side-bar">
    <div id="close-btn">
       <i class="fas fa-times"></i>
    </div>
@@ -200,165 +479,195 @@
       <img src="images/LOGO.jpg" class="image" alt="">
       <h3 class="name">UPSC hub</h3>
       <p class="role">ADMIN & HOST</p>
-   
    </div>
 
- <nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
-   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-   <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
-</nav>
-
-
+   <nav class="navbar">
+      <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
+      <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+      <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
+      <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+      <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+      <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+      <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+   </nav>
 </div>
 
 <section class="home-grid">
-   <h1 class="heading">UPSC Hub</h1>
-   <div class="flower-text">
-      
-   </div>
-
+   <h1 class="heading">UPSC Preparation Hub</h1>
    
    <div class="box-container">
-      <h1 class="name">Quick Options</h1>
-      
       <div class="box">
-         <h3 class="title">UPSC</h3>
-         <p class="likes">PRELIMS:</p>
-         <a href="syllabus.html" class="inline-btn">View Syllabus</a>
-         <p class="likes">MAINS:</p>
-         <a href="syllabus.html" class="inline-btn">View Syllabus</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> Polity : M.laxhmikant : File  </h3>
-         <p class="likes"> Accelerate Potential </p>
-         <a href="Polity_Laxhmikant.html" class="inline-btn"> Ready to Boost...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> Meditation time </h3>
-         <p class="likes"> boost up your mind : </p>
-         <a href="yoga_meditation.html" class="inline-btn"> Ready to meditate...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> UPSChub/file section </h3>
-         <p class="likes"> UPSChub: test file ( CONFIDENTIAL ) </p>
-         <a href="TESTseries-daily.html" class="inline-btn"> View...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> UPSChub/video</h3>
-         <p class="likes"> This is the Video section </p>
-         <a href="UPSChubvid.html" class="inline-btn"> Open it...</a>
-      </div>
-
-
-      <div class="box">
-         <h3 class="title"> Focus Timer</h3>
-         <p class="likes"> Track your consistency & Sterk : </p>
-         <a href="focustimer.html" class="inline-btn"> Ready to FOCUS...</a>
-      </div>
-
-       <div class="box">
-         <h3 class="title"> Today's News Update</h3>
-         <p class="likes"> Top news : daily : </p>
-         <a href="newsupdate.html" class="inline-btn"> view...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title"> NEWS-Paper </h3>
-         <p class="likes">  daily  </p>
-         <a href="newspaper.html" class="inline-btn"> read news...</a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">top categories</h3>
-         <div class="flex">
-            <a href="#"><i class=""></i><span>Geography</span></a>
-            <a href="#"><i class=""></i><span>Polity</span></a>
-            <a href="#"><i class=""></i><span>History</span></a>
-            <a href="#"><i class=""></i><span>Mapping</span></a>
-            <a href="#"><i class=""></i><span>Science & tech</span></a>
-            <a href="#"><i class=""></i><span>General studies</span></a>
-            <a href="#"><i class=""></i><span></span></a>
-            <a href="#"><i class=""></i><span></span></a>
+         <h3 class="title">UPSC Syllabus</h3>
+         <p class="likes">Comprehensive syllabus for your preparation</p>
+         <div class="flex" style="flex-direction: column; gap: 10px; margin-top: 15px;">
+            <a href="syllabus.html" class="inline-btn"><i class="fas fa-book-open"></i> Prelims Syllabus</a>
+            <a href="syllabus.html" class="inline-btn"><i class="fas fa-book"></i> Mains Syllabus</a>
          </div>
       </div>
 
       <div class="box">
-         <h3 class="title">popular topics</h3>
+         <h3 class="title">Polity: M. Laxhmikant</h3>
+         <p class="likes">Master Indian Polity with this essential resource</p>
+         <a href="Polity_Laxhmikant.html" class="inline-btn">Study Now <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Meditation Zone</h3>
+         <p class="likes">Boost your concentration and reduce stress</p>
+         <a href="yoga_meditation.html" class="inline-btn">Begin Session <i class="fas fa-spa"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Resource Files</h3>
+         <p class="likes">Confidential study materials and resources</p>
+         <a href="TESTseries-daily.html" class="inline-btn">Access Files <i class="fas fa-folder-open"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Video Lectures</h3>
+         <p class="likes">Comprehensive video learning section</p>
+         <a href="UPSChubvid.html" class="inline-btn">Watch Videos <i class="fas fa-play"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Focus Timer</h3>
+         <p class="likes">Track and improve your study sessions</p>
+         <a href="focustimer.html" class="inline-btn">Start Timer <i class="fas fa-clock"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Daily News Update</h3>
+         <p class="likes">Stay updated with current affairs</p>
+         <a href="newsupdate.html" class="inline-btn">Read Now <i class="fas fa-newspaper"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Newspaper Analysis</h3>
+         <p class="likes">Daily curated news for UPSC</p>
+         <a href="newspaper.html" class="inline-btn">View Analysis <i class="fas fa-search"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Core Subjects</h3>
          <div class="flex">
-            <a href="#"><i class=""></i><span>Current affairs</span></a>
-            <a href="#"><i class=""></i><span>Articles</span></a>
-            <a href="#"><i class=""></i><span>Editorials</span></a>
-            <a href="#"><i class=""></i><span>Newspaper analysis</span></a>
-            <a href="#"><i class=""></i><span></span></a>
-            <a href="#"><i class=""></i><span></span></a>
+            <a href="#"><i class="fas fa-globe-asia"></i> Geography</a>
+            <a href="#"><i class="fas fa-landmark"></i> Polity</a>
+            <a href="#"><i class="fas fa-history"></i> History</a>
+            <a href="#"><i class="fas fa-map-marked-alt"></i> Mapping</a>
+            <a href="#"><i class="fas fa-atom"></i> Science & Tech</a>
+            <a href="#"><i class="fas fa-book"></i> General Studies</a>
          </div>
       </div>
 
       <div class="box">
-         <h3 class="title">UPLOAD WRITTEN FILES</h3>
-         <p class="tutor">UPSC mains is fully based on writing skill, so let’s practice daily....</p>
-         <a href="drive.doc.html" class="inline-btn">upload doc</a>
+         <h3 class="title">Popular Topics</h3>
+         <div class="flex">
+            <a href="#"><i class="fas fa-bolt"></i> Current Affairs</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Articles</a>
+            <a href="#"><i class="fas fa-edit"></i> Editorials</a>
+            <a href="#"><i class="fas fa-chart-bar"></i> Newspaper Analysis</a>
+         </div>
       </div>
 
       <div class="box">
-         <h3 class="title">MOCK TEST SERIES</h3>
-         <P class="tutor">Let's test our brain....!!!</P>
-         <a href="test.html" class="inline-btn">go to test</a>
+         <h3 class="title">Answer Writing Practice</h3>
+         <p class="tutor">Upload your Mains answers for evaluation</p>
+         <a href="drive.doc.html" class="inline-btn">Upload Document <i class="fas fa-upload"></i></a>
       </div>
 
       <div class="box">
-         <h3 class="title">Test result and analysis</h3>
-         <p class="tutor">best analysis gives best result..</p>
-         <a href="testinfo.html" class="inline-btn">View report</a>
+         <h3 class="title">Mock Test Series</h3>
+         <p class="tutor">Assess your preparation with full-length tests</p>
+         <a href="test.html" class="inline-btn">Start Test <i class="fas fa-pen"></i></a>
       </div>
-   </div>   
+
+      <div class="box">
+         <h3 class="title">Performance Analysis</h3>
+         <p class="tutor">Detailed reports to improve your scores</p>
+         <a href="testinfo.html" class="inline-btn">View Report <i class="fas fa-chart-line"></i></a>
+      </div>
+   </div>
 </section>
 
 <footer class="footer">
    &copy; copyright @ 2025 by <span>Pratyush Swain</span> | All rights reserved!
 </footer>
 
-<script>
-   // Show the fullscreen overlay for 20 seconds after the page refresh
-   document.addEventListener("DOMContentLoaded", function() {
-       const overlay = document.getElementById('fullscreenOverlay');
-       overlay.classList.add('show');
+<div class="notification">
+   <div class="close"><i class="fas fa-times"></i></div>
+   <h3>Welcome to UPSC Hub!</h3>
+   <p>Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools.</p>
+   <p><em>Today's Motivation:</em> "Success isn't about luck; it's about hard work and determination."</p>
+</div>
 
-       // Hide the overlay after 20 seconds (20,000ms)
-       setTimeout(function() {
-           overlay.classList.remove('show');
-       }, 5000); // 5 seconds
+<script>
+   // Toggle sidebar
+   document.querySelector('#menu-btn').addEventListener('click', function() {
+      document.querySelector('.side-bar').classList.toggle('active');
    });
 
-   // Request browser notifications
+   document.querySelector('#close-btn').addEventListener('click', function() {
+      document.querySelector('.side-bar').classList.remove('active');
+   });
+
+   // Toggle profile dropdown
+   document.querySelector('#user-btn').addEventListener('click', function() {
+      document.querySelector('.profile').classList.toggle('active');
+   });
+
+   // Show notification
+   document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() {
+         document.querySelector('.notification').classList.add('show');
+      }, 2000);
+   });
+
+   // Close notification
+   document.querySelector('.notification .close').addEventListener('click', function() {
+      document.querySelector('.notification').classList.remove('show');
+   });
+
+   // Dark/light mode toggle
+   document.querySelector('#toggle-btn').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+         localStorage.setItem('theme', 'dark');
+         document.querySelector('#toggle-btn').classList.remove('fa-sun');
+         document.querySelector('#toggle-btn').classList.add('fa-moon');
+      } else {
+         localStorage.setItem('theme', 'light');
+         document.querySelector('#toggle-btn').classList.remove('fa-moon');
+         document.querySelector('#toggle-btn').classList.add('fa-sun');
+      }
+   });
+
+   // Check for saved theme preference
+   if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.querySelector('#toggle-btn').classList.remove('fa-sun');
+      document.querySelector('#toggle-btn').classList.add('fa-moon');
+   }
+
+   // Browser notifications
    if ("Notification" in window) {
-       if (Notification.permission === "default") {
-           Notification.requestPermission().then(permission => {
-               if (permission === "granted") {
-                   new Notification("Welcome to UPSC Hub!", {
-                       body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!",
-                       icon: "images/LOGO.jpg"
-                   });
-               }
-           });
-       } else if (Notification.permission === "granted") {
-           new Notification("Welcome to UPSC Hub!", {
-               body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: “Success isn’t about luck; it’s about hard work and determination. Let’s embark on this journey to success together. Start exploring now!",
-               icon: "images/LOGO.jpg"
-           });
-       }
+      if (Notification.permission === "default") {
+         Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+               new Notification("Welcome to UPSC Hub!", {
+                  body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: Success isn't about luck; it's about hard work and determination.",
+                  icon: "images/LOGO.jpg"
+               });
+            }
+         });
+      } else if (Notification.permission === "granted") {
+         new Notification("Welcome to UPSC Hub!", {
+            body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: Success isn't about luck; it's about hard work and determination.",
+            icon: "images/LOGO.jpg"
+         });
+      }
    }
 </script>
 
