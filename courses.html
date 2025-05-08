@@ -4,49 +4,517 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>courses</title>
+   <title>UPSC Courses - UPSC Hub</title>
 
    <!-- font awesome cdn link  -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
+   <!-- Google Fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+
    <!-- custom css file link  -->
    <link rel="stylesheet" href="css/style.css">
+
+<style>
+   :root {
+      --primary: #2563eb;
+      --secondary: #1e40af;
+      --accent: #dc2626;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --success: #059669;
+      --warning: #d97706;
+      --white: #ffffff;
+      --black: #000000;
+      --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      --upsc-blue: #0F52BA;
+      --upsc-gold: #FFD700;
+   }
+
+   body {
+      font-family: 'Open Sans', sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark);
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      line-height: 1.6;
+      transition: background-color 0.3s, color 0.3s;
+   }
+
+   body.dark-mode {
+      background-color: #121212;
+      color: #f5f5f5;
+   }
+
+   h1, h2, h3, h4, h5, h6 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+   }
+
+   /* Header */
+   .header {
+      background: linear-gradient(135deg, var(--upsc-blue), #1a365d);
+      color: var(--white);
+      padding: 15px 0;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+      z-index: 100;
+      border-bottom: 3px solid var(--upsc-gold);
+   }
+
+   .header .flex {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+   }
+
+   .header .logo {
+      font-size: 24px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+   }
+
+   .header .logo i {
+      margin-right: 10px;
+      color: var(--upsc-gold);
+   }
+
+   .header .icons {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+   }
+
+   .header .icons div {
+      color: var(--white);
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+   }
+
+   .header .icons div:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+   }
+
+   /* Sidebar */
+   .side-bar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 300px;
+      height: 100vh;
+      background: var(--white);
+      box-shadow: var(--box-shadow);
+      z-index: 1000;
+      transition: all 0.3s ease;
+      overflow-y: auto;
+   }
+
+   .side-bar.active {
+      left: 0;
+   }
+
+   .side-bar #close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 20px;
+      color: #6c757d;
+      cursor: pointer;
+   }
+
+   .side-bar .profile {
+      padding: 30px 20px;
+      text-align: center;
+      border-bottom: 1px solid #eee;
+      background: linear-gradient(to right, var(--upsc-blue), #1a365d);
+      color: white;
+   }
+
+   .side-bar .profile img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 15px;
+      border: 3px solid var(--upsc-gold);
+   }
+
+   .side-bar .profile h3 {
+      font-size: 18px;
+      margin-bottom: 5px;
+   }
+
+   .side-bar .profile .role {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.8);
+   }
+
+   .side-bar .navbar {
+      padding: 20px 0;
+   }
+
+   .side-bar .navbar a {
+      display: flex;
+      align-items: center;
+      padding: 12px 25px;
+      color: #495057;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      border-left: 3px solid transparent;
+   }
+
+   .side-bar .navbar a:hover {
+      background: #f8f9fa;
+      color: var(--upsc-blue);
+      border-left: 3px solid var(--upsc-blue);
+   }
+
+   .side-bar .navbar a i {
+      margin-right: 10px;
+      font-size: 18px;
+      width: 24px;
+      text-align: center;
+      color: var(--upsc-blue);
+   }
+
+   .side-bar .navbar a span {
+      font-size: 15px;
+   }
+
+   /* Courses Section */
+   .courses {
+      padding: 20px;
+      max-width: 1200px;
+      margin: 30px auto;
+      padding-bottom: 100px;
+   }
+
+   .courses .heading {
+      text-align: center;
+      font-size: 32px;
+      color: var(--upsc-blue);
+      margin-bottom: 40px;
+      position: relative;
+      padding-bottom: 15px;
+   }
+
+   .courses .heading:after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 150px;
+      height: 4px;
+      background: linear-gradient(to right, var(--upsc-blue), var(--upsc-gold));
+      border-radius: 2px;
+   }
+
+   .courses .box-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+   }
+
+   .courses .box {
+      background: var(--white);
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: var(--box-shadow);
+      transition: all 0.3s ease;
+      border-top: 3px solid var(--upsc-blue);
+      position: relative;
+      overflow: hidden;
+   }
+
+   .courses .box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+   }
+
+   .courses .box .tutor {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+   }
+
+   .courses .box .tutor img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--upsc-blue);
+   }
+
+   .courses .box .tutor .info h3 {
+      font-size: 16px;
+      color: var(--dark);
+      margin-bottom: 5px;
+   }
+
+   .courses .box .tutor .info span {
+      font-size: 14px;
+      color: #666;
+   }
+
+   .courses .box .thumb {
+      position: relative;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      overflow: hidden;
+   }
+
+   .courses .box .thumb img {
+      width: 100%;
+      border-radius: 5px;
+      height: 180px;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+   }
+
+   .courses .box:hover .thumb img {
+      transform: scale(1.05);
+   }
+
+   .courses .box .thumb span {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: var(--white);
+      padding: 3px 8px;
+      border-radius: 3px;
+      font-size: 12px;
+   }
+
+   .courses .box .title {
+      font-size: 18px;
+      color: var(--dark);
+      margin-bottom: 10px;
+      font-weight: 600;
+   }
+
+   .courses .box .desc {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+      line-height: 1.5;
+   }
+
+   .courses .box .stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 15px;
+   }
+
+   .courses .inline-btn {
+      display: inline-block;
+      padding: 8px 20px;
+      background: var(--upsc-blue);
+      color: var(--white);
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      text-align: center;
+      width: 100%;
+   }
+
+   .courses .inline-btn:hover {
+      background: var(--secondary);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(37, 99, 235, 0.3);
+   }
+
+   .courses .box .badge {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: var(--accent);
+      color: white;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+   }
+
+   /* Dark Mode Adjustments */
+   body.dark-mode .side-bar,
+   body.dark-mode .courses .box {
+      background: #1e1e1e;
+   }
+
+   body.dark-mode .courses .box .title,
+   body.dark-mode .courses .box .tutor .info h3,
+   body.dark-mode .side-bar .profile h3 {
+      color: #f5f5f5;
+   }
+
+   body.dark-mode .courses .box .desc,
+   body.dark-mode .courses .box .tutor .info span,
+   body.dark-mode .side-bar .profile .role {
+      color: #aaa;
+   }
+
+   body.dark-mode .side-bar #close-btn {
+      color: #ccc;
+   }
+
+   body.dark-mode .side-bar .navbar a {
+      color: #ddd;
+   }
+
+   body.dark-mode .side-bar .navbar a:hover {
+      background: #2a2a2a;
+   }
+
+   /* UPSC Banner */
+   .upsc-banner {
+      background: linear-gradient(to right, var(--upsc-blue), #1a365d);
+      color: white;
+      padding: 15px 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   }
+
+   .upsc-banner .icon {
+      font-size: 24px;
+      color: var(--upsc-gold);
+      margin-right: 15px;
+   }
+
+   .upsc-banner .content {
+      flex: 1;
+   }
+
+   .upsc-banner .content h3 {
+      margin: 0;
+      font-size: 18px;
+      margin-bottom: 5px;
+   }
+
+   .upsc-banner .content p {
+      margin: 0;
+      font-size: 14px;
+      opacity: 0.9;
+   }
+
+   .upsc-banner .btn {
+      background: var(--upsc-gold);
+      color: #1a365d;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.3s;
+   }
+
+   .upsc-banner .btn:hover {
+      background: #ffc107;
+      transform: translateY(-2px);
+   }
+
+   /* Footer */
+   .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(to right, #111, #1c1c1c);
+      color: var(--white);
+      font-size: 13px;
+      text-align: center;
+      padding: 12px 10px;
+      z-index: 999;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+      border-top: 1px solid rgba(255, 215, 0, 0.2);
+   }
+
+   .footer span {
+      color: var(--upsc-gold);
+      font-weight: 600;
+   }
+
+   .footer .footer-links {
+      margin-top: 5px;
+   }
+
+   .footer .footer-links a {
+      color: #aaa;
+      margin: 0 10px;
+      text-decoration: none;
+      transition: color 0.3s;
+   }
+
+   .footer .footer-links a:hover {
+      color: var(--upsc-gold);
+   }
+
+   /* Responsive */
+   @media (max-width: 768px) {
+      .courses .box-container {
+         grid-template-columns: 1fr;
+      }
+
+      .upsc-banner {
+         flex-direction: column;
+         text-align: center;
+      }
+
+      .upsc-banner .icon {
+         margin-right: 0;
+         margin-bottom: 10px;
+      }
+
+      .upsc-banner .btn {
+         margin-top: 10px;
+      }
+   }
+</style>
 
 </head>
 <body>
 
 <header class="header">
-   
    <section class="flex">
-
-      <a href="index.html" class="logo">UPSC hub</a>
-
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
+      <a href="index.html" class="logo">
+         <i class="fas fa-landmark"></i> UPSC Hub
+      </a>
 
       <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
+         <div id="menu-btn" class="fas fa-bars" title="Menu"></div>
+         <div id="toggle-btn" class="fas fa-sun" title="Toggle Dark Mode"></div>
       </div>
-
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-        
-         </div>
-      </div>
-
    </section>
-
 </header>   
 
 <div class="side-bar">
-
    <div id="close-btn">
       <i class="fas fa-times"></i>
    </div>
@@ -57,161 +525,306 @@
       <p class="role">ADMIN & HOST</p>
    
    </div>
-  <nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-  </nav>
 
-
-
-
+   <nav class="navbar">
+      <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
+      <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
+      <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
+      <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
+      <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+      <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+      <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+   </nav>
 </div>
 
 <section class="courses">
+   <h1 class="heading">UPSC Preparation Courses</h1>
 
-   <h1 class="heading">COURSES</h1>
+   <div class="upsc-banner">
+      <div class="icon">
+         <i class="fas fa-medal"></i>
+      </div>
+      <div class="content">
+         <h3>UPSC CSE 2024 Preparation</h3>
+         <p>Comprehensive courses covering all stages - Prelims, Mains, and Interview</p>
+      </div>
+      <a href="#" class="btn">View Exam Calendar</a>
+   </div>
 
    <div class="box-container">
-
       <div class="box">
+         <div class="badge">New</div>
          <div class="tutor">
-            <img src="images/classes.jpg" alt="">
+            <img src="images/classes.jpg" alt="Online Classes">
             <div class="info">
-               <h3> ONLINE CLASSES </h3>
-               <span> Everyday </span>
+               <h3>Daily Current Affairs</h3>
+               <span>Updated Daily</span>
             </div>
          </div>
          <div class="thumb">
-            <img src="images/classes.jpg" alt="">
-            <span></span>
+            <img src="images/current-affairs.jpg" alt="Current Affairs">
+            <span>Live Classes</span>
          </div>
-         <h3 class="title"> Current affairs and Classes</h3>
-         <a href="playlist.html" class="inline-btn">view classes</a>
-      </div>
-
-         <div class="box">
-         <div class="tutor">
-            <img src="images/worksheetlogo.jpg" alt="">
-            <div class="info">
-               <h3> Worksheet </h3>
-               <span> Daily practice questions </span>
-            </div>
+         <h3 class="title">Comprehensive Current Affairs Program</h3>
+         <p class="desc">Daily analysis of news, editorials, and government schemes relevant to UPSC preparation.</p>
+         <div class="stats">
+            <span><i class="fas fa-video"></i> 300+ Videos</span>
+            <span><i class="fas fa-file-pdf"></i> 50+ PDFs</span>
          </div>
-         <div class="thumb">
-            <img src="images/worksheet.jpg" alt="">
-            <span></span>
-         </div>
-         <h3 class="title"> DPPs & worksheet</h3>
-         <a href="worksheet.html" class="inline-btn">view </a>
+         <a href="playlist.html" class="inline-btn">Start Learning</a>
       </div>
 
       <div class="box">
          <div class="tutor">
-            <img src="images/geo.jpg" alt="">
+            <img src="images/worksheetlogo.jpg" alt="Worksheets">
             <div class="info">
-               <h3>INDIAN & WORLD GEOGRAPHY</h3>
-               <span>optional</span>
+               <h3>Practice Worksheets</h3>
+               <span>Daily MCQs</span>
             </div>
          </div>
          <div class="thumb">
-            <img src="images/geography.jpg" alt="">
-            <span>1 videos</span>
+            <img src="images/worksheet.jpg" alt="Practice Questions">
+            <span>500+ Questions</span>
          </div>
-         <h3 class="title">complete geography</h3>
-         <a href="playlist.html" class="inline-btn">view playlist</a>
+         <h3 class="title">Daily Practice Problems (DPP)</h3>
+         <p class="desc">Topic-wise worksheets with previous year questions and model answers for effective preparation.</p>
+         <div class="stats">
+            <span><i class="fas fa-question-circle"></i> 1000+ MCQs</span>
+            <span><i class="fas fa-chart-line"></i> Performance Analytics</span>
+         </div>
+         <a href="worksheet.html" class="inline-btn">Practice Now</a>
+      </div>
+
+      <div class="box">
+         <div class="badge">Popular</div>
+         <div class="tutor">
+            <img src="images/geo.jpg" alt="Geography">
+            <div class="info">
+               <h3>Geography Expert</h3>
+               <span>GS Paper I</span>
+            </div>
+         </div>
+         <div class="thumb">
+            <img src="images/geography.jpg" alt="Geography Course">
+            <span>40+ Hours</span>
+         </div>
+         <h3 class="title">Indian & World Geography</h3>
+         <p class="desc">Complete coverage of physical, economic, and human geography with maps and case studies.</p>
+         <div class="stats">
+            <span><i class="fas fa-map-marked-alt"></i> 50+ Maps</span>
+            <span><i class="fas fa-book"></i> 15 Modules</span>
+         </div>
+         <a href="playlist.html" class="inline-btn">Explore Course</a>
       </div>
 
       <div class="box">
          <div class="tutor">
-            <img src="images/PSIR.01.jpg" alt="">
+            <img src="images/PSIR.01.jpg" alt="Polity">
             <div class="info">
-               <h3>PSIR</h3>
-               <span>Indian POLITY (optional)</span>
+               <h3>Polity Expert</h3>
+               <span>GS Paper II</span>
             </div>
          </div>
          <div class="thumb">
-            <img src="images/Indian-Polity.jpg" alt="">
-            <span></span>
+            <img src="images/Indian-Polity.jpg" alt="Polity Course">
+            <span>35+ Hours</span>
          </div>
-         <h3 class="title">complete PSIR</h3>
-         <a href="polityclass.html" class="inline-btn">view playlist</a>
+         <h3 class="title">Indian Polity & Governance</h3>
+         <p class="desc">Detailed analysis of Constitution, Parliament, Judiciary, and current political developments.</p>
+         <div class="stats">
+            <span><i class="fas fa-balance-scale"></i> 200+ Articles</span>
+            <span><i class="fas fa-landmark"></i> Case Studies</span>
+         </div>
+         <a href="polityclass.html" class="inline-btn">Enroll Now</a>
+      </div>
+
+      <div class="box">
+         <div class="badge">Best Seller</div>
+         <div class="tutor">
+            <img src="images/General-Studies.jpg" alt="General Studies">
+            <div class="info">
+               <h3>GS Team</h3>
+               <span>Comprehensive</span>
+            </div>
+         </div>
+         <div class="thumb">
+            <img src="images/GS.jpg" alt="General Studies Course">
+            <span>120+ Hours</span>
+         </div>
+         <h3 class="title">Complete General Studies</h3>
+         <p class="desc">Integrated program covering all GS papers with special focus on answer writing and mains preparation.</p>
+         <div class="stats">
+            <span><i class="fas fa-pen-fancy"></i> 100+ Essays</span>
+            <span><i class="fas fa-tasks"></i> 4 Papers Covered</span>
+         </div>
+         <a href="playlist.html" class="inline-btn">View Details</a>
       </div>
 
       <div class="box">
          <div class="tutor">
-            <img src="images/General-Studies.jpg" alt="">
+            <img src="images/CSAT01.jpg" alt="CSAT">
             <div class="info">
-               <h3>GENERAL STUDIES</h3>
-               <span></span>
+               <h3>CSAT Specialist</h3>
+               <span>Prelims Paper II</span>
             </div>
          </div>
          <div class="thumb">
-            <img src="images/GS.jpg" alt="">
-            <span></span>
+            <img src="images/CSAT.jpg" alt="CSAT Course">
+            <span>30+ Hours</span>
          </div>
-         <h3 class="title"> Complete GS</h3>
-         <a href="playlist.html" class="inline-btn">view DETAILS</a>
+         <h3 class="title">CSAT Aptitude & Comprehension</h3>
+         <p class="desc">Master quantitative aptitude, logical reasoning, and reading comprehension for CSAT paper.</p>
+         <div class="stats">
+            <span><i class="fas fa-calculator"></i> 500+ Problems</span>
+            <span><i class="fas fa-stopwatch"></i> Time Management</span>
+         </div>
+         <a href="playlist.html" class="inline-btn">Start Preparation</a>
+      </div>
+
+      <div class="box">
+         <div class="badge">Free</div>
+         <div class="tutor">
+            <img src="images/news.jpg" alt="News Analysis">
+            <div class="info">
+               <h3>Editorial Team</h3>
+               <span>Daily Updates</span>
+            </div>
+         </div>
+         <div class="thumb">
+            <img src="images/article01.jpg" alt="News Analysis">
+            <span>New Daily</span>
+         </div>
+         <h3 class="title">Daily News Analysis</h3>
+         <p class="desc">Curated analysis of The Hindu, Indian Express, PIB, and other relevant sources for UPSC.</p>
+         <div class="stats">
+            <span><i class="fas fa-newspaper"></i> 30+ Sources</span>
+            <span><i class="fas fa-tags"></i> Topic-wise Tags</span>
+         </div>
+         <a href="HUBcolab.html" class="inline-btn">Read Today's Edition</a>
       </div>
 
       <div class="box">
          <div class="tutor">
-            <img src="images/CSAT01.jpg" alt="">
+            <img src="images/history.jpg" alt="History">
             <div class="info">
-               <h3>CSAT</h3>
-               <span>Prelims</span>
+               <h3>History Expert</h3>
+               <span>GS Paper I</span>
             </div>
          </div>
          <div class="thumb">
-            <img src="images/CSAT.jpg" alt="">
-            <span></span>
+            <img src="images/indian-history.jpg" alt="History Course">
+            <span>45+ Hours</span>
          </div>
-         <h3 class="title">complete CSAT</h3>
-         <a href="playlist.html" class="inline-btn">view playlist</a>
+         <h3 class="title">Indian History & Culture</h3>
+         <p class="desc">From ancient to modern India with art, culture, and post-independence consolidation.</p>
+         <div class="stats">
+            <span><i class="fas fa-monument"></i> 100+ Monuments</span>
+            <span><i class="fas fa-timeline"></i> Chronology</span>
+         </div>
+         <a href="playlist.html" class="inline-btn">Explore History</a>
       </div>
 
       <div class="box">
+         <div class="badge">New</div>
          <div class="tutor">
-            <img src="images/news.jpg" alt="">
+            <img src="images/economy.jpg" alt="Economy">
             <div class="info">
-               <h3>UPSChub / MC graw hill </h3>
-               <span>Daily</span>
+               <h3>Economy Expert</h3>
+               <span>GS Paper III</span>
             </div>
          </div>
          <div class="thumb">
-            <img src="images/article01.jpg" alt="">
-            <span></span>
+            <img src="images/indian-economy.jpg" alt="Economy Course">
+            <span>40+ Hours</span>
          </div>
-         <h3 class="title">Daily news and article HEADLINES</h3>
-         <a href="HUBcolab.html" class="inline-btn">view</a>
+         <h3 class="title">Indian Economy</h3>
+         <p class="desc">Complete coverage of economic concepts, budget, economic survey, and current economic issues.</p>
+         <div class="stats">
+            <span><i class="fas fa-rupee-sign"></i> Budget Analysis</span>
+            <span><i class="fas fa-chart-pie"></i> Economic Survey</span>
+         </div>
+         <a href="playlist.html" class="inline-btn">Learn Economics</a>
       </div>
-
-     
-           
-      </div>
-   </section>
-
-      
-
-
-
-
+   </div>
+</section>
 
 <footer class="footer">
-
-   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved!(owner)
-
+   &copy; Copyright @ 2024 by <span>UPSC Hub</span> | All rights reserved!
+   <div class="footer-links">
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms of Service</a>
+      <a href="contact.html">Contact Us</a>
+   </div>
 </footer>
 
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+      // Sidebar toggle
+      const menuBtn = document.querySelector('#menu-btn');
+      const closeBtn = document.querySelector('#close-btn');
+      const sidebar = document.querySelector('.side-bar');
 
-   
+      menuBtn.addEventListener('click', () => {
+         sidebar.classList.add('active');
+         document.body.style.overflow = 'hidden';
+      });
+
+      closeBtn.addEventListener('click', () => {
+         sidebar.classList.remove('active');
+         document.body.style.overflow = 'auto';
+      });
+
+      // Close sidebar when clicking outside
+      document.addEventListener('click', (e) => {
+         if (!sidebar.contains(e.target) && e.target !== menuBtn) {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+         }
+      });
+
+      // Dark/Light mode toggle
+      const toggleBtn = document.querySelector('#toggle-btn');
+      
+      // Check for saved theme preference or use preferred color scheme
+      const currentTheme = localStorage.getItem('theme') || 
+                           (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      
+      // Apply the current theme
+      if (currentTheme === 'dark') {
+         document.body.classList.add('dark-mode');
+         toggleBtn.classList.remove('fa-sun');
+         toggleBtn.classList.add('fa-moon');
+      }
+
+      // Toggle button functionality
+      toggleBtn.addEventListener('click', () => {
+         document.body.classList.toggle('dark-mode');
+         
+         if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            toggleBtn.classList.remove('fa-sun');
+            toggleBtn.classList.add('fa-moon');
+         } else {
+            localStorage.setItem('theme', 'light');
+            toggleBtn.classList.remove('fa-moon');
+            toggleBtn.classList.add('fa-sun');
+         }
+      });
+
+      // Add active class to current page in sidebar
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      const navLinks = document.querySelectorAll('.navbar a');
+      
+      navLinks.forEach(link => {
+         const linkHref = link.getAttribute('href');
+         if (currentPage === linkHref) {
+            link.classList.add('active');
+         }
+      });
+   });
+</script>
+
 </body>
 </html>
