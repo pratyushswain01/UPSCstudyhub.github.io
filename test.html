@@ -1,175 +1,960 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>courses</title>
+   <title>Test Series - UPSC Hub</title>
 
-   <!-- font awesome cdn link  -->
+   <!-- Font Awesome -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+   <!-- Google Fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
+   <!-- Custom CSS -->
+   <style>
+      :root {
+         --primary: #3a86ff;
+         --secondary: #8338ec;
+         --accent: #ff006e;
+         --light: #f8f9fa;
+         --dark: #212529;
+         --white: #ffffff;
+         --black: #000000;
+         --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+         font-family: 'Open Sans', sans-serif;
+         background-color: #f5f7fa;
+         color: var(--dark);
+         min-height: 100vh;
+         display: flex;
+         flex-direction: column;
+         transition: background-color 0.3s, color 0.3s;
+         line-height: 1.6;
+         margin: 0;
+         padding: 0;
+      }
+
+      body.dark-mode {
+         background-color: #121212;
+         color: #f5f5f5;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+         font-family: 'Montserrat', sans-serif;
+         font-weight: 600;
+      }
+
+      /* Header Styles */
+      .header {
+         background: linear-gradient(135deg, var(--primary), var(--secondary));
+         color: var(--white);
+         padding: 15px 0;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+         position: sticky;
+         top: 0;
+         z-index: 1000;
+      }
+
+      .header .flex {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         max-width: 1200px;
+         margin: 0 auto;
+         padding: 0 20px;
+      }
+
+      .header .logo {
+         font-size: 24px;
+         font-weight: 700;
+         color: var(--white);
+         text-decoration: none;
+      }
+
+      .header .icons {
+         display: flex;
+         gap: 15px;
+         align-items: center;
+      }
+
+      .header .icons div {
+         color: var(--white);
+         font-size: 18px;
+         cursor: pointer;
+         padding: 8px;
+         border-radius: 50%;
+         width: 36px;
+         height: 36px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         transition: all 0.3s ease;
+      }
+
+      .header .icons div:hover {
+         background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Sidebar Styles */
+      .side-bar {
+         position: fixed;
+         top: 0;
+         left: -300px;
+         width: 300px;
+         height: 100vh;
+         background: white;
+         box-shadow: 0 0 20px rgba(0,0,0,0.1);
+         z-index: 1000;
+         transition: all 0.3s ease;
+         overflow-y: auto;
+      }
+
+      body.dark-mode .side-bar {
+         background: #1e1e1e;
+         color: #f5f5f5;
+      }
+
+      .side-bar.active {
+         left: 0;
+      }
+
+      .side-bar #close-btn {
+         position: absolute;
+         top: 15px;
+         right: 15px;
+         font-size: 20px;
+         color: #6c757d;
+         cursor: pointer;
+      }
+
+      body.dark-mode .side-bar #close-btn {
+         color: #aaa;
+      }
+
+      .side-bar .profile {
+         padding: 30px 20px;
+         text-align: center;
+         border-bottom: 1px solid #eee;
+      }
+
+      body.dark-mode .side-bar .profile {
+         border-bottom-color: #333;
+      }
+
+      .side-bar .profile img {
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-bottom: 15px;
+         border: 3px solid var(--primary);
+      }
+
+      .side-bar .profile h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 5px;
+      }
+
+      body.dark-mode .side-bar .profile h3 {
+         color: #f5f5f5;
+      }
+
+      .side-bar .profile .role {
+         font-size: 14px;
+         color: #6c757d;
+      }
+
+      body.dark-mode .side-bar .profile .role {
+         color: #aaa;
+      }
+
+      .side-bar .navbar {
+         padding: 20px 0;
+      }
+
+      .side-bar .navbar a {
+         display: flex;
+         align-items: center;
+         padding: 12px 25px;
+         color: #495057;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      body.dark-mode .side-bar .navbar a {
+         color: #ddd;
+      }
+
+      .side-bar .navbar a:hover {
+         background: #f8f9fa;
+         color: var(--primary);
+      }
+
+      body.dark-mode .side-bar .navbar a:hover {
+         background: #2a2a2a;
+      }
+
+      .side-bar .navbar a i {
+         margin-right: 10px;
+         font-size: 18px;
+         width: 24px;
+         text-align: center;
+      }
+
+      .side-bar .navbar a span {
+         font-size: 15px;
+      }
+
+      /* Main Content Styles */
+      .courses {
+         padding: 20px;
+         max-width: 1200px;
+         margin: 30px auto;
+         padding-bottom: 80px;
+         flex: 1;
+      }
+
+      .courses .heading {
+         text-align: center;
+         font-size: 32px;
+         color: var(--primary);
+         margin-bottom: 40px;
+         position: relative;
+         padding-bottom: 15px;
+      }
+
+      .courses .heading:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 150px;
+         height: 4px;
+         background: linear-gradient(to right, var(--primary), var(--accent));
+         border-radius: 2px;
+      }
+
+      /* UPSC Banner */
+      .upsc-banner {
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         color: white;
+         padding: 15px 20px;
+         border-radius: 8px;
+         margin-bottom: 30px;
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+
+      .upsc-banner .icon {
+         font-size: 24px;
+         color: var(--accent);
+         margin-right: 15px;
+      }
+
+      .upsc-banner .content {
+         flex: 1;
+      }
+
+      .upsc-banner .content h3 {
+         margin: 0;
+         font-size: 18px;
+         margin-bottom: 5px;
+      }
+
+      .upsc-banner .content p {
+         margin: 0;
+         font-size: 14px;
+         opacity: 0.9;
+      }
+
+      .upsc-banner .btn {
+         background: var(--accent);
+         color: #1a365d;
+         padding: 8px 15px;
+         border-radius: 5px;
+         text-decoration: none;
+         font-weight: 600;
+         font-size: 14px;
+         transition: all 0.3s;
+      }
+
+      .upsc-banner .btn:hover {
+         background: #ffc107;
+         transform: translateY(-2px);
+      }
+
+      /* Test Series Grid */
+      .course-grid {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+         gap: 25px;
+      }
+
+      .course-card {
+         background: var(--white);
+         border-radius: 10px;
+         overflow: hidden;
+         box-shadow: var(--box-shadow);
+         transition: all 0.3s ease;
+         border-top: 3px solid var(--primary);
+      }
+
+      .course-card:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .course-card .badge {
+         position: absolute;
+         top: 15px;
+         right: 15px;
+         background: var(--accent);
+         color: #1a365d;
+         padding: 3px 10px;
+         border-radius: 20px;
+         font-size: 12px;
+         font-weight: bold;
+      }
+
+      .course-card .course-image {
+         height: 180px;
+         overflow: hidden;
+      }
+
+      .course-card .course-image img {
+         width: 100%;
+         height: 100%;
+         object-fit: cover;
+         transition: transform 0.5s ease;
+      }
+
+      .course-card:hover .course-image img {
+         transform: scale(1.05);
+      }
+
+      .course-card .course-details {
+         padding: 20px;
+      }
+
+      .course-card .course-details .tutor {
+         display: flex;
+         align-items: center;
+         margin-bottom: 15px;
+      }
+
+      .course-card .course-details .tutor img {
+         width: 40px;
+         height: 40px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-right: 10px;
+         border: 2px solid var(--primary);
+      }
+
+      .course-card .course-details .tutor-info h4 {
+         margin: 0;
+         font-size: 15px;
+         color: var(--dark);
+      }
+
+      .course-card .course-details .tutor-info span {
+         font-size: 13px;
+         color: #6c757d;
+      }
+
+      .course-card .course-details h3 {
+         margin: 0 0 10px 0;
+         font-size: 18px;
+         color: var(--dark);
+      }
+
+      .course-card .course-details p {
+         color: #6c757d;
+         font-size: 14px;
+         line-height: 1.5;
+         margin-bottom: 15px;
+      }
+
+      .course-card .course-meta {
+         display: flex;
+         justify-content: space-between;
+         font-size: 12px;
+         color: #6c757d;
+         margin-bottom: 15px;
+      }
+
+      .course-card .course-meta span i {
+         margin-right: 5px;
+      }
+
+      .course-card .enroll-btn {
+         display: block;
+         width: 100%;
+         padding: 10px;
+         background: var(--primary);
+         color: white;
+         text-align: center;
+         border-radius: 5px;
+         text-decoration: none;
+         font-weight: 500;
+         transition: all 0.3s;
+      }
+
+      .course-card .enroll-btn:hover {
+         background: var(--secondary);
+         transform: translateY(-2px);
+      }
+
+      /* Special Test Boxes */
+      .box-container {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+         gap: 25px;
+         margin-bottom: 30px;
+      }
+
+      .box {
+         background: var(--white);
+         border-radius: 10px;
+         padding: 20px;
+         box-shadow: var(--box-shadow);
+         transition: all 0.3s ease;
+         border-top: 3px solid var(--primary);
+      }
+
+      .box:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+      }
+
+      .box h3 {
+         margin-top: 0;
+         color: var(--primary);
+         font-size: 20px;
+      }
+
+      .box p {
+         color: #6c757d;
+         margin-bottom: 15px;
+      }
+
+      .box p span {
+         display: block;
+         color: var(--accent);
+         font-weight: 600;
+         margin-top: 10px;
+      }
+
+      .inline-btn {
+         display: inline-block;
+         padding: 8px 15px;
+         background: var(--primary);
+         color: white;
+         border-radius: 5px;
+         text-decoration: none;
+         font-weight: 500;
+         transition: all 0.3s;
+      }
+
+      .inline-btn:hover {
+         background: var(--secondary);
+         transform: translateY(-2px);
+      }
+
+      /* Features Section */
+      .features {
+         margin-top: 50px;
+         background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+         padding: 40px;
+         border-radius: 10px;
+      }
+
+      body.dark-mode .features {
+         background: #2a2a2a;
+      }
+
+      .features h2 {
+         text-align: center;
+         font-size: 32px;
+         color: var(--primary);
+         margin-bottom: 40px;
+         position: relative;
+      }
+
+      .features h2:after {
+         content: '';
+         position: absolute;
+         bottom: -15px;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 80px;
+         height: 4px;
+         background: linear-gradient(to right, var(--primary), var(--accent));
+         border-radius: 2px;
+      }
+
+      .features-container {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+         gap: 25px;
+         margin-top: 30px;
+      }
+
+      .feature-box {
+         background: var(--white);
+         border-radius: 10px;
+         padding: 25px;
+         box-shadow: var(--box-shadow);
+         transition: all 0.3s ease;
+         text-align: center;
+         border-top: 3px solid var(--primary);
+      }
+
+      body.dark-mode .feature-box {
+         background: #1e1e1e;
+      }
+
+      .feature-box:hover {
+         transform: translateY(-5px);
+      }
+
+      .feature-box i {
+         font-size: 40px;
+         color: var(--primary);
+         margin-bottom: 20px;
+      }
+
+      .feature-box h3 {
+         font-size: 18px;
+         margin-bottom: 15px;
+         color: var(--dark);
+      }
+
+      body.dark-mode .feature-box h3 {
+         color: #f5f5f5;
+      }
+
+      .feature-box p {
+         font-size: 14px;
+         color: #6c757d;
+         line-height: 1.6;
+      }
+
+      body.dark-mode .feature-box p {
+         color: #aaa;
+      }
+
+      /* Footer Styles */
+      .footer {
+         position: fixed;
+         bottom: 0;
+         left: 0;
+         width: 100%;
+         background: linear-gradient(to right, #111, #1c1c1c);
+         color: var(--white);
+         text-align: center;
+         font-size: 12px;
+         padding: 6px 0;
+         border-top: 1px solid rgba(255, 215, 0, 0.2);
+      }
+
+      .footer span {
+         color: var(--accent);
+         font-weight: 600;
+      }
+
+      /* Dark Mode Styles */
+      body.dark-mode .course-card,
+      body.dark-mode .feature-box,
+      body.dark-mode .box {
+         background: #1e1e1e;
+      }
+
+      body.dark-mode .course-card h3,
+      body.dark-mode .course-card .tutor-info h4,
+      body.dark-mode .feature-box h3,
+      body.dark-mode .box h3 {
+         color: #f5f5f5;
+      }
+
+      body.dark-mode .course-card p,
+      body.dark-mode .course-card .tutor-info span,
+      body.dark-mode .course-card .course-meta,
+      body.dark-mode .feature-box p,
+      body.dark-mode .box p {
+         color: #aaa;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+         .course-grid,
+         .box-container {
+            grid-template-columns: 1fr;
+         }
+
+         .upsc-banner {
+            flex-direction: column;
+            text-align: center;
+         }
+
+         .upsc-banner .icon {
+            margin-right: 0;
+            margin-bottom: 10px;
+         }
+
+         .upsc-banner .btn {
+            margin-top: 10px;
+         }
+
+         .features-container {
+            grid-template-columns: 1fr;
+         }
+      }
+   </style>
 </head>
 <body>
 
+<!-- Header Section -->
 <header class="header">
-   
    <section class="flex">
-
-      <a href="index.html" class="logo">UPSC hub</a>
-
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-
+      <a href="index.html" class="logo">UPSC Hub</a>
       <div class="icons">
          <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
          <div id="toggle-btn" class="fas fa-sun"></div>
       </div>
-
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-        
-         </div>
-      </div>
-
    </section>
+</header>
 
-</header>   
-
+<!-- Sidebar Navigation -->
 <div class="side-bar">
-
    <div id="close-btn">
       <i class="fas fa-times"></i>
    </div>
-
    <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   
+      <img src="images/LOGO.jpg" class="image" alt="UPSC Hub Logo">
+      <h3 class="name">UPSC Hub</h3>
+      <p class="role">Admin & Host</p>
+   </div>
+   <nav class="navbar">
+      <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
+      <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+      <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
+      <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+      <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+      <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+      <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+   </nav>
+</div>
+
+<!-- Main Content -->
+<section class="courses">
+   <h1 class="heading">UPSC <span>Test Series</span></h1>
+
+   <div class="upsc-banner">
+      <div class="icon">
+         <i class="fas fa-medal"></i>
+      </div>
+      <div class="content">
+         <h3>UPSC CSE 2024 Test Series</h3>
+         <p>Comprehensive test series covering all stages - Prelims, Mains, and Interview</p>
+      </div>
+      <a href="#" class="btn">View Test Schedule</a>
    </div>
 
-  <nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-  </nav>
-
-
-</div>
-
-   </nav>
-
-</div>
-
-<section class="teachers">
-
-   <h1 class="heading">MOCK TEST SERIES</h1>
-
-   
-
+   <!-- Special Test Boxes -->
    <div class="box-container">
-
       <div class="box offer">
          <h3>TEST SERIES</h3>
-         <p>Practice makes a man perfect. The number of times you practice , the strongest you will </p>
-         <p><span>hello Champ...!!!<span></p>
-         <a href="dailytest.html" class="inline-btn">get started</a>
+         <p>Practice makes a man perfect. The number of times you practice, the stronger you will become.</p>
+         <p><span>Hello Champ...!!!<span></p>
+         <a href="dailytest.html" class="inline-btn">Get Started</a>
       </div>
 
-     <div class="box offer">
-    <h3>TEST SERIES - Polity daily test </h3>
-    <p>"Sharpen your mind, strengthen your logic! Every challenge you solve brings you one step closer to success. 🧠✨"</p>
-    <p><span>Ready to conquer Polity?
-Test your knowledge of the Constitution, Parliament & more! 🏛️📘 <span></p>
-    <a href="dailytest.html" class="inline-btn">Get Started</a>
-   </div>
+      <div class="box offer">
+         <h3>TEST SERIES - Polity Daily Test</h3>
+         <p>"Sharpen your mind, strengthen your logic! Every challenge you solve brings you one step closer to success. 🧠✨"</p>
+         <p><span>Ready to conquer Polity? Test your knowledge of the Constitution, Parliament & more! 🏛️📘<span></p>
+         <a href="dailytest.html" class="inline-btn">Get Started</a>
+      </div>
 
-   <div class="box offer">
+      <div class="box offer">
          <h3>Mapping Practice</h3>
-         <p> Complete World map </p>
-         <p><span>conquer it !!!<span></p>
-         <a href="mapping.html" class="inline-btn">get started</a>
+         <p>Complete World map practice for geography preparation.</p>
+         <p><span>Conquer it!!!<span></p>
+         <a href="mapping.html" class="inline-btn">Get Started</a>
       </div>
 
-     <div class="box offer">
-         <h3>TEST: current affairs </h3>
-         <p> Attempt todays test....& cheak your todays potential </p>
-         <p><span> Hello aspirant..!!!<span></p>
-         <a href="ca_testseries.html" class="inline-btn">get started</a>
-      </div>
-
-      <div class="box">
-         <div class="tutor">
-            <img src="images/geo.jpg" alt="">
-            <div>
-               <h3>INDIAN & WORLD GEOGRAPHY</h3>
-               <span>test series</span>
-            </div>
-         </div>
-         <p> Test date : <span></span></p>
-         <p> Full mark : <span></span></p>
-         <p> Syllabus: <span></span></p>
-         <a href="testview.html" class="inline-btn"> View Test Details</a>
-      </div>
-
-      <div class="box">
-         <div class="tutor">
-            <img src="images/Indian-Polity.jpg" alt="">
-            <div>
-               <h3> PSIR</h3>
-               <p> Poltical Science & Internal Relations </p>
-               <span>test series</span>
-            </div>
-         </div>
-         <p> Test date : <span></span></p>
-         <p> Full mark : <span></span></p>
-         <p> Syllabus: <span></span></p>
-         <a href="politymock.html" class="inline-btn"> View Test Details</a>
+      <div class="box offer">
+         <h3>TEST: Current Affairs</h3>
+         <p>Attempt today's test and check your current potential.</p>
+         <p><span>Hello aspirant..!!!<span></p>
+         <a href="ca_testseries.html" class="inline-btn">Get Started</a>
       </div>
    </div>
 
+   <!-- Test Series Grid -->
+   <div class="course-grid">
+      <div class="course-card">
+         <div class="badge">New</div>
+         <div class="course-image">
+            <img src="images/geo.jpg" alt="Geography Test">
+         </div>
+         <div class="course-details">
+            <div class="tutor">
+               <img src="images/geo.jpg" alt="Instructor">
+               <div class="tutor-info">
+                  <h4>Geography Expert</h4>
+                  <span>GS Paper I</span>
+               </div>
+            </div>
+            <h3>Indian & World Geography Test Series</h3>
+            <p>Comprehensive test series covering physical, economic, and human geography with maps and case studies.</p>
+            <div class="course-meta">
+               <span><i class="fas fa-question-circle"></i> 500+ MCQs</span>
+               <span><i class="fas fa-map-marked-alt"></i> 50+ Maps</span>
+            </div>
+            <a href="testview.html" class="enroll-btn">View Test Details</a>
+         </div>
+      </div>
+
+      <div class="course-card">
+         <div class="badge">Popular</div>
+         <div class="course-image">
+            <img src="images/Indian-Polity.jpg" alt="Polity Test">
+         </div>
+         <div class="course-details">
+            <div class="tutor">
+               <img src="images/PSIR.01.jpg" alt="Instructor">
+               <div class="tutor-info">
+                  <h4>Polity Expert</h4>
+                  <span>GS Paper II</span>
+               </div>
+            </div>
+            <h3>PSIR Test Series</h3>
+            <p>Political Science & International Relations test series covering Constitution, Parliament, and current developments.</p>
+            <div class="course-meta">
+               <span><i class="fas fa-balance-scale"></i> 200+ Questions</span>
+               <span><i class="fas fa-landmark"></i> Case Studies</span>
+            </div>
+            <a href="politymock.html" class="enroll-btn">View Test Details</a>
+         </div>
+      </div>
+
+      <div class="course-card">
+         <div class="course-image">
+            <img src="images/current-affairs.jpg" alt="Current Affairs Test">
+         </div>
+         <div class="course-details">
+            <div class="tutor">
+               <img src="images/news.jpg" alt="Instructor">
+               <div class="tutor-info">
+                  <h4>Current Affairs Team</h4>
+                  <span>Daily Updates</span>
+               </div>
+            </div>
+            <h3>Daily Current Affairs Test</h3>
+            <p>Daily MCQs based on current affairs from The Hindu, Indian Express, PIB and other relevant sources.</p>
+            <div class="course-meta">
+               <span><i class="fas fa-newspaper"></i> 30+ Sources</span>
+               <span><i class="fas fa-tags"></i> Topic-wise</span>
+            </div>
+            <a href="ca_testseries.html" class="enroll-btn">Take Today's Test</a>
+         </div>
+      </div>
+
+      <div class="course-card">
+         <div class="badge">Free</div>
+         <div class="course-image">
+            <img src="images/indian-history.jpg" alt="History Test">
+         </div>
+         <div class="course-details">
+            <div class="tutor">
+               <img src="images/history.jpg" alt="Instructor">
+               <div class="tutor-info">
+                  <h4>History Expert</h4>
+                  <span>GS Paper I</span>
+               </div>
+            </div>
+            <h3>Indian History Test Series</h3>
+            <p>From ancient to modern India with art, culture, and post-independence consolidation questions.</p>
+            <div class="course-meta">
+               <span><i class="fas fa-monument"></i> 100+ Topics</span>
+               <span><i class="fas fa-timeline"></i> Chronology</span>
+            </div>
+            <a href="historytest.html" class="enroll-btn">Start Test Series</a>
+         </div>
+      </div>
+
+      <div class="course-card">
+         <div class="course-image">
+            <img src="images/indian-economy.jpg" alt="Economy Test">
+         </div>
+         <div class="course-details">
+            <div class="tutor">
+               <img src="images/economy.jpg" alt="Instructor">
+               <div class="tutor-info">
+                  <h4>Economy Expert</h4>
+                  <span>GS Paper III</span>
+               </div>
+            </div>
+            <h3>Indian Economy Test Series</h3>
+            <p>Complete coverage of economic concepts, budget, economic survey, and current economic issues.</p>
+            <div class="course-meta">
+               <span><i class="fas fa-rupee-sign"></i> Budget Analysis</span>
+               <span><i class="fas fa-chart-pie"></i> Economic Survey</span>
+            </div>
+            <a href="economytest.html" class="enroll-btn">Start Test Series</a>
+         </div>
+      </div>
+
+      <div class="course-card">
+         <div class="badge">New</div>
+         <div class="course-image">
+            <img src="images/CSAT.jpg" alt="CSAT Test">
+         </div>
+         <div class="course-details">
+            <div class="tutor">
+               <img src="images/CSAT01.jpg" alt="Instructor">
+               <div class="tutor-info">
+                  <h4>CSAT Specialist</h4>
+                  <span>Prelims Paper II</span>
+               </div>
+            </div>
+            <h3>CSAT Aptitude Test Series</h3>
+            <p>Master quantitative aptitude, logical reasoning, and reading comprehension for CSAT paper.</p>
+            <div class="course-meta">
+               <span><i class="fas fa-calculator"></i> 500+ Problems</span>
+               <span><i class="fas fa-stopwatch"></i> Time Management</span>
+            </div>
+            <a href="csattest.html" class="enroll-btn">Start Preparation</a>
+         </div>
+      </div>
+   </div>
+
+   <div class="features">
+      <h2>Why Take Our <span>Test Series</span>?</h2>
+      <div class="features-container">
+         <div class="feature-box">
+            <i class="fas fa-clipboard-check"></i>
+            <h3>Exam-like Experience</h3>
+            <p>Our tests simulate the actual UPSC exam environment to help you get comfortable with the real thing.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-chart-line"></i>
+            <h3>Performance Analytics</h3>
+            <p>Detailed performance reports to help you identify strengths and areas needing improvement.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-question-circle"></i>
+            <h3>Quality Questions</h3>
+            <p>Curated questions based on previous year patterns and current trends in UPSC exams.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-clock"></i>
+            <h3>Time Management</h3>
+            <p>Learn to manage your time effectively with timed tests and section-wise practice.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-lightbulb"></i>
+            <h3>Concept Reinforcement</h3>
+            <p>Tests designed to reinforce concepts and improve retention through active recall.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-trophy"></i>
+            <h3>Competitive Benchmarking</h3>
+            <p>Compare your performance with other aspirants to gauge your preparation level.</p>
+         </div>
+      </div>
+   </div>
 </section>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- Footer -->
 <footer class="footer">
-
-   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved!(owner)
-
+   &copy; Copyright @ 2024 by <span>Pratyush Swain</span> | All rights reserved! (owner)
 </footer>
 
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
+<!-- JavaScript -->
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+      // Sidebar toggle functionality
+      const menuBtn = document.querySelector('#menu-btn');
+      const closeBtn = document.querySelector('#close-btn');
+      const sidebar = document.querySelector('.side-bar');
 
-   
+      if (menuBtn) {
+         menuBtn.addEventListener('click', () => {
+            sidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+         });
+      }
+
+      if (closeBtn) {
+         closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+         });
+      }
+
+      // Close sidebar when clicking outside
+      document.addEventListener('click', (e) => {
+         if (!sidebar.contains(e.target) && e.target !== menuBtn) {
+            sidebar.classList.remove('active');
+            document.body.style.overflow = 'auto';
+         }
+      });
+
+      // Dark/Light mode toggle functionality
+      const toggleBtn = document.querySelector('#toggle-btn');
+      
+      // Check for saved theme preference or use system preference
+      const savedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      // Set initial theme
+      if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+         document.body.classList.add('dark-mode');
+         toggleBtn.classList.remove('fa-sun');
+         toggleBtn.classList.add('fa-moon');
+      }
+
+      // Toggle theme on button click
+      toggleBtn.addEventListener('click', () => {
+         document.body.classList.toggle('dark-mode');
+         
+         if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            toggleBtn.classList.remove('fa-sun');
+            toggleBtn.classList.add('fa-moon');
+         } else {
+            localStorage.setItem('theme', 'light');
+            toggleBtn.classList.remove('fa-moon');
+            toggleBtn.classList.add('fa-sun');
+         }
+      });
+
+      // Add active class to current page in sidebar
+      const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+      const navLinks = document.querySelectorAll('.navbar a');
+      
+      navLinks.forEach(link => {
+         const linkHref = link.getAttribute('href');
+         if (currentPage === linkHref) {
+            link.classList.add('active');
+         }
+      });
+   });
+</script>
+
 </body>
 </html>
