@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>UPSC</title>
+
+   <!-- Font Awesome -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+
+   <!-- Custom CSS -->
+   <link rel="stylesheet" href="css/style.css">
+
+   <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      color: #1f2937;
+      font-size: 18px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #f9fafb;
+    }
+    .btn {
+      background-color: #2563eb;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+      font-size: 1.3rem; /* increased from 1.1rem */
+      transition: background-color 0.3s ease;
+    }
+    .btn:hover {
+      background-color: #1e40af;
+    }
+    header.small-header, footer {
+      background: transparent;
+      text-align: center;
+      color: #4b5563;
+      font-size: 1rem;
+      padding: 0.75rem 0;
+    }
+    main {
+      flex-grow: 1;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+      max-width: 960px;
+      margin: 0 auto;
+    }
+    section {
+      border: 1px solid #d1d5db;
+      border-radius: 1rem;
+      padding: 2rem;
+      text-align: center;
+      background-color: #ffffff;
+    }
+    h1.main-header {
+      font-size: 3rem;
+      font-weight: 700;
+      text-align: center;
+      margin: 2rem 0;
+    }
+    h2.section-header {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1.25rem;
+    }
+    .date-time {
+      text-align: center;
+      margin: 16px 0;
+      font-size: 2rem;
+      color: #555;
+    }
+
+    .side-bar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: #fff;
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .side-bar.active { left: 0; }
+
+    .search-form {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 250px;
+    }
+
+    .search-form.active { display: block; }
+
+    .header .profile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 200px;
+      text-align: center;
+    }
+
+    .header .profile.active { display: block; }
+
+    .dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+    .dark-mode header {
+      background-color: #222;
+    }
+    .dark-mode .runner-strip {
+      background-color: #333;
+    }
+    .dark-mode .box {
+      background-color: #1e1e1e;
+      color: #eee;
+    }
+    .dark-mode footer {
+      background-color: #1e1e1e;
+      color: #aaa;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Loader Card */
+    .card {
+      padding: 1rem 2rem;
+      margin: 2rem auto;
+      max-width: 600px;
+      color: white;
+      background: transparent;
+      box-shadow: none;
+      border: none;
+    }
+
+    .loader {
+      color: rgb(124, 124, 124);
+      font-family: "Poppins", sans-serif;
+      font-weight: 500;
+      font-size: 18px; /* reduced from 28px */
+      height: 40px;
+      padding: 10px 10px;
+      display: flex;
+      border-radius: 8px;
+    }
+
+    .words {
+      overflow: hidden;
+      position: relative;
+    }
+
+    .words::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(transparent 10%, transparent 30%, transparent 70%, transparent 90%);
+      z-index: 20;
+    }
+
+    .word {
+      display: block;
+      height: 100%;
+      padding-left: 6px;
+      color: #956afa;
+      animation: spin_4991 7s infinite;
+    }
+
+    @keyframes spin_4991 {
+       100% { transform: translateY(-500%); }
+       0%   { transform: translateY(0%); } 
+      20%  { transform: translateY(-100%); }
+      40%  { transform: translateY(-200%); }
+      60%  { transform: translateY(-300%); }
+      80%  { transform: translateY(-400%); }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header class="header">
+   <section class="flex">
+      <a href="index.html" class="logo">UPSC hub</a>
+      <form action="search.html" method="post" class="search-form">
+         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
+         <button type="submit" class="fas fa-search"></button>
+      </form>
+      <div class="icons">
+         <div id="menu-btn" class="fas fa-bars"></div>
+         <div id="search-btn" class="fas fa-search"></div>
+         <div id="user-btn" class="fas fa-user"></div>
+         <div id="toggle-btn" class="fas fa-sun"></div>
+      </div>
+      <div class="profile">
+         <img src="images/LOGO.jpg" class="image" alt="">
+         <h3 class="name">UPSC hub</h3>
+         <p class="role">ADMIN & HOST</p>
+      </div>
+   </section>
+</header>
+
+<!-- Sidebar -->
+<div class="side-bar">
+   <div id="close-btn"><i class="fas fa-times"></i></div>
+   <div class="profile">
+      <img src="images/LOGO.jpg" class="image" alt="">
+      <h3 class="name">UPSC hub</h3>
+      <p class="role">ADMIN & HOST</p>
+   </div>
+  <nav class="navbar">
+   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
+   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
+   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
+   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
+   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+  </nav>
+</div>
+
+<h1 class="main-header">UPSC</h1>
+
+
+<div class="card">
+  <div class="loader">
+    <div class="words">
+      <span class="word">UPSChub</span>
+      <span class="word">Loading Prelims</span>
+      <span class="word">Loading Mains</span>
+      <span class="word">Loading Interview</span>
+      <span class="word">UPSChub Ready</span>
+      <span class="word">Let's Begin</span>
+    </div>
+  </div>
+</div>
+
+<div class="date-time">
+    <p id="currentDate"></p>
+</div>
+
+<main>
+  <section id="prelims">
+    <h2 class="section-header">Prelims</h2>
+    <p>Prepare for the UPSC Prelims exam with curated resources and practice tests.</p>
+    <div class="bg-gray-100 p-4 rounded-md shadow-sm inline-block">
+      <a href="prelims.html" class="btn">Go to Prelims</a>
+    </div>
+  </section>
+
+  <section id="mains">
+    <h2 class="section-header">Mains</h2>
+    <p>Access study materials and answer writing practice for UPSC Mains.</p>
+    <div class="bg-gray-100 p-4 rounded-md shadow-sm inline-block">
+      <a href="mains.html" class="btn">Go to Mains</a>
+    </div>
+  </section>
+
+  <section id="interview">
+    <h2 class="section-header">Interview</h2>
+    <p>Get tips and mock interview sessions to prepare for the UPSC Interview.</p>
+    <div class="bg-gray-100 p-4 rounded-md shadow-sm inline-block">
+      <a href="interview.html" class="btn">Go to Interview</a>
+    </div>
+  </section>
+</main>
+
+<!-- Loader Card -->
+
+
+<!-- Footer -->
+<footer>
+  &copy; 2024 UPSChub. All rights reserved.
+</footer>
+
+<script>
+    function updateDateTime() {
+      const now = new Date();
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const toggleBtn = document.getElementById('toggle-btn');
+      if(document.body.classList.contains('dark-mode')){
+         toggleBtn.classList.remove('fa-sun');
+         toggleBtn.classList.add('fa-moon');
+      } else {
+         toggleBtn.classList.remove('fa-moon');
+         toggleBtn.classList.add('fa-sun');
+      }
+    }
+
+    const menuBtn = document.querySelector('#menu-btn');
+    const searchBtn = document.querySelector('#search-btn');
+    const userBtn = document.querySelector('#user-btn');
+    const sideBar = document.querySelector('.side-bar');
+    const searchForm = document.querySelector('.search-form');
+    const profile = document.querySelector('.header .profile');
+    const closeBtn = document.querySelector('#close-btn');
+
+    menuBtn.onclick = () => {
+      sideBar.classList.toggle('active');
+      searchForm.classList.remove('active');
+      profile.classList.remove('active'); 
+    };
+
+    searchBtn.onclick = () => {
+      searchForm.classList.toggle('active');
+      sideBar.classList.remove('active');
+      profile.classList.remove('active');
+    };
+
+    userBtn.onclick = () => {
+      profile.classList.toggle('active');
+      searchForm.classList.remove('active');
+      sideBar.classList.remove('active');
+    };
+
+    closeBtn.onclick = () => {
+      sideBar.classList.remove('active');
+    };
+
+    document.getElementById('toggle-btn').addEventListener('click', toggleDarkMode);
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>UPSChub Live Poll</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      background: #f9fafb;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      animation: fadeIn 0.7s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .live-badge {
+      background: #ef4444;
+      color: #fff;
+      font-weight: 600;
+      padding: 6px 16px;
+      border-radius: 999px;
+      display: inline-block;
+      margin: 10px auto;
+      animation: blink 1.2s infinite;
+      font-size: 14px;
+      text-align: center;
+      max-width: 100px;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    main {
+      flex: 1;
+      max-width: 800px;
+      margin: 20px auto 80px;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .question-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .options {
+      margin-bottom: 20px;
+    }
+
+    .option {
+      background: #f1f5f9;
+      padding: 12px;
+      margin-bottom: 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .option:hover {
+      background: #e2e8f0;
+    }
+
+    .correct { background: #d1fae5; border: 1px solid #10b981; }
+    .wrong { background: #fee2e2; border: 1px solid #ef4444; }
+
+    .explanation {
+      background: #fff7ed;
+      padding: 10px 15px;
+      border-left: 5px solid #f97316;
+      border-radius: 5px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: #3b82f6;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+
+    button:hover {
+      background: #2563eb;
+    }
+
+    .timer {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ef4444;
+      margin-bottom: 15px;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 10px;
+      background-color: #e5e7eb;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 100%;
+      background-color: #3b82f6;
+      position: absolute;
+      top: 0;
+      left: 0;
+      transition: width 1s linear;
+    }
+
+    .result-screen {
+      text-align: center;
+      padding: 30px;
+      background: #f8fafc;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+    }
+
+    .result-screen h2 {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    footer {
+      background: #0f172a;
+      color: white;
+      text-align: center;
+      padding: 12px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>UPSChub Live Poll</h1>
+</header>
+
+<div class="live-badge">🔴 LIVE</div>
+
+<main>
+  <div id="quizSection" class="section active">
+    <div class="timer" id="timer">Time: 15s</div>
+    <div class="progress-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="question-title" id="question"></div>
+    <div class="options" id="options"></div>
+    <div class="explanation" id="explanation"></div>
+    <button onclick="nextQuestion()">Next</button>
+  </div>
+
+  <div id="resultSection" class="section">
+    <div class="result-screen">
+      <h2>🎉 Quiz Complete!</h2>
+      <p id="resultText"></p>
+      <button id="shareButton">Share Result on WhatsApp</button>
+    </div>
+  </div>
+</main>
+
+<footer>
+  &copy; 2025 UPSChub | Master UPSC Smarter
+</footer>
+
+<script>
+const quiz = [
+  {
+    slNo: 1,
+    question: "Which of the following countries is NOT part of the Andes mountain range?",
+    options: ["Chile", "Argentina", "Brazil", "Peru"],
+    correct: 2,  // Brazil is the correct answer (index 2)
+    explanation: "Brazil does not have the Andes mountain range, which mainly runs through Chile, Argentina, and Peru."
+  },
+  {
+    slNo: 2,
+    question: "The Amazon River drains into the:",
+    options: ["Pacific Ocean", "Caribbean Sea", "Atlantic Ocean", "Gulf of Mexico"],
+    correct: 2,  // Atlantic Ocean is the correct answer (index 2)
+    explanation: "The Amazon River drains into the Atlantic Ocean, not the Pacific."
+  },
+  {
+    slNo: 3,
+    question: "Lake Titicaca lies between:",
+    options: ["Brazil and Argentina", "Peru and Bolivia", "Ecuador and Colombia", "Venezuela and Guyana"],
+    correct: 1,  // Peru and Bolivia is the correct answer (index 1)
+    explanation: "Lake Titicaca lies between Peru and Bolivia."
+  },
+  {
+    slNo: 4,
+    question: "True/False: The Atacama Desert is located in Argentina.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "The Atacama Desert is located in Chile, not Argentina."
+  },
+  {
+    slNo: 5,
+    question: "Which country has both equatorial rainforest and Andes mountains?",
+    options: ["Brazil", "Peru", "Ecuador", "Bolivia"],
+    correct: 2,  // Ecuador is the correct answer (index 2)
+    explanation: "Ecuador has both the equatorial rainforest and the Andes mountains."
+  },
+  {
+    slNo: 6,
+    question: "True/False: The Gran Chaco region lies mainly in Brazil.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "The Gran Chaco region lies mainly in Paraguay, Argentina, and Bolivia, not Brazil."
+  },
+  {
+    slNo: 7,
+    question: "Which river forms a natural boundary between Argentina and Uruguay?",
+    options: ["Amazon", "Paraná", "Uruguay", "Orinoco"],
+    correct: 2,  // Uruguay is the correct answer (index 2)
+    explanation: "The Uruguay River forms a natural boundary between Argentina and Uruguay."
+  },
+  {
+    slNo: 8,
+    question: "Cape Horn is located in:",
+    options: ["Peru", "Chile", "Argentina", "Ecuador"],
+    correct: 1,  // Chile is the correct answer (index 1)
+    explanation: "Cape Horn is located at the southern tip of Chile, in the Tierra del Fuego archipelago."
+  },
+  {
+    slNo: 9,
+    question: "The Guiana Highlands are located in:",
+    options: ["Northwest", "Southeast", "Northeast", "Southwest"],
+    correct: 2,  // Northeast is the correct answer (index 2)
+    explanation: "The Guiana Highlands are located in the northeastern part of South America."
+  },
+  {
+    slNo: 10,
+    question: "True/False: The Andes is the second longest mountain range in the world.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "The Andes is the longest mountain range in the world, not the second."
+  },
+  {
+    slNo: 11,
+    question: "Pampas is a fertile plain found in:",
+    options: ["Colombia", "Chile", "Venezuela", "Argentina"],
+    correct: 3,  // Argentina is the correct answer (index 3)
+    explanation: "The Pampas is a vast, fertile plain located in Argentina."
+  },
+  {
+    slNo: 12,
+    question: "Which of the following is a major tributary of the Amazon?",
+    options: ["Madeira", "Congo", "Limpopo", "Nile"],
+    correct: 0,  // Madeira is the correct answer (index 0)
+    explanation: "The Madeira River is a major tributary of the Amazon River."
+  },
+  {
+    slNo: 13,
+    question: "Which country does not border Brazil?",
+    options: ["Chile", "Venezuela", "Argentina", "Peru"],
+    correct: 0,  // Chile is the correct answer (index 0)
+    explanation: "Chile does not share a border with Brazil."
+  },
+  {
+    slNo: 14,
+    question: "True/False: Suriname is the smallest independent country in South America.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "Suriname is the smallest independent country in South America."
+  },
+  {
+    slNo: 15,
+    question: "Which two countries are landlocked in South America?",
+    options: ["Paraguay & Bolivia", "Ecuador & Bolivia", "Uruguay & Paraguay", "Peru & Ecuador"],
+    correct: 0,  // Paraguay & Bolivia is the correct answer (index 0)
+    explanation: "Paraguay and Bolivia are the two landlocked countries in South America."
+  },
+  {
+    slNo: 16,
+    question: "True/False: Colombia touches both the Atlantic and Pacific Oceans.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "Colombia has coastlines on both the Atlantic and Pacific Oceans."
+  },
+  {
+    slNo: 17,
+    question: "Which country has no border with Argentina?",
+    options: ["Chile", "Bolivia", "Uruguay", "Venezuela"],
+    correct: 3,  // Venezuela is the correct answer (index 3)
+    explanation: "Venezuela does not share a border with Argentina."
+  },
+  {
+    slNo: 18,
+    question: "Capital of Peru is:",
+    options: ["Quito", "Lima", "Santiago", "La Paz"],
+    correct: 1,  // Lima is the correct answer (index 1)
+    explanation: "The capital of Peru is Lima."
+  },
+  {
+    slNo: 19,
+    question: "True/False: Brazil shares its border with all South American countries.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "Brazil does not share a border with Chile and Ecuador."
+  },
+  {
+    slNo: 20,
+    question: "Which country lies between French Guiana and Brazil?",
+    options: ["Suriname", "Guyana", "Venezuela", "Paraguay"],
+    correct: 0,  // Suriname is the correct answer (index 0)
+    explanation: "Suriname lies between French Guiana and Brazil."
+  },
+  {
+    slNo: 21,
+    question: "The capital of Uruguay is:",
+    options: ["Asunción", "Montevideo", "Buenos Aires", "Caracas"],
+    correct: 1,  // Montevideo is the correct answer (index 1)
+    explanation: "The capital of Uruguay is Montevideo."
+  },
+  {
+    slNo: 22,
+    question: "True/False: Ecuador lies directly on the equator.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "Ecuador lies directly on the equator."
+  },
+  {
+    slNo: 23,
+    question: "Which country is located farthest south?",
+    options: ["Chile", "Argentina", "Uruguay", "Bolivia"],
+    correct: 1,  // Argentina is the correct answer (index 1)
+    explanation: "Argentina is the southernmost country in South America."
+  },
+  {
+    slNo: 24,
+    question: "Falkland Islands are controlled by:",
+    options: ["Argentina", "United Kingdom", "Brazil", "Chile"],
+    correct: 1,  // United Kingdom is the correct answer (index 1)
+    explanation: "The Falkland Islands are a British overseas territory."
+  },
+  {
+    slNo: 25,
+    question: "True/False: La Paz is Bolivia’s only capital city.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "Bolivia has two capitals: La Paz (administrative) and Sucre (constitutional)."
+  },
+  
+  // Africa questions
+  
+  {
+    slNo: 26,
+    question: "Which river is the longest in Africa?",
+    options: ["Congo", "Niger", "Nile", "Zambezi"],
+    correct: 2,  // Nile is the correct answer (index 2)
+    explanation: "The Nile River is the longest river in Africa."
+  },
+  {
+    slNo: 27,
+    question: "True/False: The Sahara is the world’s largest hot desert.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "The Sahara Desert is the world’s largest hot desert."
+  },
+  {
+    slNo: 28,
+    question: "Lake Victoria is shared by which three countries?",
+    options: ["Kenya, Uganda, Tanzania", "Ethiopia, Kenya, Rwanda", "South Sudan, Tanzania, Burundi", "Uganda, Zambia, Malawi"],
+    correct: 0,  // Kenya, Uganda, Tanzania is the correct answer (index 0)
+    explanation: "Lake Victoria is shared by Kenya, Uganda, and Tanzania."
+  },
+  {
+    slNo: 29,
+    question: "Which waterfall lies on the Zambia-Zimbabwe border?",
+    options: ["Victoria Falls", "Tugela Falls", "Blue Nile Falls", "Kalandula Falls"],
+    correct: 0,  // Victoria Falls is the correct answer (index 0)
+    explanation: "Victoria Falls is located on the border between Zambia and Zimbabwe."
+  },
+  {
+    slNo: 30,
+    question: "True/False: Mount Kilimanjaro is a dormant volcano.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "Mount Kilimanjaro is a dormant volcano located in Tanzania."
+  },
+  {
+    slNo: 31,
+    question: "Which country has the most number of pyramids in Africa?",
+    options: ["Egypt", "Sudan", "Ethiopia", "Libya"],
+    correct: 1,  // Sudan is the correct answer (index 1)
+    explanation: "Sudan has more pyramids than Egypt, especially in the ancient Kingdom of Kush."
+  },
+  {
+    slNo: 32,
+    question: "True/False: The Congo Basin is the world’s second-largest rainforest.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "The Congo Basin is the second-largest rainforest after the Amazon."
+  },
+  {
+    slNo: 33,
+    question: "Which desert is located in southern Africa?",
+    options: ["Kalahari", "Atacama", "Sonoran", "Mojave"],
+    correct: 0,  // Kalahari is the correct answer (index 0)
+    explanation: "The Kalahari Desert is located in southern Africa, covering parts of Botswana, Namibia, and South Africa."
+  },
+  {
+    slNo: 34,
+    question: "Which of the following countries does NOT have a coastline on the Mediterranean Sea?",
+    options: ["Egypt", "Algeria", "Tunisia", "Ethiopia"],
+    correct: 3,  // Ethiopia is the correct answer (index 3)
+    explanation: "Ethiopia does not have a coastline on the Mediterranean Sea; it is bordered by the Red Sea."
+  },
+  {
+    slNo: 35,
+    question: "The Serengeti National Park is located in which country?",
+    options: ["Kenya", "Tanzania", "Uganda", "South Africa"],
+    correct: 1,  // Tanzania is the correct answer (index 1)
+    explanation: "The Serengeti National Park is located in Tanzania and is famous for its wildlife and the Great Migration."
+  },
+  {
+    slNo: 36,
+    question: "Which of the following is the longest river in West Africa?",
+    options: ["Niger River", "Zambezi River", "Orange River", "Congo River"],
+    correct: 0,  // Niger River is the correct answer (index 0)
+    explanation: "The Niger River is the longest river in West Africa."
+  },
+  {
+    slNo: 37,
+    question: "True/False: The Nile River flows through only 4 countries in Africa.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "The Nile River flows through 11 countries in Africa, including Egypt, Sudan, and Uganda."
+  },
+  {
+    slNo: 38,
+    question: "Which mountain range is found in the northeastern part of Africa?",
+    options: ["Atlas Mountains", "Drakensberg Mountains", "Ethiopian Highlands", "Kilimanjaro Mountains"],
+    correct: 2,  // Ethiopian Highlands is the correct answer (index 2)
+    explanation: "The Ethiopian Highlands are a prominent mountain range in northeastern Africa."
+  },
+  {
+    slNo: 39,
+    question: "Which African country is an island nation in the Indian Ocean?",
+    options: ["Comoros", "Mauritius", "Seychelles", "All of the above"],
+    correct: 3,  // All of the above is the correct answer (index 3)
+    explanation: "Comoros, Mauritius, and Seychelles are all island nations in the Indian Ocean."
+  },
+  {
+    slNo: 40,
+    question: "True/False: The Great Rift Valley is located in West Africa.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "The Great Rift Valley is located in East Africa, stretching through countries like Kenya, Tanzania, and Ethiopia."
+  },
+  {
+    slNo: 41,
+    question: "Which country is home to the famous Sahara Desert?",
+    options: ["Nigeria", "Egypt", "Algeria", "Kenya"],
+    correct: 2,  // Algeria is the correct answer (index 2)
+    explanation: "The Sahara Desert stretches across several North African countries, including Algeria."
+  },
+  {
+    slNo: 42,
+    question: "Which of the following rivers is found in southern Africa?",
+    options: ["Zambezi", "Nile", "Amazon", "Congo"],
+    correct: 0,  // Zambezi is the correct answer (index 0)
+    explanation: "The Zambezi River flows through several countries in southern Africa, including Zambia and Zimbabwe."
+  },
+  {
+    slNo: 43,
+    question: "Which city is known as the 'City of a Thousand Hills'?",
+    options: ["Kigali", "Nairobi", "Addis Ababa", "Lagos"],
+    correct: 0,  // Kigali is the correct answer (index 0)
+    explanation: "Kigali, the capital of Rwanda, is known as the 'City of a Thousand Hills' due to its hilly terrain."
+  },
+  {
+    slNo: 44,
+    question: "True/False: Johannesburg is the capital of South Africa.",
+    options: ["True", "False"],
+    correct: 1,  // False is the correct answer (index 1)
+    explanation: "Johannesburg is a major city in South Africa, but Pretoria is the capital."
+  },
+  {
+    slNo: 45,
+    question: "The Sahara Desert covers parts of how many countries?",
+    options: ["5", "10", "12", "16"],
+    correct: 2,  // 12 is the correct answer (index 2)
+    explanation: "The Sahara Desert spans across 12 countries in North Africa."
+  },
+  {
+    slNo: 46,
+    question: "Which of the following countries is located in the Horn of Africa?",
+    options: ["Somalia", "Ethiopia", "Djibouti", "All of the above"],
+    correct: 3,  // All of the above is the correct answer (index 3)
+    explanation: "Somalia, Ethiopia, and Djibouti are all located in the Horn of Africa."
+  },
+  {
+    slNo: 47,
+    question: "True/False: The Victoria Falls is located on the border of Zambia and Zimbabwe.",
+    options: ["True", "False"],
+    correct: 0,  // True is the correct answer (index 0)
+    explanation: "Victoria Falls is located on the Zambezi River, marking the border between Zambia and Zimbabwe."
+  },
+  {
+    slNo: 48,
+    question: "Which African country is landlocked and bordered by Libya, Sudan, and Chad?",
+    options: ["Mali", "Niger", "Central African Republic", "South Sudan"],
+    correct: 1,  // Niger is the correct answer (index 1)
+    explanation: "Niger is a landlocked country in West Africa, bordered by Libya, Sudan, and Chad."
+  },
+  {
+    slNo: 49,
+    question: "Which is the most populous country in Africa?",
+    options: ["Nigeria", "Egypt", "South Africa", "Ethiopia"],
+    correct: 0,  // Nigeria is the correct answer (index 0)
+    explanation: "Nigeria is the most populous country in Africa with over 200 million people."
+  },
+  {
+    slNo: 50,
+    question: "Which African country is the largest by area?",
+    options: ["Algeria", "Sudan", "Democratic Republic of the Congo", "South Africa"],
+    correct: 0,  // Algeria is the correct answer (index 0)
+    explanation: "Algeria is the largest country in Africa by area."
+  }
+];
+
+
+
+let current = 0, score = 0;
+let startTime, endTime, timeTaken;
+let timerValue = 15;
+let timerInterval;
+
+const testDetails = {
+  testName: "UPSChub Live Poll",
+  totalQuestions: quiz.length,
+  quizDuration: 15 // Duration for each question (in minutes)
+};
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerValue = 15;
+  document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+  document.getElementById('progressBar').style.width = "100%";
+
+  timerInterval = setInterval(() => {
+    timerValue--;
+    document.getElementById('timer').textContent = `Time: ${timerValue}s`;
+    document.getElementById('progressBar').style.width = (timerValue / 15) * 100 + "%";
+
+    if (timerValue <= 0) {
+      clearInterval(timerInterval);
+      nextQuestion();
+    }
+  }, 1000);
+}
+
+function switchSection(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+}
+
+function loadQuestion() {
+  clearInterval(timerInterval);
+  if (current === 0) startTime = new Date().toLocaleTimeString();
+
+  const q = quiz[current];
+  document.getElementById('question').textContent = `Q${current + 1}: ${q.question}`;
+  const optionsContainer = document.getElementById('options');
+  const explanationBox = document.getElementById('explanation');
+  explanationBox.style.display = 'none';
+  explanationBox.innerHTML = '';
+  optionsContainer.innerHTML = '';
+
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = opt;
+    div.onclick = () => handleAnswer(div, i === q.correct, q.correct, i);
+    optionsContainer.appendChild(div);
+  });
+
+  startTimer();
+}
+
+function handleAnswer(elem, isCorrect, correctIndex, selectedIndex) {
+  clearInterval(timerInterval);
+  const all = document.querySelectorAll('.option');
+  all.forEach((opt, idx) => {
+    opt.classList.remove('correct', 'wrong');
+    opt.onclick = null;
+    if (idx === correctIndex) opt.classList.add('correct');
+    else if (idx === selectedIndex) opt.classList.add('wrong');
+  });
+  if (isCorrect) score++;
+  const exp = document.getElementById('explanation');
+  exp.style.display = 'block';
+  exp.innerHTML = `✔️ <b>Correct:</b> ${quiz[current].options[quiz[current].correct]}<br>📘 ${quiz[current].explanation}`;
+}
+
+function nextQuestion() {
+  clearInterval(timerInterval);
+  if (current < quiz.length - 1) {
+    current++;
+    loadQuestion();
+  } else {
+    endTime = new Date().toLocaleTimeString();
+    timeTaken = (15 - timerValue); // Time taken for the last question
+    
+    const resultText = `🎉 I just completed the **${testDetails.testName}** quiz! 📝 Test Name: **${testDetails.testName}**. ⏰ Started at **${startTime}** and completed at **${endTime}**. I scored **${score}** out of **${testDetails.totalQuestions}** in **${timeTaken}** seconds. Test Details: **Total Questions**: ${testDetails.totalQuestions}, **Quiz Duration**: ${testDetails.quizDuration} minutes. Check it out and try it yourself!`;
+
+    document.getElementById('resultText').textContent = `You scored ${score} out of ${testDetails.totalQuestions}.`;
+
+    document.getElementById('shareButton').onclick = function () {
+      const whatsappURL = `whatsapp://send?text=${encodeURIComponent(resultText)}`;
+      window.location.href = whatsappURL;
+    };
+
+    switchSection('resultSection');
+  }
+}
+
+window.onload = loadQuestion;
+</script>
+
+</body>
+</html>

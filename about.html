@@ -4,164 +4,525 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>courses</title>
+   <title>About - UPSC Hub</title>
 
-   <!-- font awesome cdn link  -->
+   <!-- Font Awesome -->
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
-   <!-- custom css file link  -->
-   <link rel="stylesheet" href="css/style.css">
+   <!-- Google Fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
+   <!-- Custom CSS -->
+   <style>
+      :root {
+         --primary: #3a86ff;
+         --secondary: #8338ec;
+         --accent: #ff006e;
+         --light: #f8f9fa;
+         --dark: #212529;
+         --white: #ffffff;
+         --black: #000000;
+         --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+         font-family: 'Open Sans', sans-serif;
+         background-color: #f5f7fa;
+         color: var(--dark);
+         min-height: 100vh;
+         display: flex;
+         flex-direction: column;
+         transition: background-color 0.3s, color 0.3s;
+         line-height: 1.6;
+         margin: 0;
+         padding: 0;
+      }
+
+      body.dark-mode {
+         background-color: #121212;
+         color: #f5f5f5;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+         font-family: 'Montserrat', sans-serif;
+         font-weight: 600;
+      }
+
+      /* Header Styles */
+      .header {
+         background: linear-gradient(135deg, var(--primary), var(--secondary));
+         color: var(--white);
+         padding: 15px 0;
+         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+         position: sticky;
+         top: 0;
+         z-index: 1000;
+      }
+
+      .header .flex {
+         display: flex;
+         align-items: center;
+         justify-content: space-between;
+         max-width: 1200px;
+         margin: 0 auto;
+         padding: 0 20px;
+      }
+
+      .header .logo {
+         font-size: 24px;
+         font-weight: 700;
+         color: var(--white);
+         text-decoration: none;
+      }
+
+      .header .icons {
+         display: flex;
+         gap: 15px;
+         align-items: center;
+      }
+
+      .header .icons div {
+         color: var(--white);
+         font-size: 18px;
+         cursor: pointer;
+         padding: 8px;
+         border-radius: 50%;
+         width: 36px;
+         height: 36px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         transition: all 0.3s ease;
+      }
+
+      .header .icons div:hover {
+         background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Sidebar Styles */
+      .side-bar {
+         position: fixed;
+         top: 0;
+         left: -300px;
+         width: 300px;
+         height: 100vh;
+         background: white;
+         box-shadow: 0 0 20px rgba(0,0,0,0.1);
+         z-index: 1000;
+         transition: all 0.3s ease;
+         overflow-y: auto;
+      }
+
+      body.dark-mode .side-bar {
+         background: #1e1e1e;
+         color: #f5f5f5;
+      }
+
+      .side-bar.active {
+         left: 0;
+      }
+
+      .side-bar #close-btn {
+         position: absolute;
+         top: 15px;
+         right: 15px;
+         font-size: 20px;
+         color: #6c757d;
+         cursor: pointer;
+      }
+
+      body.dark-mode .side-bar #close-btn {
+         color: #aaa;
+      }
+
+      .side-bar .profile {
+         padding: 30px 20px;
+         text-align: center;
+         border-bottom: 1px solid #eee;
+      }
+
+      body.dark-mode .side-bar .profile {
+         border-bottom-color: #333;
+      }
+
+      .side-bar .profile img {
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-bottom: 15px;
+         border: 3px solid var(--primary);
+      }
+
+      .side-bar .profile h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 5px;
+      }
+
+      body.dark-mode .side-bar .profile h3 {
+         color: #f5f5f5;
+      }
+
+      .side-bar .profile .role {
+         font-size: 14px;
+         color: #6c757d;
+      }
+
+      body.dark-mode .side-bar .profile .role {
+         color: #aaa;
+      }
+
+      .side-bar .navbar {
+         padding: 20px 0;
+      }
+
+      .side-bar .navbar a {
+         display: flex;
+         align-items: center;
+         padding: 12px 25px;
+         color: #495057;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      body.dark-mode .side-bar .navbar a {
+         color: #ddd;
+      }
+
+      .side-bar .navbar a:hover {
+         background: #f8f9fa;
+         color: var(--primary);
+      }
+
+      body.dark-mode .side-bar .navbar a:hover {
+         background: #2a2a2a;
+      }
+
+      .side-bar .navbar a i {
+         margin-right: 10px;
+         font-size: 18px;
+         width: 24px;
+         text-align: center;
+      }
+
+      .side-bar .navbar a span {
+         font-size: 15px;
+      }
+      /* Main Content Styles */
+      .about {
+         padding: 20px;
+         max-width: 1200px;
+         margin: 30px auto;
+         padding-bottom: 80px;
+         flex: 1;
+      }
+
+      .about .row {
+         display: flex;
+         align-items: center;
+         flex-wrap: wrap;
+         gap: 30px;
+         margin-bottom: 40px;
+      }
+
+      .about .row .image,
+      .about .row .content {
+         flex: 1 1 400px;
+      }
+
+      .about .row .image img {
+         width: 100%;
+         border-radius: 10px;
+         box-shadow: var(--box-shadow);
+      }
+
+      .about .row .content h3 {
+         font-size: 28px;
+         color: var(--primary);
+         margin-bottom: 20px;
+         position: relative;
+      }
+
+      .about .row .content h3:after {
+         content: '';
+         position: absolute;
+         bottom: -10px;
+         left: 0;
+         width: 60px;
+         height: 3px;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         border-radius: 3px;
+      }
+
+      .about .row .content p {
+         font-size: 16px;
+         color: #555;
+         line-height: 1.8;
+         margin-bottom: 20px;
+      }
+
+      .thought-day {
+         background: linear-gradient(135deg, #f5f7fa, #e4e8f0);
+         padding: 25px;
+         border-radius: 10px;
+         margin-top: 30px;
+         border-left: 4px solid var(--primary);
+      }
+
+      /* Features Section */
+      .features {
+         margin-top: 50px;
+      }
+
+      .features h2 {
+         text-align: center;
+         font-size: 32px;
+         color: var(--primary);
+         margin-bottom: 40px;
+         position: relative;
+      }
+
+      .features h2:after {
+         content: '';
+         position: absolute;
+         bottom: -15px;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 80px;
+         height: 4px;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         border-radius: 2px;
+      }
+
+      .features-container {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+         gap: 25px;
+         margin-top: 30px;
+      }
+
+      .feature-box {
+         background: var(--white);
+         border-radius: 10px;
+         padding: 25px;
+         box-shadow: var(--box-shadow);
+         transition: all 0.3s ease;
+         border-top: 3px solid var(--primary);
+         text-align: center;
+      }
+
+      .feature-box:hover {
+         transform: translateY(-5px);
+      }
+
+      .feature-box i {
+         font-size: 40px;
+         color: var(--primary);
+         margin-bottom: 20px;
+      }
+
+      /* Footer Styles */
+      .footer {
+         background: linear-gradient(to right, #111, #1c1c1c);
+         color: var(--white);
+         text-align: center;
+         padding: 15px 0;
+         margin-top: auto;
+      }
+
+      /* Dark Mode Styles */
+      body.dark-mode .side-bar,
+      body.dark-mode .feature-box {
+         background: #1e1e1e;
+      }
+
+      body.dark-mode .feature-box h3,
+      body.dark-mode .side-bar .profile h3 {
+         color: #f5f5f5;
+      }
+
+      body.dark-mode .feature-box p,
+      body.dark-mode .side-bar .profile .role,
+      body.dark-mode .about .row .content p,
+      body.dark-mode .thought-day p {
+         color: #aaa;
+      }
+
+      body.dark-mode .thought-day {
+         background: #2a2a2a;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 768px) {
+         .about .row {
+            flex-direction: column;
+         }
+         
+         .features-container {
+            grid-template-columns: 1fr;
+         }
+      }
+   </style>
 </head>
 <body>
 
+<!-- Header Section -->
 <header class="header">
-   
    <section class="flex">
-
-      <a href="index.html" class="logo">UPSC hub</a>
-
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-
+      <a href="index.html" class="logo">UPSC Hub</a>
       <div class="icons">
          <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
          <div id="toggle-btn" class="fas fa-sun"></div>
       </div>
-
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-        
-         </div>
+      
       </div>
-
    </section>
+</header>
 
-</header>   
-
+<!-- Sidebar Navigation -->
 <div class="side-bar">
-
    <div id="close-btn">
       <i class="fas fa-times"></i>
    </div>
-
    <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   
+      <img src="images/LOGO.jpg" class="image" alt="UPSC Hub Logo">
+      <h3 class="name">UPSC Hub</h3>
+      <p class="role">Admin & Host</p>
+      
    </div>
-
-<nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-</nav>
-
-
-
-</div>
-   
-<a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+     <nav class="navbar">
+      <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+      <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
+      <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+      <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+      <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+      <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
+      <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+      <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+      <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+      <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
    </nav>
-
 </div>
 
+<!-- Main Content -->
 <section class="about">
-
    <div class="row">
-
-      <div class="image">
-         <img src="images/LOGO.jpg" alt="">
-      </div>
-
       <div class="content">
-         <h3> about <span> UPSC hub </span></h3>
-         <p>An integrated platform to develop all the skills for UPSC . #upscstudyhub created and designed by <span>Pratyush Swain</span> </p>
-         <p> Cheakout COURSES </p>
-         <a href="courses.html" class="inline-btn">courses</a>
-
-         <p> <span> THOUGHT OF THE DAY </span> </p>
-         
+         <h3>About <span>UPSC Hub</span></h3>
+         <p>An integrated platform to develop all the skills needed for UPSC preparation. UPSC Hub was created and designed by Pratyush Swain with the vision to provide comprehensive resources for UPSC aspirants.</p>
+         <p>Our mission is to simplify UPSC preparation by offering structured courses, mock tests, study materials, and revision tools - all in one place.</p>
+         <a href="courses.html" class="inline-btn">Explore Courses</a>
+         <div class="thought-day">
+            <h3>Thought of the Day</h3>
+            <p>"Success is no accident. It is hard work, perseverance, learning, studying, sacrifice and most of all, love of what you are doing." - Pelé</p>
+         </div>
       </div>
    </div>
-   </div>
-
    
    <div class="row">
-      
-    <div class="image">
-         <img src="images/thoughtofday.jpg" alt=" THOUGHT OF THE DAY ">
+      <div class="content">
+         <h3>Our <span>Story</span></h3>
+         <p>UPSC Hub was born out of the struggles faced by countless UPSC aspirants who found it challenging to access quality resources in one place. Recognizing the need for a centralized platform that could provide comprehensive preparation materials, we set out to create UPSC Hub.</p>
+         <p>What started as a small initiative has now grown into a trusted resource for thousands of civil service aspirants across the country. Our platform continues to evolve based on user feedback and the changing patterns of the UPSC examination.</p>
       </div>
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      
-      
-             
-
-      
-        
-     
-
-
-
-
-
-
-
-
-
-
+      <div class="image">
+         <img src="images/upsc-exam.jpg" alt="UPSC Exam Preparation">
+      </div>
+   </div>
    
+   <div class="features">
+      <h2>Why Choose <span>UPSC Hub</span>?</h2>
+      <div class="features-container">
+         <div class="feature-box">
+            <i class="fas fa-book-open"></i>
+            <h3>Comprehensive Resources</h3>
+            <p>Access to all necessary study materials, from NCERTs to advanced reference books, curated specifically for UPSC preparation.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-chalkboard-teacher"></i>
+            <h3>Expert Guidance</h3>
+            <p>Learn from experienced mentors and toppers who understand the UPSC examination pattern and requirements.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-clipboard-check"></i>
+            <h3>Mock Tests</h3>
+            <p>Regular test series with detailed analysis to help you track your progress and identify areas for improvement.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-newspaper"></i>
+            <h3>Current Affairs</h3>
+            <p>Daily updated current affairs section with relevant news analysis for Prelims and Mains preparation.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-edit"></i>
+            <h3>Answer Writing</h3>
+            <p>Practice and improve your answer writing skills with our evaluation system and model answers.</p>
+         </div>
+         <div class="feature-box">
+            <i class="fas fa-users"></i>
+            <h3>Community Support</h3>
+            <p>Connect with fellow aspirants, share knowledge, and stay motivated throughout your preparation journey.</p>
+         </div>
+      </div>
+   </div>
+</section>
 
-
-  
-
-
-
-
-
-
-
-
-
-
-
-
+<!-- Footer -->
 <footer class="footer">
-
-   &copy; copyright @ 2024 by <span> Pratyush swain </span> | all rights reserved! (owner)
-
+   &copy; Copyright @ 2024 by <span>Pratyush Swain</span> | All rights reserved!
 </footer>
 
-<!-- custom js file link  -->
-<script src="js/script.js"></script>
+<!-- JavaScript -->
+<script>
+   document.addEventListener("DOMContentLoaded", function() {
+      // Sidebar toggle functionality
+      const menuBtn = document.querySelector('#menu-btn');
+      const closeBtn = document.querySelector('#close-btn');
+      const sidebar = document.querySelector('.side-bar');
 
-   
+      if (menuBtn) {
+         menuBtn.addEventListener('click', () => {
+            sidebar.classList.add('active');
+         });
+      }
+
+      if (closeBtn) {
+         closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+         });
+      }
+
+      // Dark/Light mode toggle functionality
+      const toggleBtn = document.querySelector('#toggle-btn');
+      
+      // Check for saved theme preference or use system preference
+      const savedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      // Set initial theme
+      if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+         document.body.classList.add('dark-mode');
+         toggleBtn.classList.remove('fa-sun');
+         toggleBtn.classList.add('fa-moon');
+      }
+
+      // Toggle theme on button click
+      toggleBtn.addEventListener('click', () => {
+         document.body.classList.toggle('dark-mode');
+         
+         if (document.body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+            toggleBtn.classList.remove('fa-sun');
+            toggleBtn.classList.add('fa-moon');
+         } else {
+            localStorage.setItem('theme', 'light');
+            toggleBtn.classList.remove('fa-moon');
+            toggleBtn.classList.add('fa-sun');
+         }
+      });
+   });
+</script>
+
 </body>
 </html>

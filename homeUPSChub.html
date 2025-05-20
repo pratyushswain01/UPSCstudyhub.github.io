@@ -1,417 +1,769 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>UPSC Hub</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-  <style>
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
+   <meta name="google-site-verification" content="e1dxCqTIBSM8IRzYzO2F7uUNiugJJaC-LD6A7tQHxS4" />
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Home: UPSC Hub</title>
 
-    body {
-      background: #f5f5f5;
-      color: #333;
-      transition: background-color 0.3s, color 0.3s;
-    }
+   <!-- font awesome cdn link -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
 
-    /* Dark Mode Styles */
-    body.dark {
-      background: #121212;
-      color: #e0e0e0;
-    }
+   <!-- Google Fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
 
-    body.dark .header {
-      background: #333;
-    }
+   <!-- Custom Styles -->
+   <style>
+      /* Global Styling */
+      :root {
+         --primary: #3a86ff;
+         --secondary: #8338ec;
+         --accent: #ff006e;
+         --light: #f8f9fa;
+         --dark: #212529;
+         --success: #06d6a0;
+         --warning: #ffbe0b;
+      }
+      
+      body {
+         font-family: 'Open Sans', sans-serif;
+         background-color: #f5f7fa;
+         color: var(--dark);
+         overflow-x: hidden;
+         display: flex;
+         flex-direction: column;
+         min-height: 100vh;
+         line-height: 1.6;
+         transition: background-color 0.3s, color 0.3s;
+      }
 
-    body.dark .runner-line {
-      background: #444;
-    }
+      body.dark-mode {
+         background-color: #121212;
+         color: #f5f5f5;
+      }
 
-    body.dark .home-grid .box {
-      background-color: #333;
-      border: 1px solid #555;
-    }
+      h1, h2, h3, h4, h5, h6 {
+         font-family: 'Montserrat', sans-serif;
+         font-weight: 600;
+      }
 
-    body.dark .home-grid .box:hover {
-      background-color: #444;
-    }
+      /* Header Styling */
+   .header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 100;
+}
 
-    body.dark .sidebar {
-      background: #1f1f1f;
-    }
+.header .flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
 
-    body.dark .sidebar a {
-      color: #e0e0e0;
-    }
+.header .logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-block;
+}
 
-    body.dark footer {
-      background: #1f1f1f;
-      color: #e0e0e0;
-    }
+.header .logo:hover {
+    color: white; /* prevents hover color change */
+    text-decoration: none;
+    background: none;
+}
 
-    body.dark .top-buttons button {
-      background-color: #444;
-      color: #fff;
-    }
+      .header .search-form {
+         display: flex;
+         align-items: center;
+         background: rgba(255,255,255,0.2);
+         border-radius: 30px;
+         padding: 5px 15px;
+         width: 40%;
+         max-width: 500px;
+         transition: all 0.3s ease;
+      }
 
-    body.dark .top-buttons button:hover {
-      background-color: #666;
-    }
+      .header .search-form:hover {
+         background: rgba(255,255,255,0.3);
+      }
 
-    body.dark .contact-icons a {
-      color: #fff;
-    }
+      .header .search-form input {
+         background: transparent;
+         border: none;
+         color: white;
+         width: 100%;
+         padding: 8px 0;
+         font-size: 14px;
+      }
 
-    /* For Light Mode */
-    h3 {
-      color: #333; /* Dark color for light mode */
-    }
+      .header .search-form input::placeholder {
+         color: rgba(255,255,255,0.8);
+      }
 
-    /* For Dark Mode */
-    body.dark h3 {
-      color: #fff; /* Light color for dark mode */
-    }
+      .header .search-form button {
+         background: transparent;
+         border: none;
+         color: white;
+         cursor: pointer;
+         font-size: 16px;
+      }
 
-    /* Top Buttons - Positioned at top right above header */
-    .top-buttons {
-      position: fixed;
-      top: 10px;
-      right: 25px;
-      display: flex;
-      gap: 15px;
-      z-index: 100;
-    }
+      .header .icons {
+         display: flex;
+         gap: 15px;
+         align-items: center;
+      }
 
-    .top-buttons button {
-      padding: 6px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1.2rem;
-    }
+      .header .icons div {
+         color: white;
+         font-size: 18px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         padding: 8px;
+         border-radius: 50%;
+         width: 36px;
+         height: 36px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+      }
 
-    .top-buttons button i {
-      font-size: 1.2rem;
-    }
+      .header .icons div:hover {
+         background: rgba(255,255,255,0.2);
+         transform: translateY(-2px);
+      }
 
-    /* Header Style */
-    .header {
-      background: #4a4a4a;
-      color: white;
-      padding: 15px 25px;
-      text-align: center;
-      margin-top: 50px;
-      position: relative;
-    }
+      /* Sidebar */
+      .side-bar {
+         position: fixed;
+         top: 0;
+         left: -300px;
+         width: 300px;
+         height: 100vh;
+         background: white;
+         box-shadow: 0 0 20px rgba(0,0,0,0.1);
+         z-index: 1000;
+         transition: all 0.3s ease;
+         overflow-y: auto;
+      }
 
-    .header h1 {
-      font-size: 2.2em;
-      text-align: center;
-    }
+      body.dark-mode .side-bar {
+         background: #1e1e1e;
+         color: #f5f5f5;
+      }
 
-    .subheading {
-      font-size: 1.2em;
-      margin-top: 5px;
-      color: #ccc;
-      text-align: center;
-      font-weight: 400;
-    }
+      .side-bar.active {
+         left: 0;
+      }
 
-    .runner-line {
-      background: #f8d7da;
-      color: white;
-      padding: 5px 15px;
-      font-size: 0.9em;
-      text-align: center;
-    }
+      .side-bar #close-btn {
+         position: absolute;
+         top: 15px;
+         right: 15px;
+         font-size: 20px;
+         color: #6c757d;
+         cursor: pointer;
+      }
 
-    /* Home Grid Section */
-    .home-grid {
-      padding: 0; /* Remove padding */
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      justify-content: space-between;
-      width: 100%; /* Ensure the grid takes full width */
-    }
+      body.dark-mode .side-bar #close-btn {
+         color: #aaa;
+      }
 
-    /* Update: Make boxes take up 100% width */
-    .home-grid .box {
-      background-color: #fff;
-      padding: 25px 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
-      transition: 0.3s ease;
-      text-align: center;
-      transform: translateY(0);
-      font-size: 1rem;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      min-height: 200px;
-      margin: 0; /* Remove margin */
-      overflow: hidden;
-      width: 100%; /* Ensure each box takes full width */
-    }
+      .side-bar .profile {
+         padding: 30px 20px;
+         text-align: center;
+         border-bottom: 1px solid #eee;
+      }
 
-    .home-grid .box i {
-      font-size: 2.2rem;
-      margin-bottom: 15px;
-      color: #007bff;
-    }
+      body.dark-mode .side-bar .profile {
+         border-bottom-color: #333;
+      }
 
-    .home-grid .box:hover {
-      background-color: #f9f9f9;
-      transform: translateY(-5px);
-    }
+      .side-bar .profile img {
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-bottom: 15px;
+         border: 3px solid var(--primary);
+      }
 
-    .home-grid .box h3 {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-      color: #333;
-    }
+      .side-bar .profile h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 5px;
+      }
 
-    .home-grid .box p {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 12px;
-    }
+      body.dark-mode .side-bar .profile h3 {
+         color: #f5f5f5;
+      }
 
-    .home-grid .box a {
-      color: #007bff;
-      text-decoration: none;
-      font-weight: bold;
-      border: 2px solid #007bff;
-      padding: 5px 10px;
-      border-radius: 25px;
-      transition: 0.3s ease;
-      font-size: 0.85rem;
-    }
+      .side-bar .profile .role {
+         font-size: 14px;
+         color: #6c757d;
+      }
 
-    .home-grid .box a:hover {
-      background-color: #007bff;
-      color: #fff;
-    }
+      body.dark-mode .side-bar .profile .role {
+         color: #aaa;
+      }
 
-    /* Sidebar Style */
-    .sidebar {
-      position: fixed;
-      top: 0; left: -280px;
-      width: 260px;
-      height: 100%;
-      background: #2d2d2d;
-      color: white;
-      padding: 30px 20px;
-      transition: 0.3s ease;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
+      .side-bar .navbar {
+         padding: 20px 0;
+      }
 
-    .sidebar.show {
-      left: 0;
-    }
+      .side-bar .navbar a {
+         display: flex;
+         align-items: center;
+         padding: 12px 25px;
+         color: #495057;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
 
-    /* Fix: Reduce gap between menu icon and close cross icon */
-    .sidebar .cancel-btn {
-      position: absolute;
-      top: 15px;
-      right: 15px;
-      font-size: 1.5rem;
-      color: #fff;
-      cursor: pointer;
-    }
+      body.dark-mode .side-bar .navbar a {
+         color: #ddd;
+      }
 
-    .sidebar nav a {
-      color: white;
-      display: flex;
-      align-items: center;
-      padding: 10px 0;
-      font-size: 0.9em;
-      text-decoration: none;
-      border-bottom: 1px solid #444;
-    }
+      .side-bar .navbar a:hover {
+         background: #f8f9fa;
+         color: var(--primary);
+      }
 
-    .sidebar nav a i {
-      width: 25px;
-    }
+      body.dark-mode .side-bar .navbar a:hover {
+         background: #2a2a2a;
+      }
 
-    .sidebar-footer {
-      text-align: center;
-      margin-top: 40px;
-    }
+      .side-bar .navbar a i {
+         margin-right: 10px;
+         font-size: 18px;
+         width: 24px;
+         text-align: center;
+      }
 
-    .sidebar-footer img {
-      width: 50px;
-      margin-bottom: 5px;
-    }
+      .side-bar .navbar a span {
+         font-size: 15px;
+      }
 
-    .sidebar-footer h2 {
-      font-size: 1.1em;
-      color: #fff;
-      margin-bottom: 5px;
-    }
+      /* Main Content */
+      .home-grid {
+         max-width: 1200px;
+         margin: 30px auto;
+         padding: 0 20px;
+         flex: 1;
+      }
 
-    .sidebar-footer p {
-      font-size: 0.8em;
-      color: #aaa;
-      font-style: italic;
-    }
+      .heading {
+         font-size: 36px;
+         color: var(--primary);
+         margin-bottom: 30px;
+         text-align: center;
+         position: relative;
+         padding-bottom: 15px;
+      }
 
-    /* Footer */
-    footer {
-      background: #2d2d2d;
-      color: white;
-      padding: 10px;
-      text-align: center;
-      font-size: 0.9rem;
-    }
+      .heading:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 80px;
+         height: 4px;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         border-radius: 2px;
+      }
 
-    footer a {
-      color: #007bff;
-      text-decoration: none;
-      margin: 0 10px;
-    }
+      .box-container {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+         gap: 25px;
+         margin-top: 40px;
+      }
 
-    footer a:hover {
-      color: #0056b3;
-    }
+      .box {
+         background: white;
+         border-radius: 10px;
+         padding: 25px;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+         transition: all 0.3s ease;
+         border-top: 3px solid var(--primary);
+      }
 
-    .contact-icons a {
-      color: #fff;
-      font-size: 1.5rem;
-      margin: 0 10px;
-    }
+      body.dark-mode .box {
+         background: #1e1e1e;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      }
 
-    .contact-icons a:hover {
-      color: #007bff;
-    }
+      .box:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      }
 
-    /* Blur effect applied only to the content when menu is open */
-    #main-content.blurred {
-      filter: blur(4px);
-    }
+      body.dark-mode .box:hover {
+         box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      }
 
-  </style>
+      .box h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 15px;
+         position: relative;
+         padding-bottom: 10px;
+      }
+
+      body.dark-mode .box h3 {
+         color: #f5f5f5;
+      }
+
+      .box h3:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 0;
+         width: 40px;
+         height: 2px;
+         background: var(--primary);
+      }
+
+      .box .likes, .box .tutor {
+         font-size: 14px;
+         color: #6c757d;
+         margin-bottom: 15px;
+      }
+
+      body.dark-mode .box .likes,
+      body.dark-mode .box .tutor {
+         color: #aaa;
+      }
+
+      .inline-btn {
+         display: inline-block;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         color: white;
+         padding: 8px 20px;
+         border-radius: 30px;
+         text-decoration: none;
+         font-size: 14px;
+         font-weight: 500;
+         transition: all 0.3s ease;
+         border: none;
+         cursor: pointer;
+      }
+
+      .inline-btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
+      }
+
+      .flex {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 10px;
+      }
+
+      .flex a {
+         display: inline-block;
+         background: #f1f3f5;
+         color: var(--dark);
+         padding: 6px 12px;
+         border-radius: 5px;
+         font-size: 13px;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      body.dark-mode .flex a {
+         background: #2a2a2a;
+         color: #ddd;
+      }
+
+      .flex a:hover {
+         background: var(--primary);
+         color: white;
+      }
+
+      /* Footer */
+       .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to right, #111, #1c1c1c);
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 10px;
+    z-index: 999;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.footer span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+      /* Responsive */
+      @media (max-width: 768px) {
+         .header .search-form {
+            display: none;
+         }
+         
+         .header .icons #search-btn {
+            display: block;
+         }
+         
+         .box-container {
+            grid-template-columns: 1fr;
+         }
+      }
+
+      /* Notification */
+      .notification {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         background: white;
+         border-radius: 10px;
+         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+         padding: 15px;
+         max-width: 300px;
+         display: none;
+         z-index: 1000;
+         border-left: 4px solid var(--primary);
+      }
+
+      body.dark-mode .notification {
+         background: #2a2a2a;
+         color: #f5f5f5;
+      }
+
+      .notification.show {
+         display: block;
+         animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
+      }
+
+      @keyframes slideIn {
+         from { transform: translateX(100%); }
+         to { transform: translateX(0); }
+      }
+
+      @keyframes fadeOut {
+         from { opacity: 1; }
+         to { opacity: 0; }
+      }
+
+      .notification h3 {
+         font-size: 16px;
+         margin-bottom: 10px;
+         color: var(--dark);
+      }
+
+      body.dark-mode .notification h3 {
+         color: #f5f5f5;
+      }
+
+      .notification p {
+         font-size: 14px;
+         color: #6c757d;
+         margin-bottom: 10px;
+      }
+
+      body.dark-mode .notification p {
+         color: #aaa;
+      }
+
+      .notification .close {
+         position: absolute;
+         top: 10px;
+         right: 10px;
+         font-size: 14px;
+         color: #6c757d;
+         cursor: pointer;
+      }
+
+      body.dark-mode .notification .close {
+         color: #aaa;
+      }
+      
+.runner-strip {
+    background: linear-gradient(to right, #6a11cb, #2575fc);
+    color: #fff;
+    overflow: hidden;
+    white-space: nowrap;
+    height: 32px;
+    font-size: 14px;
+    font-weight: 500;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center; /* vertically center */
+}
+
+.runner-strip p {
+    display: inline-block;
+    padding-left: 100%;
+    animation: scrollText 18s linear infinite;
+    position: relative;
+    top: -1px; /* moves text slightly upward */
+}
+
+
+@keyframes scrollText {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+}
+
+
+   </style>
 </head>
 <body>
 
-  <!-- Top Buttons -->
-  <div class="top-buttons">
-    <button onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
-    <button onclick="toggleDarkMode()"><i class="fas fa-moon"></i></button>
-    <button><i class="fas fa-user"></i></button>
-  </div>
+<header class="header">
+   <section class="flex">
 
-  <!-- Sidebar Menu -->
-  <div class="sidebar" id="sidebar">
-    <button class="cancel-btn" onclick="toggleMenu()">X</button>
-    <nav>
-      <a href="index.html"><i class="fas fa-home"></i>Home</a>
-      <a href="about.html"><i class="fas fa-question"></i>About</a>
-      <a href="courses.html"><i class="fas fa-graduation-cap"></i>Courses</a>
-      <a href="test.html"><i class="fas fa-chalkboard-user"></i>Test</a>
-      <a href="poll.html"><i class="fas fa-poll"></i>Live Poll</a>
-      <a href="preplibrary.html"><i class="fas fa-book-reader"></i>PrepLibrary</a>
-      <a href="revision.html"><i class="fas fa-sync-alt"></i>Revision Tools</a>
-      <a href="contact.html"><i class="fas fa-headset"></i>Contact Us</a>
-    </nav>
+      <!-- Plain text logo without icon -->
+      <a href="index.html" class="logo">UPSC Hub</a>
 
-    <div class="contact-icons">
-      <a href="mailto:info@example.com"><i class="fas fa-envelope"></i></a>
-      <a href="tel:+919000000000"><i class="fas fa-phone"></i></a>
-      <a href="https://wa.me/919000000000"><i class="fab fa-whatsapp"></i></a>
-    </div>
-
-    <div class="sidebar-footer">
-      <img src="images\LOGO.jpg" alt="UPSChub Logo" />
-      <h2>UPSC Hub</h2>
-      <p>An initiative by Pratyush Swain</p>
-    </div>
-  </div>
-
-  <!-- Page Content -->
-  <div id="main-content">
-    <header class="header">
-      <h1>UPSC Hub</h1>
-      <div class="subheading">A Unique Way of Learning</div>
-    </header>
-
-    <div class="runner-line">Welcome to UPSC Hub – One stop solution for your UPSC Journey</div>
-
-    <!-- Full Home Grid Section -->
-    <section class="home-grid">
-      <div class="box">
-        <i class="fas fa-university"></i>
-        <h3>UPSC</h3>
-        <p>UPSC Syllabus:</p>
-        <a href="syllabus.html">View Syllabus</a>
+      <!-- Only Menu and Toggle buttons -->
+      <div class="icons">
+         <div id="menu-btn" class="fas fa-bars"></div>
+         <div id="toggle-btn" class="fas fa-sun"></div>
       </div>
-      <div class="box">
-        <i class="fas fa-book"></i>
-        <h3>Polity: M. Laxmikanth</h3>
-        <p>Accelerate Potential</p>
-        <a href="Polity_Laxhmikant.html">Ready to Boost...</a>
-      </div>
-      <div class="box">
-        <i class="fas fa-brain"></i>
-        <h3>Meditation Time</h3>
-        <p>Boost up your mind:</p>
-        <a href="yoga_meditation.html">Ready to Meditate...</a>
-      </div>
-      <div class="box">
-        <i class="fas fa-video"></i>
-        <h3>UPSChub/Video</h3>
-        <p>This is the Video section</p>
-        <a href="UPSChubvid.html">Open it...</a>
-      </div>
-      <div class="box">
-        <i class="fas fa-clock"></i>
-        <h3>Focus Timer</h3>
-        <p>Track your consistency</p>
-        <a href="focustimer.html">Ready to Focus...</a>
-      </div>
-      <div class="box">
-        <i class="fas fa-newspaper"></i>
-        <h3>Today's News Update</h3>
-        <p>Top News: Daily</p>
-        <a href="newsupdate.html">View...</a>
-      </div>
-      <div class="box">
-        <i class="fas fa-file-alt"></i>
-        <h3>Upload Written Files</h3>
-        <p>UPSC Mains is fully based on writing skills, so let’s practice daily....</p>
-        <a href="drive.doc.html">Upload Doc</a>
-      </div>
-      <div class="box">
-        <i class="fas fa-clipboard-check"></i>
-        <h3>Mock Test Series</h3>
-        <p>Let's test our brain!</p>
-        <a href="test.html">Go to Test</a>
-      </div>
-    </section>
-  </div>
 
-  <footer>
-    <p>&copy; 2025 UPSChub, All Rights Reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms & Conditions</a></p>
-  </footer>
+   </section>
+</header>
 
-  <script>
-    function toggleMenu() {
-      const sidebar = document.getElementById("sidebar");
-      sidebar.classList.toggle("show");
-      document.getElementById("main-content").classList.toggle("blurred");
-    }
+<div class="runner-strip">
+   <p>Welcome to UPSC Hub – Your Smart Preparation Partner for Prelims, Mains & Interview • Stay Updated • Practice Smart • Achieve More</p>
+</div>
 
-    function toggleDarkMode() {
-      document.body.classList.toggle("dark");
-    }
-  </script>
+
+
+
+<div class="side-bar">
+   <div id="close-btn">
+      <i class="fas fa-times"></i>
+   </div>
+
+   <div class="profile">
+      <img src="images/LOGO.jpg" class="image" alt="">
+      <h3 class="name">UPSC hub</h3>
+      <p class="role">ADMIN & HOST</p>
+   </div>
+
+    <nav class="navbar">
+    <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
+    <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+    <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+    <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
+    <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+    <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
+    <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+    <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+    <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+    <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+
+    <!-- New Links -->
+    <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+    <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+</nav>
+
+</div>
+
+<section class="home-grid">
+   <h1 class="heading">UPSC Preparation Hub</h1>
+   
+   <div class="box-container">
+      <div class="box">
+         <h3 class="title">UPSC Syllabus</h3>
+         <p class="likes">Comprehensive syllabus for your preparation</p>
+         <div class="flex" style="flex-direction: column; gap: 10px; margin-top: 15px;">
+            <a href="syllabus.html" class="inline-btn"><i class="fas fa-book-open"></i> Prelims Syllabus</a>
+            <a href="syllabus.html" class="inline-btn"><i class="fas fa-book"></i> Mains Syllabus</a>
+         </div>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Polity: M. Laxhmikant</h3>
+         <p class="likes">Master Indian Polity with this essential resource</p>
+         <a href="Polity_Laxhmikant.html" class="inline-btn">Study Now <i class="fas fa-arrow-right"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Meditation Zone</h3>
+         <p class="likes">Boost your concentration and reduce stress</p>
+         <a href="yoga_meditation.html" class="inline-btn">Begin Session <i class="fas fa-spa"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Resource Files</h3>
+         <p class="likes">Confidential study materials and resources</p>
+         <a href="TESTseries-daily.html" class="inline-btn">Access Files <i class="fas fa-folder-open"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Video Lectures</h3>
+         <p class="likes">Comprehensive video learning section</p>
+         <a href="UPSChubvid.html" class="inline-btn">Watch Videos <i class="fas fa-play"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Focus Timer</h3>
+         <p class="likes">Track and improve your study sessions</p>
+         <a href="focustimer.html" class="inline-btn">Start Timer <i class="fas fa-clock"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Daily News Update</h3>
+         <p class="likes">Stay updated with current affairs</p>
+         <a href="newsupdate.html" class="inline-btn">Read Now <i class="fas fa-newspaper"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Newspaper Analysis</h3>
+         <p class="likes">Daily curated news for UPSC</p>
+         <a href="newspaper.html" class="inline-btn">View Analysis <i class="fas fa-search"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Core Subjects</h3>
+         <div class="flex">
+            <a href="#"><i class="fas fa-globe-asia"></i> Geography</a>
+            <a href="#"><i class="fas fa-landmark"></i> Polity</a>
+            <a href="#"><i class="fas fa-history"></i> History</a>
+            <a href="#"><i class="fas fa-map-marked-alt"></i> Mapping</a>
+            <a href="#"><i class="fas fa-atom"></i> Science & Tech</a>
+            <a href="#"><i class="fas fa-book"></i> General Studies</a>
+         </div>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Popular Topics</h3>
+         <div class="flex">
+            <a href="#"><i class="fas fa-bolt"></i> Current Affairs</a>
+            <a href="#"><i class="fas fa-file-alt"></i> Articles</a>
+            <a href="#"><i class="fas fa-edit"></i> Editorials</a>
+            <a href="#"><i class="fas fa-chart-bar"></i> Newspaper Analysis</a>
+         </div>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Answer Writing Practice</h3>
+         <p class="tutor">Upload your Mains answers for evaluation</p>
+         <a href="drive.doc.html" class="inline-btn">Upload Document <i class="fas fa-upload"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Mock Test Series</h3>
+         <p class="tutor">Assess your preparation with full-length tests</p>
+         <a href="test.html" class="inline-btn">Start Test <i class="fas fa-pen"></i></a>
+      </div>
+
+      <div class="box">
+         <h3 class="title">Performance Analysis</h3>
+         <p class="tutor">Detailed reports to improve your scores</p>
+         <a href="testinfo.html" class="inline-btn">View Report <i class="fas fa-chart-line"></i></a>
+      </div>
+   </div>
+</section>
+
+<footer class="footer">
+   <div class="footer-content">
+      &copy; 2025 <span>Pratyush Swain</span> | UPSChub • All rights reserved
+   </div>
+</footer>
+
+
+<div class="notification">
+   <div class="close"><i class="fas fa-times"></i></div>
+   <h3>Welcome to UPSC Hub!</h3>
+   <p>Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools.</p>
+   <p><em>Today's Motivation:</em> "Success isn't about luck; it's about hard work and determination."</p>
+</div>
+
+<script>
+   // Toggle sidebar
+   document.querySelector('#menu-btn').addEventListener('click', function() {
+      document.querySelector('.side-bar').classList.toggle('active');
+   });
+
+   document.querySelector('#close-btn').addEventListener('click', function() {
+      document.querySelector('.side-bar').classList.remove('active');
+   });
+
+   // Close notification
+   document.querySelector('.notification .close').addEventListener('click', function() {
+      document.querySelector('.notification').classList.remove('show');
+   });
+
+   // Show notification
+   document.addEventListener("DOMContentLoaded", function() {
+      setTimeout(function() {
+         document.querySelector('.notification').classList.add('show');
+      }, 2000);
+   });
+
+   // Dark/light mode toggle
+   document.querySelector('#toggle-btn').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+         localStorage.setItem('theme', 'dark');
+         document.querySelector('#toggle-btn').classList.remove('fa-sun');
+         document.querySelector('#toggle-btn').classList.add('fa-moon');
+      } else {
+         localStorage.setItem('theme', 'light');
+         document.querySelector('#toggle-btn').classList.remove('fa-moon');
+         document.querySelector('#toggle-btn').classList.add('fa-sun');
+      }
+   });
+
+   // Check for saved theme preference
+   if (localStorage.getItem('theme') === 'dark') {
+      document.body.classList.add('dark-mode');
+      document.querySelector('#toggle-btn').classList.remove('fa-sun');
+      document.querySelector('#toggle-btn').classList.add('fa-moon');
+   }
+
+   // Browser notifications
+   if ("Notification" in window) {
+      if (Notification.permission === "default") {
+         Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+               new Notification("Welcome to UPSC Hub!", {
+                  body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: Success isn't about luck; it's about hard work and determination.",
+                  icon: "images/LOGO.jpg"
+               });
+            }
+         });
+      } else if (Notification.permission === "granted") {
+         new Notification("Welcome to UPSC Hub!", {
+            body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: Success isn't about luck; it's about hard work and determination.",
+            icon: "images/LOGO.jpg"
+         });
+      }
+   }
+</script>
 
 </body>
 </html>

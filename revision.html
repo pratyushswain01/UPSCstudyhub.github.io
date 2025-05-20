@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Revision Page</title>
+
+   <!-- Font Awesome -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+
+   <!-- Custom CSS -->
+   <link rel="stylesheet" href="css/style.css">
+
+   <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #e9f5ff;
+      color: #333;
+      font-size: 14px;
+    }
+
+    header {
+      background-color: #007BFF;
+      color: white;
+      text-align: center;
+      padding: 1.2em 0 0.8em;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      font-size: 1.3em;
+      position: relative;
+      animation: fadeSlideDown 1s ease-out forwards;
+    }
+
+    @keyframes fadeSlideDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .runner-strip {
+      background-color: #0056b3;
+      color: #ffffff;
+      padding: 6px 0;
+      overflow: hidden;
+      white-space: nowrap;
+      font-size: 0.85em;
+    }
+
+    .runner-text {
+      display: inline-block;
+      padding-left: 100%;
+      animation: scroll-left 15s linear infinite;
+    }
+
+    @keyframes scroll-left {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
+    }
+
+    .date-time {
+      text-align: center;
+      margin: 12px 0;
+      font-size: 0.95em;
+      color: #555;
+    }
+
+    .container {
+      width: 90%;
+      max-width: 550px;
+      margin: 0 auto;
+      padding-bottom: 25px;
+    }
+
+    .section-title {
+      text-align: center;
+      margin: 25px 0 12px;
+      font-size: 1.1em;
+      color: #007BFF;
+      font-weight: bold;
+    }
+
+    .box {
+      background-color: white;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      padding: 16px;
+      margin: 10px 0;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s, box-shadow 0.3s;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      font-size: 0.95em;
+      font-weight: 600;
+    }
+
+    .box:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+      background-color: #f0f8ff;
+    }
+
+    .revision-test {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .revision-test button {
+      padding: 8px 20px;
+      font-size: 0.95em;
+      color: white;
+      background-color: #28A745;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.3s;
+    }
+
+    .revision-test button:hover {
+      background-color: #218838;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 12px;
+      background-color: #f1f1f1;
+      margin-top: 25px;
+      font-size: 0.8em;
+      color: #777;
+    }
+
+    /* Dots Loader */
+    .dots-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 40px;
+      width: 100%;
+      margin-top: 8px;
+    }
+
+    .dot {
+      height: 12px;
+      width: 12px;
+      margin-right: 6px;
+      border-radius: 50%;
+      background-color: #b3d4fc;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+
+    .dot:last-child {
+      margin-right: 0;
+    }
+
+    .dot:nth-child(1) { animation-delay: -0.3s; }
+    .dot:nth-child(2) { animation-delay: -0.1s; }
+    .dot:nth-child(3) { animation-delay: 0.1s; }
+    .dot:nth-child(4) { animation-delay: 0.3s; }
+    .dot:nth-child(5) { animation-delay: 0.5s; }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+      }
+      50% {
+        transform: scale(1.2);
+        background-color: #6793fb;
+        box-shadow: 0 0 0 10px rgba(178, 212, 252, 0);
+      }
+      100% {
+        transform: scale(0.8);
+        background-color: #b3d4fc;
+        box-shadow: 0 0 0 0 rgba(178, 212, 252, 0.7);
+      }
+    }
+
+    /* Sidebar + Search + Profile Toggle Styles */
+    .side-bar {
+      position: fixed;
+      top: 0;
+      left: -300px;
+      width: 250px;
+      height: 100%;
+      background: #fff;
+      padding: 20px;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    .side-bar.active { left: 0; }
+
+    .search-form {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 250px;
+    }
+
+    .search-form.active { display: block; }
+
+    .header .profile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      right: 20px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      width: 200px;
+      text-align: center;
+    }
+
+    .header .profile.active { display: block; }
+
+    /* Dark Mode */
+    .dark-mode {
+      background-color: #121212;
+      color: #eee;
+    }
+    .dark-mode header {
+      background-color: #222;
+    }
+    .dark-mode .runner-strip {
+      background-color: #333;
+    }
+    .dark-mode .box {
+      background-color: #1e1e1e;
+      color: #eee;
+    }
+    .dark-mode footer {
+      background-color: #1e1e1e;
+      color: #aaa;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header class="header">
+   <section class="flex">
+      <a href="index.html" class="logo">UPSC hub</a>
+      <form action="search.html" method="post" class="search-form">
+         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
+         <button type="submit" class="fas fa-search"></button>
+      </form>
+      <div class="icons">
+         <div id="menu-btn" class="fas fa-bars"></div>
+         <div id="search-btn" class="fas fa-search"></div>
+         <div id="user-btn" class="fas fa-user"></div>
+         <div id="toggle-btn" class="fas fa-sun"></div>
+      </div>
+      <div class="profile">
+         <img src="images/LOGO.jpg" class="image" alt="">
+         <h3 class="name">UPSC hub</h3>
+         <p class="role">ADMIN & HOST</p>
+      </div>
+   </section>
+</header>
+
+<!-- Sidebar -->
+<div class="side-bar">
+   <div id="close-btn"><i class="fas fa-times"></i></div>
+   <div class="profile">
+      <img src="images/LOGO.jpg" class="image" alt="">
+      <h3 class="name">UPSC hub</h3>
+      <p class="role">ADMIN & HOST</p>
+   </div>
+
+    <nav class="navbar">
+   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
+   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
+   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
+   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
+   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
+   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
+  </nav>
+
+</div>
+
+<!-- Revision Section -->
+<section class="revision-section">
+  <header>
+    <h1>UPSChub Revision Page</h1>
+    <section class="dots-container">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </section>
+  </header>
+
+  <div class="runner-strip">
+    <div class="runner-text">
+      Welcome to UPSChub! | Stay focused, stay sharp! | New updates added daily. | Take your revision tests now!
+    </div>
+  </div>
+
+  <div class="date-time">
+    <p id="currentDate"></p>
+  </div>
+
+  <div class="container">
+    <h2 class="section-title">Revision Content</h2>
+
+    <div class="box" onclick="redirectTo('mindmap.html')">Mind Map</div>
+    <div class="box" onclick="redirectTo('shortnotes.html')">Short Notes</div>
+    <div class="box" onclick="redirectTo('smartcards.html')">Smart Cards</div>
+
+    <h2 class="section-title">Latest Updates</h2>
+
+    <div class="box" onclick="redirectTo('news.html')">News</div>
+    <div class="box" onclick="redirectTo('current-affairs.html')">Current Affairs</div>
+    <div class="box" onclick="redirectTo('important-articles.html')">Important Articles</div>
+
+    <div class="revision-test">
+      <h2 class="section-title">Revision Test</h2>
+      <button onclick="redirectToPoll()">Take Revision Test</button>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>&copy; 2025 UPSChub. All rights reserved.</p>
+</footer>
+
+<script>
+    function updateDateTime() {
+      const now = new Date();
+      const options = {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    function redirectTo(page) {
+      window.location.href = page;
+    }
+
+    function redirectToPoll() {
+      window.location.href = "revision-test.html";
+    }
+
+    // Dark mode toggle
+    function toggleDarkMode() {
+      document.body.classList.toggle('dark-mode');
+      const toggleBtn = document.getElementById('toggle-btn');
+      if(document.body.classList.contains('dark-mode')){
+         toggleBtn.classList.remove('fa-sun');
+         toggleBtn.classList.add('fa-moon');
+      } else {
+         toggleBtn.classList.remove('fa-moon');
+         toggleBtn.classList.add('fa-sun');
+      }
+    }
+
+    // Menu, Search, User functionality
+    const menuBtn = document.querySelector('#menu-btn');
+    const searchBtn = document.querySelector('#search-btn');
+    const userBtn = document.querySelector('#user-btn');
+    const sideBar = document.querySelector('.side-bar');
+    const searchForm = document.querySelector('.search-form');
+    const profile = document.querySelector('.header .profile');
+    const closeBtn = document.querySelector('#close-btn');
+
+    menuBtn.onclick = () => {
+      sideBar.classList.toggle('active');
+      searchForm.classList.remove('active');
+      profile.classList.remove('active'); 
+    
+    };
+
+    searchBtn.onclick = () => {
+      searchForm.classList.toggle('active');
+      sideBar.classList.remove('active');
+      profile.classList.remove('active');
+    };
+
+    userBtn.onclick = () => {
+      profile.classList.toggle('active');
+      searchForm.classList.remove('active');
+      sideBar.classList.remove('active');
+    };
+
+    closeBtn.onclick = () => {
+      sideBar.classList.remove('active');
+    };
+
+    document.getElementById('toggle-btn').addEventListener('click', toggleDarkMode);
+
+    setInterval(updateDateTime, 1000);
+    updateDateTime();
+</script>
+
+</body>
+</html>
