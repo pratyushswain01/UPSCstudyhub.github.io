@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UPSChub Chatbot</title>
+<style>
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: #e0e0e0;
+  }
+
+  /* Chat Container */
+  #chat-container {
+    max-width: 450px;
+    height: 90vh;
+    max-height: 800px;
+    background: #fff;
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Header like WhatsApp */
+  #chat-header {
+    background: #075e54;
+    color: #fff;
+    padding: 15px 20px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  #chat-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #25d366;
+  }
+  .header-actions {
+    display: flex;
+    gap: 15px;
+  }
+  .header-icon {
+    font-size: 1.3rem;
+    cursor: pointer;
+    opacity: 0.9;
+  }
+  .header-icon:hover {
+    opacity: 1;
+  }
+
+  /* Messages window */
+  #messages {
+    flex-grow: 1;
+    padding: 15px 10px;
+    overflow-y: auto;
+    background-image: url('https://web.whatsapp.com/img/bg-chat-tile-dark_a4be512e7195b6b733d9110b408f075d.png');
+    background-repeat: repeat;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Date divider */
+  .date-divider {
+    text-align: center;
+    margin: 15px 0;
+    position: relative;
+  }
+  .date-divider span {
+    background: rgba(225,245,254,0.8);
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.75rem;
+    color: #075e54;
+    font-weight: 500;
+  }
+
+  /* Message bubbles */
+  .msg-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 8px;
+    max-width: 80%;
+    position: relative;
+  }
+  .msg-container.user {
+    align-self: flex-end;
+  }
+  .msg-container.bot {
+    align-self: flex-start;
+  }
+  .msg {
+    padding: 8px 12px;
+    border-radius: 7.5px;
+    font-size: 0.95rem;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    position: relative;
+  }
+  .bot .msg {
+    background: #ffffff;
+    border: 1px solid #e5e5ea;
+    color: #111;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+    border-top-left-radius: 0;
+  }
+  .user .msg {
+    background: #dcf8c6;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+    border-top-right-radius: 0;
+  }
+  .msg-time {
+    font-size: 0.7rem;
+    color: #666;
+    margin: 2px 8px 0 0;
+    text-align: right;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 3px;
+  }
+  .user .msg-time {
+    color: #075e54;
+  }
+  .msg-status {
+    font-size: 0.6rem;
+    margin-left: 3px;
+  }
+
+  /* Typing indicator */
+  .typing-indicator {
+    background: #ffffff;
+    border: 1px solid #e5e5ea;
+    padding: 8px 12px;
+    border-radius: 7.5px;
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 8px;
+    border-top-left-radius: 0;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.08);
+  }
+  .typing-dots {
+    display: flex;
+    gap: 3px;
+    margin-left: 5px;
+  }
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: #888;
+    border-radius: 50%;
+    animation: typingAnimation 1.4s infinite ease-in-out;
+  }
+  .typing-dot:nth-child(1) { animation-delay: 0s; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingAnimation {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30% { transform: translateY(-3px); opacity: 1; }
+  }
+
+  /* Chat input area */
+  #input-area {
+    display: flex;
+    align-items: center;
+    border-top: 1px solid #e0e0e0;
+    padding: 8px 12px;
+    background: #f0f0f0;
+    position: relative;
+  }
+  .input-actions {
+    display: flex;
+    gap: 8px;
+    margin-right: 10px;
+  }
+  .input-icon {
+    font-size: 1.4rem;
+    color: #666;
+    cursor: pointer;
+    padding: 5px;
+  }
+  .input-icon:hover {
+    color: #075e54;
+  }
+  #user-input {
+    flex-grow: 1;
+    border: none;
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    outline: none;
+    background: #fff;
+    min-height: 20px;
+    max-height: 100px;
+    resize: none;
+    overflow-y: auto;
+  }
+  #send-btn {
+    background: #075e54;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  #send-btn:disabled {
+    background: #a5d6a7;
+    cursor: not-allowed;
+  }
+  #send-btn:not(:disabled):hover {
+    background: #128c46;
+    transform: scale(1.05);
+  }
+
+  /* Menu options container inside bot messages */
+  .bot-options {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Each option button */
+  .option-btn {
+    background: #075e54;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 18px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .option-btn:hover {
+    background: #128c46;
+    transform: translateY(-1px);
+  }
+  .option-btn:active {
+    transform: translateY(0);
+  }
+
+  /* Quick reply buttons */
+  .quick-replies {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 10px;
+  }
+  .quick-reply {
+    background: #e5e5ea;
+    color: #075e54;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    transition: all 0.2s;
+  }
+  .quick-reply:hover {
+    background: #d5d5da;
+  }
+
+  /* Info cards */
+  .info-card {
+    background: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  }
+  .card-title {
+    font-weight: 600;
+    color: #075e54;
+    margin-bottom: 6px;
+    font-size: 0.95rem;
+  }
+  .card-content {
+    font-size: 0.85rem;
+    color: #333;
+  }
+  .card-link {
+    color: #25d366;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.8rem;
+    display: inline-block;
+    margin-top: 5px;
+  }
+  .card-link:hover {
+    text-decoration: underline;
+  }
+
+  /* Media messages */
+  .media-message {
+    max-width: 250px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  }
+  .media-message img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  .media-caption {
+    padding: 8px;
+    background: #fff;
+    font-size: 0.85rem;
+  }
+
+  /* Progress indicator */
+  .progress-container {
+    width: 100%;
+    background: #e0e0e0;
+    border-radius: 5px;
+    margin: 10px 0;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 6px;
+    background: #25d366;
+    border-radius: 5px;
+    transition: width 0.3s ease;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 500px) {
+    #chat-container {
+      height: 100vh;
+      max-height: none;
+      margin: 0;
+      border-radius: 0;
+    }
+    .msg-container {
+      max-width: 90%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div id="chat-container" role="main" aria-label="UPSChub chat interface">
+  <header id="chat-header" role="banner">
+    <div class="header-content">
+      <img src="images\LOGO.jpg" alt="UPSChub Bot Logo" />
+      <div>
+        <div>UPSChub Bot</div>
+        <div id="bot-status" style="font-size: 0.7rem; font-weight: normal;">Online</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <div class="header-icon" title="Search">🔍</div>
+      <div class="header-icon" title="Menu">⋮</div>
+    </div>
+  </header>
+
+  <section id="messages" role="log" aria-live="polite" aria-relevant="additions">
+    <div class="date-divider">
+      <span>Today</span>
+    </div>
+  </section>
+
+  <form id="input-area" onsubmit="event.preventDefault(); sendMsg();" aria-label="Send message form">
+    <div class="input-actions">
+      <div class="input-icon" title="Attach">📎</div>
+      <div class="input-icon" title="Emoji">😊</div>
+    </div>
+    <textarea
+      id="user-input"
+      placeholder="Type a message"
+      aria-label="Type your message"
+      autocomplete="off"
+      required
+      minlength="1"
+      maxlength="500"
+      rows="1"
+    ></textarea>
+    <button type="submit" id="send-btn" aria-label="Send message" title="Send">➤</button>
+  </form>
+</div>
+
+<script>
+  const messagesEl = document.getElementById('messages');
+  const inputEl = document.getElementById('user-input');
+  const sendBtn = document.getElementById('send-btn');
+  const botStatusEl = document.getElementById('bot-status');
+
+  // Auto-resize textarea
+  inputEl.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+
+  // Get current time in HH:MM format
+  function getCurrentTime() {
+    const now = new Date();
+    return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  // Create a typing indicator
+  function showTypingIndicator() {
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'msg-container bot';
+    typingDiv.id = 'typing-indicator';
+    typingDiv.innerHTML = `
+      <div class="msg">
+        <div class="typing-indicator">
+          Typing
+          <div class="typing-dots">
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+            <div class="typing-dot"></div>
+          </div>
+        </div>
+      </div>
+    `;
+    messagesEl.appendChild(typingDiv);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // Remove typing indicator
+  function hideTypingIndicator() {
+    const typingIndicator = document.getElementById('typing-indicator');
+    if (typingIndicator) {
+      typingIndicator.remove();
+    }
+  }
+
+  // Append message to chat
+  function appendMessage(sender, text, options = null, extras = null) {
+    const msgContainer = document.createElement('div');
+    msgContainer.className = `msg-container ${sender}`;
+    
+    const msgDiv = document.createElement('div');
+    msgDiv.className = 'msg';
+    
+    if (sender === 'bot') {
+      msgDiv.innerHTML = text;
+      
+      if (options && options.length) {
+        const optionsContainer = document.createElement('div');
+        optionsContainer.className = 'bot-options';
+        options.forEach(opt => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.innerHTML = opt.icon ? `${opt.icon} ${opt.label}` : opt.label;
+          btn.setAttribute('aria-label', `Select option ${opt.label}`);
+          btn.onclick = () => {
+            if (opt.action === 'link') {
+              window.open(opt.value, '_blank');
+            } else {
+              inputEl.value = opt.value;
+              sendMsg();
+            }
+          };
+          optionsContainer.appendChild(btn);
+        });
+        msgDiv.appendChild(optionsContainer);
+      }
+      
+      if (extras) {
+        if (extras.card) {
+          const card = document.createElement('div');
+          card.className = 'info-card';
+          card.innerHTML = `
+            <div class="card-title">${extras.card.title}</div>
+            <div class="card-content">${extras.card.content}</div>
+            ${extras.card.link ? `<a href="${extras.card.link.url}" target="_blank" class="card-link">${extras.card.link.text}</a>` : ''}
+          `;
+          msgDiv.appendChild(card);
+        }
+        
+        if (extras.media) {
+          const media = document.createElement('div');
+          media.className = 'media-message';
+          media.innerHTML = `
+            <img src="${extras.media.url}" alt="${extras.media.alt || ''}" />
+            ${extras.media.caption ? `<div class="media-caption">${extras.media.caption}</div>` : ''}
+          `;
+          msgDiv.appendChild(media);
+        }
+        
+        if (extras.progress) {
+          const progress = document.createElement('div');
+          progress.className = 'progress-container';
+          progress.innerHTML = `
+            <div class="progress-bar" style="width: ${extras.progress.percentage}%"></div>
+          `;
+          msgDiv.appendChild(progress);
+        }
+        
+        if (extras.quickReplies) {
+          const quickReplies = document.createElement('div');
+          quickReplies.className = 'quick-replies';
+          extras.quickReplies.forEach(reply => {
+            const quickReply = document.createElement('div');
+            quickReply.className = 'quick-reply';
+            quickReply.textContent = reply;
+            quickReply.onclick = () => {
+              inputEl.value = reply;
+              sendMsg();
+            };
+            quickReplies.appendChild(quickReply);
+          });
+          msgDiv.appendChild(quickReplies);
+        }
+      }
+    } else {
+      // User message
+      msgDiv.textContent = text;
+    }
+    
+    // Add timestamp
+    const timeDiv = document.createElement('div');
+    timeDiv.className = 'msg-time';
+    timeDiv.innerHTML = `
+      ${getCurrentTime()}
+      ${sender === 'user' ? '<span class="msg-status">✓✓</span>' : ''}
+    `;
+    
+    msgContainer.appendChild(msgDiv);
+    msgContainer.appendChild(timeDiv);
+    messagesEl.appendChild(msgContainer);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  // Advanced bot reply logic
+  function advancedBotReply(userMsg) {
+    let msg = userMsg.toLowerCase().trim();
+    const menuOptions = [
+      { label: "Syllabus", value: "syllabus", icon: "📘" },
+      { label: "Test Series", value: "test series", icon: "📝" },
+      { label: "Study Material", value: "study material", icon: "📚" },
+      { label: "Video Lectures", value: "video lectures", icon: "🎥" },
+      { label: "Current Affairs", value: "current affairs", icon: "📰" },
+      { label: "My Progress", value: "my progress", icon: "📊" }
+    ];
+
+    const quickReplies = ["Tell me more", "Show syllabus", "Practice tests", "What's new?"];
+    
+    let reply = {
+      text: "Welcome to <b>UPSChub Bot</b>! 👋 I'm here to help you with your UPSC preparation. What would you like to explore today?",
+      options: menuOptions,
+      extras: {
+        quickReplies: quickReplies
+      }
+    };
+
+    if (msg === "" || ["hi", "hello", "hey", "menu", "start"].includes(msg)) {
+      return reply;
+    }
+
+    if (["1", "syllabus", "syllabus"].includes(msg)) {
+      return {
+        text: "📘 <b>UPSC Syllabus Overview</b>",
+        extras: {
+          card: {
+            title: "Complete UPSC Syllabus",
+            content: "The UPSC Civil Services Exam syllabus is divided into Prelims (GS + CSAT) and Mains (9 papers). Key areas include History, Geography, Polity, Economy, Environment, Science, and Current Affairs.",
+            link: {
+              text: "View detailed syllabus breakdown",
+              url: "https://upsc.gov.in/syllabus"
+            }
+          },
+          quickReplies: ["Prelims syllabus", "Mains syllabus", "Optional subjects", "Back to menu"]
+        }
+      };
+    }
+
+    if (["2", "test", "test series", "tests", "mock"].includes(msg)) {
+      return {
+        text: "📝 <b>UPSC Test Series</b>",
+        extras: {
+          card: {
+            title: "Comprehensive Test Series",
+            content: "We offer 3 types of test series: 1) Full-length mocks (30 tests), 2) Sectional tests (100+ topic-wise), 3) Previous year papers (10 years).",
+            link: {
+              text: "View test schedule",
+              url: "#"
+            }
+          },
+          progress: {
+            percentage: 35 // Example progress
+          },
+          quickReplies: ["Take a test now", "My test history", "Analysis reports", "Back to menu"]
+        }
+      };
+    }
+
+    if (["3", "notes", "pdf", "study material", "material"].includes(msg)) {
+      return {
+        text: "📚 <b>Study Material Available</b>",
+        extras: {
+          media: {
+            url: "https://images.unsplash.com/photo-1506880018603-83d5b814b5a6?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+            alt: "Study materials",
+            caption: "Comprehensive notes updated for 2024-25"
+          },
+          options: [
+            { label: "Polity Notes", value: "polity notes", icon: "🏛️" },
+            { label: "Economy Notes", value: "economy notes", icon: "💹" },
+            { label: "History Notes", value: "history notes", icon: "🏺" },
+            { label: "Geography Notes", value: "geography notes", icon: "🗺️" }
+          ]
+        }
+      };
+    }
+
+    if (["4", "video", "lectures", "videos"].includes(msg)) {
+      return {
+        text: "🎥 <b>Video Lecture Library</b>",
+        extras: {
+          card: {
+            title: "Recommended for you",
+            content: "1. Indian Polity - Laxmikant Summary (4h)\n2. Modern History - Bipin Chandra Crash Course (6h)\n3. Economic Survey 2024 Analysis (3h)",
+            link: {
+              text: "Browse all videos",
+              url: "#"
+            }
+          },
+          quickReplies: ["Polity videos", "Economy videos", "Current affairs videos", "Back to menu"]
+        }
+      };
+    }
+
+    if (["5", "current affairs", "news", "ca"].includes(msg)) {
+      return {
+        text: "📰 <b>Current Affairs Updates</b>",
+        extras: {
+          card: {
+            title: "Today's Headlines (June 15, 2024)",
+            content: "1. India signs new trade pact with EU\n2. RBI keeps repo rate unchanged at 6.5%\n3. New species discovered in Western Ghats\n4. Cabinet approves new education policy reforms",
+            link: {
+              text: "Read more",
+              url: "#"
+            }
+          },
+          options: [
+            { label: "Daily CA", value: "daily ca", icon: "📅" },
+            { label: "Monthly Compilation", value: "monthly ca", icon: "📑" },
+            { label: "CA Quiz", value: "ca quiz", icon: "✍️" }
+          ]
+        }
+      };
+    }
+
+    if (["6", "progress", "my progress", "analytics"].includes(msg)) {
+      return {
+        text: "📊 <b>Your Progress Summary</b>",
+        extras: {
+          card: {
+            title: "Completion Status",
+            content: "Syllabus covered: 42%\nTest scores average: 68%\nDaily study time: 3.2h\nStreak: 15 days",
+            link: {
+              text: "View detailed analytics",
+              url: "#"
+            }
+          },
+          progress: {
+            percentage: 42
+          },
+          quickReplies: ["Study plan", "Weak areas", "Compare with peers", "Back to menu"]
+        }
+      };
+    }
+
+    if (["help", "support", "contact"].includes(msg)) {
+      return {
+        text: "🆘 <b>Support Options</b>",
+        options: [
+          { label: "Email Support", value: "support@upschub.com", action: "link", icon: "✉️" },
+          { label: "FAQ", value: "faq", icon: "❓" },
+          { label: "Live Chat", value: "live chat", icon: "💬" },
+          { label: "Feedback", value: "feedback", icon: "📝" }
+        ]
+      };
+    }
+
+    // Fallback reply with suggestions
+    return {
+      text: "I'm not sure I understand. Here are some things I can help with:",
+      options: menuOptions,
+      extras: {
+        quickReplies: ["How to start preparation?", "Best books for UPSC?", "Time management tips?"]
+      }
+    };
+  }
+
+  // Handle sending message
+  function sendMsg() {
+    const userMsg = inputEl.value.trim();
+    if (!userMsg) return;
+
+    appendMessage("user", userMsg);
+    inputEl.value = "";
+    inputEl.style.height = 'auto';
+    inputEl.disabled = true;
+    sendBtn.disabled = true;
+
+    // Show typing indicator
+    showTypingIndicator();
+    
+    // Simulate bot thinking time (random between 0.5-2 seconds)
+    const typingTime = 500 + Math.random() * 1500;
+    
+    setTimeout(() => {
+      hideTypingIndicator();
+      const botResponse = advancedBotReply(userMsg);
+      appendMessage("bot", botResponse.text, botResponse.options || null, botResponse.extras || null);
+      inputEl.disabled = false;
+      sendBtn.disabled = false;
+      inputEl.focus();
+    }, typingTime);
+  }
+
+  // Show welcome message on load
+  window.onload = () => {
+    // Simulate bot coming online
+    setTimeout(() => {
+      botStatusEl.textContent = "Online";
+      const welcomeMsg = advancedBotReply("");
+      appendMessage("bot", welcomeMsg.text, welcomeMsg.options, welcomeMsg.extras);
+    }, 800);
+  };
+
+  // Allow sending message with Enter key (but allow Shift+Enter for new lines)
+  inputEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMsg();
+    }
+  });
+</script>
+
+</body>
+</html>
