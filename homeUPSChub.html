@@ -533,6 +533,99 @@
     100% { transform: translateX(-100%); }
 }
 
+/* Container for chatbot button + text */
+#chatbot-container {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #007bff;
+  border-radius: 24px;
+  padding: 8px 14px;
+  box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
+  cursor: pointer;
+  z-index: 1000;
+
+  /* Initially hidden (slide out) */
+  transform: translateX(100%);
+  opacity: 0;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+/* Show container on scroll */
+#chatbot-container.show {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+/* Chatbot button styling */
+#chatbot-button {
+  width: 48px;
+  height: 48px;
+  background-color: #007bff;
+  border-radius: 50%;
+  box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: pulse 2.5s infinite;
+  flex-shrink: 0;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#chatbot-button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 12px 20px rgba(0, 86, 179, 0.5);
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba(0, 123, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+  }
+}
+
+/* SVG icon smaller */
+#chatbot-button svg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Text next to chatbot button */
+#chatbot-text {
+  color: white;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+}
+
+#chatbot-text .name {
+  font-weight: 700;
+  font-size: 16px;
+  line-height: 1;
+}
+
+#chatbot-text .click-me {
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1;
+  animation: blinkText 1.5s infinite;
+}
+
+@keyframes blinkText {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.4; }
+}
+
 
    </style>
 </head>
@@ -685,6 +778,25 @@
          <p class="tutor">Detailed reports to improve your scores</p>
          <a href="testinfo.html" class="inline-btn">View Report <i class="fas fa-chart-line"></i></a>
       </div>
+
+      <body style="height:2000px; margin:0;">
+
+  <!-- Chatbot container -->
+  <div id="chatbot-container" title="Chat with hubChatbot.ai">
+    <div id="chatbot-button">
+      <svg xmlns="http://www.w3.org/2000/svg" 
+           viewBox="0 0 24 24" fill="white">
+        <path d="M12 3C7.03 3 3 6.58 3 11c0 1.87.84 3.58 2.35 4.87L5 21l4.6-2.25A8.958 8.958 0 0 0 12 20c4.97 0 9-3.58 9-8s-4.03-9-9-9z"/>
+      </svg>
+    </div>
+    <div id="chatbot-text">
+      <div class="name">hubChatbot.ai</div>
+      <div class="click-me">Click me</div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
    </div>
 </section>
 
@@ -737,6 +849,23 @@
          document.querySelector('#toggle-btn').classList.add('fa-sun');
       }
    });
+
+    const container = document.getElementById('chatbot-container');
+
+// Show/hide chatbot container on scroll past 100px
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 100) {
+    container.classList.add('show');
+  } else {
+    container.classList.remove('show');
+  }
+});
+
+// Navigate to UPSChub_ai.html on click
+container.addEventListener('click', () => {
+  window.location.href = 'UPSChub_ai.html';
+});
+
 
    // Check for saved theme preference
    if (localStorage.getItem('theme') === 'dark') {
