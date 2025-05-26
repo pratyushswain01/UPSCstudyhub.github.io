@@ -3,162 +3,1171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPSC Hub - PDF Viewer</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>UPSC Hub - Study Materials</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* Reset styles */
-        * {
+        /* SIDEBAR STYLES */
+              :root {
+         --primary: #3a86ff;
+         --secondary: #8338ec;
+         --accent: #ff006e;
+         --light: #f8f9fa;
+         --dark: #212529;
+         --success: #06d6a0;
+         --warning: #ffbe0b;
+      }
+      
+      body {
+         font-family: 'Open Sans', sans-serif;
+         background-color: #f5f7fa;
+         color: var(--dark);
+         overflow-x: hidden;
+         display: flex;
+         flex-direction: column;
+         min-height: 100vh;
+         line-height: 1.6;
+         transition: background-color 0.3s, color 0.3s;
+      }
+
+      body.dark-mode {
+         background-color: #121212;
+         color: #f5f5f5;
+      }
+
+      h1, h2, h3, h4, h5, h6 {
+         font-family: 'Montserrat', sans-serif;
+         font-weight: 600;
+      }
+
+      /* Header Styling */
+   .header {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 100;
+}
+
+.header .flex {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.header .logo {
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    text-decoration: none;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-block;
+}
+
+.header .logo:hover {
+    color: white; /* prevents hover color change */
+    text-decoration: none;
+    background: none;
+}
+
+      .header .search-form {
+         display: flex;
+         align-items: center;
+         background: rgba(255,255,255,0.2);
+         border-radius: 30px;
+         padding: 5px 15px;
+         width: 40%;
+         max-width: 500px;
+         transition: all 0.3s ease;
+      }
+
+      .header .search-form:hover {
+         background: rgba(255,255,255,0.3);
+      }
+
+      .header .search-form input {
+         background: transparent;
+         border: none;
+         color: white;
+         width: 100%;
+         padding: 8px 0;
+         font-size: 14px;
+      }
+
+      .header .search-form input::placeholder {
+         color: rgba(255,255,255,0.8);
+      }
+
+      .header .search-form button {
+         background: transparent;
+         border: none;
+         color: white;
+         cursor: pointer;
+         font-size: 16px;
+      }
+
+      .header .icons {
+         display: flex;
+         gap: 15px;
+         align-items: center;
+      }
+
+      .header .icons div {
+         color: white;
+         font-size: 18px;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         padding: 8px;
+         border-radius: 50%;
+         width: 36px;
+         height: 36px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+      }
+
+      .header .icons div:hover {
+         background: rgba(255,255,255,0.2);
+         transform: translateY(-2px);
+      }
+
+      /* Sidebar */
+      .side-bar {
+         position: fixed;
+         top: 0;
+         left: -300px;
+         width: 300px;
+         height: 100vh;
+         background: white;
+         box-shadow: 0 0 20px rgba(0,0,0,0.1);
+         z-index: 1000;
+         transition: all 0.3s ease;
+         overflow-y: auto;
+      }
+
+      body.dark-mode .side-bar {
+         background: #1e1e1e;
+         color: #f5f5f5;
+      }
+
+      .side-bar.active {
+         left: 0;
+      }
+
+      .side-bar #close-btn {
+         position: absolute;
+         top: 15px;
+         right: 15px;
+         font-size: 20px;
+         color: #6c757d;
+         cursor: pointer;
+      }
+
+      body.dark-mode .side-bar #close-btn {
+         color: #aaa;
+      }
+
+      .side-bar .profile {
+         padding: 30px 20px;
+         text-align: center;
+         border-bottom: 1px solid #eee;
+      }
+
+      body.dark-mode .side-bar .profile {
+         border-bottom-color: #333;
+      }
+
+      .side-bar .profile img {
+         width: 100px;
+         height: 100px;
+         border-radius: 50%;
+         object-fit: cover;
+         margin-bottom: 15px;
+         border: 3px solid var(--primary);
+      }
+
+      .side-bar .profile h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 5px;
+      }
+
+      body.dark-mode .side-bar .profile h3 {
+         color: #f5f5f5;
+      }
+
+      .side-bar .profile .role {
+         font-size: 14px;
+         color: #6c757d;
+      }
+
+      body.dark-mode .side-bar .profile .role {
+         color: #aaa;
+      }
+
+      .side-bar .navbar {
+         padding: 20px 0;
+      }
+
+      .side-bar .navbar a {
+         display: flex;
+         align-items: center;
+         padding: 12px 25px;
+         color: #495057;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      body.dark-mode .side-bar .navbar a {
+         color: #ddd;
+      }
+
+      .side-bar .navbar a:hover {
+         background: #f8f9fa;
+         color: var(--primary);
+      }
+
+      body.dark-mode .side-bar .navbar a:hover {
+         background: #2a2a2a;
+      }
+
+      .side-bar .navbar a i {
+         margin-right: 10px;
+         font-size: 18px;
+         width: 24px;
+         text-align: center;
+      }
+
+      .side-bar .navbar a span {
+         font-size: 15px;
+      }
+
+      /* Main Content */
+      .home-grid {
+         max-width: 1200px;
+         margin: 30px auto;
+         padding: 0 20px;
+         flex: 1;
+      }
+
+      .heading {
+         font-size: 36px;
+         color: var(--primary);
+         margin-bottom: 30px;
+         text-align: center;
+         position: relative;
+         padding-bottom: 15px;
+      }
+
+      .heading:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 50%;
+         transform: translateX(-50%);
+         width: 80px;
+         height: 4px;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         border-radius: 2px;
+      }
+
+      .box-container {
+         display: grid;
+         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+         gap: 25px;
+         margin-top: 40px;
+      }
+
+      .box {
+         background: white;
+         border-radius: 10px;
+         padding: 25px;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+         transition: all 0.3s ease;
+         border-top: 3px solid var(--primary);
+      }
+
+      body.dark-mode .box {
+         background: #1e1e1e;
+         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      }
+
+      .box:hover {
+         transform: translateY(-5px);
+         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      }
+
+      body.dark-mode .box:hover {
+         box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      }
+
+      .box h3 {
+         font-size: 18px;
+         color: var(--dark);
+         margin-bottom: 15px;
+         position: relative;
+         padding-bottom: 10px;
+      }
+
+      body.dark-mode .box h3 {
+         color: #f5f5f5;
+      }
+
+      .box h3:after {
+         content: '';
+         position: absolute;
+         bottom: 0;
+         left: 0;
+         width: 40px;
+         height: 2px;
+         background: var(--primary);
+      }
+
+      .box .likes, .box .tutor {
+         font-size: 14px;
+         color: #6c757d;
+         margin-bottom: 15px;
+      }
+
+      body.dark-mode .box .likes,
+      body.dark-mode .box .tutor {
+         color: #aaa;
+      }
+
+      .inline-btn {
+         display: inline-block;
+         background: linear-gradient(to right, var(--primary), var(--secondary));
+         color: white;
+         padding: 8px 20px;
+         border-radius: 30px;
+         text-decoration: none;
+         font-size: 14px;
+         font-weight: 500;
+         transition: all 0.3s ease;
+         border: none;
+         cursor: pointer;
+      }
+
+      .inline-btn:hover {
+         transform: translateY(-2px);
+         box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
+      }
+
+      .flex {
+         display: flex;
+         flex-wrap: wrap;
+         gap: 10px;
+      }
+
+      .flex a {
+         display: inline-block;
+         background: #f1f3f5;
+         color: var(--dark);
+         padding: 6px 12px;
+         border-radius: 5px;
+         font-size: 13px;
+         text-decoration: none;
+         transition: all 0.3s ease;
+      }
+
+      body.dark-mode .flex a {
+         background: #2a2a2a;
+         color: #ddd;
+      }
+
+      .flex a:hover {
+         background: var(--primary);
+         color: white;
+      }
+
+      /* Footer */
+       .footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(to right, #111, #1c1c1c);
+    color: #fff;
+    font-size: 13px;
+    text-align: center;
+    padding: 8px 10px;
+    z-index: 999;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.footer span {
+    color: var(--primary);
+    font-weight: 600;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+      /* Responsive */
+      @media (max-width: 768px) {
+         .header .search-form {
+            display: none;
+         }
+         
+         .header .icons #search-btn {
+            display: block;
+         }
+         
+         .box-container {
+            grid-template-columns: 1fr;
+         }
+      }
+
+      /* Notification */
+      .notification {
+         position: fixed;
+         bottom: 20px;
+         right: 20px;
+         background: white;
+         border-radius: 10px;
+         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+         padding: 15px;
+         max-width: 300px;
+         display: none;
+         z-index: 1000;
+         border-left: 4px solid var(--primary);
+      }
+
+     /* Notification styles */
+.notification {
+    background: white;
+    color: #212529;
+    position: relative;
+}
+
+body.dark-mode .notification {
+    background: #2a2a2a;
+    color: #f5f5f5;
+}
+
+.notification.show {
+    display: block;
+    animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+
+@keyframes fadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+.notification h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    color: #212529;
+}
+
+body.dark-mode .notification h3 {
+    color: #f5f5f5;
+}
+
+.notification p {
+    font-size: 14px;
+    color: #6c757d;
+    margin-bottom: 10px;
+}
+
+body.dark-mode .notification p {
+    color: #aaa;
+}
+
+.notification .close {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 14px;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+body.dark-mode .notification .close {
+    color: #aaa;
+}
+
+/* Sidebar styles */
+.side-bar {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 300px;
+    height: 100vh;
+    background: white;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+    color: #212529;
+}
+
+body.dark-mode .side-bar {
+    background: #1e1e1e;
+    color: #f5f5f5;
+}
+
+.side-bar.active {
+    left: 0;
+}
+
+.side-bar #close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 20px;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+body.dark-mode .side-bar #close-btn {
+    color: #aaa;
+}
+
+.side-bar .profile {
+    padding: 30px 20px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+body.dark-mode .side-bar .profile {
+    border-bottom-color: #333;
+}
+
+.side-bar .profile img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 15px;
+    border: 3px solid var(--primary);
+}
+
+.side-bar .profile h3 {
+    font-size: 18px;
+    color: #212529;
+    margin-bottom: 5px;
+}
+
+body.dark-mode .side-bar .profile h3 {
+    color: #f5f5f5;
+}
+
+.side-bar .profile .role {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+body.dark-mode .side-bar .profile .role {
+    color: #aaa;
+}
+
+.side-bar .navbar {
+    padding: 20px 0;
+}
+
+.side-bar .navbar a {
+    display: flex;
+    align-items: center;
+    padding: 12px 25px;
+    color: #495057;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+body.dark-mode .side-bar .navbar a {
+    color: #ddd;
+}
+
+.side-bar .navbar a:hover {
+    background: #f8f9fa;
+    color: var(--primary);
+}
+
+body.dark-mode .side-bar .navbar a:hover {
+    background: #2a2a2a;
+    color: var(--primary);
+}
+
+.side-bar .navbar a i {
+    margin-right: 10px;
+    font-size: 18px;
+    width: 24px;
+    text-align: center;
+}
+
+.side-bar .navbar a span {
+    font-size: 15px;
+}
+
+
+        /* MAIN PAGE STYLES */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
+            background-color: #f5f5f5;
+            color: #333;
         }
 
-        html, body {
-            height: 100%;
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-        }
-
-        /* Layout styles */
-        body {
-            display: flex;
-            flex-direction: column;
-        }
-
-        header {
-            background-color: #0056b3;
-            color: white;
-            padding: 10px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        header h1 {
-            margin: 0;
-            font-size: 1.5rem;
-        }
-
-        header h1 span {
-            color: #ffdd57;
-        }
-
-        header .controls {
-            display: flex;
-            gap: 15px;
-        }
-
-        header .controls button {
-            padding: 8px;
-            font-size: 1.2rem;
-            background-color: transparent;
-            color: white;
-            border: none;
-            cursor: pointer;
-            transition: transform 0.3s ease, color 0.3s ease;
-        }
-
-        header .controls button:hover {
-            color: #ffdd57;
-            transform: scale(1.2);
-        }
-
-        .pdf-container {
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background-color: #eaeaea;
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
 
-        .pdf-box {
-            width: 100%;
-            height: 100%;
-            background-color: white;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+        header {
+            background-color: #1a237e;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            position: relative;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
+        .menu-icon {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .tagline {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .search-bar {
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .search-bar input {
+            width: 60%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+        }
+
+        .search-bar button {
+            padding: 12px 20px;
+            background-color: #ff5722;
+            color: white;
             border: none;
-            transition: transform 0.3s ease;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .filter-options {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-options select {
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            background-color: white;
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #1a237e;
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            margin-right: 5px;
+            transition: all 0.3s;
+        }
+
+        .view-btn {
+            background-color: #4caf50;
+            color: white;
+        }
+
+        .download-btn {
+            background-color: #2196f3;
+            color: white;
+        }
+
+        .view-btn:hover {
+            background-color: #3d8b40;
+        }
+
+        .download-btn:hover {
+            background-color: #0b7dda;
         }
 
         footer {
-            background-color: #0056b3;
+            background-color: #1a237e;
             color: white;
             text-align: center;
-            font-size: 0.8rem;
-            padding: 5px 10px;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
+            padding: 20px 0;
+            margin-top: 30px;
+            font-size: 14px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            color: #1a237e;
+            padding: 8px 16px;
+            text-decoration: none;
+            border: 1px solid #ddd;
+            margin: 0 4px;
+        }
+
+        .pagination a.active {
+            background-color: #1a237e;
+            color: white;
+            border: 1px solid #1a237e;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #666;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .search-bar input {
+                width: 70%;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>UPSC Hub <span>PDF Viewer</span></h1>
-        <div class="controls">
-            <button onclick="zoomIn()" title="Zoom In">
-                <i class="fas fa-search-plus"></i>
-            </button>
-            <button onclick="zoomOut()" title="Zoom Out">
-                <i class="fas fa-search-minus"></i>
-            </button>
-            <button onclick="fitToWidth()" title="Fit to Width">
-                <i class="fas fa-arrows-alt-h"></i>
-            </button>
-            <button onclick="fitToHeight()" title="Fit to Height">
-                <i class="fas fa-arrows-alt-v"></i>
-            </button>
+
+    <!-- SIDEBAR -->
+  <header class="header">
+   <section class="flex">
+
+      <!-- Plain text logo without icon -->
+      <a href="index.html" class="logo">UPSC Hub</a>
+
+      <!-- Only Menu and Toggle buttons -->
+      <div class="icons">
+         <div id="menu-btn" class="fas fa-bars"></div>
+         <div id="toggle-btn" class="fas fa-sun"></div>
+      </div>
+
+   </section>
+</header>
+
+<div class="side-bar">
+   <div id="close-btn">
+      <i class="fas fa-times"></i>
+   </div>
+        <div class="profile">
+            <img src="images/LOGO.jpg" class="image" alt="">
+            <h3 class="name">UPSC hub</h3>
+            <p class="role">ADMIN & HOST</p>
         </div>
-    </header>
-
-    <div class="pdf-container">
-    <div class="pdf-box">
-        <embed src="UPSChub test 1.pdf" type="application/pdf" width="100%" height="600px">
+        <nav class="navbar">
+            <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
+            <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+            <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+            <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+            <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
+            <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+            <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
+            <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+            <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+            <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+            <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        </nav>
     </div>
-</div>
 
+      
 
-
+    <div class="container">
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="Search PDFs by name, subject or keyword..." onkeyup="searchPDFs()">
+            <button onclick="searchPDFs()">Search</button>
+        </div>
+        
+        <div class="filter-options">
+            <select id="subject-filter" onchange="filterTable()">
+                <option value="">All Subjects</option>
+                <option value="History">History</option>
+                <option value="Polity">Polity</option>
+                <option value="Geography">Geography</option>
+                <option value="Economics">Economics</option>
+                <option value="Science">Science & Technology</option>
+                <option value="Environment">Environment</option>
+                <option value="Current Affairs">Current Affairs</option>
+            </select>
+            
+            <select id="year-filter" onchange="filterTable()">
+                <option value="">All Years</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+                <option value="2021">2021</option>
+                <option value="2020">2020</option>
+                <option value="2019">2019</option>
+            </select>
+            
+            <select id="type-filter" onchange="filterTable()">
+                <option value="">All Types</option>
+                <option value="Notes">Notes</option>
+                <option value="PYQ">Previous Year Questions</option>
+                <option value="Report">Reports</option>
+                <option value="Magazine">Magazines</option>
+                <option value="Book">Books</option>
+            </select>
+            
+            <select id="sort-by" onchange="filterTable()">
+                <option value="recent">Sort by: Most Recent</option>
+                <option value="popular">Sort by: Most Popular</option>
+                <option value="name">Sort by: Name (A-Z)</option>
+            </select>
+        </div>
+        
+        <table id="pdf-table">
+            <thead>
+                <tr>
+                    <th>SL No</th>
+                    <th>Subject Classified</th>
+                    <th>Name of the PDF</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="pdf-table-body">
+                <tr>
+                    <td>1</td>
+                    <td>History - Modern India</td>
+                    <td>Indian National Movement - Complete Notes.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Indian National Movement - Complete Notes.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Indian National Movement - Complete Notes.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Polity</td>
+                    <td>Constitution of India - Key Articles.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Constitution of India - Key Articles.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Constitution of India - Key Articles.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Geography - World</td>
+                    <td>Climatology - Concepts and Examples.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Climatology - Concepts and Examples.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Climatology - Concepts and Examples.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Economics</td>
+                    <td>Indian Economy - Budget Analysis 2023.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Indian Economy - Budget Analysis 2023.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Indian Economy - Budget Analysis 2023.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Environment</td>
+                    <td>Biodiversity Hotspots of India.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Biodiversity Hotspots of India.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Biodiversity Hotspots of India.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Current Affairs</td>
+                    <td>Monthly Current Affairs - June 2023.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Monthly Current Affairs - June 2023.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Monthly Current Affairs - June 2023.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>7</td>
+                    <td>Science & Technology</td>
+                    <td>Space Technology - ISRO Achievements.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Space Technology - ISRO Achievements.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Space Technology - ISRO Achievements.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>8</td>
+                    <td>Polity</td>
+                    <td>Fundamental Rights - Case Studies.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Fundamental Rights - Case Studies.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Fundamental Rights - Case Studies.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>9</td>
+                    <td>History - Ancient India</td>
+                    <td>Indus Valley Civilization - New Findings.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Indus Valley Civilization - New Findings.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Indus Valley Civilization - New Findings.pdf')">Download</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>10</td>
+                    <td>Economics</td>
+                    <td>Five Year Plans - Critical Analysis.pdf</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPDF('Five Year Plans - Critical Analysis.pdf')">View PDF</button>
+                        <button class="action-btn download-btn" onclick="downloadPDF('Five Year Plans - Critical Analysis.pdf')">Download</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <div id="no-results" class="no-results">
+            No PDFs found matching your search criteria.
+        </div>
+        
+        <div class="pagination">
+            <a href="#">&laquo;</a>
+            <a href="#" class="active">1</a>
+            <a href="#">2</a>
+            <a href="#">3</a>
+            <a href="#">4</a>
+            <a href="#">5</a>
+            <a href="#">&raquo;</a>
+        </div>
+    </div>
+    
     <footer>
-        <p>© 2025 UPSC Hub. All Rights Reserved.</p>
+        <div class="container">
+            <p>&copy; 2023 UPSC Hub. All Rights Reserved.</p>
+            <p>Contact: info@upschub.com | Follow us on Twitter, Facebook, Telegram</p>
+            <p>Disclaimer: This content is for educational purposes only.</p>
+        </div>
     </footer>
-
+    
     <script>
-        const iframe = document.getElementById('pdfViewer');
+      
+         function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
 
-        // Zoom control variables
-        let scale = 1;
+        // Toggle navbar classes
+        const navbar = document.getElementById('navbar');
+        navbar.classList.toggle('navbar-light');
+        navbar.classList.toggle('navbar-dark');
+        navbar.classList.toggle('bg-light');
+        navbar.classList.toggle('bg-dark');
 
-        function zoomIn() {
-            scale += 0.1;
-            iframe.style.transform = `scale(${scale})`;
+        // Toggle footer classes
+        const footer = document.getElementById('footer');
+        footer.classList.toggle('bg-light');
+        footer.classList.toggle('bg-dark');
+    }
+      
+       // Dark/light mode toggle
+   document.querySelector('#toggle-btn').addEventListener('click', function() {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+         localStorage.setItem('theme', 'dark');
+         document.querySelector('#toggle-btn').classList.remove('fa-sun');
+         document.querySelector('#toggle-btn').classList.add('fa-moon');
+      } else {
+         localStorage.setItem('theme', 'light');
+         document.querySelector('#toggle-btn').classList.remove('fa-moon');
+         document.querySelector('#toggle-btn').classList.add('fa-sun');
+      }
+   });
+
+    const container = document.getElementById('chatbot-container');
+
+        
+        const menuBtn = document.getElementById('menu-btn');
+        const closeBtn = document.getElementById('close-btn');
+        const sidebar = document.querySelector('.side-bar');
+
+        menuBtn.addEventListener('click', () => {
+            sidebar.classList.add('active');
+        });
+
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+        
+        // Function to view PDF
+        function viewPDF(pdfName) {
+            // In a real implementation, this would open the PDF in a viewer
+            // For demo purposes, we'll just show an alert
+            alert("Opening PDF: " + pdfName + " in default PDF viewer");
+            
+            // Actual implementation might look like:
+            // window.open('/pdfs/' + encodeURIComponent(pdfName), '_blank');
         }
-
-        function zoomOut() {
-            scale = Math.max(0.5, scale - 0.1);
-            iframe.style.transform = `scale(${scale})`;
+        
+        // Function to download PDF
+        function downloadPDF(pdfName) {
+            // In a real implementation, this would trigger a download
+            // For demo purposes, we'll just show an alert
+            alert("Downloading PDF: " + pdfName);
+            
+            // Actual implementation might look like:
+            // const link = document.createElement('a');
+            // link.href = '/pdfs/' + encodeURIComponent(pdfName);
+            // link.download = pdfName;
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
         }
-
-        function fitToWidth() {
-            iframe.style.width = '100%';
-            iframe.style.height = 'auto';
-            iframe.style.transform = 'scale(1)';
+        
+        // Search functionality
+        function searchPDFs() {
+            const input = document.getElementById('search-input');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('pdf-table-body');
+            const rows = table.getElementsByTagName('tr');
+            let hasResults = false;
+            
+            for (let i = 0; i < rows.length; i++) {
+                const nameCell = rows[i].getElementsByTagName('td')[2];
+                const subjectCell = rows[i].getElementsByTagName('td')[1];
+                
+                if (nameCell || subjectCell) {
+                    const nameText = nameCell.textContent || nameCell.innerText;
+                    const subjectText = subjectCell.textContent || subjectCell.innerText;
+                    
+                    if (nameText.toUpperCase().indexOf(filter) > -1 || 
+                        subjectText.toUpperCase().indexOf(filter) > -1) {
+                        rows[i].style.display = "";
+                        hasResults = true;
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+            
+            // Show/hide no results message
+            document.getElementById('no-results').style.display = hasResults ? 'none' : 'block';
+            
+            // Also apply other filters after search
+            filterTable();
         }
-
-        function fitToHeight() {
-            iframe.style.width = 'auto';
-            iframe.style.height = '100%';
-            iframe.style.transform = 'scale(1)';
+        
+        // Filter functionality
+        function filterTable() {
+            const subjectFilter = document.getElementById('subject-filter').value.toLowerCase();
+            const yearFilter = document.getElementById('year-filter').value.toLowerCase();
+            const typeFilter = document.getElementById('type-filter').value.toLowerCase();
+            const searchFilter = document.getElementById('search-input').value.toLowerCase();
+            
+            const rows = document.querySelectorAll('#pdf-table tbody tr');
+            let hasResults = false;
+            
+            rows.forEach(row => {
+                if (row.style.display === "none") return; // Skip already hidden rows from search
+                
+                const subject = row.cells[1].textContent.toLowerCase();
+                const name = row.cells[2].textContent.toLowerCase();
+                
+                const subjectMatch = subjectFilter === '' || subject.includes(subjectFilter);
+                const yearMatch = yearFilter === '' || name.includes(yearFilter);
+                const typeMatch = typeFilter === '' || 
+                    (typeFilter === 'notes' && name.includes('notes')) ||
+                    (typeFilter === 'pyq' && (name.includes('pyq') || name.includes('previous year'))) ||
+                    (typeFilter === 'report' && name.includes('report')) ||
+                    (typeFilter === 'magazine' && name.includes('magazine')) ||
+                    (typeFilter === 'book' && name.includes('book'));
+                const searchMatch = searchFilter === '' || 
+                    name.includes(searchFilter) || 
+                    subject.includes(searchFilter);
+                
+                if (subjectMatch && yearMatch && typeMatch && searchMatch) {
+                    row.style.display = '';
+                    hasResults = true;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show/hide no results message
+            document.getElementById('no-results').style.display = hasResults ? 'none' : 'block';
         }
+        
+        // Initialize by applying all filters
+        document.addEventListener('DOMContentLoaded', function() {
+            filterTable();
+        });
     </script>
 </body>
 </html>
