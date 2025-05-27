@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -662,8 +663,7 @@
                 width: 100%;
                 justify-content: flex-end;
             }
-        
-        /* Daily Current Affairs Section */
+     /* Daily Current Affairs Section */
         .daily-current-affairs {
             margin-bottom: 30px;
         }
@@ -797,6 +797,22 @@
             color: white;
         }
         
+        .toggle-ca-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .toggle-ca-btn:hover {
+            background-color: #2a75e6;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .current-affairs-header {
@@ -814,6 +830,8 @@
                 grid-template-columns: 1fr;
             }
         }
+        
+        
     </style>
     </style>
 </head>
@@ -859,9 +877,7 @@
             <h1 class="heading">e-news / CA section </h1>
             
           
-            
-            <!-- Daily Current Affairs Section -->
-            <div class="daily-current-affairs">
+          <div class="daily-current-affairs">
                 <div class="current-affairs-header">
                     <h2><i class="fas fa-newspaper"></i> Daily Current Affairs</h2>
                     <div class="date-selector">
@@ -942,7 +958,61 @@
                             </div>
                         </div>
                     </div>
+            
+                    
+                    <!-- Older current affairs (hidden by default) -->
+                    <div class="daily-ca-card hidden-ca" style="display: none;">
+                        <div class="ca-date">June 12, 2023</div>
+                        <div class="ca-content">
+                            <div class="ca-title">Daily Current Affairs - June 12, 2023</div>
+                            <div class="ca-source">Source: The Hindu, Indian Express, PIB</div>
+                            <div class="ca-actions">
+                                <button class="ca-btn ca-view" onclick="viewPDF('Current_Affairs/Daily_CA_June_12_2023.pdf')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="ca-btn ca-download" onclick="downloadPDF('Current_Affairs/Daily_CA_June_12_2023.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="daily-ca-card hidden-ca" style="display: none;">
+                        <div class="ca-date">June 11, 2023</div>
+                        <div class="ca-content">
+                            <div class="ca-title">Daily Current Affairs - June 11, 2023</div>
+                            <div class="ca-source">Source: The Hindu, Indian Express, PIB</div>
+                            <div class="ca-actions">
+                                <button class="ca-btn ca-view" onclick="viewPDF('Current_Affairs/Daily_CA_June_11_2023.pdf')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="ca-btn ca-download" onclick="downloadPDF('Current_Affairs/Daily_CA_June_11_2023.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="daily-ca-card hidden-ca" style="display: none;">
+                        <div class="ca-date">June 10, 2023</div>
+                        <div class="ca-content">
+                            <div class="ca-title">Daily Current Affairs - June 10, 2023</div>
+                            <div class="ca-source">Source: The Hindu, Indian Express, PIB</div>
+                            <div class="ca-actions">
+                                <button class="ca-btn ca-view" onclick="viewPDF('Current_Affairs/Daily_CA_June_10_2023.pdf')">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                                <button class="ca-btn ca-download" onclick="downloadPDF('Current_Affairs/Daily_CA_June_10_2023.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                
+                <button class="toggle-ca-btn" id="toggle-ca-btn" onclick="toggleCA()">
+                    <i class="fas fa-chevron-down"></i> Show More
+                </button>
             </div>
             
             
@@ -1320,6 +1390,81 @@
     </footer>
     
     <script>
+      
+              // Add this for current affairs functionality
+        document.getElementById('month-select').addEventListener('change', filterCurrentAffairs);
+        document.getElementById('year-select').addEventListener('change', filterCurrentAffairs);
+        
+        let showingAllCA = false;
+        const hiddenCACards = document.querySelectorAll('.hidden-ca');
+        
+        function filterCurrentAffairs() {
+            const monthFilter = document.getElementById('month-select').value.toLowerCase();
+            const yearFilter = document.getElementById('year-select').value.toLowerCase();
+            
+            const caCards = document.querySelectorAll('.daily-ca-card');
+            let hasVisibleCards = false;
+            
+            caCards.forEach(card => {
+                const dateText = card.querySelector('.ca-date').textContent.toLowerCase();
+                const showCard = 
+                    (monthFilter === '' || dateText.includes(monthFilter)) && 
+                    (yearFilter === '' || dateText.includes(yearFilter));
+                
+                if (showCard) {
+                    card.style.display = 'block';
+                    hasVisibleCards = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Update toggle button visibility and text
+            updateToggleButton();
+        }
+        
+        function toggleCA() {
+            const btn = document.getElementById('toggle-ca-btn');
+            
+            if (showingAllCA) {
+                // Show less - hide all except first 3
+                hiddenCACards.forEach(card => {
+                    card.style.display = 'none';
+                });
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i> Show More';
+            } else {
+                // Show more - display all
+                hiddenCACards.forEach(card => {
+                    card.style.display = 'block';
+                });
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i> Show Less';
+            }
+            
+            showingAllCA = !showingAllCA;
+        }
+        
+        function updateToggleButton() {
+            const monthFilter = document.getElementById('month-select').value;
+            const yearFilter = document.getElementById('year-select').value;
+            const btn = document.getElementById('toggle-ca-btn');
+            
+            if (monthFilter === '' && yearFilter === '') {
+                // No filters applied - show toggle button
+                btn.style.display = 'block';
+                btn.innerHTML = showingAllCA ? 
+                    '<i class="fas fa-chevron-up"></i> Show Less' : 
+                    '<i class="fas fa-chevron-down"></i> Show More';
+            } else {
+                // Filters applied - hide toggle button
+                btn.style.display = 'none';
+            }
+        }
+        
+        // Initialize to show only latest 3
+        document.addEventListener('DOMContentLoaded', function() {
+            updateToggleButton();
+        });
+      
       
       
        // Add this for date filtering functionality
