@@ -1,0 +1,1293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Hub - Magazine Archives</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Base Styles */
+        :root {
+            --primary: #3a86ff;
+            --secondary: #8338ec;
+            --accent: #ff006e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #06d6a0;
+            --warning: #ffbe0b;
+            --gray: #6c757d;
+            --dark-bg: #121212;
+            --dark-card: #1e1e1e;
+            --dark-text: #f5f5f5;
+            --dark-border: #333;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: 'Open Sans', sans-serif;
+            background-color: #f5f7fa;
+            color: var(--dark);
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body.dark-mode {
+            background-color: var(--dark-bg);
+            color: var(--dark-text);
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        /* Header Styling */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+        .header .flex {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 20px;
+        }
+
+        .header .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+        }
+
+        .header .icons {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .header .icons div {
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 8px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .header .icons div:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Sidebar */
+        .side-bar {
+            position: fixed;
+            top: 0;
+            left: -300px;
+            width: 280px;
+            height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+        }
+
+        body.dark-mode .side-bar {
+            background: var(--dark-card);
+        }
+
+        .side-bar.active {
+            left: 0;
+        }
+
+        .side-bar #close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 20px;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        body.dark-mode .side-bar #close-btn {
+            color: #aaa;
+        }
+
+        .side-bar .profile {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid #eee;
+        }
+
+        body.dark-mode .side-bar .profile {
+            border-bottom-color: var(--dark-border);
+        }
+
+        .side-bar .profile img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 3px solid var(--primary);
+        }
+
+        .side-bar .profile h3 {
+            font-size: 18px;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        body.dark-mode .side-bar .profile h3 {
+            color: var(--dark-text);
+        }
+
+        .side-bar .profile .role {
+            font-size: 14px;
+            color: var(--gray);
+        }
+
+        body.dark-mode .side-bar .profile .role {
+            color: #aaa;
+        }
+
+        .side-bar .navbar {
+            padding: 20px 0;
+        }
+
+        .side-bar .navbar a {
+            display: flex;
+            align-items: center;
+            padding: 12px 25px;
+            color: #495057;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode .side-bar .navbar a {
+            color: #ddd;
+        }
+
+        .side-bar .navbar a:hover {
+            background: #f8f9fa;
+            color: var(--primary);
+        }
+
+        body.dark-mode .side-bar .navbar a:hover {
+            background: #2a2a2a;
+        }
+
+        .side-bar .navbar a i {
+            margin-right: 10px;
+            font-size: 18px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .side-bar .navbar a span {
+            font-size: 15px;
+        }
+
+        /* Main Content */
+        .main-content {
+            width: 100%;
+            margin-top: 66px; /* Header height */
+            padding: 20px;
+            flex: 1;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .heading {
+            font-size: 28px;
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .heading:after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: 2px;
+        }
+
+        /* Magazine Section Styles */
+        .magazine-section {
+            margin-bottom: 40px;
+        }
+        
+        .magazine-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .magazine-header h2 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .magazine-header h2 i {
+            color: var(--secondary);
+        }
+        
+        .magazine-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .magazine-search {
+            position: relative;
+            min-width: 250px;
+        }
+        
+        .magazine-search input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        body.dark-mode .magazine-search input {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        .magazine-search i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .magazine-filter {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .magazine-filter select {
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background-color: white;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        body.dark-mode .magazine-filter select {
+            background: var(--dark-card);
+            border-color: var(--dark-border);
+            color: var(--dark-text);
+        }
+        
+        /* Magazine Grid */
+        .magazine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .magazine-card {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        body.dark-mode .magazine-card {
+            background: var(--dark-card);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .magazine-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+        }
+        
+        .magazine-cover {
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .magazine-cover img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .magazine-card:hover .magazine-cover img {
+            transform: scale(1.05);
+        }
+        
+        .magazine-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: var(--accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .magazine-content {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .magazine-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--dark);
+        }
+        
+        body.dark-mode .magazine-title {
+            color: var(--dark-text);
+        }
+        
+        .magazine-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-size: 13px;
+            color: var(--gray);
+        }
+        
+        .magazine-date {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .magazine-pages {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .magazine-desc {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 20px;
+            flex: 1;
+        }
+        
+        body.dark-mode .magazine-desc {
+            color: #bbb;
+        }
+        
+        .magazine-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+        
+        .magazine-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .preview-btn {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #4caf50;
+            border: 1px solid #4caf50;
+        }
+        
+        .download-btn {
+            background-color: rgba(33, 150, 243, 0.1);
+            color: #2196f3;
+            border: 1px solid #2196f3;
+        }
+        
+        .preview-btn:hover {
+            background-color: #4caf50;
+            color: white;
+        }
+        
+        .download-btn:hover {
+            background-color: #2196f3;
+            color: white;
+        }
+        
+        /* Magazine Stats */
+        .magazine-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+            font-size: 12px;
+            color: var(--gray);
+        }
+        
+        body.dark-mode .magazine-stats {
+            border-top-color: var(--dark-border);
+        }
+        
+        .stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        /* View All Button */
+        .view-all {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .view-all-btn {
+            padding: 12px 25px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .view-all-btn:hover {
+            background-color: #2a75e6;
+            transform: translateY(-2px);
+        }
+        
+        /* Magazine Archive */
+        .magazine-archive {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        body.dark-mode .magazine-archive {
+            background: var(--dark-card);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .archive-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .archive-header h3 {
+            color: var(--primary);
+            margin: 0;
+        }
+        
+        .archive-years {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .year-btn {
+            padding: 8px 15px;
+            background-color: #f1f1f1;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        body.dark-mode .year-btn {
+            background-color: #2a2a2a;
+            color: var(--dark-text);
+        }
+        
+        .year-btn.active, .year-btn:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .archive-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .archive-item {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        body.dark-mode .archive-item {
+            background: #2a2a2a;
+        }
+        
+        .archive-item:hover {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .archive-item.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            background: linear-gradient(to right, #111, #1c1c1c);
+            color: #fff;
+            font-size: 13px;
+            text-align: center;
+            padding: 12px 10px;
+            width: 100%;
+            box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .footer span {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* Responsive */
+        @media (max-width: 992px) {
+            .magazine-grid {
+                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .magazine-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .magazine-controls {
+                width: 100%;
+            }
+            
+            .magazine-search {
+                width: 100%;
+            }
+            
+            .magazine-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .archive-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .magazine-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .magazine-actions {
+                flex-direction: column;
+            }
+            
+            .archive-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- SIDEBAR -->
+    <header class="header">
+        <section class="flex">
+            <a href="index.html" class="logo">UPSC Hub</a>
+            <div class="icons">
+                <div id="menu-btn" class="fas fa-bars"></div>
+                <div id="toggle-btn" class="fas fa-sun"></div>
+            </div>
+        </section>
+    </header>
+
+    <div class="side-bar">
+        <div id="close-btn">
+            <i class="fas fa-times"></i>
+        </div>
+        <div class="profile">
+            <img src="images/LOGO.jpg" class="image" alt="">
+            <h3 class="name">UPSC hub</h3>
+            <p class="role">ADMIN & HOST</p>
+        </div>
+        <nav class="navbar">
+            <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
+            <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+            <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+            <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+            <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+            <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
+            <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+            <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
+            <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+            <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+            <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+            <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        </nav>
+    </div>
+
+    <div class="main-content">
+        <div class="container">
+            <h1 class="heading">Magazine Archives</h1>
+            
+            <!-- Weekly Magazines Section -->
+            <div class="magazine-section">
+                <div class="magazine-header">
+                    <h2><i class="fas fa-calendar-week"></i> Weekly Magazines</h2>
+                    <div class="magazine-controls">
+                        <div class="magazine-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="weekly-search" placeholder="Search weekly magazines..." oninput="searchMagazines('weekly')">
+                        </div>
+                        <div class="magazine-filter">
+                            <select id="weekly-month" onchange="filterMagazines('weekly')">
+                                <option value="">All Months</option>
+                                <option value="january">January</option>
+                                <option value="february">February</option>
+                                <option value="march">March</option>
+                                <option value="april">April</option>
+                                <option value="may">May</option>
+                                <option value="june">June</option>
+                                <option value="july">July</option>
+                                <option value="august">August</option>
+                                <option value="september">September</option>
+                                <option value="october">October</option>
+                                <option value="november">November</option>
+                                <option value="december">December</option>
+                            </select>
+                            <select id="weekly-year" onchange="filterMagazines('weekly')">
+                                <option value="">All Years</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="magazine-grid" id="weekly-grid">
+                    <!-- Weekly Magazine 1 -->
+                    <div class="magazine-card" data-month="may" data-year="2025" data-title="weekly current affairs may week 4">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/weekly-cover1.jpg" alt="Weekly Magazine Cover">
+                            <div class="magazine-badge">New</div>
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Weekly Current Affairs - May Week 4</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> May 22-28, 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 24 pages</span>
+                            </div>
+                            <p class="magazine-desc">Comprehensive coverage of important national and international events from the past week.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Momentum Ignite publish -1. May 22-28.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Momentum Ignite publish -1. May 22-28.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 1.2K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 845</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.8</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Magazine 2 -->
+                    <div class="magazine-card" data-month="may" data-year="2025" data-title="weekly current affairs may week 3">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/weekly-cover2.jpg" alt="Weekly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Weekly Current Affairs - May Week 3</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> May 15-21, 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 22 pages</span>
+                            </div>
+                            <p class="magazine-desc">Analysis of key events with special focus on government policies and international relations.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Weekly/Weekly_CA_May_W3_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Weekly/Weekly_CA_May_W3_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 980</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 720</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.7</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Magazine 3 -->
+                    <div class="magazine-card" data-month="may" data-year="2025" data-title="weekly current affairs may week 2">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/weekly-cover3.jpg" alt="Weekly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Weekly Current Affairs - May Week 2</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> May 8-14, 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 26 pages</span>
+                            </div>
+                            <p class="magazine-desc">Special edition covering economic survey and important science & technology developments.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Weekly/Weekly_CA_May_W2_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Weekly/Weekly_CA_May_W2_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 1.1K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 890</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Magazine 4 (initially hidden) -->
+                    <div class="magazine-card hidden-magazine" data-month="may" data-year="2025" data-title="weekly current affairs may week 1" style="display: none;">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/weekly-cover4.jpg" alt="Weekly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Weekly Current Affairs - May Week 1</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> May 1-7, 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 20 pages</span>
+                            </div>
+                            <p class="magazine-desc">Coverage of important events with special sections on environment and ecology.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Weekly/Weekly_CA_May_W1_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Weekly/Weekly_CA_May_W1_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 950</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 780</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.6</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Weekly Magazine 5 (initially hidden) -->
+                    <div class="magazine-card hidden-magazine" data-month="april" data-year="2025" data-title="weekly current affairs april week 4" style="display: none;">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/weekly-cover5.jpg" alt="Weekly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Weekly Current Affairs - April Week 4</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> April 22-30, 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 28 pages</span>
+                            </div>
+                            <p class="magazine-desc">Special focus on international relations and India's foreign policy developments.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Weekly/Weekly_CA_April_W4_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Weekly/Weekly_CA_April_W4_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 1.3K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 920</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-all">
+                    <button class="view-all-btn" id="weekly-view-all" onclick="toggleViewAll('weekly')">
+                        <i class="fas fa-chevron-down"></i> View All Weekly Magazines
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Monthly Magazines Section -->
+            <div class="magazine-section">
+                <div class="magazine-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Monthly Magazines</h2>
+                    <div class="magazine-controls">
+                        <div class="magazine-search">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="monthly-search" placeholder="Search monthly magazines..." oninput="searchMagazines('monthly')">
+                        </div>
+                        <div class="magazine-filter">
+                            <select id="monthly-year" onchange="filterMagazines('monthly')">
+                                <option value="">All Years</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                                <option value="2022">2022</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="magazine-grid" id="monthly-grid">
+                    <!-- Monthly Magazine 1 -->
+                    <div class="magazine-card" data-month="may" data-year="2025" data-title="monthly current affairs may 2025">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/monthly-cover1.jpg" alt="Monthly Magazine Cover">
+                            <div class="magazine-badge">Latest</div>
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Monthly Current Affairs - May 2025</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> May 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 48 pages</span>
+                            </div>
+                            <p class="magazine-desc">Comprehensive compilation of all important events with detailed analysis and infographics.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Monthly/Monthly_CA_May_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Monthly/Monthly_CA_May_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 2.5K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 1.8K</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Magazine 2 -->
+                    <div class="magazine-card" data-month="april" data-year="2025" data-title="monthly current affairs april 2025">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/monthly-cover2.jpg" alt="Monthly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Monthly Current Affairs - April 2025</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> April 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 52 pages</span>
+                            </div>
+                            <p class="magazine-desc">Special edition covering economic policies, international summits, and science breakthroughs.</p
+                                                        <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Monthly/Monthly_CA_April_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Monthly/Monthly_CA_April_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 2.3K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 1.7K</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.8</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Magazine 3 -->
+                    <div class="magazine-card" data-month="march" data-year="2025" data-title="monthly current affairs march 2025">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/monthly-cover3.jpg" alt="Monthly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Monthly Current Affairs - March 2025</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> March 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 50 pages</span>
+                            </div>
+                            <p class="magazine-desc">Focus on budget analysis, government schemes, and important court judgments.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Monthly/Monthly_CA_March_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Monthly/Monthly_CA_March_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 2.4K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 1.9K</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.9</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Magazine 4 (initially hidden) -->
+                    <div class="magazine-card hidden-magazine" data-month="february" data-year="2025" data-title="monthly current affairs february 2025" style="display: none;">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/monthly-cover4.jpg" alt="Monthly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Monthly Current Affairs - February 2025</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> February 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 46 pages</span>
+                            </div>
+                            <p class="magazine-desc">Special coverage on Union Budget 2025-26 with detailed analysis and implications.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Monthly/Monthly_CA_February_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Monthly/Monthly_CA_February_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 2.7K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 2.1K</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 5.0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Monthly Magazine 5 (initially hidden) -->
+                    <div class="magazine-card hidden-magazine" data-month="january" data-year="2025" data-title="monthly current affairs january 2025" style="display: none;">
+                        <div class="magazine-cover">
+                            <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/monthly-cover5.jpg" alt="Monthly Magazine Cover">
+                        </div>
+                        <div class="magazine-content">
+                            <h3 class="magazine-title">Monthly Current Affairs - January 2025</h3>
+                            <div class="magazine-meta">
+                                <span class="magazine-date"><i class="far fa-calendar-alt"></i> January 2025</span>
+                                <span class="magazine-pages"><i class="far fa-file-pdf"></i> 44 pages</span>
+                            </div>
+                            <p class="magazine-desc">Comprehensive coverage of Republic Day special events and economic survey highlights.</p>
+                            <div class="magazine-actions">
+                                <button class="magazine-btn preview-btn" onclick="viewPDF('Magazines/Monthly/Monthly_CA_January_2025.pdf')">
+                                    <i class="far fa-eye"></i> Preview
+                                </button>
+                                <button class="magazine-btn download-btn" onclick="downloadPDF('Magazines/Monthly/Monthly_CA_January_2025.pdf')">
+                                    <i class="fas fa-download"></i> Download
+                                </button>
+                            </div>
+                            <div class="magazine-stats">
+                                <span class="stat-item"><i class="far fa-eye"></i> 2.2K</span>
+                                <span class="stat-item"><i class="fas fa-download"></i> 1.6K</span>
+                                <span class="stat-item"><i class="far fa-star"></i> 4.7</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="view-all">
+                    <button class="view-all-btn" id="monthly-view-all" onclick="toggleViewAll('monthly')">
+                        <i class="fas fa-chevron-down"></i> View All Monthly Magazines
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Yearly Archive Section -->
+            <div class="magazine-archive">
+                <div class="archive-header">
+                    <h3><i class="fas fa-archive"></i> Yearly Archives</h3>
+                    <div class="archive-years">
+                        <button class="year-btn active" onclick="filterArchive('all')">All</button>
+                        <button class="year-btn" onclick="filterArchive('2025')">2025</button>
+                        <button class="year-btn" onclick="filterArchive('2024')">2024</button>
+                        <button class="year-btn" onclick="filterArchive('2023')">2023</button>
+                        <button class="year-btn" onclick="filterArchive('2022')">2022</button>
+                    </div>
+                </div>
+                <div class="archive-grid" id="archive-grid">
+                    <div class="archive-item" data-year="2025">
+                        <h4>2025 Complete</h4>
+                        <p>All Issues</p>
+                    </div>
+                    <div class="archive-item" data-year="2024">
+                        <h4>2024 Complete</h4>
+                        <p>All Issues</p>
+                    </div>
+                    <div class="archive-item" data-year="2024">
+                        <h4>2024 - Part 1</h4>
+                        <p>Jan-Jun 2024</p>
+                    </div>
+                    <div class="archive-item" data-year="2024">
+                        <h4>2024 - Part 2</h4>
+                        <p>Jul-Dec 2024</p>
+                    </div>
+                    <div class="archive-item" data-year="2023">
+                        <h4>2023 Complete</h4>
+                        <p>All Issues</p>
+                    </div>
+                    <div class="archive-item" data-year="2023">
+                        <h4>2023 - Part 1</h4>
+                        <p>Jan-Jun 2023</p>
+                    </div>
+                    <div class="archive-item" data-year="2023">
+                        <h4>2023 - Part 2</h4>
+                        <p>Jul-Dec 2023</p>
+                    </div>
+                    <div class="archive-item" data-year="2022">
+                        <h4>2022 Complete</h4>
+                        <p>All Issues</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <p>Copyright &copy; <span>UPSC Hub</span> 2025 | All Rights Reserved</p>
+        </div>
+    </footer>
+
+    <script>
+        // Sidebar Toggle
+        document.querySelector('#menu-btn').onclick = () => {
+            document.querySelector('.side-bar').classList.add('active');
+        }
+
+        document.querySelector('#close-btn').onclick = () => {
+            document.querySelector('.side-bar').classList.remove('active');
+        }
+
+        // Dark Mode Toggle
+        document.querySelector('#toggle-btn').onclick = () => {
+            document.body.classList.toggle('dark-mode');
+            
+            if(document.body.classList.contains('dark-mode')) {
+                document.querySelector('#toggle-btn').classList.remove('fa-sun');
+                document.querySelector('#toggle-btn').classList.add('fa-moon');
+                localStorage.setItem('dark-mode', 'enabled');
+            } else {
+                document.querySelector('#toggle-btn').classList.remove('fa-moon');
+                document.querySelector('#toggle-btn').classList.add('fa-sun');
+                localStorage.setItem('dark-mode', 'disabled');
+            }
+        }
+
+        // Check for saved dark mode preference
+        if(localStorage.getItem('dark-mode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('#toggle-btn').classList.remove('fa-sun');
+            document.querySelector('#toggle-btn').classList.add('fa-moon');
+        }
+
+        // Magazine Functions
+        function viewPDF(pdfPath) {
+            // In a real implementation, this would open the PDF in a viewer
+            alert(`Opening PDF: ${pdfPath}`);
+            // window.open(pdfPath, '_blank');
+        }
+
+        function downloadPDF(pdfPath) {
+            // In a real implementation, this would trigger a download
+            alert(`Downloading PDF: ${pdfPath}`);
+            // Create a temporary anchor element to trigger download
+            // const link = document.createElement('a');
+            // link.href = pdfPath;
+            // link.download = pdfPath.split('/').pop();
+            // document.body.appendChild(link);
+            // link.click();
+            // document.body.removeChild(link);
+        }
+
+        // Toggle View All functionality
+        function toggleViewAll(type) {
+            const button = document.getElementById(`${type}-view-all`);
+            const hiddenMagazines = document.querySelectorAll(`#${type}-grid .hidden-magazine`);
+            let allVisible = true;
+            
+            // Check if any hidden magazines exist
+            hiddenMagazines.forEach(magazine => {
+                if(magazine.style.display === 'none') {
+                    allVisible = false;
+                }
+            });
+            
+            if(allVisible) {
+                // Hide all but first 3 magazines
+                hiddenMagazines.forEach((magazine, index) => {
+                    if(index >= 0) { // Adjust this number based on how many you want to show initially
+                        magazine.style.display = 'none';
+                    }
+                });
+                button.innerHTML = `<i class="fas fa-chevron-down"></i> View All ${type.charAt(0).toUpperCase() + type.slice(1)} Magazines`;
+            } else {
+                // Show all magazines
+                hiddenMagazines.forEach(magazine => {
+                    magazine.style.display = 'block';
+                });
+                button.innerHTML = `<i class="fas fa-chevron-up"></i> Show Less`;
+            }
+        }
+
+        // Search functionality
+        function searchMagazines(type) {
+            const searchTerm = document.getElementById(`${type}-search`).value.toLowerCase();
+            const magazines = document.querySelectorAll(`#${type}-grid .magazine-card`);
+            
+            magazines.forEach(magazine => {
+                const title = magazine.getAttribute('data-title');
+                if(title.includes(searchTerm)) {
+                    magazine.style.display = 'block';
+                } else {
+                    magazine.style.display = 'none';
+                }
+            });
+        }
+
+        // Filter functionality
+        function filterMagazines(type) {
+            const month = document.getElementById(`${type}-month`) ? document.getElementById(`${type}-month`).value : '';
+            const year = document.getElementById(`${type}-year`).value;
+            const magazines = document.querySelectorAll(`#${type}-grid .magazine-card`);
+            
+            magazines.forEach(magazine => {
+                const magazineMonth = magazine.getAttribute('data-month');
+                const magazineYear = magazine.getAttribute('data-year');
+                
+                const monthMatch = !month || magazineMonth === month;
+                const yearMatch = !year || magazineYear === year;
+                
+                if(monthMatch && yearMatch) {
+                    magazine.style.display = 'block';
+                } else {
+                    magazine.style.display = 'none';
+                }
+            });
+        }
+
+        // Archive filter
+        function filterArchive(year) {
+            const archiveItems = document.querySelectorAll('#archive-grid .archive-item');
+            const yearButtons = document.querySelectorAll('.archive-years .year-btn');
+            
+            // Update active button
+            yearButtons.forEach(button => {
+                button.classList.remove('active');
+                if(button.textContent.toLowerCase().includes(year) || (year === 'all' && button.textContent === 'All')) {
+                    button.classList.add('active');
+                }
+            });
+            
+            // Filter items
+            archiveItems.forEach(item => {
+                if(year === 'all' || item.getAttribute('data-year') === year) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Initialize - show first 3 magazines in each section
+        document.addEventListener('DOMContentLoaded', function() {
+            const weeklyMagazines = document.querySelectorAll('#weekly-grid .magazine-card');
+            const monthlyMagazines = document.querySelectorAll('#monthly-grid .magazine-card');
+            
+            // Hide all but first 3 weekly magazines
+            weeklyMagazines.forEach((magazine, index) => {
+                if(index >= 3) {
+                    magazine.classList.add('hidden-magazine');
+                    magazine.style.display = 'none';
+                }
+            });
+            
+            // Hide all but first 3 monthly magazines
+            monthlyMagazines.forEach((magazine, index) => {
+                if(index >= 3) {
+                    magazine.classList.add('hidden-magazine');
+                    magazine.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
