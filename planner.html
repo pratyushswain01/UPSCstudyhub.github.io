@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Annual Study Planner - UPSChub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498DB; /* A calming, authoritative blue */
+            --secondary-color: #2ECC71; /* Green for success/completion */
+            --accent-color: #F39C12; /* Orange for highlights/warnings */
+            --background-color: #F8F9FA;
+            --card-background: #FFFFFF;
+            --text-color: #2C3E50; /* Dark blue-gray */
+            --text-light: #7F8C8D; /* Lighter gray */
+            --border-color: #EAECEE;
+            --header-bg: #2C3E50;
+            --header-text: #ECF0F1;
+
+            --polity-color: #3498DB;
+            --geography-color: #27AE60;
+            --history-color: #E67E22;
+            --current-affairs-color: #E74C3C;
+            --mcq-practice-color: #8E44AD;
+            --revision-color: #F1C40F;
+            --answer-writing-color: #1ABC9C;
+            --test-color: #D35400;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.7;
+        }
+
+        .planner-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px; /* Add some padding for smaller screens */
+        }
+
+        /* --- Sticky Header --- */
+        .planner-main-header {
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            padding: 15px 0;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .planner-main-header h1 {
+            font-family: 'Lora', serif;
+            font-size: 2.2em;
+            margin-bottom: 5px;
+        }
+        .planner-main-header p {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        .planner-main-header #current-date-time-header {
+            font-size: 0.85em;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* --- Jump To Navigation (Conceptual) --- */
+        .jump-to-nav {
+            background-color: #dde1e6;
+            padding: 10px 0;
+            text-align: center;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 85px; /* Adjust based on main header height */
+            z-index: 999;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .jump-to-nav label {
+            font-weight: 500;
+            margin-right: 10px;
+        }
+        .jump-to-nav select {
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid var(--border-color);
+            font-size: 0.95em;
+        }
+
+        /* --- Key Resources & Targets Section --- */
+        .key-info-section {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+        }
+        .key-info-section h2 {
+            font-family: 'Lora', serif;
+            font-size: 1.6em;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+        }
+        .key-info-section h3 {
+            font-size: 1.2em;
+            color: var(--text-color);
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .key-info-section ul {
+            list-style-position: inside;
+            padding-left: 5px;
+            font-size: 0.95em;
+        }
+        .key-info-section ul li {
+            margin-bottom: 5px;
+            color: var(--text-light);
+        }
+        .key-info-section .info-columns {
+            display: flex;
+            gap: 30px;
+        }
+        .key-info-section .info-columns > div {
+            flex: 1;
+        }
+
+
+        /* --- Month Section --- */
+        .month-section {
+            margin-bottom: 40px;
+            padding-top: 20px; /* For jump-to anchor spacing */
+        }
+        .month-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px 8px 0 0;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .month-header h2 {
+            font-family: 'Lora', serif;
+            font-size: 2em;
+            margin: 0;
+        }
+        .month-content {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.07);
+        }
+
+        /* --- Week Section --- */
+        .week-section {
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden; /* To contain box shadow of header */
+        }
+        .week-header-main {
+            background-color: #E9F5FB; /* Light blue for week header */
+            padding: 12px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .week-header-main h3 {
+            font-size: 1.3em;
+            color: var(--primary-color);
+            margin: 0;
+            font-weight: 600;
+        }
+        .week-header-main .book-ref-main {
+            font-size: 0.9em;
+            color: var(--text-light);
+            background-color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .daily-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            padding: 15px;
+        }
+        .day-card {
+            background-color: #FAFCFE; /* Slightly off-white for day cards */
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .day-card h4 {
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--border-color);
+            color: var(--primary-color);
+            text-transform: uppercase;
+        }
+        .task-list-main {
+            list-style: none;
+            padding-left: 0;
+        }
+        .task-item-main {
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            padding: 8px;
+            background-color: #fff;
+            border-radius: 4px;
+            border-left: 4px solid var(--text-light);
+        }
+        .task-item-main input[type="checkbox"] {
+            margin-right: 8px;
+            accent-color: var(--primary-color);
+            transform: scale(1.05);
+            vertical-align: middle;
+        }
+        .task-item-main label {
+            cursor: pointer;
+            font-weight: 500;
+            vertical-align: middle;
+        }
+        .task-item-main input[type="checkbox"]:checked + label {
+            text-decoration: line-through;
+            color: var(--text-light);
+            opacity: 0.8;
+        }
+        .task-details-main {
+            display: block;
+            font-size: 0.85em;
+            color: var(--text-light);
+            margin-left: 26px;
+            margin-top: 3px;
+            padding-left: 5px;
+            border-left: 2px solid #eee;
+        }
+
+        /* Subject Color Coding for Tasks */
+        .task-item-main.polity { border-left-color: var(--polity-color); }
+        .task-item-main.geography { border-left-color: var(--geography-color); }
+        .task-item-main.history { border-left-color: var(--history-color); }
+        .task-item-main.current-affairs { border-left-color: var(--current-affairs-color); }
+        .task-item-main.mcq-practice { border-left-color: var(--mcq-practice-color); }
+        .task-item-main.revision { border-left-color: var(--revision-color); }
+        .task-item-main.answer-writing { border-left-color: var(--answer-writing-color); }
+        .task-item-main.test { border-left-color: var(--test-color); }
+        .task-item-main.map-work { border-left-color: var(--geography-color); opacity: 0.9; } /* Example */
+
+
+        /* Footer */
+        .planner-footer {
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 40px;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            font-size: 0.9em;
+        }
+        .planner-footer p {
+            margin: 5px 0;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .planner-wrapper { padding: 0 10px; }
+            .planner-main-header h1 { font-size: 1.8em; }
+            .planner-main-header p { font-size: 0.9em; }
+            .jump-to-nav { top: 75px; /* Adjust based on potentially smaller header */ }
+            .jump-to-nav select { width: 80%; }
+            .key-info-section .info-columns { flex-direction: column; gap: 15px; }
+            .month-header h2 { font-size: 1.6em; }
+            .week-header-main { flex-direction: column; align-items: flex-start; gap: 5px;}
+            .week-header-main h3 { font-size: 1.15em; }
+            .daily-grid { grid-template-columns: 1fr; } /* Stack days */
+        }
+        @media (max-width: 480px) {
+            .planner-main-header { padding: 10px 0; }
+            .planner-main-header h1 { font-size: 1.5em; }
+            .jump-to-nav { top: 65px; }
+            .key-info-section h2 { font-size: 1.4em; }
+            .month-header h2 { font-size: 1.4em; }
+        }
+    </style>
+</head>
+<body>
+    <header class="planner-main-header">
+        <h1>UPSChub Annual Study Planner</h1>
+        <p>Your Comprehensive Guide to UPSC CSE 2025 Preparation</p>
+        <p id="current-date-time-header">Loading date...</p>
+    </header>
+
+    <nav class="jump-to-nav">
+        <label for="month-select">Jump to Month:</label>
+        <select id="month-select">
+            <option value="june-2025">June 2025</option>
+            <option value="july-2025">July 2025</option>
+            <option value="august-2025">August 2025</option>
+            <option value="september-2025">September 2025</option>
+            <option value="october-2025">October 2025</option>
+            <option value="november-2025">November 2025</option>
+            <option value="december-2025">December 2025</option>
+            <!-- Add options for Jan-May 2026 if your plan extends that far -->
+        </select>
+    </nav>
+
+    <div class="planner-wrapper">
+
+        <section class="key-info-section">
+            <h2>Key Resources & Weekly Targets</h2>
+            <div class="info-columns">
+                <div>
+                    <h3>Primary Resources:</h3>
+                    <ul>
+                        <li>M. Laxmikant (Indian Polity – New Edition)</li>
+                        <li>Geography: McGraw Hill (Relevant Chapters) / NCERTs</li>
+                        <!-- Add other primary resources -->
+                    </ul>
+                    <h3>Supplementary Resources:</h3>
+                    <ul>
+                        <li>DD Basu’s Introduction to the Constitution of India</li>
+                        <li>Current Affairs: PRS India, The Hindu Polity Notes, VisionIAS/InsightsIAS Monthly</li>
+                        <li>PYQs: UPSC Prelims (2013-2024) + Mains (2016-2024)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3>Weekly Targets (General):</h3>
+                    <ul>
+                        <li>3-4 Chapters from Core Book (e.g., Laxmikant/Spectrum/NCERT)</li>
+                        <li>50 MCQs (Chapter-wise/Thematic)</li>
+                        <li>2 Mains Answers (GS-focused)</li>
+                        <li>Daily Newspaper Reading & Note-making</li>
+                        <li>Weekly Revision of covered topics</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- ==================== JUNE 2025 ==================== -->
+        <section id="june-2025" class="month-section">
+            <div class="month-header">
+                <h2><i class="fas fa-calendar-alt"></i> June 2025: Constitutional Framework & Fundamental Concepts</h2>
+            </div>
+            <div class="month-content">
+
+                <!-- Week 1: June 2-8 -->
+                <div class="week-section">
+                    <div class="week-header-main">
+                        <h3>Week 1 (June 2-8): Historical Background & Making of the Constitution</h3>
+                        <span class="book-ref-main">Laxmikant (Ch. 1-4)</span>
+                    </div>
+                    <div class="daily-grid">
+                        <div class="day-card">
+                            <h4><i class="fas fa-book-open"></i> Day 1 (Mon, Jun 2)</h4>
+                            <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w1-d1-t1"><label for="jun-w1-d1-t1">Historical Background (1773-1858)</label>
+                                    <span class="task-details-main">Regulating Act, Pitt’s India Act, Charter Acts.</span>
+                                </li>
+                                <li class="task-item-main current-affairs">
+                                    <input type="checkbox" id="jun-w1-d1-t2"><label for="jun-w1-d1-t2">Newspaper Reading</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-book-open"></i> Day 2 (Tue, Jun 3)</h4>
+                            <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w1-d2-t1"><label for="jun-w1-d2-t1">British Reforms (1858-1947)</label>
+                                    <span class="task-details-main">GOI Acts 1858, 1909, 1919, 1935.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-users"></i> Day 3 (Wed, Jun 4)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w1-d3-t1"><label for="jun-w1-d3-t1">Constituent Assembly</label>
+                                    <span class="task-details-main">Composition, Sessions, Key Committees.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-pencil-ruler"></i> Day 4 (Thu, Jun 5)</h4>
+                            <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w1-d4-t1"><label for="jun-w1-d4-t1">Drafting Process & Influences</label>
+                                    <span class="task-details-main">GOI Act 1935, U.S. Bill of Rights.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-star"></i> Day 5 (Fri, Jun 6)</h4>
+                            <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w1-d5-t1"><label for="jun-w1-d5-t1">Salient Features of Constitution</label>
+                                    <span class="task-details-main">Federalism, Parliamentary System, FRs.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-scroll"></i> Day 6 (Sat, Jun 7)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w1-d6-t1"><label for="jun-w1-d6-t1">Preamble</label>
+                                    <span class="task-details-main">Keywords, Amendability (Berubari).</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-tasks"></i> Day 7 (Sun, Jun 8)</h4>
+                            <ul class="task-list-main">
+                                <li class="task-item-main mcq-practice">
+                                    <input type="checkbox" id="jun-w1-d7-t1"><label for="jun-w1-d7-t1">MCQs on Ch. 1-4</label>
+                                </li>
+                                <li class="task-item-main answer-writing">
+                                    <input type="checkbox" id="jun-w1-d7-t2"><label for="jun-w1-d7-t2">Answer: "Significance of GOI Act 1935..."</label>
+                                </li>
+                                 <li class="task-item-main revision">
+                                    <input type="checkbox" id="jun-w1-d7-t3"><label for="jun-w1-d7-t3">Weekly Revision (Polity Week 1)</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Week 2: June 9-15 -->
+                <div class="week-section">
+                    <div class="week-header-main">
+                        <h3>Week 2 (June 9-15): Union & Its Territory, Citizenship</h3>
+                        <span class="book-ref-main">Laxmikant (Ch. 5-6)</span>
+                    </div>
+                    <div class="daily-grid">
+                        <div class="day-card">
+                            <h4><i class="fas fa-flag"></i> Day 1 (Mon, Jun 9)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w2-d1-t1"><label for="jun-w2-d1-t1">Article 1-4</label>
+                                    <span class="task-details-main">States vs UTs, Reorganization.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-id-card"></i> Day 2 (Tue, Jun 10)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w2-d2-t1"><label for="jun-w2-d2-t1">Citizenship (Articles 5-11)</label>
+                                    <span class="task-details-main">Acquisition, Termination, CAA, NRC.</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- ... Continue for Day 3 to Day 6 for Week 2 ... -->
+                        <div class="day-card">
+                            <h4><i class="fas fa-map-marked-alt"></i> Day 3 (Wed, Jun 11)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main polity">
+                                    <input type="checkbox" id="jun-w2-d3-t1"><label for="jun-w2-d3-t1">Special Provisions (Art 371A-J)</label>
+                                    <span class="task-details-main">J&K (Post-370), NE States.</span>
+                                </li>
+                            </ul>
+                        </div>
+                         <div class="day-card">
+                            <h4><i class="fas fa-drafting-compass"></i> Day 4 (Thu, Jun 12)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main map-work">
+                                    <input type="checkbox" id="jun-w2-d4-t1"><label for="jun-w2-d4-t1">Map Work: States after 2000</label>
+                                    <span class="task-details-main">Telangana, Uttarakhand.</span>
+                                </li>
+                            </ul>
+                        </div>
+                         <div class="day-card">
+                            <h4><i class="far fa-newspaper"></i> Day 5 (Fri, Jun 13)</h4>
+                            <ul class="task-list-main">
+                                <li class="task-item-main current-affairs">
+                                    <input type="checkbox" id="jun-w2-d5-t1"><label for="jun-w2-d5-t1">Current Affairs: Statehood Demands</label>
+                                    <span class="task-details-main">Ladakh, Gorkhaland.</span>
+                                </li>
+                            </ul>
+                        </div>
+                         <div class="day-card">
+                            <h4><i class="fas fa-balance-scale"></i> Day 6 (Sat, Jun 14)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main revision">
+                                    <input type="checkbox" id="jun-w2-d6-t1"><label for="jun-w2-d6-t1">Revision: Citizenship Act 1955 vs CAA 2019</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="day-card">
+                            <h4><i class="fas fa-tasks"></i> Day 7 (Sun, Jun 15)</h4>
+                             <ul class="task-list-main">
+                                <li class="task-item-main mcq-practice">
+                                    <input type="checkbox" id="jun-w2-d7-t1"><label for="jun-w2-d7-t1">MCQs: PYQs on State Reorganization</label>
+                                </li>
+                                <li class="task-item-main revision">
+                                    <input type="checkbox" id="jun-w2-d7-t2"><label for="jun-w2-d7-t2">Weekly Revision (Polity Week 2)</label>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ... Continue for Week 3 and Week 4 of June ... -->
+                <!-- Week 3: June 16-22: Fundamental Rights (Part III) -->
+                <!-- Week 4 (June 23-29): Directive Principles & Fundamental Duties -->
+
+            </div> <!-- month-content end -->
+        </section> <!-- june-2025 end -->
+
+
+        <!-- ==================== JULY 2025 ==================== -->
+        <section id="july-2025" class="month-section">
+            <div class="month-header">
+                <h2><i class="fas fa-landmark"></i> July 2025: Governance & Central Government</h2>
+            </div>
+            <div class="month-content">
+                <!-- Week 5 (June 30-July 6): Parliamentary System & President -->
+                <div class="week-section">
+                    <div class="week-header-main">
+                        <h3>Week 5 (June 30-July 6): Parliamentary System & President</h3>
+                        <span class="book-ref-main">Laxmikant (Ch. 12-14)</span>
+                    </div>
+                    <div class="daily-grid">
+                        <!-- ... Populate days for Week 5 ... -->
+                        <div class="day-card"><h4><i class="fas fa-user-tie"></i> Day 1 (Mon, Jun 30)</h4><ul class="task-list-main"><li class="task-item-main polity"><input type="checkbox" id="jul-w5-d1-t1"><label for="jul-w5-d1-t1">President (Art 52-62)</label><span class="task-details-main">Election, Impeachment, Powers.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-users-cog"></i> Day 2 (Tue, Jul 1)</h4> <ul class="task-list-main"><li class="task-item-main polity"><input type="checkbox" id="jul-w5-d2-t1"><label for="jul-w5-d2-t1">Vice President & PM (Art 63-78)</label><span class="task-details-main">Role, Collective Responsibility.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-gavel"></i> Day 3 (Wed, Jul 2)</h4><ul class="task-list-main"><li class="task-item-main polity"><input type="checkbox" id="jul-w5-d3-t1"><label for="jul-w5-d3-t1">Parliament (Art 79-122)</label><span class="task-details-main">Sessions, Motions.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-file-invoice-dollar"></i> Day 4 (Thu, Jul 3)</h4><ul class="task-list-main"><li class="task-item-main polity"><input type="checkbox" id="jul-w5-d4-t1"><label for="jul-w5-d4-t1">Legislative Process</label><span class="task-details-main">Money Bill vs Ordinary Bill.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="far fa-folder-open"></i> Day 5 (Fri, Jul 4)</h4><ul class="task-list-main"><li class="task-item-main polity"><input type="checkbox" id="jul-w5-d5-t1"><label for="jul-w5-d5-t1">Committees - PAC, Estimates</label></li></ul></div>
+                        <div class="day-card"><h4><i class="far fa-newspaper"></i> Day 6 (Sat, Jul 5)</h4><ul class="task-list-main"><li class="task-item-main current-affairs"><input type="checkbox" id="jul-w5-d6-t1"><label for="jul-w5-d6-t1">Current Affairs: Recent Ordinances</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-tasks"></i> Day 7 (Sun, Jul 6)</h4><ul class="task-list-main"><li class="task-item-main mcq-practice"><input type="checkbox" id="jul-w5-d7-t1"><label for="jul-w5-d7-t1">MCQs: PYQs on Presidential Powers</label></li><li class="task-item-main revision"><input type="checkbox" id="jul-w5-d7-t2"><label for="jul-w5-d7-t2">Weekly Revision</label></li></ul></div>
+                    </div>
+                </div>
+                <!-- ... Continue for Week 6, 7, 8 of July ... -->
+            </div>
+        </section>
+
+        <!-- ==================== AUGUST 2025 ==================== -->
+        <section id="august-2025" class="month-section">
+            <div class="month-header">
+                 <h2><i class="fas fa-shield-alt"></i> August 2025: Constitutional Bodies & Current Affairs Integration</h2>
+            </div>
+            <div class="month-content">
+                <!-- ... Populate Weeks 9, 10, 11, 12 ... -->
+                <!-- Week 9 (July 28-Aug 3): Current Affairs Integration -->
+                <div class="week-section">
+                    <div class="week-header-main">
+                        <h3>Week 9 (July 28-Aug 3): Current Affairs Integration</h3>
+                        <span class="book-ref-main">Polity in News, Schemes</span>
+                    </div>
+                     <div class="daily-grid">
+                        <!-- Days 1-3 for Polity in News -->
+                        <div class="day-card"><h4><i class="far fa-newspaper"></i> Day 1 (Mon, Jul 28)</h4><ul class="task-list-main"><li class="task-item-main current-affairs"><input type="checkbox" id="aug-w9-d1-t1"><label for="aug-w9-d1-t1">Polity in News - Recent SC Judgments</label></li></ul></div>
+                        <div class="day-card"><h4><i class="far fa-newspaper"></i> Day 2 (Tue, Jul 29)</h4><ul class="task-list-main"><li class="task-item-main current-affairs"><input type="checkbox" id="aug-w9-d2-t1"><label for="aug-w9-d2-t1">Polity in News - Important Bills</label></li></ul></div>
+                        <div class="day-card"><h4><i class="far fa-newspaper"></i> Day 3 (Wed, Jul 30)</h4><ul class="task-list-main"><li class="task-item-main current-affairs"><input type="checkbox" id="aug-w9-d3-t1"><label for="aug-w9-d3-t1">Analyze Editorials on Polity Issues</label></li></ul></div>
+                        <!-- Days 4-5 for Govt Schemes -->
+                        <div class="day-card"><h4><i class="fas fa-landmark"></i> Day 4 (Thu, Jul 31)</h4><ul class="task-list-main"><li class="task-item-main current-affairs"><input type="checkbox" id="aug-w9-d4-t1"><label for="aug-w9-d4-t1">Govt Schemes - Federalism Angle (PM-KISAN)</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-landmark"></i> Day 5 (Fri, Aug 1)</h4><ul class="task-list-main"><li class="task-item-main current-affairs"><input type="checkbox" id="aug-w9-d5-t1"><label for="aug-w9-d5-t1">Govt Schemes - (Ayushman Bharat)</label></li></ul></div>
+                        <!-- Days 6-7 for Full Length Test -->
+                        <div class="day-card"><h4><i class="fas fa-file-alt"></i> Day 6 (Sat, Aug 2)</h4><ul class="task-list-main"><li class="task-item-main test"><input type="checkbox" id="aug-w9-d6-t1"><label for="aug-w9-d6-t1">Full-Length Polity MCQs (50 Qs)</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-pen-alt"></i> Day 7 (Sun, Aug 3)</h4><ul class="task-list-main"><li class="task-item-main answer-writing"><input type="checkbox" id="aug-w9-d7-t1"><label for="aug-w9-d7-t1">Mains Answer Writing Practice</label></li><li class="task-item-main revision"><input type="checkbox" id="aug-w9-d7-t2"><label for="aug-w9-d7-t2">Weekly Revision</label></li></ul></div>
+                    </div>
+                </div>
+                <!-- Week 10-12 for Revision & Mock Tests -->
+            </div>
+        </section>
+
+        <!-- ==================== SEPTEMBER 2025 ==================== -->
+        <section id="september-2025" class="month-section">
+            <div class="month-header">
+                 <h2><i class="fas fa-mountain"></i> September 2025: Geography - India's Physical Framework</h2>
+            </div>
+            <div class="month-content">
+                <!-- Week 1: India's Physical Framework & The Himalayas -->
+                <div class="week-section">
+                    <div class="week-header-main">
+                        <h3>Week 1 (Sep 1-7): India's Location & The Himalayas</h3>
+                        <span class="book-ref-main">Geography Respective Chapters</span>
+                    </div>
+                    <div class="daily-grid">
+                        <div class="day-card"><h4><i class="fas fa-map-marker-alt"></i> Day 1 (Mon, Sep 1)</h4><ul class="task-list-main"><li class="task-item-main geography"><input type="checkbox" id="sep-w1-d1-t1"><label for="sep-w1-d1-t1">India's Location & Neighbors</label><span class="task-details-main">Lat/Long, Borders, Map Work.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-history"></i> Day 2 (Tue, Sep 2)</h4><ul class="task-list-main"><li class="task-item-main geography"><input type="checkbox" id="sep-w1-d2-t1"><label for="sep-w1-d2-t1">Geological History</label><span class="task-details-main">Peninsular Block, Himalayan Formation.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-mountain"></i> Day 3 (Wed, Sep 3)</h4><ul class="task-list-main"><li class="task-item-main geography"><input type="checkbox" id="sep-w1-d3-t1"><label for="sep-w1-d3-t1">Himalayan Divisions (Part 1)</label><span class="task-details-main">Trans & Greater Himalayas.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-mountain"></i> Day 4 (Thu, Sep 4)</h4><ul class="task-list-main"><li class="task-item-main geography"><input type="checkbox" id="sep-w1-d4-t1"><label for="sep-w1-d4-t1">Himalayan Divisions (Part 2)</label><span class="task-details-main">Lesser Himalayas, Shiwaliks, Passes.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-seedling"></i> Day 5 (Fri, Sep 5)</h4><ul class="task-list-main"><li class="task-item-main geography"><input type="checkbox" id="sep-w1-d5-t1"><label for="sep-w1-d5-t1">Himalayan Climate & Biodiversity</label><span class="task-details-main">Vegetation Zones, Protected Areas.</span></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-map"></i> Day 6 (Sat, Sep 6)</h4><ul class="task-list-main"><li class="task-item-main map-work"><input type="checkbox" id="sep-w1-d6-t1"><label for="sep-w1-d6-t1">Map Work: Himalayan Peaks, Rivers, Passes</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-tasks"></i> Day 7 (Sun, Sep 7)</h4><ul class="task-list-main"><li class="task-item-main mcq-practice"><input type="checkbox" id="sep-w1-d7-t1"><label for="sep-w1-d7-t1">MCQs on Himalayas</label></li><li class="task-item-main answer-writing"><input type="checkbox" id="sep-w1-d7-t2"><label for="sep-w1-d7-t2">Answer: "Himalayas as climatic divide..."</label></li><li class="task-item-main revision"><input type="checkbox" id="sep-w1-d7-t3"><label for="sep-w1-d7-t3">Weekly Revision</label></li></ul></div>
+                    </div>
+                </div>
+                <!-- ... Continue for other weeks of September ... -->
+            </div>
+        </section>
+
+        <!-- ... REPEAT THE <section class="month-section"> STRUCTURE FOR OCTOBER, NOVEMBER, DECEMBER ... -->
+        <!-- You will need to manually create the content for each day of each week for these months. -->
+
+        <!-- ==================== DECEMBER 2025 ==================== -->
+        <section id="december-2025" class="month-section">
+            <div class="month-header">
+                 <h2><i class="fas fa-sync-alt"></i> December 2025: Comprehensive Revision (Geography + Polity)</h2>
+            </div>
+            <div class="month-content">
+                <!-- Week 1: Geography Revision -->
+                 <div class="week-section">
+                    <div class="week-header-main">
+                        <h3>Week 1 (Dec 1-7): Geography Revision (Physical & World Geography)</h3>
+                        <span class="book-ref-main">Consolidated Notes</span>
+                    </div>
+                    <div class="daily-grid">
+                        <!-- Days 1-2: Physiography of India -->
+                        <div class="day-card"><h4><i class="fas fa-mountain"></i> Day 1 (Mon, Dec 1)</h4><ul class="task-list-main"><li class="task-item-main revision"><input type="checkbox" id="dec-w1-d1-t1"><label for="dec-w1-d1-t1">Revise: Himalayas, Northern Plains</label></li><li class="task-item-main map-work"><input type="checkbox" id="dec-w1-d1-t2"><label for="dec-w1-d1-t2">Map: Peaks & Rivers</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-water"></i> Day 2 (Tue, Dec 2)</h4><ul class="task-list-main"><li class="task-item-main revision"><input type="checkbox" id="dec-w1-d2-t1"><label for="dec-w1-d2-t1">Revise: Peninsular Plateau, Coasts, Islands</label></li></ul></div>
+                        <!-- Days 3-4: Climate, Rivers & Soils -->
+                        <div class="day-card"><h4><i class="fas fa-cloud-sun-rain"></i> Day 3 (Wed, Dec 3)</h4><ul class="task-list-main"><li class="task-item-main revision"><input type="checkbox" id="dec-w1-d3-t1"><label for="dec-w1-d3-t1">Revise: Monsoon, River Systems</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-leaf"></i> Day 4 (Thu, Dec 4)</h4><ul class="task-list-main"><li class="task-item-main revision"><input type="checkbox" id="dec-w1-d4-t1"><label for="dec-w1-d4-t1">Revise: Soil Types, Natural Vegetation</label></li><li class="task-item-main mcq-practice"><input type="checkbox" id="dec-w1-d4-t2"><label for="dec-w1-d4-t2">PYQs: Rainfall distribution</label></li></ul></div>
+                        <!-- Days 5-6: World Geography -->
+                        <div class="day-card"><h4><i class="fas fa-globe-americas"></i> Day 5 (Fri, Dec 5)</h4><ul class="task-list-main"><li class="task-item-main revision"><input type="checkbox" id="dec-w1-d5-t1"><label for="dec-w1-d5-t1">Revise: Continents, Landforms, Ocean Currents</label></li></ul></div>
+                        <div class="day-card"><h4><i class="fas fa-thermometer-half"></i> Day 6 (Sat, Dec 6)</h4><ul class="task-list-main"><li class="task-item-main revision"><input type="checkbox" id="dec-w1-d6-t1"><label for="dec-w1-d6-t1">Revise: Climatic Zones (Koeppen)</label></li></ul></div>
+                        <!-- Day 7: Mock Test -->
+                        <div class="day-card"><h4><i class="fas fa-file-signature"></i> Day 7 (Sun, Dec 7)</h4><ul class="task-list-main"><li class="task-item-main test"><input type="checkbox" id="dec-w1-d7-t1"><label for="dec-w1-d7-t1">Mock Test (50 Geo MCQs)</label></li><li class="task-item-main answer-writing"><input type="checkbox" id="dec-w1-d7-t2"><label for="dec-w1-d7-t2">Answer: "Himalayas influence on climate..."</label></li></ul></div>
+                    </div>
+                </div>
+                <!-- ... Continue for other weeks of December ... -->
+            </div>
+        </section>
+
+    </div> <!-- planner-wrapper end -->
+
+    <footer class="planner-footer">
+        <p>© <span id="currentYear"></span> UPSChub - All Rights Reserved.</p>
+        <p>Dedicated to your UPSC Success!</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- Display Current Date in Header & Footer Year ---
+            function updateDateTimeHeader() {
+                const now = new Date();
+                const optionsDate = { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' };
+                const formattedDate = now.toLocaleDateString(undefined, optionsDate);
+                const dateTimeEl = document.getElementById('current-date-time-header');
+                if (dateTimeEl) {
+                    dateTimeEl.textContent = formattedDate;
+                }
+                const currentYearEl = document.getElementById('currentYear');
+                if (currentYearEl) {
+                    currentYearEl.textContent = now.getFullYear();
+                }
+            }
+            updateDateTimeHeader();
+            setInterval(updateDateTimeHeader, 3600000); // Update hourly
+
+            // --- Jump To Month Navigation ---
+            const monthSelect = document.getElementById('month-select');
+            if (monthSelect) {
+                monthSelect.addEventListener('change', function() {
+                    const selectedMonthId = this.value;
+                    const targetSection = document.getElementById(selectedMonthId);
+                    if (targetSection) {
+                        // Smooth scroll if supported, otherwise jump
+                        if ('scrollBehavior' in document.documentElement.style) {
+                            window.scrollTo({
+                                top: targetSection.offsetTop - 100, // Adjust offset for sticky headers
+                                behavior: 'smooth'
+                            });
+                        } else {
+                            window.location.hash = selectedMonthId; // Fallback for older browsers
+                        }
+                    }
+                });
+            }
+
+            // --- Task Checkbox Persistence (Conceptual - using localStorage) ---
+            const checkboxes = document.querySelectorAll('.task-item-main input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                // Load saved state
+                const savedState = localStorage.getItem(checkbox.id);
+                if (savedState === 'true') {
+                    checkbox.checked = true;
+                }
+
+                // Save state on change
+                checkbox.addEventListener('change', function() {
+                    localStorage.setItem(this.id, this.checked);
+                });
+            });
+
+            // --- Auto-generate unique IDs for tasks if not present (for localStorage) ---
+            // This is a very basic way; ideally, backend would assign stable IDs.
+            const taskItems = document.querySelectorAll('.task-item-main');
+            taskItems.forEach((task, index) => {
+                const checkbox = task.querySelector('input[type="checkbox"]');
+                const label = task.querySelector('label');
+                if (checkbox && !checkbox.id) {
+                    const uniqueId = `task-${Date.now()}-${index}`;
+                    checkbox.id = uniqueId;
+                    if (label) {
+                        label.setAttribute('for', uniqueId);
+                    }
+                }
+            });
+
+
+        });
+    </script>
+</body>
+</html>
