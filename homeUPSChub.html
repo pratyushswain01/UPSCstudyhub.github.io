@@ -19,16 +19,20 @@
          --primary-start: #6a11cb;
          --primary-end: #2575fc;
          --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+         
+         /* Light Mode */
          --bg-light: #f0f2f5;
          --card-bg-light: rgba(255, 255, 255, 0.65);
          --text-primary-light: #1c1e21;
          --text-secondary-light: #555c6e;
          --border-light: rgba(0, 0, 0, 0.1);
-         --bg-dark: #101114;
-         --card-bg-dark: rgba(28, 30, 35, 0.65);
+
+         /* --- REFINED: Dark Mode Variables --- */
+         --bg-dark: #101114; /* Deep, almost black background */
+         --card-bg-dark: #1c1e23; /* Solid, slightly lighter dark for surfaces */
          --text-primary-dark: #e4e6eb;
          --text-secondary-dark: #b0b3b8;
-         --border-dark: rgba(255, 255, 255, 0.15);
+         --border-dark: rgba(255, 255, 255, 0.1); /* Slightly more subtle border */
       }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       html { scroll-behavior: smooth; }
@@ -47,13 +51,14 @@
          background: radial-gradient(circle at 10% 20%, #d9c2ff, transparent 40%),
                      radial-gradient(circle at 80% 70%, #b5d8ff, transparent 40%);
          animation: moveGradient 20s linear infinite;
-         transition: background 0.5s ease;
+         transition: opacity 0.5s ease;
       }
       @keyframes moveGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+      
       body.dark-mode { background-color: var(--bg-dark); color: var(--text-primary-dark); }
+      
       body.dark-mode::before {
-         background: radial-gradient(circle at 10% 20%, #2f1a52, transparent 50%),
-                     radial-gradient(circle at 80% 70%, #17335c, transparent 50%);
+         opacity: 0; /* Hide the glowing background in dark mode */
       }
       h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; }
       
@@ -65,21 +70,24 @@
          border-bottom: 1px solid var(--border-light); z-index: 1000;
          transition: all 0.4s ease;
       }
-      body.dark-mode .app-header { background: var(--card-bg-dark); border-color: var(--border-dark); }
+      
+      body.dark-mode .app-header { 
+         background: var(--card-bg-dark); 
+         border-color: var(--border-dark);
+         backdrop-filter: none; /* No blur needed for solid background */
+      }
       .app-header .logo {
          font-size: 22px; font-weight: 700; text-decoration: none;
          background: var(--primary-gradient); -webkit-background-clip: text;
          -webkit-text-fill-color: transparent; background-clip: text;
       }
-      .header-right { display: flex; align-items: center; gap: 15px; } /* Reduced gap slightly */
-      
-      /* UPDATED: Date/Time Style */
+      .header-right { display: flex; align-items: center; gap: 15px; }
       #datetime-container {
-         font-size: 0.75rem; /* Made font smaller */
+         font-size: 0.75rem;
          color: var(--text-secondary-light);
          font-weight: 500;
          transition: color 0.4s ease;
-         white-space: nowrap; /* Prevent wrapping on smaller screens */
+         white-space: nowrap;
       }
       body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
       .app-header .icon-btn {
@@ -97,10 +105,7 @@
          padding: 8px 0; overflow: hidden; white-space: nowrap;
          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       }
-      .runner-bar .runner-text {
-         display: inline-block; padding-left: 100%;
-         animation: scroll-left 30s linear infinite; font-size: 0.9rem;
-      }
+      .runner-bar .runner-text { display: inline-block; padding-left: 100%; animation: scroll-left 30s linear infinite; font-size: 0.9rem; }
       .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
       @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
 
@@ -125,8 +130,18 @@
          flex-direction: column; transition: all 0.4s ease; animation: popIn 0.5s ease-out forwards;
          opacity: 0;
       }
-      body.dark-mode .card { background: var(--card-bg-dark); border-color: var(--border-dark); }
       .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+      
+      body.dark-mode .card { 
+         background: var(--card-bg-dark); 
+         border-color: var(--border-dark);
+         backdrop-filter: none;
+      }
+      body.dark-mode .card:hover {
+         transform: translateY(-8px);
+         box-shadow: none; /* Disable default shadow */
+         border-color: rgba(255, 255, 255, 0.25); /* Brighten border on hover */
+      }
       .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
       .card-icon {
          width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px;
@@ -159,19 +174,26 @@
          border-top: 1px solid var(--border-light); display: flex; justify-content: space-around;
          z-index: 1000;
       }
-      body.dark-mode .bottom-nav { background: var(--card-bg-dark); border-color: var(--border-dark); }
-      .nav-item {
-         display: flex; flex-direction: column; align-items: center; justify-content: center;
-         color: var(--text-secondary-light); text-decoration: none; flex-grow: 1;
-         transition: color 0.2s, transform 0.2s; cursor: pointer;
+      body.dark-mode .bottom-nav { 
+         background: var(--card-bg-dark); 
+         border-top-color: var(--border-dark);
+         backdrop-filter: none;
       }
+      .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color 0.2s, transform 0.2s; cursor: pointer; }
       body.dark-mode .nav-item { color: var(--text-secondary-dark); }
       .nav-item i { font-size: 22px; margin-bottom: 4px; } .nav-item span { font-size: 11px; font-weight: 500; }
       .nav-item.active { color: var(--primary-start); }
       .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
-
-      /* Sidebar styles are unchanged */
-      .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color:var(--bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}body.dark-mode .side-bar{background-color:#15171a}.side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}.side-bar .profile img{width:90px;height:90px;border-radius:50%;border:4px solid;border-image:var(--primary-gradient) 1}.side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+      
+      /* --- Sidebar Styles --- */
+      .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
+      body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
+      .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
+      
+      /* --- UPDATED: Removed border from sidebar logo --- */
+      .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
+      
+      .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
 
       @keyframes popIn { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
       @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
@@ -241,7 +263,7 @@
     
     <section class="dashboard-grid">
         <div class="card-container">
-            <!-- All cards are unchanged -->
+            <!-- HTML for cards is unchanged -->
             <div class="card">
                 <div class="card-header"><div class="card-icon"><i class="fas fa-book-open"></i></div><h3>UPSC Syllabus</h3></div>
                 <p>Access the complete and detailed Prelims & Mains syllabi to structure your preparation.</p>
@@ -328,12 +350,13 @@
 <!-- Bottom Navigation Bar -->
 <nav class="bottom-nav">
    <a href="homeUPSChub.html" class="nav-item active"> <i class="fas fa-home"></i> <span>Home</span> </a>
-   <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>Planner</span> </a>
-   <a href="test.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Tests</span> </a>
+   <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>UPSC-28 Planner</span> </a>
+   <a href="testinterface.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Mock Tests</span> </a>
    <div id="menu-btn" class="nav-item"> <i class="fas fa-bars-staggered"></i> <span>Menu</span> </div>
 </nav>
 
 <script>
+   // All JavaScript is unchanged
    // Sidebar toggle
    const menuBtn = document.querySelector('#menu-btn');
    const closeBtn = document.querySelector('#close-btn');
@@ -357,17 +380,14 @@
       applyTheme(newTheme);
    });
    
-   // --- UPDATED: Live Date and Time Script ---
+   // Live Date and Time Script
    const dateTimeContainer = document.getElementById('datetime-container');
    const updateDateTime = () => {
       const now = new Date();
-      // UPDATED: Removed 'weekday' from options
       const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
       const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-      
       const dateStr = now.toLocaleDateString('en-US', dateOptions);
       const timeStr = now.toLocaleTimeString('en-US', timeOptions);
-      
       dateTimeContainer.textContent = `${dateStr} | ${timeStr}`;
    };
    
