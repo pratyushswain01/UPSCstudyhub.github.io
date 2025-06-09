@@ -90,14 +90,18 @@
             border: 1px solid var(--border-color);
             margin-bottom: 2rem;
         }
-        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; align-items: center; }
+        /* MODIFICATION: Changed minmax to be more flexible on smaller screens */
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: center; }
         .stat-card { text-align: center; }
-        .stat-card h4 { font-size: 0.9rem; font-weight: 500; color: var(--text-color); }
+        /* MODIFICATION: Reduced heading font size and added margin for better spacing */
+        .stat-card h4 { font-size: 0.85rem; font-weight: 500; color: var(--text-color); margin-bottom: 0.25rem; }
         .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--heading-color); }
-        .progress-bar-container { width: 100%; background-color: var(--border-color); border-radius: 20px; overflow: hidden; height: 12px; }
+        /* MODIFICATION: Reduced progress bar height and added margin */
+        .progress-bar-container { width: 100%; background-color: var(--border-color); border-radius: 20px; overflow: hidden; height: 10px; margin-top: 4px; }
         .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-color), var(--primary-color)); border-radius: 20px; transition: width 0.5s ease-in-out; }
+        
         .navigation { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
-        .navigation > * { flex: 1; }
+        .navigation > * { flex: 1 1 200px; } /* Allow shrinking and growing */
         .nav-button, #month-select {
             width: 100%;
             padding: 0.75rem;
@@ -192,12 +196,30 @@
         /* --- Footer --- */
         .planner-footer { text-align: center; padding: 2rem 1rem; margin-top: 2rem; border-top: 1px solid var(--border-color); font-size: 0.9rem; }
 
+        /* --- RESPONSIVE DESIGN --- */
         @media (max-width: 768px) {
             .planner-header h1 { font-size: 2.2rem; }
-            .dashboard-grid, .navigation { grid-template-columns: 1fr 1fr; }
+            /* MODIFICATION: Removed explicit grid column definition to allow natural wrapping */
+            .navigation { grid-template-columns: 1fr; } /* Stack nav buttons on mobile */
             .month-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
             .month-header h2 { font-size: 1.5rem; }
             .month-progress { width: 100%; text-align: left; }
+        }
+
+        /* MODIFICATION: Added new media query for smaller mobile screens */
+        @media (max-width: 480px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr 1fr; /* Force 2x2 grid on small screens */
+            }
+            .stat-card .stat-value {
+                font-size: 1.3rem; /* Further reduce font size */
+            }
+            .theme-switch-wrapper {
+                margin-top: 0; /* Align theme switcher better in the grid */
+            }
+            .planner-header h1 {
+                font-size: 2rem;
+            }
         }
     </style>
 </head>
@@ -226,13 +248,16 @@
                         <h4>Today is</h4>
                         <p class="stat-value" id="current-date-header">Loading...</p>
                     </div>
-                    <div class="theme-switch-wrapper">
-                        <i class="fas fa-sun"></i>
-                        <label class="theme-switch">
-                            <input type="checkbox" id="theme-toggle">
-                            <span class="slider"></span>
-                        </label>
-                         <i class="fas fa-moon"></i>
+                    <div class="stat-card"> <!-- Wrapped theme switcher in a stat-card for alignment -->
+                         <h4>Theme</h4>
+                        <div class="theme-switch-wrapper">
+                            <i class="fas fa-sun"></i>
+                            <label class="theme-switch">
+                                <input type="checkbox" id="theme-toggle">
+                                <span class="slider"></span>
+                            </label>
+                            <i class="fas fa-moon"></i>
+                        </div>
                     </div>
                 </div>
                 <div class="navigation">
@@ -374,8 +399,7 @@
                  <!-- (Other weeks for July would go here) -->
             </section>
 
-            <!-- (Sections for August, September, etc. would continue in the same format) -->
-             <!-- ==================== SEPTEMBER 2025 ==================== -->
+            <!-- ==================== SEPTEMBER 2025 ==================== -->
             <section id="september-2025" class="month-section">
                  <div class="month-header">
                     <h2><i class="fas fa-mountain"></i> September 2025: Geography - Physical Framework</h2>
@@ -406,7 +430,6 @@
                     </div>
                 </div>
             </section>
-
         </main>
         
         <footer class="planner-footer">
@@ -490,6 +513,8 @@
         // --- DATE & NAVIGATION ---
         function initializeDateAndNav() {
             const today = new Date();
+            // FOR DEMONSTRATION PURPOSES, let's pretend today is September 2nd, 2025
+            // const today = new Date('2025-09-02T12:00:00'); 
             const year = today.getFullYear();
             const month = String(today.getMonth() + 1).padStart(2, '0');
             const day = String(today.getDate()).padStart(2, '0');
@@ -505,7 +530,7 @@
                 // Highlight today's card
                 todayCard.classList.add('current-day');
                 
-                // Expand today's week
+                // Expand today's week and month
                 const currentWeek = todayCard.closest('.week-section');
                 if (currentWeek) {
                     currentWeek.classList.add('expanded');
