@@ -5,894 +5,407 @@
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Home: UPSC Hub</title>
+   <title>Dashboard: UPSC Hub</title>
 
-   <!-- font awesome cdn link -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+   <!-- Font Awesome CDN -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 
    <!-- Google Fonts -->
-   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
    <!-- Custom Styles -->
    <style>
-      /* Global Styling */
       :root {
-         --primary: #3a86ff;
-         --secondary: #8338ec;
-         --accent: #ff006e;
-         --light: #f8f9fa;
-         --dark: #212529;
-         --success: #06d6a0;
-         --warning: #ffbe0b;
+         --primary-start: #6a11cb;
+         --primary-end: #2575fc;
+         --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+         --bg-light: #f0f2f5;
+         --card-bg-light: rgba(255, 255, 255, 0.65);
+         --text-primary-light: #1c1e21;
+         --text-secondary-light: #555c6e;
+         --border-light: rgba(0, 0, 0, 0.1);
+         --bg-dark: #101114;
+         --card-bg-dark: rgba(28, 30, 35, 0.65);
+         --text-primary-dark: #e4e6eb;
+         --text-secondary-dark: #b0b3b8;
+         --border-dark: rgba(255, 255, 255, 0.15);
       }
-      
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
       body {
-         font-family: 'Open Sans', sans-serif;
-         background-color: #f5f7fa;
-         color: var(--dark);
+         font-family: 'Inter', sans-serif;
+         background-color: var(--bg-light);
+         color: var(--text-primary-light);
          overflow-x: hidden;
-         display: flex;
-         flex-direction: column;
-         min-height: 100vh;
-         line-height: 1.6;
-         transition: background-color 0.3s, color 0.3s;
+         transition: background-color 0.4s ease, color 0.4s ease;
+         padding-top: 110px; /* Increased padding to make space for runner bar */
+         padding-bottom: 80px;
       }
-
-      body.dark-mode {
-         background-color: #121212;
-         color: #f5f5f5;
+      body::before {
+         content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+         z-index: -1;
+         background: radial-gradient(circle at 10% 20%, #d9c2ff, transparent 40%),
+                     radial-gradient(circle at 80% 70%, #b5d8ff, transparent 40%);
+         animation: moveGradient 20s linear infinite;
+         transition: background 0.5s ease;
       }
-
-      h1, h2, h3, h4, h5, h6 {
-         font-family: 'Montserrat', sans-serif;
-         font-weight: 600;
+      @keyframes moveGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+      body.dark-mode { background-color: var(--bg-dark); color: var(--text-primary-dark); }
+      body.dark-mode::before {
+         background: radial-gradient(circle at 10% 20%, #2f1a52, transparent 50%),
+                     radial-gradient(circle at 80% 70%, #17335c, transparent 50%);
       }
-
-      /* Header Styling */
-   .header {
-    background: linear-gradient(135deg, var(--primary), var(--secondary));
-    color: white;
-    padding: 15px 0;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    position: relative;
-    z-index: 100;
-}
-
-.header .flex {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.header .logo {
-    font-size: 24px;
-    font-weight: 700;
-    color: white;
-    text-decoration: none;
-    background: none !important;
-    border: none !important;
-    box-shadow: none !important;
-    transition: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    display: inline-block;
-}
-
-.header .logo:hover {
-    color: white; /* prevents hover color change */
-    text-decoration: none;
-    background: none;
-}
-
-      .header .search-form {
-         display: flex;
-         align-items: center;
-         background: rgba(255,255,255,0.2);
-         border-radius: 30px;
-         padding: 5px 15px;
-         width: 40%;
-         max-width: 500px;
-         transition: all 0.3s ease;
-      }
-
-      .header .search-form:hover {
-         background: rgba(255,255,255,0.3);
-      }
-
-      .header .search-form input {
-         background: transparent;
-         border: none;
-         color: white;
-         width: 100%;
-         padding: 8px 0;
-         font-size: 14px;
-      }
-
-      .header .search-form input::placeholder {
-         color: rgba(255,255,255,0.8);
-      }
-
-      .header .search-form button {
-         background: transparent;
-         border: none;
-         color: white;
-         cursor: pointer;
-         font-size: 16px;
-      }
-
-      .header .icons {
-         display: flex;
-         gap: 15px;
-         align-items: center;
-      }
-
-      .header .icons div {
-         color: white;
-         font-size: 18px;
-         cursor: pointer;
-         transition: all 0.3s ease;
-         padding: 8px;
-         border-radius: 50%;
-         width: 36px;
-         height: 36px;
-         display: flex;
-         align-items: center;
-         justify-content: center;
-      }
-
-      .header .icons div:hover {
-         background: rgba(255,255,255,0.2);
-         transform: translateY(-2px);
-      }
-
-      /* Sidebar */
-      .side-bar {
-         position: fixed;
-         top: 0;
-         left: -300px;
-         width: 300px;
-         height: 100vh;
-         background: white;
-         box-shadow: 0 0 20px rgba(0,0,0,0.1);
-         z-index: 1000;
-         transition: all 0.3s ease;
-         overflow-y: auto;
-      }
-
-      body.dark-mode .side-bar {
-         background: #1e1e1e;
-         color: #f5f5f5;
-      }
-
-      .side-bar.active {
-         left: 0;
-      }
-
-      .side-bar #close-btn {
-         position: absolute;
-         top: 15px;
-         right: 15px;
-         font-size: 20px;
-         color: #6c757d;
-         cursor: pointer;
-      }
-
-      body.dark-mode .side-bar #close-btn {
-         color: #aaa;
-      }
-
-      .side-bar .profile {
-         padding: 30px 20px;
-         text-align: center;
-         border-bottom: 1px solid #eee;
-      }
-
-      body.dark-mode .side-bar .profile {
-         border-bottom-color: #333;
-      }
-
-      .side-bar .profile img {
-         width: 100px;
-         height: 100px;
-         border-radius: 50%;
-         object-fit: cover;
-         margin-bottom: 15px;
-         border: 3px solid var(--primary);
-      }
-
-      .side-bar .profile h3 {
-         font-size: 18px;
-         color: var(--dark);
-         margin-bottom: 5px;
-      }
-
-      body.dark-mode .side-bar .profile h3 {
-         color: #f5f5f5;
-      }
-
-      .side-bar .profile .role {
-         font-size: 14px;
-         color: #6c757d;
-      }
-
-      body.dark-mode .side-bar .profile .role {
-         color: #aaa;
-      }
-
-      .side-bar .navbar {
-         padding: 20px 0;
-      }
-
-      .side-bar .navbar a {
-         display: flex;
-         align-items: center;
-         padding: 12px 25px;
-         color: #495057;
-         text-decoration: none;
-         transition: all 0.3s ease;
-      }
-
-      body.dark-mode .side-bar .navbar a {
-         color: #ddd;
-      }
-
-      .side-bar .navbar a:hover {
-         background: #f8f9fa;
-         color: var(--primary);
-      }
-
-      body.dark-mode .side-bar .navbar a:hover {
-         background: #2a2a2a;
-      }
-
-      .side-bar .navbar a i {
-         margin-right: 10px;
-         font-size: 18px;
-         width: 24px;
-         text-align: center;
-      }
-
-      .side-bar .navbar a span {
-         font-size: 15px;
-      }
-
-      /* Main Content */
-      .home-grid {
-         max-width: 1200px;
-         margin: 30px auto;
-         padding: 0 20px;
-         flex: 1;
-      }
-
-      .heading {
-         font-size: 36px;
-         color: var(--primary);
-         margin-bottom: 30px;
-         text-align: center;
-         position: relative;
-         padding-bottom: 15px;
-      }
-
-      .heading:after {
-         content: '';
-         position: absolute;
-         bottom: 0;
-         left: 50%;
-         transform: translateX(-50%);
-         width: 80px;
-         height: 4px;
-         background: linear-gradient(to right, var(--primary), var(--secondary));
-         border-radius: 2px;
-      }
-
-      .box-container {
-         display: grid;
-         grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-         gap: 25px;
-         margin-top: 40px;
-      }
-
-      .box {
-         background: white;
-         border-radius: 10px;
-         padding: 25px;
-         box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-         transition: all 0.3s ease;
-         border-top: 3px solid var(--primary);
-      }
-
-      body.dark-mode .box {
-         background: #1e1e1e;
-         box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-      }
-
-      .box:hover {
-         transform: translateY(-5px);
-         box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-      }
-
-      body.dark-mode .box:hover {
-         box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-      }
-
-      .box h3 {
-         font-size: 18px;
-         color: var(--dark);
-         margin-bottom: 15px;
-         position: relative;
-         padding-bottom: 10px;
-      }
-
-      body.dark-mode .box h3 {
-         color: #f5f5f5;
-      }
-
-      .box h3:after {
-         content: '';
-         position: absolute;
-         bottom: 0;
-         left: 0;
-         width: 40px;
-         height: 2px;
-         background: var(--primary);
-      }
-
-      .box .likes, .box .tutor {
-         font-size: 14px;
-         color: #6c757d;
-         margin-bottom: 15px;
-      }
-
-      body.dark-mode .box .likes,
-      body.dark-mode .box .tutor {
-         color: #aaa;
-      }
-
-      .inline-btn {
-         display: inline-block;
-         background: linear-gradient(to right, var(--primary), var(--secondary));
-         color: white;
-         padding: 8px 20px;
-         border-radius: 30px;
-         text-decoration: none;
-         font-size: 14px;
-         font-weight: 500;
-         transition: all 0.3s ease;
-         border: none;
-         cursor: pointer;
-      }
-
-      .inline-btn:hover {
-         transform: translateY(-2px);
-         box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
-      }
-
-      .flex {
-         display: flex;
-         flex-wrap: wrap;
-         gap: 10px;
-      }
-
-      .flex a {
-         display: inline-block;
-         background: #f1f3f5;
-         color: var(--dark);
-         padding: 6px 12px;
-         border-radius: 5px;
-         font-size: 13px;
-         text-decoration: none;
-         transition: all 0.3s ease;
-      }
-
-      body.dark-mode .flex a {
-         background: #2a2a2a;
-         color: #ddd;
-      }
-
-      .flex a:hover {
-         background: var(--primary);
-         color: white;
-      }
-
-      /* Footer */
-       .footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background: linear-gradient(to right, #111, #1c1c1c);
-    color: #fff;
-    font-size: 13px;
-    text-align: center;
-    padding: 8px 10px;
-    z-index: 999;
-    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.2);
-}
-
-.footer span {
-    color: var(--primary);
-    font-weight: 600;
-}
-
-.footer-content {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-      /* Responsive */
-      @media (max-width: 768px) {
-         .header .search-form {
-            display: none;
-         }
-         
-         .header .icons #search-btn {
-            display: block;
-         }
-         
-         .box-container {
-            grid-template-columns: 1fr;
-         }
-      }
-
-      /* Notification */
-      .notification {
-         position: fixed;
-         bottom: 20px;
-         right: 20px;
-         background: white;
-         border-radius: 10px;
-         box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-         padding: 15px;
-         max-width: 300px;
-         display: none;
-         z-index: 1000;
-         border-left: 4px solid var(--primary);
-      }
-
-      body.dark-mode .notification {
-         background: #2a2a2a;
-         color: #f5f5f5;
-      }
-
-      .notification.show {
-         display: block;
-         animation: slideIn 0.5s forwards, fadeOut 0.5s 4.5s forwards;
-      }
-
-      @keyframes slideIn {
-         from { transform: translateX(100%); }
-         to { transform: translateX(0); }
-      }
-
-      @keyframes fadeOut {
-         from { opacity: 1; }
-         to { opacity: 0; }
-      }
-
-      .notification h3 {
-         font-size: 16px;
-         margin-bottom: 10px;
-         color: var(--dark);
-      }
-
-      body.dark-mode .notification h3 {
-         color: #f5f5f5;
-      }
-
-      .notification p {
-         font-size: 14px;
-         color: #6c757d;
-         margin-bottom: 10px;
-      }
-
-      body.dark-mode .notification p {
-         color: #aaa;
-      }
-
-      .notification .close {
-         position: absolute;
-         top: 10px;
-         right: 10px;
-         font-size: 14px;
-         color: #6c757d;
-         cursor: pointer;
-      }
-
-      body.dark-mode .notification .close {
-         color: #aaa;
-      }
+      h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; }
       
-.runner-strip {
-    background: linear-gradient(to right, #6a11cb, #2575fc);
-    color: #fff;
-    overflow: hidden;
-    white-space: nowrap;
-    height: 32px;
-    font-size: 14px;
-    font-weight: 500;
-    position: relative;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    display: flex;
-    align-items: center; /* vertically center */
-}
+      .app-header {
+         position: fixed; top: 0; left: 0; right: 0; padding: 0 25px;
+         height: 65px; display: flex; align-items: center; justify-content: space-between;
+         background: var(--card-bg-light);
+         backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+         border-bottom: 1px solid var(--border-light); z-index: 1000;
+         transition: all 0.4s ease;
+      }
+      body.dark-mode .app-header { background: var(--card-bg-dark); border-color: var(--border-dark); }
+      .app-header .logo {
+         font-size: 22px; font-weight: 700; text-decoration: none;
+         background: var(--primary-gradient); -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent; background-clip: text;
+      }
+      .header-right { display: flex; align-items: center; gap: 20px; }
+      #datetime-container {
+         font-size: 0.85rem;
+         color: var(--text-secondary-light);
+         font-weight: 500;
+         transition: color 0.4s ease;
+      }
+      body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
+      .app-header .icon-btn {
+         font-size: 20px; color: var(--text-secondary-light); cursor: pointer;
+         width: 40px; height: 40px; display: grid; place-items: center;
+         border-radius: 50%; transition: all 0.2s;
+      }
+      body.dark-mode .app-header .icon-btn { color: var(--text-secondary-dark); }
+      .app-header .icon-btn:hover { background-color: rgba(0,0,0,0.05); }
+      body.dark-mode .app-header .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
+      
+      /* --- NEW: Runner Bar (Marquee) --- */
+      .runner-bar {
+         position: fixed;
+         top: 65px; /* Position below the header */
+         left: 0;
+         right: 0;
+         z-index: 999;
+         background: var(--primary-gradient);
+         color: white;
+         padding: 8px 0;
+         overflow: hidden;
+         white-space: nowrap;
+         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+      .runner-bar .runner-text {
+         display: inline-block;
+         padding-left: 100%;
+         animation: scroll-left 30s linear infinite;
+         font-size: 0.9rem;
+      }
+      .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
+      @keyframes scroll-left {
+         0% { transform: translateX(0%); }
+         100% { transform: translateX(-100%); }
+      }
 
-.runner-strip p {
-    display: inline-block;
-    padding-left: 100%;
-    animation: scrollText 18s linear infinite;
-    position: relative;
-    top: -1px; /* moves text slightly upward */
-}
+      .hero-section { text-align: center; padding: 30px 20px 0; }
+      .hero-section h1 {
+         font-size: 2.5rem; font-weight: 700; margin-bottom: 8px;
+         background: var(--primary-gradient); -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+         animation: fadeInDown 0.8s ease-out;
+      }
+      .hero-section p {
+         font-size: 1.1rem; color: var(--text-secondary-light); max-width: 600px;
+         margin: 0 auto; animation: fadeInUp 0.8s ease-out 0.2s; animation-fill-mode: both;
+      }
+      body.dark-mode .hero-section p { color: var(--text-secondary-dark); }
+      
+      .dashboard-grid { max-width: 1200px; margin: 40px auto 0; padding: 0 20px; }
+      .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+      .card {
+         background: var(--card-bg-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light);
+         border-radius: 16px; padding: 24px; position: relative; display: flex;
+         flex-direction: column; transition: all 0.4s ease; animation: popIn 0.5s ease-out forwards;
+         opacity: 0;
+      }
+      body.dark-mode .card { background: var(--card-bg-dark); border-color: var(--border-dark); }
+      .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+      .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
+      .card-icon {
+         width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px;
+         background: var(--primary-gradient); color: white; font-size: 20px; flex-shrink: 0;
+      }
+      .card h3 { font-size: 1.1rem; }
+      .card p { font-size: 0.9rem; color: var(--text-secondary-light); margin-bottom: 20px; flex-grow: 1; }
+      body.dark-mode .card p { color: var(--text-secondary-dark); }
+      .action-btn {
+         display: block; background: var(--primary-gradient); color: white; padding: 12px 20px;
+         border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: 500;
+         text-align: center; margin-top: auto; transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .action-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(106, 17, 203, 0.3); }
+      
+      .card.topic-list { grid-column: 1 / -1; }
+      .card .topic-tags { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; flex-grow: 1; }
+      .card .topic-tags a {
+         background-color: rgba(106, 17, 203, 0.08); color: var(--primary-start); padding: 8px 15px;
+         border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 500;
+         transition: all 0.2s ease; border: 1px solid transparent;
+      }
+      body.dark-mode .card .topic-tags a { background-color: rgba(181, 216, 255, 0.1); color: #b5d8ff; }
+      .card .topic-tags a:hover { background-color: var(--primary-start); color: white; transform: translateY(-2px); border-color: var(--primary-end); }
+      .card .topic-tags a i { margin-right: 6px; }
+      
+      .bottom-nav {
+         position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
+         background: var(--card-bg-light); backdrop-filter: blur(12px);
+         border-top: 1px solid var(--border-light); display: flex; justify-content: space-around;
+         z-index: 1000;
+      }
+      body.dark-mode .bottom-nav { background: var(--card-bg-dark); border-color: var(--border-dark); }
+      .nav-item {
+         display: flex; flex-direction: column; align-items: center; justify-content: center;
+         color: var(--text-secondary-light); text-decoration: none; flex-grow: 1;
+         transition: color 0.2s, transform 0.2s; cursor: pointer;
+      }
+      body.dark-mode .nav-item { color: var(--text-secondary-dark); }
+      .nav-item i { font-size: 22px; margin-bottom: 4px; } .nav-item span { font-size: 11px; font-weight: 500; }
+      .nav-item.active { color: var(--primary-start); }
+      .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
 
+      .side-bar {
+         position: fixed; top: 0; left: -320px; width: 300px; height: 100vh;
+         background-color: var(--bg-light); z-index: 1002;
+         transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+         display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,0.1);
+      }
+      body.dark-mode .side-bar { background-color: #15171a; }
+      .side-bar.active { left: 0; }
+      /* ... Rest of sidebar styles are unchanged ... */
+      .sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}.side-bar .profile img{width:90px;height:90px;border-radius:50%;border:4px solid;border-image:var(--primary-gradient) 1}.side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
 
-@keyframes scrollText {
-    0%   { transform: translateX(0%); }
-    100% { transform: translateX(-100%); }
-}
-
-/* Container for chatbot button + text */
-#chatbot-container {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  background-color: #007bff;
-  border-radius: 24px;
-  padding: 8px 14px;
-  box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
-  cursor: pointer;
-  z-index: 1000;
-
-  /* Initially hidden (slide out) */
-  transform: translateX(100%);
-  opacity: 0;
-  transition: transform 0.4s ease, opacity 0.4s ease;
-}
-
-/* Show container on scroll */
-#chatbot-container.show {
-  transform: translateX(0);
-  opacity: 1;
-}
-
-/* Chatbot button styling */
-#chatbot-button {
-  width: 48px;
-  height: 48px;
-  background-color: #007bff;
-  border-radius: 50%;
-  box-shadow: 0 8px 15px rgba(0, 123, 255, 0.3);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  animation: pulse 2.5s infinite;
-  flex-shrink: 0;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-#chatbot-button:hover {
-  background-color: #0056b3;
-  box-shadow: 0 12px 20px rgba(0, 86, 179, 0.5);
-}
-
-/* Pulse animation */
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
-  }
-  70% {
-    box-shadow: 0 0 0 15px rgba(0, 123, 255, 0);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
-  }
-}
-
-/* SVG icon smaller */
-#chatbot-button svg {
-  width: 22px;
-  height: 22px;
-}
-
-/* Text next to chatbot button */
-#chatbot-text {
-  color: white;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  user-select: none;
-  display: flex;
-  flex-direction: column;
-}
-
-#chatbot-text .name {
-  font-weight: 700;
-  font-size: 16px;
-  line-height: 1;
-}
-
-#chatbot-text .click-me {
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 1;
-  animation: blinkText 1.5s infinite;
-}
-
-@keyframes blinkText {
-  0%, 50%, 100% { opacity: 1; }
-  25%, 75% { opacity: 0.4; }
-}
-
-
+      @keyframes popIn { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+      @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
    </style>
 </head>
 <body>
 
-<header class="header">
-   <section class="flex">
-
-      <!-- Plain text logo without icon -->
-      <a href="index.html" class="logo">UPSC Hub</a>
-
-      <!-- Only Menu and Toggle buttons -->
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
-      </div>
-
-   </section>
+<!-- App Header -->
+<header class="app-header">
+   <a href="index.html" class="logo">UPSC Hub</a>
+   <div class="header-right">
+      <div id="datetime-container"></div>
+      <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
+   </div>
 </header>
 
-<div class="runner-strip">
-   <p>Welcome to UPSC Hub – Your Smart Preparation Partner for Prelims, Mains & Interview • Stay Updated • Practice Smart • Achieve More</p>
+<!-- NEW: Runner Bar -->
+<div class="runner-bar">
+   <div class="runner-text">
+      <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
+      <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
+   </div>
 </div>
 
 
-
-
+<!-- Sidebar (Drawer Menu) with Categories -->
 <div class="side-bar">
-   <div id="close-btn">
-      <i class="fas fa-times"></i>
-   </div>
+    <div class="sidebar-header">
+       <h3 class="title">Complete Menu</h3>
+       <div id="close-btn"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="profile">
+      <img src="images/LOGO.jpg" class="image" alt="UPSC Hub Logo">
+      <h3 class="name">UPSC Hub</h3>
+      <p class="role">Your Success Partner</p>
+    </div>
+    <nav class="navbar">
+        <div class="sidebar-category"><h4>Learn</h4></div>
+        <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
 
-   <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   </div>
+        <div class="sidebar-category"><h4>Practice & Tools</h4></div>
+        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+        <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
+        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+        
+        <div class="sidebar-category"><h4>Resources</h4></div>
+        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
 
-  <nav class="navbar">
-            <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="about.html"><i class="fas fa-question"></i><span>About</span></a>
-            <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
-            <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-            <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
-            <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
-            <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
-            <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
-            <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
-            <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>Test</span></a>
-            <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
-            <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-            <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-            <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
-            <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
-            <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+        <div class="sidebar-category"><h4>Support & Info</h4></div>
+        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+    </nav>
+</div>
+
+
+<!-- Main Content Area -->
+<main>
+    <section class="hero-section">
+        <h1>UPSC Preparation Hub</h1>
+        <p>Your journey to success starts here. Seize the day and conquer your goals.</p>
+    </section>
+    
+    <section class="dashboard-grid">
+        <div class="card-container">
+            <!-- All the cards from previous version -->
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-book-open"></i></div><h3>UPSC Syllabus</h3></div>
+                <p>Access the complete and detailed Prelims & Mains syllabi to structure your preparation.</p>
+                <a href="syllabus.html" class="action-btn">View Syllabus <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-landmark"></i></div><h3>Polity: Laxhmikant</h3></div>
+                <p>Master Indian Polity with the bible for civil service aspirants. Chapter-wise notes and tests.</p>
+                <a href="Polity_Laxhmikant.html" class="action-btn">Study Now <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-spa"></i></div><h3>Meditation Zone</h3></div>
+                <p>Boost your concentration, reduce stress, and improve mental clarity for long study hours.</p>
+                <a href="yoga_meditation.html" class="action-btn">Begin Session <i class="fas fa-brain"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-folder-open"></i></div><h3>Resource Files</h3></div>
+                <p>Find all your confidential study materials, notes, and downloaded resources in one place.</p>
+                <a href="TESTseries-daily.html" class="action-btn">Access Files <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-video"></i></div><h3>Video Lectures</h3></div>
+                <p>Explore our comprehensive video learning section covering all subjects and topics.</p>
+                <a href="UPSChubvid.html" class="action-btn">Watch Videos <i class="fas fa-play"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-clock"></i></div><h3>Focus Timer</h3></div>
+                <p>Use the Pomodoro technique to track and improve your study session efficiency.</p>
+                <a href="focustimer.html" class="action-btn">Start Timer <i class="fas fa-hourglass-start"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-newspaper"></i></div><h3>Daily News Update</h3></div>
+                <p>Stay on top of current affairs with daily news digests relevant to the UPSC exam.</p>
+                <a href="newsupdate.html" class="action-btn">Read Now <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-search"></i></div><h3>Newspaper Analysis</h3></div>
+                <p>Get daily in-depth analysis of The Hindu and Indian Express editorials and important articles.</p>
+                <a href="newspaper.html" class="action-btn">View Analysis <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-pen-fancy"></i></div><h3>Answer Writing</h3></div>
+                <p>Upload your Mains answers for peer and expert evaluation to hone your writing skills.</p>
+                <a href="drive.doc.html" class="action-btn">Upload Document <i class="fas fa-upload"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-tasks"></i></div><h3>Mock Test Series</h3></div>
+                <p>Simulate the real exam environment and assess your preparation with full-length tests.</p>
+                <a href="test.html" class="action-btn">Start Test <i class="fas fa-pen"></i></a>
+            </div>
+            <div class="card">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-chart-line"></i></div><h3>Performance Analysis</h3></div>
+                <p>Get detailed, insightful reports after each test to identify your strengths and weaknesses.</p>
+                <a href="testinfo.html" class="action-btn">View Report <i class="fas fa-chart-pie"></i></a>
+            </div>
+            <!-- Special Topic List Cards -->
+            <div class="card topic-list">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-book-atlas"></i></div><h3>Core Subjects</h3></div>
+                <div class="topic-tags">
+                    <a href="#"><i class="fas fa-globe-asia"></i> Geography</a>
+                    <a href="#"><i class="fas fa-landmark"></i> Polity</a>
+                    <a href="#"><i class="fas fa-history"></i> History</a>
+                    <a href="#"><i class="fas fa-map-marked-alt"></i> Mapping</a>
+                    <a href="#"><i class="fas fa-atom"></i> Science & Tech</a>
+                    <a href="#"><i class="fas fa-book"></i> General Studies</a>
+                    <a href="#"><i class="fas fa-leaf"></i> Environment</a>
+                    <a href="#"><i class="fas fa-rupee-sign"></i> Economy</a>
+                </div>
+            </div>
+            <div class="card topic-list">
+                <div class="card-header"><div class="card-icon"><i class="fas fa-fire"></i></div><h3>Popular Topics</h3></div>
+                <div class="topic-tags">
+                    <a href="#"><i class="fas fa-bolt"></i> Current Affairs</a>
+                    <a href="#"><i class="fas fa-file-alt"></i> Important Articles</a>
+                    <a href="#"><i class="fas fa-edit"></i> Editorials Explained</a>
+                    <a href="#"><i class="fas fa-chart-bar"></i> Infographics</a>
+                    <a href="#"><i class="fas fa-lightbulb"></i> Mains Questions</a>
+                    <a href="#"><i class="fas fa-check-double"></i> Prelims MCQs</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav">
+   <a href="homeUPSChub.html" class="nav-item active"> <i class="fas fa-home"></i> <span>Home</span> </a>
+   <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>UPSC-28 Planner</span> </a>
+   <a href="test.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>MOCKTests</span> </a>
+   <div id="menu-btn" class="nav-item"> <i class="fas fa-bars-staggered"></i> <span>Menu</span> </div>
 </nav>
 
-</div>
-
-<section class="home-grid">
-   <h1 class="heading">UPSC Preparation Hub</h1>
-   
-   <div class="box-container">
-      <div class="box">
-         <h3 class="title">UPSC Syllabus</h3>
-         <p class="likes">Comprehensive syllabus for your preparation</p>
-         <div class="flex" style="flex-direction: column; gap: 10px; margin-top: 15px;">
-            <a href="syllabus.html" class="inline-btn"><i class="fas fa-book-open"></i> Prelims Syllabus</a>
-            <a href="syllabus.html" class="inline-btn"><i class="fas fa-book"></i> Mains Syllabus</a>
-         </div>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Polity: M. Laxhmikant</h3>
-         <p class="likes">Master Indian Polity with this essential resource</p>
-         <a href="Polity_Laxhmikant.html" class="inline-btn">Study Now <i class="fas fa-arrow-right"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Meditation Zone</h3>
-         <p class="likes">Boost your concentration and reduce stress</p>
-         <a href="yoga_meditation.html" class="inline-btn">Begin Session <i class="fas fa-spa"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Resource Files</h3>
-         <p class="likes">Confidential study materials and resources</p>
-         <a href="TESTseries-daily.html" class="inline-btn">Access Files <i class="fas fa-folder-open"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Video Lectures</h3>
-         <p class="likes">Comprehensive video learning section</p>
-         <a href="UPSChubvid.html" class="inline-btn">Watch Videos <i class="fas fa-play"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Focus Timer</h3>
-         <p class="likes">Track and improve your study sessions</p>
-         <a href="focustimer.html" class="inline-btn">Start Timer <i class="fas fa-clock"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Daily News Update</h3>
-         <p class="likes">Stay updated with current affairs</p>
-         <a href="newsupdate.html" class="inline-btn">Read Now <i class="fas fa-newspaper"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Newspaper Analysis</h3>
-         <p class="likes">Daily curated news for UPSC</p>
-         <a href="newspaper.html" class="inline-btn">View Analysis <i class="fas fa-search"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Core Subjects</h3>
-         <div class="flex">
-            <a href="#"><i class="fas fa-globe-asia"></i> Geography</a>
-            <a href="#"><i class="fas fa-landmark"></i> Polity</a>
-            <a href="#"><i class="fas fa-history"></i> History</a>
-            <a href="#"><i class="fas fa-map-marked-alt"></i> Mapping</a>
-            <a href="#"><i class="fas fa-atom"></i> Science & Tech</a>
-            <a href="#"><i class="fas fa-book"></i> General Studies</a>
-         </div>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Popular Topics</h3>
-         <div class="flex">
-            <a href="#"><i class="fas fa-bolt"></i> Current Affairs</a>
-            <a href="#"><i class="fas fa-file-alt"></i> Articles</a>
-            <a href="#"><i class="fas fa-edit"></i> Editorials</a>
-            <a href="#"><i class="fas fa-chart-bar"></i> Newspaper Analysis</a>
-         </div>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Answer Writing Practice</h3>
-         <p class="tutor">Upload your Mains answers for evaluation</p>
-         <a href="drive.doc.html" class="inline-btn">Upload Document <i class="fas fa-upload"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Mock Test Series</h3>
-         <p class="tutor">Assess your preparation with full-length tests</p>
-         <a href="test.html" class="inline-btn">Start Test <i class="fas fa-pen"></i></a>
-      </div>
-
-      <div class="box">
-         <h3 class="title">Performance Analysis</h3>
-         <p class="tutor">Detailed reports to improve your scores</p>
-         <a href="testinfo.html" class="inline-btn">View Report <i class="fas fa-chart-line"></i></a>
-      </div>
-
-      <body style="height:2000px; margin:0;">
-
-  <!-- Chatbot container -->
-  <div id="chatbot-container" title="Chat with hubChatbot.ai">
-    <div id="chatbot-button">
-      <svg xmlns="http://www.w3.org/2000/svg" 
-           viewBox="0 0 24 24" fill="white">
-        <path d="M12 3C7.03 3 3 6.58 3 11c0 1.87.84 3.58 2.35 4.87L5 21l4.6-2.25A8.958 8.958 0 0 0 12 20c4.97 0 9-3.58 9-8s-4.03-9-9-9z"/>
-      </svg>
-    </div>
-    <div id="chatbot-text">
-      <div class="name">hubChatbot.ai</div>
-      <div class="click-me">Click me</div>
-    </div>
-  </div>
-
-  <script src="script.js"></script>
-</body>
-   </div>
-</section>
-
-<footer class="footer">
-   <div class="footer-content">
-      &copy; 2025 <span>Pratyush Swain</span> | UPSChub • All rights reserved
-   </div>
-</footer>
-
-
-<div class="notification">
-   <div class="close"><i class="fas fa-times"></i></div>
-   <h3>Welcome to UPSC Hub!</h3>
-   <p>Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools.</p>
-   <p><em>Today's Motivation:</em> "Success isn't about luck; it's about hard work and determination."</p>
-</div>
-
 <script>
-   // Toggle sidebar
-   document.querySelector('#menu-btn').addEventListener('click', function() {
-      document.querySelector('.side-bar').classList.toggle('active');
+   // Sidebar toggle
+   const menuBtn = document.querySelector('#menu-btn');
+   const closeBtn = document.querySelector('#close-btn');
+   const sideBar = document.querySelector('.side-bar');
+   menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
+   closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+
+   // Theme toggle
+   const toggleBtn = document.querySelector('#toggle-btn');
+   const body = document.body;
+   const applyTheme = (theme) => {
+      body.classList.toggle('dark-mode', theme === 'dark');
+      toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+      toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+   };
+   const savedTheme = localStorage.getItem('theme') || 'light';
+   applyTheme(savedTheme);
+   toggleBtn.addEventListener('click', () => {
+      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+      localStorage.setItem('theme', newTheme);
+      applyTheme(newTheme);
    });
-
-   document.querySelector('#close-btn').addEventListener('click', function() {
-      document.querySelector('.side-bar').classList.remove('active');
+   
+   // --- NEW: Live Date and Time Script ---
+   const dateTimeContainer = document.getElementById('datetime-container');
+   const updateDateTime = () => {
+      const now = new Date();
+      const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+      
+      const dateStr = now.toLocaleDateString('en-US', dateOptions);
+      const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+      
+      dateTimeContainer.textContent = `${dateStr} | ${timeStr}`;
+   };
+   
+   document.addEventListener('DOMContentLoaded', () => {
+      // Staggered card animation
+      const cards = document.querySelectorAll('.card');
+      cards.forEach((card, index) => {
+         card.style.animationDelay = `${index * 0.05}s`;
+      });
+      
+      // Initialize and update the clock
+      updateDateTime(); // Call once immediately
+      setInterval(updateDateTime, 1000); // Update every second
    });
-
-   // Close notification
-   document.querySelector('.notification .close').addEventListener('click', function() {
-      document.querySelector('.notification').classList.remove('show');
-   });
-
-   // Show notification
-   document.addEventListener("DOMContentLoaded", function() {
-      setTimeout(function() {
-         document.querySelector('.notification').classList.add('show');
-      }, 2000);
-   });
-
-   // Dark/light mode toggle
-   document.querySelector('#toggle-btn').addEventListener('click', function() {
-      document.body.classList.toggle('dark-mode');
-      if (document.body.classList.contains('dark-mode')) {
-         localStorage.setItem('theme', 'dark');
-         document.querySelector('#toggle-btn').classList.remove('fa-sun');
-         document.querySelector('#toggle-btn').classList.add('fa-moon');
-      } else {
-         localStorage.setItem('theme', 'light');
-         document.querySelector('#toggle-btn').classList.remove('fa-moon');
-         document.querySelector('#toggle-btn').classList.add('fa-sun');
-      }
-   });
-
-    const container = document.getElementById('chatbot-container');
-
-// Show/hide chatbot container on scroll past 100px
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 100) {
-    container.classList.add('show');
-  } else {
-    container.classList.remove('show');
-  }
-});
-
-// Navigate to UPSChub_ai.html on click
-container.addEventListener('click', () => {
-  window.location.href = 'UPSChub_ai.html';
-});
-
-
-   // Check for saved theme preference
-   if (localStorage.getItem('theme') === 'dark') {
-      document.body.classList.add('dark-mode');
-      document.querySelector('#toggle-btn').classList.remove('fa-sun');
-      document.querySelector('#toggle-btn').classList.add('fa-moon');
-   }
-
-   // Browser notifications
-   if ("Notification" in window) {
-      if (Notification.permission === "default") {
-         Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-               new Notification("Welcome to UPSC Hub!", {
-                  body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: Success isn't about luck; it's about hard work and determination.",
-                  icon: "images/LOGO.jpg"
-               });
-            }
-         });
-      } else if (Notification.permission === "granted") {
-         new Notification("Welcome to UPSC Hub!", {
-            body: "Empower your UPSC preparation with expertly curated resources, mock tests, and personalized tools. ✨ Today's Motivation: Success isn't about luck; it's about hard work and determination.",
-            icon: "images/LOGO.jpg"
-         });
-      }
-   }
 </script>
 
 </body>
