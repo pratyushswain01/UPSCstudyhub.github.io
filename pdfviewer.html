@@ -286,11 +286,37 @@
             <div id="pdf-pane" class="tab-pane">
                 <div class="pdf-filter-hub">
                     <div class="search-bar">
-                        <input type="text" id="pdf-search-input" placeholder="Search the library...">
+                        <input type="text" id="pdf-search-input" placeholder="Search for Polity, History, Economy, etc...">
                     </div>
                     <div class="filter-options">
-                        <select id="pdf-subject-filter"><option value="">All Subjects</option><option value="History">History</option><option value="Polity">Polity</option><option value="Geography">Geography</option><option value="Economics">Economics</option><option value="Science & Technology">Science & Tech</option><option value="Environment">Environment</option></select>
-                        <select id="pdf-type-filter"><option value="">All Types</option><option value="Notes">Notes</option><option value="PYQ">PYQ</option><option value="Report">Report</option><option value="Magazine">Magazine</option><option value="Book">Book</option></select>
+                        <select id="pdf-subject-filter">
+                           <option value="">All Subjects</option>
+                           <option value="Polity">Polity</option>
+                           <option value="History">History</option>
+                           <option value="Art & Culture">Art & Culture</option>
+                           <option value="Economics">Economics</option>
+                           <option value="Geography">Geography</option>
+                           <option value="Environment">Environment</option>
+                           <option value="Science & Technology">Science & Tech</option>
+                           <option value="International Relations">International Relations</option>
+                           <option value="Internal Security">Internal Security</option>
+                        </select>
+                        <select id="pdf-type-filter">
+                           <option value="">All Types</option>
+                           <option value="Notes">Notes</option>
+                           <option value="Conceptual">Conceptual</option>
+                           <option value="Factual">Factual</option>
+                           <option value="Report">Report</option>
+                           <option value="Schemes">Schemes</option>
+                           <option value="Map-based">Map-based</option>
+                           <option value="Analysis">Analysis</option>
+                           <option value="Current Affairs">Current Affairs</option>
+                           <option value="Social Issues">Social Issues</option>
+                           <option value="Ancient History">Ancient History</option>
+                           <option value="PYQ">PYQ</option>
+                           <option value="Magazine">Magazine</option>
+                           <option value="Book">Book</option>
+                        </select>
                     </div>
                 </div>
                 <div class="resource-grid" id="pdf-grid"></div>
@@ -316,13 +342,46 @@ const currentAffairsData = [
 ].sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest first
 
 const pdfLibraryData = [
-    { title: 'Constitution - Basic Structure', subject: 'Polity', type: 'Notes', file: 'Polity/Constitution_Basic_Structure.pdf' },
-    { title: 'Fundamental Rights and Duties', subject: 'Polity', type: 'Notes', file: 'Polity/Fundamental_Rights_Duties.pdf' },
-    { title: 'Indian National Movement', subject: 'History', type: 'Notes', file: 'Indian National Movement - Complete Notes.pdf' },
-    { title: 'Budget Analysis 2023', subject: 'Economics', type: 'Report', file: 'Indian Economy - Budget Analysis 2023.pdf' },
-    { title: 'ISRO Achievements', subject: 'Science & Technology', type: 'Notes', file: 'Space Technology - ISRO Achievements.pdf' },
-    { title: 'Biodiversity Hotspots', subject: 'Environment', type: 'Notes', file: 'Biodiversity Hotspots of India.pdf' },
-    { title: 'World Climate Patterns', subject: 'Geography', type: 'Notes', file: 'Geography/World_Climate_Patterns.pdf' }
+    // Indian Polity & Constitution
+    { title: 'Preamble & Its Philosophy', subject: 'Polity', type: 'Notes', file: 'Polity/Preamble_Philosophy.pdf' },
+    { title: 'Citizenship & Related Amendments (CAA)', subject: 'Polity', type: 'Current Affairs', file: 'Polity/Citizenship_CAA.pdf' },
+    { title: 'DPSP & Fundamental Duties', subject: 'Polity', type: 'Notes', file: 'Polity/DPSP_Fundamental_Duties.pdf' },
+    { title: 'Parliament & Its Functioning', subject: 'Polity', type: 'Conceptual', file: 'Polity/Parliament_Functioning.pdf' },
+    { title: 'The Judiciary: SC, HC & Judicial Review', subject: 'Polity', type: 'Notes', file: 'Polity/The_Judiciary.pdf' },
+    { title: 'Federalism & Centre-State Relations', subject: 'Polity', type: 'Conceptual', file: 'Polity/Federalism_Centre_State.pdf' },
+    { title: 'Panchayati Raj & Urban Local Bodies', subject: 'Polity', type: 'Notes', file: 'Polity/Panchayati_Raj.pdf' },
+    { title: 'Constitutional & Non-Constitutional Bodies', subject: 'Polity', type: 'Factual', file: 'Polity/Constitutional_Bodies.pdf' },
+
+    // Modern History & Art and Culture
+    { title: 'The Revolt of 1857: Causes & Consequences', subject: 'History', type: 'Notes', file: 'History/Revolt_of_1857.pdf' },
+    { title: 'Social & Religious Reform Movements', subject: 'History', type: 'Social Issues', file: 'History/Social_Religious_Reforms.pdf' },
+    { title: 'Gandhian Era (1915-1947): Major Movements', subject: 'History', type: 'Notes', file: 'History/Gandhian_Era.pdf' },
+    { title: 'Indus Valley Civilization: Society, Art & Decline', subject: 'Art & Culture', type: 'Ancient History', file: 'ArtCulture/Indus_Valley_Civilization.pdf' },
+    { title: 'Temple Architecture of India (Nagara, Dravida)', subject: 'Art & Culture', type: 'Notes', file: 'ArtCulture/Temple_Architecture.pdf' },
+    { title: 'Bhakti & Sufi Movements: Impact on Society', subject: 'Art & Culture', type: 'Notes', file: 'ArtCulture/Bhakti_Sufi_Movements.pdf' },
+
+    // Economy
+    { title: 'Economic Survey Analysis', subject: 'Economics', type: 'Report', file: 'Economy/Economic_Survey_Analysis.pdf' },
+    { title: 'Monetary Policy & The Role of RBI', subject: 'Economics', type: 'Conceptual', file: 'Economy/Monetary_Policy_RBI.pdf' },
+    { title: 'Inflation: Types, Causes, and Control', subject: 'Economics', type: 'Conceptual', file: 'Economy/Inflation.pdf' },
+    { title: 'National Income Accounting (GDP, GNP, NNP)', subject: 'Economics', type: 'Notes', file: 'Economy/National_Income_Accounting.pdf' },
+    { title: 'Major Government Schemes & Initiatives', subject: 'Economics', type: 'Schemes', file: 'Economy/Govt_Schemes.pdf' },
+
+    // Geography & Environment
+    { title: 'The Indian Monsoon System: Mechanism & Impact', subject: 'Geography', type: 'Conceptual', file: 'Geography/Indian_Monsoon_System.pdf' },
+    { title: 'Major River Systems of India & Tributaries', subject: 'Geography', type: 'Map-based', file: 'Geography/River_Systems_India.pdf' },
+    { title: 'Physiographic Divisions of India', subject: 'Geography', type: 'Notes', file: 'Geography/Physiographic_Divisions.pdf' },
+    { title: 'Climate Change: Conventions & Summits', subject: 'Environment', type: 'Report', file: 'Environment/Climate_Change_Conventions.pdf' },
+    { title: 'National Parks & Sanctuaries in News', subject: 'Environment', type: 'Map-based', file: 'Environment/National_Parks_News.pdf' },
+
+    // Science & Technology
+    { title: 'Indian Defence Technology', subject: 'Science & Technology', type: 'Notes', file: 'SciTech/Defence_Technology.pdf' },
+    { title: 'Biotechnology: Genetic Engineering & CRISPR', subject: 'Science & Technology', type: 'Conceptual', file: 'SciTech/Biotechnology_Applications.pdf' },
+    { title: 'Artificial Intelligence, Big Data & IoT', subject: 'Science & Technology', type: 'Current Affairs', file: 'SciTech/AI_Big_Data_IoT.pdf' },
+    
+    // Internal Security & International Relations
+    { title: "India's Neighborhood First Policy", subject: 'International Relations', type: 'Analysis', file: 'IR/Neighborhood_First_Policy.pdf' },
+    { title: 'Cyber Security: Threats & Framework', subject: 'Internal Security', type: 'Notes', file: 'Security/Cyber_Security.pdf' },
 ];
 
 // --- TAB SWITCHING LOGIC ---
@@ -435,7 +494,21 @@ const pdfSubjectFilter = document.getElementById('pdf-subject-filter');
 const pdfTypeFilter = document.getElementById('pdf-type-filter');
 const pdfNoResults = document.getElementById('pdf-no-results');
 
-const getIconForType = (type) => ({'Notes': 'fa-file-alt', 'Magazine': 'fa-book-open', 'Book': 'fa-book', 'PYQ': 'fa-question-circle', 'Report': 'fa-chart-bar'}[type] || 'fa-file');
+const getIconForType = (type) => ({
+    'Notes': 'fa-file-alt', 
+    'Magazine': 'fa-book-open', 
+    'Book': 'fa-book', 
+    'PYQ': 'fa-question-circle', 
+    'Report': 'fa-chart-bar',
+    'Conceptual': 'fa-lightbulb',
+    'Factual': 'fa-list-ol',
+    'Current Affairs': 'fa-newspaper',
+    'Schemes': 'fa-bullhorn',
+    'Map-based': 'fa-map-marked-alt',
+    'Analysis': 'fa-search-plus',
+    'Social Issues': 'fa-users',
+    'Ancient History': 'fa-landmark'
+}[type] || 'fa-file-pdf');
 
 function renderPdfLibrary() {
     const searchTerm = pdfSearchInput.value.toLowerCase();
