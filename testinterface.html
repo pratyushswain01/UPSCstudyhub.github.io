@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UPSChub - Mock Test</title>
+  <title>UPSChub - Mock Test & Answer Writing</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <style>
@@ -12,7 +12,7 @@
       margin: 0;
       padding: 0;
     }
-
+    
     body {
       font-family: 'Poppins', sans-serif;
       background: #f0f0f5;
@@ -89,6 +89,33 @@
       gap: 12px;
       min-width: 0;
     }
+    
+    .navigation-tabs {
+      display: flex;
+      gap: 5px;
+      background: rgba(0,0,0,0.15);
+      border-radius: 6px;
+      padding: 3px;
+    }
+    .nav-tab {
+      background: transparent;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      font-size: 0.85em;
+    }
+    .nav-tab:hover {
+      background: rgba(255,255,255,0.2);
+    }
+    .nav-tab.active {
+      background: white;
+      color: #3f51b5;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
 
     .timer {
       font-size: 0.95em;
@@ -104,6 +131,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      display: none;
     }
 
     /* Main Content */
@@ -136,482 +164,185 @@
       line-height: 1.5;
       font-size: 0.95em;
     }
-
-    /* Options Styling - Made smaller */
-    .options-list {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .option {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: white;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      font-size: 0.9em;
-      position: relative;
-      z-index: 2;
-    }
-
-    .option:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .option.selected {
-      background: #4caf50;
-      color: white;
-      border-color: #4caf50;
-      box-shadow: 0 1px 3px rgba(76,175,80,0.3);
-    }
-
-    .option-radio {
-      margin-right: 10px;
-      min-width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-radius: 50%;
-      display: inline-block;
-      position: relative;
-    }
-
-    .option.selected .option-radio {
-      border-color: white;
-      background: white;
-      box-shadow: inset 0 0 0 3px #4caf50;
-    }
-
-    /* Sidebar Styles */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      right: -280px;
-      width: 280px;
-      height: 100%;
-      background: #f8f9fa;
-      border-left: 1px solid #ccc;
-      padding: 15px;
-      padding-right: 20px;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-      z-index: 200;
-      padding-top: 60px;
-    }
-
-    .sidebar-open .sidebar {
-      transform: translateX(-280px);
-      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    }
-
-    .sidebar-open .question-area {
-      filter: blur(2px);
-      pointer-events: none;
-    }
-
-    /* Smaller Question Palette Buttons */
-    .question-palette {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 6px;
-      margin-bottom: 20px;
-    }
-
-    .question-number {
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      background: #e9ecef;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-      font-size: 12px;
-      margin: 0 auto;
-    }
-
-    .question-number:hover {
-      transform: scale(1.05);
-    }
-
-    .answered {
-      background: #4caf50;
-      color: white;
-    }
-
-    .not-answered {
-      background: #f44336;
-      color: white;
-    }
-
-    .marked {
-      background: #ff9800;
-      color: white;
-    }
-
-    .current {
-      border: 2px solid #3f51b5;
-      background: #3f51b5;
-      color: white;
-    }
-
-    .not-visited {
-      background: #e9ecef;
-      color: #333;
-    }
-
-    /* Legend Section */
-    .legend {
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-    }
-
-    .legend-title {
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #3f51b5;
-      font-size: 0.9em;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.85em;
-      padding: 6px 8px;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.7);
-    }
-
-    .legend-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 3px;
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .legend-answered {
-      background: #4caf50;
-    }
-
-    .legend-not-answered {
-      background: #f44336;
-    }
-
-    .legend-marked {
-      background: #ff9800;
-    }
-
-    .legend-not-visited {
-      background: #e9ecef;
-      border: 1px solid #ccc;
-    }
-
-    .legend-current {
-      background: #3f51b5;
-    }
-
-    /* Action Buttons - Compact Footer Layout */
-    .fixed-action-area {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
+    
+    .instructions-box {
       background: #fff;
-      border-top: 1px solid #ccc;
-      padding: 10px 12px;
-      z-index: 100;
+      border: 1px solid #ddd;
+      border-left: 4px solid #3f51b5;
+      padding: 15px;
+      margin: 20px 0;
+      border-radius: 6px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
-
-    .action-buttons {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-size: 0.85em;
-      min-width: 0;
-    }
-
-    .btn-action:hover {
-      opacity: 0.9;
-    }
-
-    #btnPrevQuestion {
-      background: #2196f3;
-      color: white;
-    }
-
-    #btnSaveNext {
-      background: #4caf50;
-      color: white;
-    }
-
-    #btnMarkReview {
-      background: #ff9800;
-      color: white;
-    }
-
-    #btnClearResponse {
-      background: #f44336;
-      color: white;
-    }
-
-    .submit-button {
-      width: 100%;
-      padding: 10px;
-      background: #3f51b5;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 0.9em;
-    }
-
-    .submit-button:hover {
-      background: #303f9f;
-    }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      padding: 8px;
-      font-size: 0.8em;
-      color: #666;
-    }
-
-    .powered-by {
-      text-align: center;
-      font-size: 0.8em;
-      color: #666;
-      margin-bottom: 5px;
-    }
-
-    /* Dark Mode Styles */
-    .dark .sidebar {
-      background: #2c2c3c;
-      border-left: 1px solid #444;
-    }
-
-    .dark .question-number {
-      background: #3d3d4a;
-      color: #eee;
-    }
-
-    .dark .not-visited {
-      background: #3d3d4a;
-      color: #eee;
-    }
-
-    .dark .legend {
-      border-top-color: #444;
-    }
-
-    .dark .legend-item {
-      background: rgba(255,255,255,0.05);
-    }
-
-    .dark .legend-title {
-      color: #8ab4f8;
-    }
-
-    .dark .legend-not-visited {
-      background: #3d3d4a;
-      border: 1px solid #555;
-    }
-
-    .dark .fixed-action-area {
-      background: #1e1e2f;
-      border-top: 1px solid #444;
-    }
-
-    .dark .footer, .dark .powered-by {
-      color: #aaa;
-    }
-
-    .dark .option {
+    .dark .instructions-box {
       background: #2c2c3c;
       border-color: #444;
+      border-left-color: #8ab4f8;
+    }
+    .instructions-box h3 {
+      margin-bottom: 10px;
+      color: #3f51b5;
+    }
+    .dark .instructions-box h3 {
+      color: #8ab4f8;
+    }
+    .instructions-box ul {
+      list-style-position: inside;
+      padding-left: 5px;
+      line-height: 1.6;
+    }
+    .answer-writing-submit {
+      margin-top: 20px;
+      text-decoration: none;
+      display: inline-flex;
+      width: auto;
+      padding: 12px 25px;
     }
 
-    .dark .option:hover {
-      background: #3d3d4a;
-    }
+    .options-list { list-style: none; display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .option { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.9em; position: relative; z-index: 2; }
+    .option:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .option.selected { background: #4caf50; color: white; border-color: #4caf50; box-shadow: 0 1px 3px rgba(76,175,80,0.3); }
+    .option-radio { margin-right: 10px; min-width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%; display: inline-block; position: relative; }
+    .option.selected .option-radio { border-color: white; background: white; box-shadow: inset 0 0 0 3px #4caf50; }
 
+    /* Sidebar Styles */
+    .sidebar { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #f8f9fa; border-left: 1px solid #ccc; padding: 15px; padding-right: 20px; overflow-y: auto; transition: transform 0.3s ease; z-index: 200; padding-top: 60px; }
+    .sidebar-open .sidebar { transform: translateX(-280px); box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+    .sidebar-open .question-area { filter: blur(2px); pointer-events: none; }
+    .question-palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
+    .question-number { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: #e9ecef; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 12px; margin: 0 auto; }
+    .question-number:hover { transform: scale(1.05); }
+    .answered { background: #4caf50; color: white; }
+    .not-answered { background: #f44336; color: white; }
+    .marked { background: #ff9800; color: white; }
+    .current { border: 2px solid #3f51b5; background: #3f51b5; color: white; }
+    .not-visited { background: #e9ecef; color: #333; }
+    .legend { margin-top: 20px; padding-top: 15px; border-top: 1px solid #ddd; }
+    .legend-title { font-weight: 600; margin-bottom: 12px; color: #3f51b5; font-size: 0.9em; }
+    .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em; padding: 6px 8px; border-radius: 4px; background: rgba(255,255,255,0.7); }
+    .legend-color { width: 16px; height: 16px; border-radius: 3px; margin-right: 8px; flex-shrink: 0; }
+    .legend-answered { background: #4caf50; }
+    .legend-not-answered { background: #f44336; }
+    .legend-marked { background: #ff9800; }
+    .legend-not-visited { background: #e9ecef; border: 1px solid #ccc; }
+    .legend-current { background: #3f51b5; }
+    
+    .fixed-action-area { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #ccc; padding: 10px 12px; z-index: 100; }
+    .action-buttons { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+    .btn-action { flex: 1; padding: 8px; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85em; min-width: 0; }
+    .btn-action:hover { opacity: 0.9; }
+    #btnPrevQuestion { background: #2196f3; color: white; }
+    #btnSaveNext { background: #4caf50; color: white; }
+    #btnMarkReview { background: #ff9800; color: white; }
+    #btnClearResponse { background: #f44336; color: white; }
+    .submit-button { width: 100%; padding: 10px; background: #3f51b5; color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9em; }
+    .submit-button:hover { background: #303f9f; }
+    .footer, .powered-by { text-align: center; font-size: 0.8em; color: #666; }
+    .powered-by { margin-bottom: 5px; }
+
+    /* Dark Mode Styles */
+    .dark .sidebar, .dark .option { background: #2c2c3c; border-color: #444; }
+    .dark .sidebar { border-left: 1px solid #444; }
+    .dark .question-number, .dark .not-visited, .dark .legend-not-visited, .dark .option:hover { background: #3d3d4a; }
+    .dark .question-number, .dark .not-visited { color: #eee; }
+    .dark .legend, .dark .fixed-action-area { border-top-color: #444; }
+    .dark .legend-item { background: rgba(255,255,255,0.05); }
+    .dark .legend-title { color: #8ab4f8; }
+    .dark .legend-not-visited { border: 1px solid #555; }
+    .dark .fixed-action-area { background: #1e1e2f; }
+    .dark .footer, .dark .powered-by { color: #aaa; }
+    
     /* Toggle Switch */
-    .dark-mode-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 26px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .toggle-slider {
-      background-color: #3f51b5;
-    }
-
-    input:checked + .toggle-slider:before {
-      transform: translateX(24px);
-    }
-
-    .toggle-icons {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 6px;
-      pointer-events: none;
-    }
-
-    .toggle-icons i {
-      color: white;
-      font-size: 12px;
-    }
-
-    .toggle-label {
-      font-size: 0.9em;
-      white-space: nowrap;
-    }
+    .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
+    .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: #3f51b5; }
+    input:checked + .toggle-slider:before { transform: translateX(24px); }
+    .toggle-icons { position: absolute; top: 50%; transform: translateY(-50%); width: 100%; display: flex; justify-content: space-between; padding: 0 6px; pointer-events: none; }
+    .toggle-icons i { color: white; font-size: 12px; }
+    .toggle-label { font-size: 0.9em; white-space: nowrap; }
 
     /* Sidebar Toggle Button */
-    .sidebar-toggle {
-      position: fixed;
-      top: 70px;
-      right: 15px;
-      z-index: 300;
-      background: #3f51b5;
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      color: white;
-      font-size: 1em;
-      transition: all 0.3s ease;
+    .sidebar-toggle { position: fixed; top: 70px; right: 15px; z-index: 300; background: #3f51b5; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: white; font-size: 1em; transition: all 0.3s ease; }
+    .sidebar-open .sidebar-toggle { right: calc(90% + 15px); }
+    
+    /* Result Screen Styles */
+    #resultScreenWrapper {
+        display: none; /* Hidden by default */
+        text-align: center;
+        padding: 40px 20px;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
     }
+    #resultScreenWrapper h2 { font-size: 2.5em; color: #3f51b5; margin-bottom: 10px; }
+    #resultScreenWrapper p { font-size: 1.2em; margin-bottom: 25px; }
+    #finalScore { font-weight: 600; font-size: 1.8em; color: #4caf50; }
+    #retestButton { padding: 12px 30px; background-color: #3f51b5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; transition: background-color 0.3s; }
+    #retestButton:hover { background-color: #303f9f; }
+    .dark #resultScreenWrapper h2 { color: #8ab4f8; }
+    .dark #finalScore { color: #81c784; }
 
-    .sidebar-open .sidebar-toggle {
-      right: calc(90% + 15px);
+    /* Password Modal Styles */
+    .password-modal {
+        display: none; /* Hidden by default */
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0,0,0,0.5);
     }
-
-    /* Mobile Responsive */
-    @media (max-width: 480px) {
-      .sidebar {
+    .modal-content {
+        background-color: #fefefe;
+        margin: 15% auto;
+        padding: 20px 30px;
+        border: 1px solid #888;
         width: 90%;
-        right: -90%;
-        padding-right: 15px;
-      }
-      
-      .sidebar-open .sidebar {
-        transform: translateX(-90%);
-      }
-      
-      .question-palette {
-        grid-template-columns: repeat(5, 1fr);
-      }
-      
-      .option {
-        padding: 8px 10px;
-        font-size: 0.85em;
-      }
-      
-      .action-buttons {
-        gap: 4px;
-      }
-      
-      .btn-action {
-        padding: 6px;
-        font-size: 0.8em;
-      }
-      
-      .legend-item {
-        padding: 5px 6px;
-        font-size: 0.8em;
-      }
-      
-      .legend-color {
-        width: 14px;
-        height: 14px;
-      }
+        max-width: 400px;
+        border-radius: 8px;
+        text-align: center;
+        position: relative;
+    }
+    .modal-content h3 { margin-bottom: 20px; }
+    .close-modal {
+        color: #aaa;
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    #passwordInput { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
+    #passwordError { color: #f44336; font-size: 0.9em; height: 1.2em; margin-bottom: 10px;}
+    .contact-admin-text { font-size: 0.9em; margin-top: 20px; color: #666; }
+    .contact-admin-text a { color: #3f51b5; text-decoration: none; font-weight: 600; }
+    .dark .modal-content { background-color: #2c2c3c; border-color: #555; }
+    .dark #passwordInput { background-color: #3d3d4a; border-color: #555; color: #eee; }
+    .dark .contact-admin-text { color: #aaa; }
+    .dark .contact-admin-text a { color: #8ab4f8; }
 
-      .watermark-logo {
-        max-width: 80px;
-      }
-
-      .watermark-text {
-        font-size: 2em;
-      }
+    @media (max-width: 768px) {
+        .test-title { display: none; }
+        .navigation-tabs { order: -1; margin-bottom: 5px; width: 100%; justify-content: center; }
+        .topbar { justify-content: space-around; }
+    }
+    @media (max-width: 480px) {
+      .sidebar { width: 90%; right: -90%; padding-right: 15px; }
+      .sidebar-open .sidebar { transform: translateX(-90%); }
+      .question-palette { grid-template-columns: repeat(5, 1fr); }
+      .option, .btn-action, .legend-item { font-size: 0.85em; }
+      .btn-action, .legend-item { padding: 6px; }
+      .legend-color { width: 14px; height: 14px; }
+      .watermark-logo { max-width: 80px; }
+      .watermark-text { font-size: 2em; }
     }
   </style>
 </head>
@@ -622,175 +353,136 @@
         <div class="timer" id="timer">60:00</div>
         <div class="test-title">UPSChub Mock Test - Indian Polity</div>
       </div>
+      
+      <div class="navigation-tabs">
+        <button id="showMockTestTab" class="nav-tab active">Mock Test</button>
+        <button id="showAnswerWritingTab" class="nav-tab">Answer Writing</button>
+      </div>
+
       <div class="dark-mode-toggle">
         <span class="toggle-label" id="toggleLabel">Dark</span>
         <label class="toggle-switch">
           <input type="checkbox" id="darkModeToggle">
           <span class="toggle-slider"></span>
-          <div class="toggle-icons">
-            <i class="fas fa-moon"></i>
-            <i class="fas fa-sun"></i>
-          </div>
         </label>
       </div>
     </header>
 
-    <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar">
-      <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="watermark">
-      <img src="images/LOGO.jpg" alt="UPSChub Logo" class="watermark-logo" />
-      <div class="watermark-text">UPSChub</div>
+    <!-- ### MOCK TEST SECTION WRAPPER ### -->
+    <div id="mockTestWrapper">
+        <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="watermark">
+            <img src="https://assets.codepen.io/162656/upsc-logo-placeholder.png" alt="UPSChub Logo" class="watermark-logo" />
+            <div class="watermark-text">UPSChub</div>
+        </div>
+        <div class="main-content">
+            <section class="question-area">
+                <h2 class="question-header" id="questionNumber"></h2>
+                <div class="question-content" id="questionText"></div>
+                <ul class="options-list" id="optionsList"></ul>
+            </section>
+            <aside class="sidebar">
+                <div class="palette-title">Question Palette</div>
+                <div class="question-palette" id="questionPalette"></div>
+                <div class="legend">
+                    <div class="legend-title">Answer Status Legend:</div>
+                    <div class="legend-item"><div class="legend-color legend-answered"></div><span>Answered</span></div>
+                    <div class="legend-item"><div class="legend-color legend-not-answered"></div><span>Not Answered</span></div>
+                    <div class="legend-item"><div class="legend-color legend-marked"></div><span>Marked for Review</span></div>
+                    <div class="legend-item"><div class="legend-color legend-not-visited"></div><span>Not Visited</span></div>
+                    <div class="legend-item"><div class="legend-color legend-current"></div><span>Current Question</span></div>
+                </div>
+            </aside>
+        </div>
+        <div class="fixed-action-area">
+            <div class="powered-by">Powered by UPSChub | Pratyush Swain</div>
+            <div class="action-buttons" id="actionButtons">
+                <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i> Prev</button>
+                <button class="btn-action" id="btnSaveNext"><i class="fas fa-save"></i> Save & Next</button>
+                <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i> Mark</button>
+                <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i> Clear</button>
+            </div>
+            <button id="btnSubmit" class="submit-button" style="display: none;"><i class="fas fa-paper-plane"></i> Submit Test</button>
+        </div>
     </div>
 
-    <div class="main-content">
-      <section class="question-area">
-        <h2 class="question-header" id="questionNumber">Question 1 of 10</h2>
-        <div class="question-content" id="questionText">
-          What is the primary function of the Rajya Sabha in the Indian Parliamentary system?
+    <!-- ### ANSWER WRITING SECTION WRAPPER ### -->
+    <div id="answerWritingWrapper" style="display: none;">
+        <div class="main-content" style="display: block; overflow-y: auto;">
+            <section class="question-area">
+                <h2 class="question-header">Answer Writing Practice</h2>
+                <div class="question-content"><p><strong>Question:</strong> "The Indian Constitution is a 'bag of borrowings,' but it is more than a mere patchwork. It is a beautiful tapestry woven with threads of nationalistic ideals." Critically analyze the statement. (250 words)</p></div>
+                <div class="instructions-box">
+                    <h3>Instructions:</h3>
+                    <ul>
+                        <li>Read the question carefully and understand its core demands.</li>
+                        <li>Structure your answer with a clear introduction, body, and conclusion.</li>
+                        <li>Use relevant articles, amendments, and Supreme Court judgments to support your arguments.</li>
+                        <li>Adhere to the word and time limits.</li>
+                        <li>After writing your answer, click the submit button below to upload your file.</li>
+                    </ul>
+                </div>
+                <!-- CORRECTED GOOGLE DRIVE LINK (target="_blank" IS CRITICAL) -->
+                <a href="https://drive.google.com/drive/folders/1QVN9twgnuhhfOvqBv8qybAZozFRsocks?usp=sharing" target="_blank" class="submit-button answer-writing-submit"><i class="fas fa-upload"></i> END AND SUBMIT</a>
+            </section>
         </div>
-        <ul class="options-list" id="optionsList">
-          <li class="option">
-            <span class="option-radio"></span>
-            <span class="option-text">Pass money bills</span>
-          </li>
-          <li class="option selected">
-            <span class="option-radio"></span>
-            <span class="option-text">Represent the states</span>
-          </li>
-          <li class="option">
-            <span class="option-radio"></span>
-            <span class="option-text">Conduct elections</span>
-          </li>
-          <li class="option">
-            <span class="option-radio"></span>
-            <span class="option-text">Enforce laws</span>
-          </li>
-        </ul>
-      </section>
-
-      <aside class="sidebar">
-        <div class="palette-title">Question Palette</div>
-        <div class="question-palette" id="questionPalette">
-          <!-- Generated by JavaScript -->
-        </div>
-        
-        <div class="legend">
-          <div class="legend-title">Answer Status Legend:</div>
-          <div class="legend-item">
-            <div class="legend-color legend-answered"></div>
-            <span>Answered</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-not-answered"></div>
-            <span>Not Answered</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-marked"></div>
-            <span>Marked for Review</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-not-visited"></div>
-            <span>Not Visited</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-current"></div>
-            <span>Current Question</span>
-          </div>
-        </div>
-      </aside>
+    </div>
+    
+    <!-- ### RESULT SCREEN WRAPPER ### -->
+    <div id="resultScreenWrapper" style="display: none;">
+        <h2>Test Completed!</h2>
+        <p>Your final score is:</p>
+        <p id="finalScore">0/10</p>
+        <button id="retestButton" class="submit-button">Retest</button>
     </div>
 
-    <div class="fixed-action-area">
-      <div class="powered-by">Powered by UPSChub | Pratyush Swain</div>
-      <div class="action-buttons" id="actionButtons">
-        <button class="btn-action" id="btnPrevQuestion">
-          <i class="fas fa-arrow-left"></i> Prev
-        </button>
-        <button class="btn-action" id="btnSaveNext">
-          <i class="fas fa-save"></i> Save & Next
-        </button>
-        <button class="btn-action" id="btnMarkReview">
-          <i class="fas fa-flag"></i> Mark
-        </button>
-        <button class="btn-action" id="btnClearResponse">
-          <i class="fas fa-ban"></i> Clear
-        </button>
-      </div>
-      <button id="btnSubmit" class="submit-button" style="display: none;">
-        <i class="fas fa-paper-plane"></i> Submit Test
-      </button>
+    <!-- ### PASSWORD MODAL ### -->
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close-modal">×</span>
+            <h3>Enter Password to Retest</h3>
+            <input type="password" id="passwordInput" placeholder="Enter password...">
+            <div id="passwordError"></div>
+            <button id="verifyPasswordButton" class="submit-button">Verify</button>
+            <p class="contact-admin-text">
+                Don't have a password? 
+                <!-- CORRECTED WHATSAPP LINK (target="_blank" IS CRITICAL) -->
+                <a href="https://api.whatsapp.com/send?phone=918658567727&text=I%20need%20the%20password%20for%20the%20mock%20test." target="_blank">Contact Admin</a>
+            </p>
+        </div>
     </div>
 
     <div class="footer">
-      &copy; 2023 UPSChub. All rights reserved.
+      © 2023 UPSChub. All rights reserved.
     </div>
   </div>
 
   <script>
-    // Initialize variables
+    // ### CONFIGURATION ###
+    const RETEST_PASSWORD = "UPSC2024";
     const questions = [
-      {
-        text: "What is the primary function of the Rajya Sabha in the Indian Parliamentary system?",
-        options: ["Pass money bills", "Represent the states", "Conduct elections", "Enforce laws"],
-        answer: 1
-      },
-      {
-        text: "Which Article of the Constitution deals with the Election Commission?",
-        options: ["Article 320", "Article 324", "Article 330", "Article 300"],
-        answer: 1
-      },
-      {
-        text: "Who is known as the 'Father of the Indian Constitution'?",
-        options: ["Mahatma Gandhi", "B. R. Ambedkar", "Jawaharlal Nehru", "Rajendra Prasad"],
-        answer: 1
-      },
-      {
-        text: "The President of India is elected by:",
-        options: ["Only Lok Sabha", "Only Rajya Sabha", "Both Houses of Parliament", "An electoral college"],
-        answer: 3
-      },
-      {
-        text: "What is the maximum gap between two parliamentary sessions?",
-        options: ["4 months", "6 months", "8 months", "12 months"],
-        answer: 1
-      },
-      {
-        text: "Directive Principles are mentioned in which part of the Constitution?",
-        options: ["Part III", "Part IV", "Part V", "Part VI"],
-        answer: 1
-      },
-      {
-        text: "Which constitutional amendment added the Fundamental Duties?",
-        options: ["24th", "42nd", "44th", "52nd"],
-        answer: 1
-      },
-      {
-        text: "The first Lok Sabha elections were held in:",
-        options: ["1947", "1949", "1951-52", "1955"],
-        answer: 2
-      },
-      {
-        text: "How many members can the President nominate to the Rajya Sabha?",
-        options: ["10", "12", "14", "15"],
-        answer: 1
-      },
-      {
-        text: "Who appoints the Chief Election Commissioner?",
-        options: ["The Prime Minister", "The President", "The Parliament", "The Chief Justice"],
-        answer: 1
-      }
+      { text: "What is the primary function of the Rajya Sabha in the Indian Parliamentary system?", options: ["Pass money bills", "Represent the states", "Conduct elections", "Enforce laws"], answer: 1 },
+      { text: "Which Article of the Constitution deals with the Election Commission?", options: ["Article 320", "Article 324", "Article 330", "Article 300"], answer: 1 },
+      { text: "Who is known as the 'Father of the Indian Constitution'?", options: ["Mahatma Gandhi", "B. R. Ambedkar", "Jawaharlal Nehru", "Rajendra Prasad"], answer: 1 },
+      { text: "The President of India is elected by:", options: ["Only Lok Sabha", "Only Rajya Sabha", "Both Houses of Parliament", "An electoral college"], answer: 3 },
+      { text: "What is the maximum gap between two parliamentary sessions?", options: ["4 months", "6 months", "8 months", "12 months"], answer: 1 },
+      { text: "Directive Principles are mentioned in which part of the Constitution?", options: ["Part III", "Part IV", "Part V", "Part VI"], answer: 1 },
+      { text: "Which constitutional amendment added the Fundamental Duties?", options: ["24th", "42nd", "44th", "52nd"], answer: 1 },
+      { text: "The first Lok Sabha elections were held in:", options: ["1947", "1949", "1951-52", "1955"], answer: 2 },
+      { text: "How many members can the President nominate to the Rajya Sabha?", options: ["10", "12", "14", "15"], answer: 1 },
+      { text: "Who appoints the Chief Election Commissioner?", options: ["The Prime Minister", "The President", "The Parliament", "The Chief Justice"], answer: 1 }
     ];
 
-    const state = {
-      current: 0,
-      answers: Array(questions.length).fill(null),
-      marked: Array(questions.length).fill(false),
-      visited: Array(questions.length).fill(false)
-    };
+    let state = {};
+    let timerInterval;
 
-    // DOM Elements
+    // ### DOM ELEMENTS ###
+    const mockTestWrapper = document.getElementById('mockTestWrapper');
+    const answerWritingWrapper = document.getElementById('answerWritingWrapper');
+    const resultScreenWrapper = document.getElementById('resultScreenWrapper');
+    const passwordModal = document.getElementById('passwordModal');
     const questionText = document.getElementById('questionText');
     const questionNumber = document.getElementById('questionNumber');
     const optionsList = document.getElementById('optionsList');
@@ -801,8 +493,13 @@
     const btnPrevQuestion = document.getElementById('btnPrevQuestion');
     const btnSaveNext = document.getElementById('btnSaveNext');
 
-    // Initialize the test
+    // ### MOCK TEST LOGIC ###
+    function resetState() {
+        state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) };
+    }
+
     function initTest() {
+      resetState();
       state.visited[0] = true;
       loadQuestion(0);
       updatePalette();
@@ -810,84 +507,46 @@
       startTimer();
     }
 
-    // Load a question
     function loadQuestion(index) {
       const q = questions[index];
       questionText.textContent = q.text;
       questionNumber.textContent = `Question ${index + 1} of ${questions.length}`;
-      
       optionsList.innerHTML = '';
       q.options.forEach((opt, i) => {
         const li = document.createElement('li');
         li.className = 'option';
         if (state.answers[index] === i) li.classList.add('selected');
-        
-        li.innerHTML = `
-          <span class="option-radio" style="${state.answers[index] === i ? 
-            'box-shadow: inset 0 0 0 3px #4caf50; border-color: white; background: white' : ''}"></span>
-          <span class="option-text">${opt}</span>
-        `;
-        
+        li.innerHTML = `<span class="option-radio"></span><span class="option-text">${opt}</span>`;
         li.onclick = () => selectOption(index, i);
         optionsList.appendChild(li);
       });
-      
       state.current = index;
       state.visited[index] = true;
       updatePalette();
       updateNavigationButtons();
     }
 
-    // Select an option
     function selectOption(qIndex, optIndex) {
-      const options = optionsList.querySelectorAll('.option');
-      
-      // Clear previous selection
-      options.forEach(opt => {
-        opt.classList.remove('selected');
-        opt.querySelector('.option-radio').style.boxShadow = 'none';
-        opt.querySelector('.option-radio').style.borderColor = '#ccc';
-        opt.querySelector('.option-radio').style.background = 'transparent';
-      });
-      
-      // Set new selection
-      options[optIndex].classList.add('selected');
-      const radio = options[optIndex].querySelector('.option-radio');
-      radio.style.boxShadow = 'inset 0 0 0 3px #4caf50';
-      radio.style.borderColor = 'white';
-      radio.style.background = 'white';
-      
       state.answers[qIndex] = optIndex;
+      const options = optionsList.querySelectorAll('.option');
+      options.forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
       updatePalette();
     }
 
-    // Update question palette
     function updatePalette() {
       questionPalette.innerHTML = '';
       questions.forEach((_, i) => {
         const btn = document.createElement('div');
         btn.className = 'question-number';
-        
-        // Set base class
         if (state.visited[i]) {
-          if (state.answers[i] !== null) {
-            btn.classList.add('answered');
-          } else if (state.marked[i]) {
-            btn.classList.add('marked');
-          } else {
-            btn.classList.add('not-answered');
-          }
+          if (state.answers[i] !== null) btn.classList.add('answered');
+          else if (state.marked[i]) btn.classList.add('marked');
+          else btn.classList.add('not-answered');
         } else {
           btn.classList.add('not-visited');
         }
-        
-        // Highlight current question
-        if (i === state.current) {
-          btn.classList.add('current');
-        }
-        
+        if (i === state.current) btn.classList.add('current');
         btn.textContent = i + 1;
-        
         btn.onclick = () => {
           loadQuestion(i);
           document.body.classList.remove('sidebar-open');
@@ -896,100 +555,119 @@
       });
     }
 
-    // Update navigation buttons visibility
     function updateNavigationButtons() {
-      // Show/hide previous button
       btnPrevQuestion.style.display = state.current === 0 ? 'none' : 'flex';
-      
-      // Show submit button only on last question
-      if (state.current === questions.length - 1) {
-        btnSubmit.style.display = 'flex';
-        actionButtons.style.display = 'none';
-      } else {
-        btnSubmit.style.display = 'none';
-        actionButtons.style.display = 'flex';
-      }
-      
-      // Change next button text on last question
-      btnSaveNext.textContent = state.current === questions.length - 1 ? 'Save' : 'Save & Next';
+      actionButtons.style.display = state.current === questions.length - 1 ? 'none' : 'flex';
+      btnSubmit.style.display = state.current === questions.length - 1 ? 'flex' : 'none';
     }
 
-    // Timer functionality
     function startTimer() {
-      let timeLeft = 60 * 60; // 60 minutes
-      
-      const timerInterval = setInterval(() => {
+      let timeLeft = 60 * 60;
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          submitTest();
-        } else {
-          timeLeft--;
-        }
+        if (timeLeft-- <= 0) { clearInterval(timerInterval); submitTest(); }
       }, 1000);
     }
+    
+    function stopTimer() { clearInterval(timerInterval); }
 
-    // Submit test
     function submitTest() {
-      const score = state.answers.reduce((acc, ans, i) => 
-        ans === questions[i].answer ? acc + 1 : acc, 0);
-      
-      alert(`Test submitted!\nYour score: ${score}/${questions.length}`);
+      stopTimer();
+      const score = state.answers.reduce((acc, ans, i) => (ans === questions[i].answer ? acc + 1 : acc), 0);
+      const scoreText = `${score}/${questions.length}`;
+
+      localStorage.setItem('testTaken', 'true');
+      localStorage.setItem('lastScore', scoreText);
+
+      showResultScreen(scoreText);
     }
 
-    // Navigation functions
-    function goToNextQuestion() {
-      if (state.current < questions.length - 1) {
-        loadQuestion(state.current + 1);
-      } else {
-        submitTest();
-      }
+    function showResultScreen(scoreText) {
+        mockTestWrapper.style.display = 'none';
+        answerWritingWrapper.style.display = 'none';
+        resultScreenWrapper.style.display = 'flex';
+        document.getElementById('finalScore').textContent = scoreText;
     }
 
-    function goToPrevQuestion() {
-      if (state.current > 0) {
-        loadQuestion(state.current - 1);
-      }
-    }
-
-    // Event Listeners
-    document.getElementById('btnToggleSidebar').addEventListener('click', function() {
-      document.body.classList.toggle('sidebar-open');
+    // ### PAGE & NAVIGATION LOGIC ###
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('testTaken') === 'true') {
+            const lastScore = localStorage.getItem('lastScore');
+            showResultScreen(lastScore);
+        } else {
+            initTest();
+        }
     });
 
-    document.getElementById('darkModeToggle').addEventListener('change', function(e) {
+    // Tab Switching
+    const showMockTestTab = document.getElementById('showMockTestTab');
+    const showAnswerWritingTab = document.getElementById('showAnswerWritingTab');
+    const sidebarToggleButton = document.getElementById('btnToggleSidebar');
+
+    showMockTestTab.addEventListener('click', () => {
+        if (localStorage.getItem('testTaken') === 'true') {
+            showResultScreen(localStorage.getItem('lastScore'));
+        } else {
+            answerWritingWrapper.style.display = 'none';
+            resultScreenWrapper.style.display = 'none';
+            mockTestWrapper.style.display = 'block';
+            sidebarToggleButton.style.display = 'flex';
+            startTimer();
+        }
+        showMockTestTab.classList.add('active');
+        showAnswerWritingTab.classList.remove('active');
+    });
+
+    showAnswerWritingTab.addEventListener('click', () => {
+        mockTestWrapper.style.display = 'none';
+        resultScreenWrapper.style.display = 'none';
+        answerWritingWrapper.style.display = 'block';
+        showAnswerWritingTab.classList.add('active');
+        showMockTestTab.classList.remove('active');
+        sidebarToggleButton.style.display = 'none';
+        document.body.classList.remove('sidebar-open');
+        stopTimer();
+    });
+
+    // Retest and Password Modal Logic
+    document.getElementById('retestButton').addEventListener('click', () => {
+        passwordModal.style.display = 'block';
+    });
+    document.getElementById('closeModal').addEventListener('click', () => {
+        passwordModal.style.display = 'none';
+        document.getElementById('passwordError').textContent = '';
+    });
+    document.getElementById('verifyPasswordButton').addEventListener('click', () => {
+        const input = document.getElementById('passwordInput');
+        const error = document.getElementById('passwordError');
+        if (input.value === RETEST_PASSWORD) {
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('lastScore');
+            passwordModal.style.display = 'none';
+            input.value = '';
+            error.textContent = '';
+            resultScreenWrapper.style.display = 'none';
+            mockTestWrapper.style.display = 'block';
+            initTest();
+        } else {
+            error.textContent = 'Incorrect password. Please try again.';
+        }
+    });
+    
+    // Other Event Listeners
+    sidebarToggleButton.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
+    document.getElementById('darkModeToggle').addEventListener('change', (e) => {
       document.body.classList.toggle('dark', e.target.checked);
       document.getElementById('toggleLabel').textContent = e.target.checked ? 'Light' : 'Dark';
     });
-
-    document.getElementById('btnSaveNext').addEventListener('click', goToNextQuestion);
-    document.getElementById('btnPrevQuestion').addEventListener('click', goToPrevQuestion);
-
-    document.getElementById('btnMarkReview').addEventListener('click', function() {
-      state.marked[state.current] = !state.marked[state.current];
-      updatePalette();
-    });
-
-    document.getElementById('btnClearResponse').addEventListener('click', function() {
-      state.answers[state.current] = null;
-      const options = optionsList.querySelectorAll('.option');
-      options.forEach(opt => {
-        opt.classList.remove('selected');
-        const radio = opt.querySelector('.option-radio');
-        radio.style.boxShadow = 'none';
-        radio.style.borderColor = '#ccc';
-        radio.style.background = 'transparent';
-      });
-      updatePalette();
-    });
-
-    document.getElementById('btnSubmit').addEventListener('click', submitTest);
-
-    // Initialize the test
-    initTest();
+    btnSaveNext.addEventListener('click', () => { if (state.current < questions.length - 1) loadQuestion(state.current + 1); });
+    btnPrevQuestion.addEventListener('click', () => { if (state.current > 0) loadQuestion(state.current - 1); });
+    document.getElementById('btnMarkReview').addEventListener('click', () => { state.marked[state.current] = !state.marked[state.current]; updatePalette(); });
+    document.getElementById('btnClearResponse').addEventListener('click', () => { state.answers[state.current] = null; loadQuestion(state.current); updatePalette(); });
+    btnSubmit.addEventListener('click', submitTest);
   </script>
 </body>
 </html>
