@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>UPSChub - Mock Test & Answer Writing</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
@@ -17,7 +17,7 @@
       font-family: 'Poppins', sans-serif;
       background: #f0f0f5;
       color: #333;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .dark {
@@ -31,6 +31,44 @@
       height: 100vh;
       position: relative;
     }
+
+    /* NEW: Site Header Styles */
+    .site-header {
+      background: #ffffff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      z-index: 101; /* Above topbar */
+    }
+    .site-logo {
+      height: 40px;
+      width: auto;
+    }
+    .site-branding .site-title {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: #3f51b5;
+      line-height: 1.1;
+    }
+    .site-branding .site-tagline {
+      font-size: 0.8em;
+      color: #666;
+      margin: 0;
+    }
+    .dark .site-header {
+      background: #2a2a3a;
+      border-bottom-color: #3a3a4a;
+    }
+    .dark .site-branding .site-title {
+      color: #8ab4f8;
+    }
+    .dark .site-branding .site-tagline {
+      color: #aaa;
+    }
+
 
     /* Watermark Styles */
     .watermark {
@@ -69,7 +107,7 @@
       color: #aaa;
     }
 
-    /* Header Styles */
+    /* Topbar Styles */
     .topbar {
       display: flex;
       align-items: center;
@@ -126,6 +164,38 @@
       border-radius: 4px;
     }
 
+    /* Stopwatch Styles */
+    #stopwatchWrapper {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .stopwatch-controls {
+        display: flex;
+        gap: 5px;
+    }
+    .stopwatch-btn {
+        background: transparent;
+        border: none;
+        color: white;
+        cursor: pointer;
+        font-size: 1em;
+        padding: 5px;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background-color 0.2s;
+    }
+    .stopwatch-btn:hover {
+        background-color: rgba(255,255,255,0.2);
+    }
+    .stopwatch-btn.hidden {
+        display: none;
+    }
+
     .test-title {
       font-size: 0.95em;
       white-space: nowrap;
@@ -138,66 +208,20 @@
     .main-content {
       flex: 1;
       display: flex;
-      overflow: hidden;
+      overflow-y: auto; /* Changed from hidden */
       position: relative;
     }
 
-    .question-area {
-      width: 100%;
-      padding: 15px;
-      overflow-y: auto;
-      padding-bottom: 120px;
-      transition: filter 0.3s ease;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Question Styling */
-    .question-header {
-      font-size: 1.2em;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    .question-content {
-      margin-bottom: 15px;
-      line-height: 1.5;
-      font-size: 0.95em;
-    }
+    .question-area { width: 100%; padding: 15px; overflow-y: auto; padding-bottom: 120px; transition: filter 0.3s ease; position: relative; z-index: 2; }
+    .question-header { font-size: 1.2em; margin-bottom: 15px; font-weight: 600; }
+    .question-content { margin-bottom: 15px; line-height: 1.5; font-size: 0.95em; }
     
-    .instructions-box {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-left: 4px solid #3f51b5;
-      padding: 15px;
-      margin: 20px 0;
-      border-radius: 6px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .dark .instructions-box {
-      background: #2c2c3c;
-      border-color: #444;
-      border-left-color: #8ab4f8;
-    }
-    .instructions-box h3 {
-      margin-bottom: 10px;
-      color: #3f51b5;
-    }
-    .dark .instructions-box h3 {
-      color: #8ab4f8;
-    }
-    .instructions-box ul {
-      list-style-position: inside;
-      padding-left: 5px;
-      line-height: 1.6;
-    }
-    .answer-writing-submit {
-      margin-top: 20px;
-      text-decoration: none;
-      display: inline-flex;
-      width: auto;
-      padding: 12px 25px;
-    }
+    .instructions-box { background: #fff; border: 1px solid #ddd; border-left: 4px solid #3f51b5; padding: 15px; margin: 20px 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .dark .instructions-box { background: #2c2c3c; border-color: #444; border-left-color: #8ab4f8; }
+    .instructions-box h3 { margin-bottom: 10px; color: #3f51b5; }
+    .dark .instructions-box h3 { color: #8ab4f8; }
+    .instructions-box ul { list-style-position: inside; padding-left: 5px; line-height: 1.6; }
+    .answer-writing-submit { margin-top: 20px; text-decoration: none; display: inline-flex; width: auto; padding: 12px 25px; }
 
     .options-list { list-style: none; display: grid; grid-template-columns: 1fr; gap: 8px; }
     .option { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.9em; position: relative; z-index: 2; }
@@ -205,9 +229,7 @@
     .option.selected { background: #4caf50; color: white; border-color: #4caf50; box-shadow: 0 1px 3px rgba(76,175,80,0.3); }
     .option-radio { margin-right: 10px; min-width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%; display: inline-block; position: relative; }
     .option.selected .option-radio { border-color: white; background: white; box-shadow: inset 0 0 0 3px #4caf50; }
-
-    /* Sidebar Styles */
-    .sidebar { position: fixed; top: 0; right: -280px; width: 280px; height: 100%; background: #f8f9fa; border-left: 1px solid #ccc; padding: 15px; padding-right: 20px; overflow-y: auto; transition: transform 0.3s ease; z-index: 200; padding-top: 60px; }
+    .sidebar { position: fixed; top: 121px; /* Adjusted for new header */ right: -280px; width: 280px; height: calc(100% - 121px); background: #f8f9fa; border-left: 1px solid #ccc; padding: 15px; padding-right: 20px; overflow-y: auto; transition: transform 0.3s ease; z-index: 200; }
     .sidebar-open .sidebar { transform: translateX(-280px); box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
     .sidebar-open .question-area { filter: blur(2px); pointer-events: none; }
     .question-palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 20px; }
@@ -222,7 +244,7 @@
     .legend-title { font-weight: 600; margin-bottom: 12px; color: #3f51b5; font-size: 0.9em; }
     .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em; padding: 6px 8px; border-radius: 4px; background: rgba(255,255,255,0.7); }
     .legend-color { width: 16px; height: 16px; border-radius: 3px; margin-right: 8px; flex-shrink: 0; }
-    .legend-answered { background: #4caf50; }
+    .legend-answered, .legend-not-answered, .legend-marked, .legend-not-visited, .legend-current { background: #4caf50; }
     .legend-not-answered { background: #f44336; }
     .legend-marked { background: #ff9800; }
     .legend-not-visited { background: #e9ecef; border: 1px solid #ccc; }
@@ -241,7 +263,6 @@
     .footer, .powered-by { text-align: center; font-size: 0.8em; color: #666; }
     .powered-by { margin-bottom: 5px; }
 
-    /* Dark Mode Styles */
     .dark .sidebar, .dark .option { background: #2c2c3c; border-color: #444; }
     .dark .sidebar { border-left: 1px solid #444; }
     .dark .question-number, .dark .not-visited, .dark .legend-not-visited, .dark .option:hover { background: #3d3d4a; }
@@ -253,7 +274,6 @@
     .dark .fixed-action-area { background: #1e1e2f; }
     .dark .footer, .dark .powered-by { color: #aaa; }
     
-    /* Toggle Switch */
     .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
     .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
     .toggle-switch input { opacity: 0; width: 0; height: 0; }
@@ -265,20 +285,10 @@
     .toggle-icons i { color: white; font-size: 12px; }
     .toggle-label { font-size: 0.9em; white-space: nowrap; }
 
-    /* Sidebar Toggle Button */
-    .sidebar-toggle { position: fixed; top: 70px; right: 15px; z-index: 300; background: #3f51b5; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: white; font-size: 1em; transition: all 0.3s ease; }
+    .sidebar-toggle { position: fixed; top: 130px; /* Adjusted */ right: 15px; z-index: 300; background: #3f51b5; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: white; font-size: 1em; transition: all 0.3s ease; }
     .sidebar-open .sidebar-toggle { right: calc(90% + 15px); }
     
-    /* Result Screen Styles */
-    #resultScreenWrapper {
-        display: none; /* Hidden by default */
-        text-align: center;
-        padding: 40px 20px;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        height: 100%;
-    }
+    #resultScreenWrapper { display: none; text-align: center; padding: 40px 20px; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
     #resultScreenWrapper h2 { font-size: 2.5em; color: #3f51b5; margin-bottom: 10px; }
     #resultScreenWrapper p { font-size: 1.2em; margin-bottom: 25px; }
     #finalScore { font-weight: 600; font-size: 1.8em; color: #4caf50; }
@@ -287,45 +297,16 @@
     .dark #resultScreenWrapper h2 { color: #8ab4f8; }
     .dark #finalScore { color: #81c784; }
 
-    /* Password Modal Styles */
-    .password-modal {
-        display: none; /* Hidden by default */
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        overflow: auto;
-        background-color: rgba(0,0,0,0.5);
-    }
-    .modal-content {
-        background-color: #fefefe;
-        margin: 15% auto;
-        padding: 20px 30px;
-        border: 1px solid #888;
-        width: 90%;
-        max-width: 400px;
-        border-radius: 8px;
-        text-align: center;
-        position: relative;
-    }
+    .password-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px 30px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 8px; text-align: center; position: relative; }
     .modal-content h3 { margin-bottom: 20px; }
-    .close-modal {
-        color: #aaa;
-        position: absolute;
-        top: 10px;
-        right: 20px;
-        font-size: 28px;
-        font-weight: bold;
-        cursor: pointer;
-    }
+    .close-modal { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
     #passwordInput { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
     #passwordError { color: #f44336; font-size: 0.9em; height: 1.2em; margin-bottom: 10px;}
     .contact-admin-text { font-size: 0.9em; margin-top: 20px; color: #666; }
     .contact-admin-text a { color: #3f51b5; text-decoration: none; font-weight: 600; }
-    .dark .modal-content { background-color: #2c2c3c; border-color: #555; }
-    .dark #passwordInput { background-color: #3d3d4a; border-color: #555; color: #eee; }
+    .dark .modal-content, .dark #passwordInput { background-color: #2c2c3c; border-color: #555; }
+    .dark #passwordInput { color: #eee; }
     .dark .contact-admin-text { color: #aaa; }
     .dark .contact-admin-text a { color: #8ab4f8; }
 
@@ -333,6 +314,9 @@
         .test-title { display: none; }
         .navigation-tabs { order: -1; margin-bottom: 5px; width: 100%; justify-content: center; }
         .topbar { justify-content: space-around; }
+        .site-header { flex-direction: column; text-align: center; gap: 5px; padding: 10px; }
+        .sidebar { top: 170px; height: calc(100% - 170px); }
+        .sidebar-toggle { top: 180px; }
     }
     @media (max-width: 480px) {
       .sidebar { width: 90%; right: -90%; padding-right: 15px; }
@@ -348,10 +332,31 @@
 </head>
 <body>
   <div class="container">
+    <!-- NEW: BRANDED SITE HEADER -->
+    <header class="site-header">
+        <img src="https://assets.codepen.io/162656/upsc-logo-placeholder.png" alt="UPSChub Logo" class="site-logo">
+        <div class="site-branding">
+            <div class="site-title">UPSChub</div>
+            <p class="site-tagline">Civil Services Exam Preparation</p>
+        </div>
+    </header>
+
     <header class="topbar">
       <div class="header-group">
-        <div class="timer" id="timer">60:00</div>
-        <div class="test-title">UPSChub Mock Test - Indian Polity</div>
+        <!-- COUNTDOWN TIMER WRAPPER (for Mock Test) -->
+        <div id="countdownWrapper">
+            <div class="timer" id="timer">60:00</div>
+        </div>
+        
+        <!-- STOPWATCH WRAPPER (for Answer Writing) -->
+        <div id="stopwatchWrapper" style="display: none;">
+            <div class="timer" id="stopwatchDisplay">00:00:00</div>
+            <div class="stopwatch-controls">
+                <button id="stopwatchStart" class="stopwatch-btn" title="Start"><i class="fas fa-play"></i></button>
+                <button id="stopwatchStop" class="stopwatch-btn hidden" title="Pause"><i class="fas fa-pause"></i></button>
+                <button id="stopwatchReset" class="stopwatch-btn" title="Reset"><i class="fas fa-sync-alt"></i></button>
+            </div>
+        </div>
       </div>
       
       <div class="navigation-tabs">
@@ -368,16 +373,17 @@
       </div>
     </header>
 
-    <!-- ### MOCK TEST SECTION WRAPPER ### -->
-    <div id="mockTestWrapper">
-        <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar">
-            <i class="fas fa-bars"></i>
-        </button>
-        <div class="watermark">
-            <img src="https://assets.codepen.io/162656/upsc-logo-placeholder.png" alt="UPSChub Logo" class="watermark-logo" />
-            <div class="watermark-text">UPSChub</div>
-        </div>
-        <div class="main-content">
+    <!-- This div now wraps all main page content -->
+    <div class="main-content">
+        <!-- MOCK TEST SECTION WRAPPER -->
+        <div id="mockTestWrapper" style="display: flex; width: 100%;">
+            <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="watermark">
+                <img src="https://assets.codepen.io/162656/upsc-logo-placeholder.png" alt="UPSChub Logo" class="watermark-logo" />
+                <div class="watermark-text">UPSChub</div>
+            </div>
             <section class="question-area">
                 <h2 class="question-header" id="questionNumber"></h2>
                 <div class="question-content" id="questionText"></div>
@@ -396,21 +402,9 @@
                 </div>
             </aside>
         </div>
-        <div class="fixed-action-area">
-            <div class="powered-by">Powered by UPSChub | Pratyush Swain</div>
-            <div class="action-buttons" id="actionButtons">
-                <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i> Prev</button>
-                <button class="btn-action" id="btnSaveNext"><i class="fas fa-save"></i> Save & Next</button>
-                <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i> Mark</button>
-                <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i> Clear</button>
-            </div>
-            <button id="btnSubmit" class="submit-button" style="display: none;"><i class="fas fa-paper-plane"></i> Submit Test</button>
-        </div>
-    </div>
 
-    <!-- ### ANSWER WRITING SECTION WRAPPER ### -->
-    <div id="answerWritingWrapper" style="display: none;">
-        <div class="main-content" style="display: block; overflow-y: auto;">
+        <!-- ANSWER WRITING SECTION WRAPPER -->
+        <div id="answerWritingWrapper" style="display: none; width: 100%;">
             <section class="question-area">
                 <h2 class="question-header">Answer Writing Practice</h2>
                 <div class="question-content"><p><strong>Question:</strong> "The Indian Constitution is a 'bag of borrowings,' but it is more than a mere patchwork. It is a beautiful tapestry woven with threads of nationalistic ideals." Critically analyze the statement. (250 words)</p></div>
@@ -419,26 +413,35 @@
                     <ul>
                         <li>Read the question carefully and understand its core demands.</li>
                         <li>Structure your answer with a clear introduction, body, and conclusion.</li>
-                        <li>Use relevant articles, amendments, and Supreme Court judgments to support your arguments.</li>
-                        <li>Adhere to the word and time limits.</li>
+                        <li>Use the stopwatch above to time your writing.</li>
                         <li>After writing your answer, click the submit button below to upload your file.</li>
                     </ul>
                 </div>
-                <!-- CORRECTED GOOGLE DRIVE LINK (target="_blank" IS CRITICAL) -->
                 <a href="https://drive.google.com/drive/folders/1QVN9twgnuhhfOvqBv8qybAZozFRsocks?usp=sharing" target="_blank" class="submit-button answer-writing-submit"><i class="fas fa-upload"></i> END AND SUBMIT</a>
             </section>
         </div>
-    </div>
-    
-    <!-- ### RESULT SCREEN WRAPPER ### -->
-    <div id="resultScreenWrapper" style="display: none;">
-        <h2>Test Completed!</h2>
-        <p>Your final score is:</p>
-        <p id="finalScore">0/10</p>
-        <button id="retestButton" class="submit-button">Retest</button>
+        
+        <!-- RESULT SCREEN WRAPPER -->
+        <div id="resultScreenWrapper" style="display: none; width: 100%;">
+            <h2>Test Completed!</h2>
+            <p>Your final score is:</p>
+            <p id="finalScore">0/10</p>
+            <button id="retestButton" class="submit-button">Retest</button>
+        </div>
     </div>
 
-    <!-- ### PASSWORD MODAL ### -->
+    <!-- This area is for elements outside the main content flow -->
+    <div class="fixed-action-area" id="mcqFooter">
+        <div class="powered-by">Powered by UPSChub | Pratyush Swain</div>
+        <div class="action-buttons" id="actionButtons">
+            <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i> Prev</button>
+            <button class="btn-action" id="btnSaveNext"><i class="fas fa-save"></i> Save & Next</button>
+            <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i> Mark</button>
+            <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i> Clear</button>
+        </div>
+        <button id="btnSubmit" class="submit-button" style="display: none;"><i class="fas fa-paper-plane"></i> Submit Test</button>
+    </div>
+
     <div id="passwordModal" class="password-modal">
         <div class="modal-content">
             <span id="closeModal" class="close-modal">×</span>
@@ -448,14 +451,9 @@
             <button id="verifyPasswordButton" class="submit-button">Verify</button>
             <p class="contact-admin-text">
                 Don't have a password? 
-                <!-- CORRECTED WHATSAPP LINK (target="_blank" IS CRITICAL) -->
                 <a href="https://api.whatsapp.com/send?phone=918658567727&text=I%20need%20the%20password%20for%20the%20mock%20test." target="_blank">Contact Admin</a>
             </p>
         </div>
-    </div>
-
-    <div class="footer">
-      © 2023 UPSChub. All rights reserved.
     </div>
   </div>
 
@@ -483,21 +481,55 @@
     const answerWritingWrapper = document.getElementById('answerWritingWrapper');
     const resultScreenWrapper = document.getElementById('resultScreenWrapper');
     const passwordModal = document.getElementById('passwordModal');
+    const mcqFooter = document.getElementById('mcqFooter');
     const questionText = document.getElementById('questionText');
     const questionNumber = document.getElementById('questionNumber');
     const optionsList = document.getElementById('optionsList');
     const questionPalette = document.getElementById('questionPalette');
-    const timerElement = document.getElementById('timer');
     const btnSubmit = document.getElementById('btnSubmit');
     const actionButtons = document.getElementById('actionButtons');
     const btnPrevQuestion = document.getElementById('btnPrevQuestion');
     const btnSaveNext = document.getElementById('btnSaveNext');
+    const countdownWrapper = document.getElementById('countdownWrapper');
+    const timerElement = document.getElementById('timer');
+    const stopwatchWrapper = document.getElementById('stopwatchWrapper');
+    const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+    const stopwatchStartBtn = document.getElementById('stopwatchStart');
+    const stopwatchStopBtn = document.getElementById('stopwatchStop');
+    const stopwatchResetBtn = document.getElementById('stopwatchReset');
+
+    // ### STOPWATCH LOGIC ###
+    let stopwatchInterval;
+    let stopwatchSeconds = 0;
+    let isStopwatchRunning = false;
+    function formatTime(sec) {
+        const hours = Math.floor(sec / 3600);
+        const minutes = Math.floor((sec % 3600) / 60);
+        const seconds = sec % 60;
+        return [hours, minutes, seconds].map(v => v.toString().padStart(2, '0')).join(':');
+    }
+    function updateStopwatchDisplay() { stopwatchDisplay.textContent = formatTime(stopwatchSeconds); }
+    function startStopwatch() {
+        if (isStopwatchRunning) return;
+        isStopwatchRunning = true;
+        stopwatchStartBtn.classList.add('hidden');
+        stopwatchStopBtn.classList.remove('hidden');
+        stopwatchInterval = setInterval(() => { stopwatchSeconds++; updateStopwatchDisplay(); }, 1000);
+    }
+    function stopStopwatch() {
+        if (!isStopwatchRunning) return;
+        isStopwatchRunning = false;
+        stopwatchStartBtn.classList.remove('hidden');
+        stopwatchStopBtn.classList.add('hidden');
+        clearInterval(stopwatchInterval);
+    }
+    function resetStopwatch() { stopStopwatch(); stopwatchSeconds = 0; updateStopwatchDisplay(); }
+    stopwatchStartBtn.addEventListener('click', startStopwatch);
+    stopwatchStopBtn.addEventListener('click', stopStopwatch);
+    stopwatchResetBtn.addEventListener('click', resetStopwatch);
 
     // ### MOCK TEST LOGIC ###
-    function resetState() {
-        state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) };
-    }
-
+    function resetState() { state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) }; }
     function initTest() {
       resetState();
       state.visited[0] = true;
@@ -506,7 +538,6 @@
       updateNavigationButtons();
       startTimer();
     }
-
     function loadQuestion(index) {
       const q = questions[index];
       questionText.textContent = q.text;
@@ -525,14 +556,12 @@
       updatePalette();
       updateNavigationButtons();
     }
-
     function selectOption(qIndex, optIndex) {
       state.answers[qIndex] = optIndex;
       const options = optionsList.querySelectorAll('.option');
       options.forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
       updatePalette();
     }
-
     function updatePalette() {
       questionPalette.innerHTML = '';
       questions.forEach((_, i) => {
@@ -547,23 +576,19 @@
         }
         if (i === state.current) btn.classList.add('current');
         btn.textContent = i + 1;
-        btn.onclick = () => {
-          loadQuestion(i);
-          document.body.classList.remove('sidebar-open');
-        };
+        btn.onclick = () => { loadQuestion(i); document.body.classList.remove('sidebar-open'); };
         questionPalette.appendChild(btn);
       });
     }
-
     function updateNavigationButtons() {
       btnPrevQuestion.style.display = state.current === 0 ? 'none' : 'flex';
       actionButtons.style.display = state.current === questions.length - 1 ? 'none' : 'flex';
       btnSubmit.style.display = state.current === questions.length - 1 ? 'flex' : 'none';
     }
-
     function startTimer() {
       let timeLeft = 60 * 60;
       clearInterval(timerInterval);
+      timerElement.textContent = `60:00`;
       timerInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
@@ -571,75 +596,73 @@
         if (timeLeft-- <= 0) { clearInterval(timerInterval); submitTest(); }
       }, 1000);
     }
-    
     function stopTimer() { clearInterval(timerInterval); }
-
     function submitTest() {
       stopTimer();
       const score = state.answers.reduce((acc, ans, i) => (ans === questions[i].answer ? acc + 1 : acc), 0);
       const scoreText = `${score}/${questions.length}`;
-
       localStorage.setItem('testTaken', 'true');
       localStorage.setItem('lastScore', scoreText);
-
       showResultScreen(scoreText);
     }
-
     function showResultScreen(scoreText) {
         mockTestWrapper.style.display = 'none';
         answerWritingWrapper.style.display = 'none';
         resultScreenWrapper.style.display = 'flex';
+        mcqFooter.style.display = 'none';
+        countdownWrapper.style.display = 'none';
+        stopwatchWrapper.style.display = 'none';
         document.getElementById('finalScore').textContent = scoreText;
     }
-
+    
     // ### PAGE & NAVIGATION LOGIC ###
     document.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('testTaken') === 'true') {
-            const lastScore = localStorage.getItem('lastScore');
-            showResultScreen(lastScore);
+            showResultScreen(localStorage.getItem('lastScore'));
         } else {
             initTest();
         }
     });
 
-    // Tab Switching
     const showMockTestTab = document.getElementById('showMockTestTab');
     const showAnswerWritingTab = document.getElementById('showAnswerWritingTab');
     const sidebarToggleButton = document.getElementById('btnToggleSidebar');
 
     showMockTestTab.addEventListener('click', () => {
+        showMockTestTab.classList.add('active');
+        showAnswerWritingTab.classList.remove('active');
+        countdownWrapper.style.display = 'flex';
+        stopwatchWrapper.style.display = 'none';
+        stopStopwatch();
         if (localStorage.getItem('testTaken') === 'true') {
             showResultScreen(localStorage.getItem('lastScore'));
         } else {
             answerWritingWrapper.style.display = 'none';
             resultScreenWrapper.style.display = 'none';
-            mockTestWrapper.style.display = 'block';
+            mockTestWrapper.style.display = 'flex';
+            mcqFooter.style.display = 'block';
             sidebarToggleButton.style.display = 'flex';
             startTimer();
         }
-        showMockTestTab.classList.add('active');
-        showAnswerWritingTab.classList.remove('active');
     });
 
     showAnswerWritingTab.addEventListener('click', () => {
+        showAnswerWritingTab.classList.add('active');
+        showMockTestTab.classList.remove('active');
         mockTestWrapper.style.display = 'none';
         resultScreenWrapper.style.display = 'none';
         answerWritingWrapper.style.display = 'block';
-        showAnswerWritingTab.classList.add('active');
-        showMockTestTab.classList.remove('active');
+        mcqFooter.style.display = 'none';
         sidebarToggleButton.style.display = 'none';
         document.body.classList.remove('sidebar-open');
         stopTimer();
+        countdownWrapper.style.display = 'none';
+        stopwatchWrapper.style.display = 'flex';
+        resetStopwatch();
     });
 
-    // Retest and Password Modal Logic
-    document.getElementById('retestButton').addEventListener('click', () => {
-        passwordModal.style.display = 'block';
-    });
-    document.getElementById('closeModal').addEventListener('click', () => {
-        passwordModal.style.display = 'none';
-        document.getElementById('passwordError').textContent = '';
-    });
+    document.getElementById('retestButton').addEventListener('click', () => { passwordModal.style.display = 'block'; });
+    document.getElementById('closeModal').addEventListener('click', () => { passwordModal.style.display = 'none'; document.getElementById('passwordError').textContent = ''; });
     document.getElementById('verifyPasswordButton').addEventListener('click', () => {
         const input = document.getElementById('passwordInput');
         const error = document.getElementById('passwordError');
@@ -650,19 +673,17 @@
             input.value = '';
             error.textContent = '';
             resultScreenWrapper.style.display = 'none';
-            mockTestWrapper.style.display = 'block';
+            mockTestWrapper.style.display = 'flex';
+            mcqFooter.style.display = 'block';
+            countdownWrapper.style.display = 'flex';
             initTest();
         } else {
             error.textContent = 'Incorrect password. Please try again.';
         }
     });
     
-    // Other Event Listeners
     sidebarToggleButton.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
-    document.getElementById('darkModeToggle').addEventListener('change', (e) => {
-      document.body.classList.toggle('dark', e.target.checked);
-      document.getElementById('toggleLabel').textContent = e.target.checked ? 'Light' : 'Dark';
-    });
+    document.getElementById('darkModeToggle').addEventListener('change', (e) => { document.body.classList.toggle('dark', e.target.checked); document.getElementById('toggleLabel').textContent = e.target.checked ? 'Light' : 'Dark'; });
     btnSaveNext.addEventListener('click', () => { if (state.current < questions.length - 1) loadQuestion(state.current + 1); });
     btnPrevQuestion.addEventListener('click', () => { if (state.current > 0) loadQuestion(state.current - 1); });
     document.getElementById('btnMarkReview').addEventListener('click', () => { state.marked[state.current] = !state.marked[state.current]; updatePalette(); });
