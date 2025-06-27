@@ -439,4 +439,44 @@
          const searchTerm = searchInput.value.toLowerCase();
          const selectedCategory = filterSelect.value;
          const filteredPdfs = testPdfs.filter(test => {
-            const matchesCategory = selectedCategory === 'all' || test.category === selectedC
+            const matchesCategory = selectedCategory === 'all' || test.category === selectedCategory;
+            const matchesSearch = test.name.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+         });
+
+         testListContainer.innerHTML = '';
+         noResultsDiv.style.display = filteredPdfs.length === 0 ? 'block' : 'none';
+
+         filteredPdfs.forEach(test => {
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            card.innerHTML = `
+               <div class="test-info">
+                  <h3>${test.name}</h3>
+                  <div class="metadata">
+                     <span><i class="fas fa-calendar-alt"></i> ${test.date}</span>
+                     <span><i class="fas fa-file-archive"></i> ${test.size}</span>
+                  </div>
+               </div>
+               <div class="test-actions">
+                  <a href="${test.pdfUrl}" class="btn btn-download" target="_blank" rel="noopener noreferrer"><i class="fas fa-download"></i> Download PDF</a>
+                  <a href="${test.solutionUrl}" class="btn btn-solution" target="_blank" rel="noopener noreferrer"><i class="fas fa-book-open"></i> View Solution</a>
+               </div>
+            `;
+            testListContainer.appendChild(card);
+         });
+      }
+
+      // Initial PDF library setup
+      populateFilters();
+      renderTestList();
+
+      if (searchInput && filterSelect) {
+         searchInput.addEventListener('input', renderTestList);
+         filterSelect.addEventListener('change', renderTestList);
+      }
+   });
+</script>
+
+</body>
+</html>
