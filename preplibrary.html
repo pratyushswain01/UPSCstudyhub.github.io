@@ -1,221 +1,633 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+   <meta name="google-site-verification" content="e1dxCqTIBSM8IRzYzO2F7uUNiugJJaC-LD6A7tQHxS4" />
    <meta charset="UTF-8">
    <meta http-equiv="X-UA-Compatible" content="IE=edge">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title> UPSChub-Preplibrary</title>
+   <title>Videos|UPSChub</title>
 
-   <!-- Font Awesome -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css">
+   <!-- Font Awesome CDN -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
 
-   <!-- Custom CSS -->
-   <link rel="stylesheet" href="css/style.css">
+   <!-- Google Fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
+   <!-- Custom Styles -->
    <style>
-      .container {
-         padding: 2rem;
-      }
+      /* --- GLOBAL STYLES & VARIABLES FROM DASHBOARD --- */
+      :root {
+         --primary-start: #6a11cb;
+         --primary-end: #2575fc;
+         --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+         
+         /* Light Mode */
+         --bg-light: #f0f2f5;
+         --card-bg-light: rgba(255, 255, 255, 0.65);
+         --text-primary-light: #1c1e21;
+         --text-secondary-light: #555c6e;
+         --border-light: rgba(0, 0, 0, 0.1);
 
-      .section-title {
-         font-size: 1.5rem;
-         margin: 2rem 0 1rem;
-         color: #002b5b;
+         /* Dark Mode */
+         --bg-dark: #101114;
+         --card-bg-dark: #1c1e23;
+         --text-primary-dark: #e4e6eb;
+         --text-secondary-dark: #b0b3b8;
+         --border-dark: rgba(255, 255, 255, 0.1);
       }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+         font-family: 'Inter', sans-serif;
+         background-color: var(--bg-light);
+         color: var(--text-primary-light);
+         overflow-x: hidden;
+         transition: background-color 0.4s ease, color 0.4s ease;
+         padding-top: 110px; /* Space for header + runner bar */
+         padding-bottom: 80px; /* Space for bottom nav */
+      }
+      body::before {
+         content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+         z-index: -1;
+         background: radial-gradient(circle at 10% 20%, #d9c2ff, transparent 40%),
+                     radial-gradient(circle at 80% 70%, #b5d8ff, transparent 40%);
+         animation: moveGradient 20s linear infinite;
+         transition: opacity 0.5s ease;
+      }
+      @keyframes moveGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+      
+      body.dark-mode { background-color: var(--bg-dark); color: var(--text-primary-dark); }
+      body.dark-mode::before { opacity: 0; }
+      h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; }
+      a { text-decoration: none; color: inherit; }
 
-      .grid {
+      /* --- HEADER & NAVIGATION (FROM DASHBOARD) --- */
+      .app-header {
+         position: fixed; top: 0; left: 0; right: 0; padding: 0 25px;
+         height: 65px; display: flex; align-items: center; justify-content: space-between;
+         background: var(--card-bg-light);
+         backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+         border-bottom: 1px solid var(--border-light); z-index: 1000;
+         transition: all 0.4s ease;
+      }
+      body.dark-mode .app-header { background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none; }
+      .app-header .logo {
+         font-size: 22px; font-weight: 700;
+         background: var(--primary-gradient); -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent; background-clip: text;
+      }
+      .header-right { display: flex; align-items: center; gap: 15px; }
+      #datetime-container { font-size: 0.75rem; color: var(--text-secondary-light); font-weight: 500; transition: color 0.4s ease; white-space: nowrap; }
+      body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
+      .app-header .icon-btn {
+         font-size: 20px; color: var(--text-secondary-light); cursor: pointer;
+         width: 40px; height: 40px; display: grid; place-items: center;
+         border-radius: 50%; transition: all 0.2s;
+      }
+      body.dark-mode .app-header .icon-btn { color: var(--text-secondary-dark); }
+      .app-header .icon-btn:hover { background-color: rgba(0,0,0,0.05); }
+      body.dark-mode .app-header .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
+      
+      .runner-bar {
+         position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
+         background: var(--primary-gradient); color: white;
+         padding: 8px 0; overflow: hidden; white-space: nowrap;
+         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+      .runner-bar .runner-text { display: inline-block; padding-left: 100%; animation: scroll-left 30s linear infinite; font-size: 0.9rem; }
+      .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
+      @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+
+      .bottom-nav {
+         position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
+         background: var(--card-bg-light); backdrop-filter: blur(12px);
+         border-top: 1px solid var(--border-light); display: flex; justify-content: space-around;
+         z-index: 1000; transition: transform 0.4s cubic-bezier(.25,.46,.45,.94);
+      }
+      .bottom-nav.nav-hidden { transform: translateY(100%); }
+      body.dark-mode .bottom-nav { background: var(--card-bg-dark); border-top-color: var(--border-dark); backdrop-filter: none; }
+      .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color 0.2s, transform 0.2s; cursor: pointer; }
+      body.dark-mode .nav-item { color: var(--text-secondary-dark); }
+      .nav-item i { font-size: 22px; margin-bottom: 4px; } .nav-item span { font-size: 11px; font-weight: 500; }
+      .nav-item.active { color: var(--primary-start); }
+      .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
+      
+      /* Sidebar Styles (FROM DASHBOARD) */
+      .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
+      body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
+      .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
+      .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
+      .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+
+      /* --- VIDEO PAGE SPECIFIC STYLES --- */
+      main { padding: 40px 20px 0; }
+      .video-page-grid {
+         max-width: 1400px;
+         margin: 0 auto;
          display: grid;
-         grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-         gap: 1.5rem;
+         grid-template-columns: minmax(0, 2.5fr) minmax(320px, 1fr);
+         gap: 24px;
+      }
+      /* Base styles for all cards on this page, inheriting from dashboard's .card */
+      .content-card {
+         background: var(--card-bg-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light);
+         border-radius: 16px; padding: 24px;
+         transition: all 0.4s ease;
+      }
+      body.dark-mode .content-card {
+         background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none;
+      }
+      .video-player-wrapper {
+         border-radius: 16px; overflow: hidden;
+         border: 1px solid var(--border-light);
+         transition: border-color 0.4s ease;
+      }
+      body.dark-mode .video-player-wrapper { border-color: var(--border-dark); }
+      
+      .video-title {
+          font-size: 2rem;
+          margin-bottom: 12px;
+          line-height: 1.3;
+      }
+      .meta-actions-bar {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 1rem;
+          padding-bottom: 20px;
+          border-bottom: 1px solid var(--border-light);
+      }
+      body.dark-mode .meta-actions-bar { border-color: var(--border-dark); }
+      
+      .video-stats { color: var(--text-secondary-light); font-size: 0.9rem; }
+      body.dark-mode .video-stats { color: var(--text-secondary-dark); }
+      
+      .action-buttons { display: flex; gap: 10px; }
+      .action-buttons .btn {
+          display: flex; align-items: center; gap: 8px;
+          padding: 8px 16px; border-radius: 20px;
+          border: 1px solid var(--border-light);
+          background-color: var(--bg-light);
+          color: var(--text-secondary-light);
+          cursor: pointer; font-weight: 500; font-size: 0.9rem;
+          transition: all 0.2s ease;
+      }
+      body.dark-mode .action-buttons .btn {
+          background-color: var(--bg-dark);
+          border-color: var(--border-dark);
+          color: var(--text-secondary-dark);
+      }
+      .action-buttons .btn:hover {
+          transform: translateY(-2px);
+          border-color: var(--text-secondary-light);
+      }
+      body.dark-mode .action-buttons .btn:hover { border-color: var(--text-secondary-dark); }
+      .action-buttons .btn.like-btn.active {
+          background: rgba(106, 17, 203, 0.1);
+          color: var(--primary-start);
+          border-color: var(--primary-start);
       }
 
-      .card {
-         background: #fff;
-         border-radius: 10px;
-         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-         padding: 1.5rem;
-         transition: 0.3s;
-         display: flex;
-         flex-direction: column;
-         justify-content: space-between;
+      .channel-info-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 20px; }
+      .channel-details { display: flex; align-items: center; gap: 12px; }
+      .channel-details img { width: 48px; height: 48px; border-radius: 50%; }
+      .channel-details .name { font-weight: 600; font-size: 1rem; }
+      .channel-details .subs { font-size: 0.85rem; color: var(--text-secondary-light); }
+      body.dark-mode .channel-details .subs { color: var(--text-secondary-dark); }
+
+      .subscribe-btn {
+          padding: 10px 24px; background: var(--primary-gradient); color: white;
+          border: none; border-radius: 20px; font-weight: 600; cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .subscribe-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(106, 17, 203, 0.3); }
+      .subscribe-btn.subscribed {
+          background: #e9ecef; color: var(--text-secondary-light); box-shadow: none;
+      }
+      body.dark-mode .subscribe-btn.subscribed { background: var(--bg-dark); color: var(--text-secondary-dark); }
+
+      .video-description { margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border-light); }
+      body.dark-mode .video-description { border-color: var(--border-dark); }
+      .description-content {
+          max-height: 5em; overflow: hidden; transition: max-height 0.4s ease-out;
+          color: var(--text-secondary-light); font-size: 0.95rem; line-height: 1.7;
+      }
+      body.dark-mode .description-content { color: var(--text-secondary-dark); }
+      .description-content.expanded { max-height: 500px; }
+      .toggle-description {
+          background: none; border: none; font-weight: 600; cursor: pointer; margin-top: 8px;
+          color: var(--primary-start);
       }
 
-      .card:hover {
-         transform: translateY(-5px);
+      /* Sidebar (Right Column) Styles */
+      .sidebar-column { position: sticky; top: 125px; align-self: start; }
+      .sidebar-column .content-card h3 { font-size: 1.1rem; margin-bottom: 15px; }
+      .sidebar-column ul { list-style: none; }
+      .sidebar-column ul li {
+          display: flex; align-items: flex-start; gap: 12px;
+          padding: 12px 0; border-bottom: 1px solid var(--border-light);
+          font-size: 0.9rem;
       }
+      body.dark-mode .sidebar-column ul li { border-color: var(--border-dark); }
+      .sidebar-column ul li:last-child { border-bottom: none; }
+      .sidebar-column ul i { color: var(--primary-start); margin-top: 4px; }
+      
+      /* Related Videos Section */
+      .related-videos-section {
+          grid-column: 1 / -1;
+          margin-top: 40px;
+          max-width: 1400px; padding: 0 20px; margin: 40px auto;
+      }
+      .related-videos-section h2 { font-size: 1.5rem; margin-bottom: 20px; }
+      .related-videos-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 24px;
+      }
+      .related-videos-grid .content-card {
+          padding: 12px;
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .related-videos-grid .content-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+      body.dark-mode .related-videos-grid .content-card:hover { box-shadow: none; border-color: rgba(255,255,255,0.25); }
+      .related-videos-grid img { width: 100%; border-radius: 10px; aspect-ratio: 16/9; object-fit: cover; margin-bottom: 12px; }
+      .related-videos-grid .card-title { font-size: 1rem; font-weight: 500; line-height: 1.4; margin-bottom: 6px; }
+      .related-videos-grid .card-channel { font-size: 0.85rem; color: var(--text-secondary-light); }
+      body.dark-mode .related-videos-grid .card-channel { color: var(--text-secondary-dark); }
 
-      .card i {
-         font-size: 2rem;
-         color: #0066cc;
-         margin-bottom: 1rem;
+      /* Footer (FROM DASHBOARD) */
+      .site-footer {
+         background-color: #e9ecef; color: var(--text-secondary-light);
+         padding: 50px 0 30px; margin-top: 60px;
+         border-top: 1px solid var(--border-light);
+         transition: background-color 0.4s ease, color 0.4s ease;
       }
+      body.dark-mode .site-footer { background-color: var(--card-bg-dark); color: var(--text-secondary-dark); border-top-color: var(--border-dark); }
+      .footer-container {
+         max-width: 1200px; margin: 0 auto; padding: 0 20px;
+         display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+         gap: 40px; margin-bottom: 40px;
+      }
+      .footer-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; color: var(--text-primary-light); }
+      body.dark-mode .footer-title { color: var(--text-primary-dark); }
+      .footer-about p, .footer-links li { font-size: 0.9rem; line-height: 1.6; }
+      .footer-links ul { list-style: none; } .footer-links li { margin-bottom: 10px; }
+      .footer-links a:hover { color: var(--primary-start); text-decoration: underline; }
+      .footer-social a {
+         display: inline-flex; align-items: center; justify-content: center;
+         width: 40px; height: 40px; border-radius: 50%;
+         background: var(--primary-gradient); color: #fff; font-size: 1rem; margin-right: 10px;
+         transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+      .footer-social a:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+      .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-light); margin: 0 20px; font-size: 0.85rem; }
+      body.dark-mode .footer-bottom { border-top-color: var(--border-dark); }
+      .footer-bottom a { font-weight: 500; }
+      .footer-bottom a:hover { text-decoration: underline; color: var(--primary-end); }
+      
+      /* RESPONSIVE DESIGN */
+      @media (max-width: 992px) {
+        .video-page-grid { grid-template-columns: 1fr; }
+        .sidebar-column { position: static; }
+      }
+      @media (max-width: 576px) {
+        body { padding-top: 100px; }
+        .app-header { padding: 0 15px; }
+        #datetime-container { display: none; }
+        main { padding: 20px 15px 0; }
+        .video-title { font-size: 1.5rem; }
+        .meta-actions-bar { flex-direction: column; align-items: flex-start; }
+        .channel-info-bar { flex-direction: column; align-items: flex-start; gap: 1rem; }
+        .related-videos-section { padding: 0; }
+      }
+      
+      /* Animation keyframes */
+@keyframes fadeSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-      .card h3 {
-         font-size: 1.2rem;
-         margin-bottom: 0.5rem;
-      }
+/* Animate the page-details section */
+.page-details {
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-light);
+  padding: 20px 20px;
+  text-align: center;
+  opacity: 0; /* start hidden */
+  animation: fadeSlideIn 0.8s ease-out 0.3s forwards;
+}
 
-      .card p {
-         font-size: 0.95rem;
-         color: #555;
-      }
+body.dark-mode .page-details {
+  background-color: rgba(28, 30, 35, 0.6);
+  border-bottom-color: var(--border-dark);
+}
 
-      .card a {
-         margin-top: 1rem;
-         text-decoration: none;
-         color: #0066cc;
-         font-weight: bold;
-      }
+.page-details h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
 
-      .filters {
-         display: flex;
-         gap: 1rem;
-         flex-wrap: wrap;
-         margin-bottom: 2rem;
-      }
+.page-details p {
+  font-size: 1rem;
+  color: var(--text-secondary-light);
+}
 
-      .filters select {
-         padding: 0.5rem;
-         border-radius: 5px;
-         border: 1px solid #ccc;
-      }
+body.dark-mode .page-details p {
+  color: var(--text-secondary-dark);
+}
 
-      /* Footer Styles */
-      footer {
-         background-color: #002b5b;
-         color: white;
-         padding: 2rem 0;
-         text-align: center;
-      }
-
-      footer .social-icons {
-         margin-top: 1rem;
-      }
-
-      footer .social-icons a {
-         color: white;
-         margin: 0 10px;
-         font-size: 1.5rem;
-         text-decoration: none;
-      }
-
-      footer .social-icons a:hover {
-         color: #ff6f61;
-      }
-
-      footer p {
-         margin-top: 1rem;
-         font-size: 0.9rem;
-      }
    </style>
-
 </head>
 <body>
 
-<!-- Header -->
-<header class="header">
-   <section class="flex">
-      <a href="index.html" class="logo">UPSC hub</a>
-      <form action="search.html" method="post" class="search-form">
-         <input type="text" name="search_box" required placeholder="search courses..." maxlength="100">
-         <button type="submit" class="fas fa-search"></button>
-      </form>
-      <div class="icons">
-         <div id="menu-btn" class="fas fa-bars"></div>
-         <div id="search-btn" class="fas fa-search"></div>
-         <div id="user-btn" class="fas fa-user"></div>
-         <div id="toggle-btn" class="fas fa-sun"></div>
-      </div>
-      <div class="profile">
-         <img src="images/LOGO.jpg" class="image" alt="">
-         <h3 class="name">UPSC hub</h3>
-         <p class="role">ADMIN & HOST</p>
-      </div>
-   </section>
+<!-- App Header -->
+<header class="app-header">
+   <a href="index.html" class="logo">UPSC Hub</a>
+   <div class="header-right">
+      <div id="datetime-container"></div>
+      <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
+   </div>
 </header>
 
-<!-- Sidebar -->
-<div class="side-bar">
-   <div id="close-btn">
-      <i class="fas fa-times"></i>
+<!-- Runner Bar -->
+<div class="runner-bar">
+   <div class="runner-text">
+      <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
+      <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
    </div>
-   <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="">
-      <h3 class="name">UPSC hub</h3>
-      <p class="role">ADMIN & HOST</p>
-   </div>
-
-  <nav class="navbar">
-   <a href="index.html"><i class="fas fa-home"></i><span>home</span></a>
-   <a href="about.html"><i class="fas fa-question"></i><span>about</span></a>
-   <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-   <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>courses</span></a>
-   <a href="test.html"><i class="fas fa-chalkboard-user"></i><span>test</span></a>
-   <a href="poll.html"><i class="fas fa-poll"></i><span>live poll</span></a>
-   <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
-   <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-   <a href="contact.html"><i class="fas fa-headset"></i><span>contact us</span></a>
-  </nav>
-
 </div>
 
-<!-- Poll Section -->
-<section class="preplibrary-section">
-
-<header class="header" style="text-align: center; padding-top: 2rem;">
-   <h1 style="font-size: 3rem; font-weight: bold; color: #002b5b;">PrepLibrary</h1>
-   <p style="font-size: 1.2rem; color: #555;">Curated by <strong style="color: #0066cc;">UPSC Hub</strong> to provide you with premium UPSC preparation resources.</p>
-</header>
-
-
-    <div class="container">
-
-      <!-- PrepLibrary Filters Section -->
-      <div class="filters">
-         <select><option>All Subjects</option><option>Polity</option><option>Geography</option><option>Economy</option></select>
-         <select><option>All Types</option><option>Notes</option><option>Mind Maps</option><option>PYQs</option></select>
-         <select><option>All Years</option><option>2024</option><option>2023</option><option>2022</option></select>
-      </div>
-
-      <!-- Core Content Section -->
-      <section class="preplibrary-section">
-         <h2 class="section-title">📚 Core Content</h2>
-         <div class="grid">
-            <div class="card"><i class="fas fa-book"></i><h3>NCERT Archive</h3><p>All NCERTs from Class 6–12 arranged by subject and year.</p><a href="#">Open</a></div>
-            <div class="card"><i class="fas fa-file-alt"></i><h3>Standard Book Notes</h3><p>Summarized notes from Laxmikanth, Spectrum, and more.</p><a href="#">Read Notes</a></div>
-            <div class="card"><i class="fas fa-star"></i><h3>Topper Notes</h3><p>Scanned or typed notes from top UPSC rankers.</p><a href="#">Explore</a></div>
-            <div class="card"><i class="fas fa-question-circle"></i><h3>PYQs Hub</h3><p>Prelims and Mains Previous Year Questions, topic-wise.</p><a href="#">Practice</a></div>
-            <div class="card"><i class="fas fa-landmark"></i><h3>Govt Docs</h3><p>Budget, Economic Survey, India Year Book, NITI Docs.</p><a href="#">View</a></div>
-         </div>
-      </section>
-
-      <!-- Visual & Quick Learning Section -->
-      <h2 class="section-title">🧠 Visual & Quick Learning</h2>
-      <div class="grid">
-         <div class="card"><i class="fas fa-brain"></i><h3>Mind Maps</h3><p>Polity, Geography & Economy covered in flowcharts.</p><a href="#">Visualize</a></div>
-         <div class="card"><i class="fas fa-layer-group"></i><h3>Flashcards</h3><p>Daily revision through quick flash quizzes.</p><a href="#">Flash Now</a></div>
-         <div class="card"><i class="fas fa-bookmark"></i><h3>Smart Bookmarks</h3><p>Mark and revisit your frequently used notes.</p><a href="#">My Bookmarks</a></div>
-      </div>
-
-      <!-- Practice & AI Tools Section -->
-      <h2 class="section-title">🚀 Practice & AI Tools</h2>
-      <div class="grid">
-         <div class="card"><i class="fas fa-robot"></i><h3>AI Q&A Assistant</h3><p>Ask anything from notes or documents.</p><a href="#">Talk to AI</a></div>
-         <div class="card"><i class="fas fa-question"></i><h3>Auto MCQ Generator</h3><p>Create MCQs based on any topic or PDF.</p><a href="#">Generate</a></div>
-         <div class="card"><i class="fas fa-pencil-alt"></i><h3>Model Answers</h3><p>Get sample answers and feedback for mains questions.</p><a href="#">Write Now</a></div>
-         <div class="card"><i class="fas fa-pen-fancy"></i><h3>Essay Bank</h3><p>Best essays with sample intros and conclusions.</p><a href="#">Read Essays</a></div>
-      </div>
-
+<!-- Sidebar (Drawer Menu) -->
+<div class="side-bar">
+    <div class="sidebar-header">
+       <h3 class="title">Complete Menu</h3>
+       <div id="close-btn"><i class="fas fa-times"></i></div>
     </div>
+    <div class="profile">
+      <img src="images\LOGO.jpg" class="image" alt="UPSC Hub Logo">
+      <h3 class="name">UPSC Hub</h3>
+      <p class="role">Your Success Partner</p>
+    </div>
+     <nav class="navbar">
+        <div class="sidebar-category"><h4>Learn</h4></div>
+        <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
+        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+        <div class="sidebar-category"><h4>Practice & Tools</h4></div>
+        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+        <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
+        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+        <div class="sidebar-category"><h4>Resources</h4></div>
+        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+        <div class="sidebar-category"><h4>Support & Info</h4></div>
+        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+    </nav>
+</div>
 
+<!-- Main Content Area -->
+<main>
+  
+  <section class="page-details">
+   <div class="container">
+      <h1>Video Library</h1>
+      <p>Explore curated strategy sessions, lectures, and insights to boost your UPSC preparation.</p>
+   </div>
 </section>
 
-<!-- Footer Section -->
-<footer>
-   <p>© 2025 UPSC hub. All Rights Reserved.</p>
-   
-</footer>
+    <div class="video-page-grid">
+        <!-- Left Column -->
+        <div class="video-column">
+            <div class="video-player-wrapper">
+                <!-- Canva Embed -->
+                <div style="position: relative; width: 100%; height: 0; padding-top: 56.2500%; padding-bottom: 0; overflow: hidden; will-change: transform;">
+                    <iframe loading="lazy" style="position: absolute; width: 100%; height: 100%; top: 0; left: 0; border: none; padding: 0;margin: 0;"
+                       src="https://www.canva.com/design/DAGrFTXdFns/Glzf4YJMMDDwVEDQthVSYg/watch?embed" allowfullscreen="allowfullscreen" allow="fullscreen">
+                    </iframe>
+                </div>
+            </div>
+            
+            <div class="content-card">
+                <h1 class="video-title">UPSC 2028: The Ultimate 4-Year Strategic Planner</h1>
+                <div class="meta-actions-bar">
+                    <div class="video-stats">1.2M views • 3 days ago • #UPSCStrategy</div>
+                    <div class="action-buttons">
+                        <button class="btn like-btn" id="like-btn">
+                            <i class="far fa-thumbs-up"></i> <span id="like-count">125K</span>
+                        </button>
+                        <button class="btn"><i class="fas fa-share"></i> Share</button>
+                        <button class="btn"><i class="fas fa-bookmark"></i> Save</button>
+                    </div>
+                </div>
+                <div class="channel-info-bar">
+                    <div class="channel-details">
+                        <img src="images\LOGO.jpg" alt="Channel Logo">
+                        <div>
+                            <div class="name">UPSChub Official</div>
+                            <div class="subs"></div>
+                        </div>
+                    </div>
+                    <button class="subscribe-btn" id="subscribe-btn">Subscribe</button>
+                </div>
+                <div class="video-description">
+                    <div class="description-content" id="description-content">
+                        <p><strong>Begin your UPSC Civil Services journey with a rock-solid, long-term strategy.</strong> This video provides a detailed 4-year planner for aspirants targeting UPSC 2028. We cover everything from building a strong foundation with NCERTs to mastering your optional subject and acing the personality test.</p>
+                        <p>Perfect for college students and early beginners, this guide will provide the structure and confidence needed to navigate this challenging exam. Stop wondering where to start and begin building your path to success today.</p>
+                    </div>
+                    <button class="toggle-description" id="toggle-description">Show More</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Sidebar Column -->
+        <div class="sidebar-column">
+            <div class="content-card">
+                 <h3><i class="fas fa-list-check"></i> Resources & Notes</h3>
+                 <ul>
+                     <li><i class="fas fa-file-pdf"></i><a href="#">Download Planner PDF</a></li>
+                     <li><i class="fas fa-book-open"></i><a href="#">Complete Booklist for Beginners</a></li>
+                     <li><i class="fas fa-pen-nib"></i><a href="#">Join Answer Writing Group</a></li>
+                     <li><i class="fas fa-question-circle"></i><a href="#">Ask in the Forum</a></li>
+                 </ul>
+            </div>
+        </div>
+    </div>
+    
+    <section class="related-videos-section">
+        <h2>Up Next For You</h2>
+        <div class="related-videos-grid">
+            <div class="content-card">
+                <img src="https://img.youtube.com/vi/a-F6a_iWrYc/hqdefault.jpg" alt="Video Thumbnail">
+                <h4 class="card-title">How to Read 'The Hindu' Newspaper for UPSC</h4>
+                <p class="card-channel">UPSChub Official</p>
+            </div>
+            <div class="content-card">
+                <img src="https://img.youtube.com/vi/OTrWB832_2I/hqdefault.jpg" alt="Video Thumbnail">
+                <h4 class="card-title">Choosing the Right Optional Subject: A Complete Guide</h4>
+                <p class="card-channel">Aspirant's Guide</p>
+            </div>
+            <div class="content-card">
+                <img src="https://img.youtube.com/vi/qBY0yOa63cE/hqdefault.jpg" alt="Video Thumbnail">
+                <h4 class="card-title">Polity Masterclass: Top 50 Articles Explained</h4>
+                <p class="card-channel">UPSChub Official</p>
+            </div>
+        </div>
+    </section>
 
-<script src="js/script.js"></script>
+    <!-- Site Footer -->
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3 class="footer-title">UPSC Hub</h3>
+                <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
+            </div>
+            <div class="footer-links">
+                <h3 class="footer-title">Quick Links</h3>
+                <ul>
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Contact Support</a></li>
+                    <li><a href="#">Courses</a></li>
+                    <li><a href="#">Test Series</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h3 class="footer-title">Connect With Us</h3>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2024 UPSC Hub. All Rights Reserved.</p>
+            <p><a href="#">Privacy Policy</a> • <a href="#">Terms of Use</a></p>
+        </div>
+    </footer>
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav">
+   <a href="homeUPSChub.html" class="nav-item"> <i class="fas fa-home"></i> <span>Home</span> </a>
+   <a href="#" class="nav-item active"> <i class="fas fa-video"></i> <span>Videos</span> </a>
+   <a href="#" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Mock Tests</span> </a>
+   <div id="menu-btn" class="nav-item"> <i class="fas fa-bars-staggered"></i> <span>Menu</span> </div>
+</nav>
+
+<script>
+   document.addEventListener('DOMContentLoaded', function() {
+       // --- Sidebar Toggle ---
+       const menuBtn = document.querySelector('#menu-btn');
+       const closeBtn = document.querySelector('#close-btn');
+       const sideBar = document.querySelector('.side-bar');
+       if (menuBtn && closeBtn && sideBar) {
+           menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
+           closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+       }
+
+       // --- Theme Toggle ---
+       const toggleBtn = document.querySelector('#toggle-btn');
+       const body = document.body;
+       const applyTheme = (theme) => {
+          body.classList.toggle('dark-mode', theme === 'dark');
+          if (toggleBtn) {
+            toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+            toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+          }
+       };
+       const savedTheme = localStorage.getItem('theme') || 'light';
+       applyTheme(savedTheme);
+       if (toggleBtn) {
+           toggleBtn.addEventListener('click', () => {
+              const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+              localStorage.setItem('theme', newTheme);
+              applyTheme(newTheme);
+           });
+       }
+
+       // --- Live Date and Time Script ---
+       const dateTimeContainer = document.getElementById('datetime-container');
+       const updateDateTime = () => {
+          if (!dateTimeContainer) return;
+          const now = new Date();
+          const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+          const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+          const dateStr = now.toLocaleDateString('en-US', dateOptions);
+          const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+          dateTimeContainer.textContent = `${dateStr} | ${timeStr}`;
+       };
+       updateDateTime();
+       setInterval(updateDateTime, 1000);
+
+       // --- Auto-hide Bottom Navigation on Scroll ---
+       const bottomNav = document.querySelector('.bottom-nav');
+       if (bottomNav) {
+           let lastScrollY = window.scrollY;
+           window.addEventListener('scroll', () => {
+              if (window.scrollY > lastScrollY && window.scrollY > 100) { 
+                 bottomNav.classList.add('nav-hidden');
+              } else {
+                 bottomNav.classList.remove('nav-hidden');
+              }
+              lastScrollY = Math.max(0, window.scrollY); 
+           });
+       }
+
+       // --- VIDEO PAGE INTERACTIVITY ---
+       // Toggle Description Box
+       const toggleDescBtn = document.getElementById('toggle-description');
+       const descriptionContent = document.getElementById('description-content');
+       if(toggleDescBtn && descriptionContent) {
+           toggleDescBtn.addEventListener('click', () => {
+               const isExpanded = descriptionContent.classList.toggle('expanded');
+               toggleDescBtn.textContent = isExpanded ? 'Show Less' : 'Show More';
+           });
+       }
+
+       // Like Button
+       const likeBtn = document.getElementById('like-btn');
+       if (likeBtn) {
+           const likeIcon = likeBtn.querySelector('i');
+           const likeCountSpan = document.getElementById('like-count');
+           let isLiked = false;
+           let currentLikes = 125000;
+           likeBtn.addEventListener('click', () => {
+              isLiked = !isLiked;
+              likeBtn.classList.toggle('active', isLiked);
+              currentLikes += isLiked ? 1 : -1;
+              likeIcon.className = isLiked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
+              likeCountSpan.textContent = (currentLikes / 1000).toFixed(1) + 'K';
+           });
+       }
+
+       // Subscribe Button
+       const subscribeBtn = document.getElementById('subscribe-btn');
+       if (subscribeBtn) {
+           let isSubscribed = false;
+           subscribeBtn.addEventListener('click', () => {
+              isSubscribed = !isSubscribed;
+              subscribeBtn.classList.toggle('subscribed', isSubscribed);
+              subscribeBtn.innerHTML = isSubscribed ? `<i class="fas fa-check"></i> Subscribed` : 'Subscribe';
+           });
+       }
+   });
+</script>
+
 </body>
 </html>

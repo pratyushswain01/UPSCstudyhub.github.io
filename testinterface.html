@@ -3,21 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>UPSChub - Mock Test</title>
+  <title>UPSChub - Mock Test & Answer Writing</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
   <style>
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
-
+    
     body {
       font-family: 'Poppins', sans-serif;
       background: #f0f0f5;
       color: #333;
-      transition: all 0.3s ease;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .dark {
@@ -31,6 +31,44 @@
       height: 100vh;
       position: relative;
     }
+
+    /* Site Header Styles */
+    .site-header {
+      background: #ffffff;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid #e0e0e0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      z-index: 101;
+    }
+    .site-logo {
+      height: 40px;
+      width: auto;
+    }
+    .site-branding .site-title {
+      font-size: 1.4em;
+      font-weight: 700;
+      color: #3f51b5;
+      line-height: 1.1;
+    }
+    .site-branding .site-tagline {
+      font-size: 0.8em;
+      color: #666;
+      margin: 0;
+    }
+    .dark .site-header {
+      background: #2a2a3a;
+      border-bottom-color: #3a3a4a;
+    }
+    .dark .site-branding .site-title {
+      color: #8ab4f8;
+    }
+    .dark .site-branding .site-tagline {
+      color: #aaa;
+    }
+
 
     /* Watermark Styles */
     .watermark {
@@ -48,28 +86,24 @@
       justify-content: center;
       width: 100%;
     }
-
     .watermark-logo {
       max-width: 150px;
       margin-bottom: 10px;
       filter: grayscale(100%) brightness(0.8);
     }
-
     .watermark-text {
       font-size: 3.5em;
       font-weight: bold;
       color: #555;
       text-transform: uppercase;
       letter-spacing: 2px;
-      font-family: 'Poppins', sans-serif;
       text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
     }
-
     .dark .watermark-text {
       color: #aaa;
     }
 
-    /* Header Styles */
+    /* Topbar Styles */
     .topbar {
       display: flex;
       align-items: center;
@@ -82,914 +116,789 @@
       z-index: 100;
       position: relative;
     }
+    .header-group { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .navigation-tabs { display: flex; gap: 5px; background: rgba(0,0,0,0.15); border-radius: 6px; padding: 3px; }
+    .nav-tab { background: transparent; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s; font-size: 0.85em; }
+    .nav-tab:hover:not(.locked) { background: rgba(255,255,255,0.2); }
+    .nav-tab.active { background: white; color: #3f51b5; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .nav-tab.locked { cursor: not-allowed; opacity: 0.6; position: relative; }
+    .nav-tab.locked::after { content: '\f023'; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-left: 8px; font-size: 0.9em; }
+    
+    .timer { font-size: 0.95em; font-weight: bold; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; }
 
-    .header-group {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      min-width: 0;
-    }
-
-    .timer {
-      font-size: 0.95em;
-      font-weight: bold;
-      white-space: nowrap;
-      background: rgba(0,0,0,0.2);
-      padding: 4px 8px;
-      border-radius: 4px;
-    }
-
-    .test-title {
-      font-size: 0.95em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+    /* Stopwatch Styles */
+    #stopwatchWrapper { display: flex; align-items: center; gap: 10px; }
+    .stopwatch-controls { display: flex; gap: 5px; }
+    .stopwatch-btn { background: transparent; border: none; color: white; cursor: pointer; font-size: 1em; padding: 5px; border-radius: 50%; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+    .stopwatch-btn:hover { background-color: rgba(255,255,255,0.2); }
+    .stopwatch-btn.hidden { display: none; }
 
     /* Main Content */
-    .main-content {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-      position: relative;
-    }
-
-    .question-area {
-      width: 100%;
-      padding: 15px;
-      overflow-y: auto;
-      padding-bottom: 120px;
-      transition: filter 0.3s ease;
-      position: relative;
-      z-index: 2;
-    }
-
-    /* Question Styling */
-    .question-header {
-      font-size: 1.2em;
-      margin-bottom: 15px;
-      font-weight: 600;
-    }
-
-    .question-content {
-      margin-bottom: 15px;
-      line-height: 1.5;
-      font-size: 0.95em;
-    }
-
-    /* Options Styling - Made smaller */
-    .options-list {
-      list-style: none;
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 8px;
-    }
-
-    .option {
-      padding: 10px 12px;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-      background: white;
-      display: flex;
-      align-items: center;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      font-size: 0.9em;
-      position: relative;
-      z-index: 2;
-    }
-
-    .option:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-
-    .option.selected {
-      background: #4caf50;
-      color: white;
-      border-color: #4caf50;
-      box-shadow: 0 1px 3px rgba(76,175,80,0.3);
-    }
-
-    .option-radio {
-      margin-right: 10px;
-      min-width: 16px;
-      height: 16px;
-      border: 2px solid #ccc;
-      border-radius: 50%;
-      display: inline-block;
-      position: relative;
-    }
-
-    .option.selected .option-radio {
-      border-color: white;
-      background: white;
-      box-shadow: inset 0 0 0 3px #4caf50;
-    }
-
-    /* Sidebar Styles */
-    .sidebar {
-      position: fixed;
-      top: 0;
-      right: -280px;
-      width: 280px;
-      height: 100%;
-      background: #f8f9fa;
-      border-left: 1px solid #ccc;
-      padding: 15px;
-      padding-right: 20px;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-      z-index: 200;
-      padding-top: 60px;
-    }
-
-    .sidebar-open .sidebar {
-      transform: translateX(-280px);
-      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
-    }
-
-    .sidebar-open .question-area {
-      filter: blur(2px);
-      pointer-events: none;
-    }
-
-    /* Smaller Question Palette Buttons */
-    .question-palette {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 6px;
-      margin-bottom: 20px;
-    }
-
-    .question-number {
-      width: 30px;
-      height: 30px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      background: #e9ecef;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s;
-      font-size: 12px;
-      margin: 0 auto;
-    }
-
-    .question-number:hover {
-      transform: scale(1.05);
-    }
-
-    .answered {
-      background: #4caf50;
-      color: white;
-    }
-
-    .not-answered {
-      background: #f44336;
-      color: white;
-    }
-
-    .marked {
-      background: #ff9800;
-      color: white;
-    }
-
-    .current {
-      border: 2px solid #3f51b5;
-      background: #3f51b5;
-      color: white;
-    }
-
-    .not-visited {
-      background: #e9ecef;
-      color: #333;
-    }
-
-    /* Legend Section */
-    .legend {
-      margin-top: 20px;
-      padding-top: 15px;
-      border-top: 1px solid #ddd;
-    }
-
-    .legend-title {
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #3f51b5;
-      font-size: 0.9em;
-    }
-
-    .legend-item {
-      display: flex;
-      align-items: center;
-      margin-bottom: 8px;
-      font-size: 0.85em;
-      padding: 6px 8px;
-      border-radius: 4px;
-      background: rgba(255,255,255,0.7);
-    }
-
-    .legend-color {
-      width: 16px;
-      height: 16px;
-      border-radius: 3px;
-      margin-right: 8px;
-      flex-shrink: 0;
-    }
-
-    .legend-answered {
-      background: #4caf50;
-    }
-
-    .legend-not-answered {
-      background: #f44336;
-    }
-
-    .legend-marked {
-      background: #ff9800;
-    }
-
-    .legend-not-visited {
-      background: #e9ecef;
-      border: 1px solid #ccc;
-    }
-
-    .legend-current {
-      background: #3f51b5;
-    }
-
-    /* Action Buttons - Compact Footer Layout */
-    .fixed-action-area {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #fff;
-      border-top: 1px solid #ccc;
-      padding: 10px 12px;
-      z-index: 100;
-    }
-
-    .action-buttons {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-action {
-      flex: 1;
-      padding: 8px;
-      border: none;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 5px;
-      font-size: 0.85em;
-      min-width: 0;
-    }
-
-    .btn-action:hover {
-      opacity: 0.9;
-    }
-
-    #btnPrevQuestion {
-      background: #2196f3;
-      color: white;
-    }
-
-    #btnSaveNext {
-      background: #4caf50;
-      color: white;
-    }
-
-    #btnMarkReview {
-      background: #ff9800;
-      color: white;
-    }
-
-    #btnClearResponse {
-      background: #f44336;
-      color: white;
-    }
-
-    .submit-button {
-      width: 100%;
-      padding: 10px;
-      background: #3f51b5;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      font-size: 0.9em;
-    }
-
-    .submit-button:hover {
-      background: #303f9f;
-    }
-
-    /* Footer */
-    .footer {
-      text-align: center;
-      padding: 8px;
-      font-size: 0.8em;
-      color: #666;
-    }
-
-    .powered-by {
-      text-align: center;
-      font-size: 0.8em;
-      color: #666;
-      margin-bottom: 5px;
-    }
-
-    /* Dark Mode Styles */
-    .dark .sidebar {
-      background: #2c2c3c;
-      border-left: 1px solid #444;
-    }
-
-    .dark .question-number {
-      background: #3d3d4a;
-      color: #eee;
-    }
-
-    .dark .not-visited {
-      background: #3d3d4a;
-      color: #eee;
-    }
-
-    .dark .legend {
-      border-top-color: #444;
-    }
-
-    .dark .legend-item {
-      background: rgba(255,255,255,0.05);
-    }
-
-    .dark .legend-title {
-      color: #8ab4f8;
-    }
-
-    .dark .legend-not-visited {
-      background: #3d3d4a;
-      border: 1px solid #555;
-    }
-
-    .dark .fixed-action-area {
-      background: #1e1e2f;
-      border-top: 1px solid #444;
-    }
-
-    .dark .footer, .dark .powered-by {
-      color: #aaa;
-    }
-
-    .dark .option {
-      background: #2c2c3c;
-      border-color: #444;
-    }
-
-    .dark .option:hover {
-      background: #3d3d4a;
-    }
-
-    /* Toggle Switch */
-    .dark-mode-toggle {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .toggle-switch {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 26px;
-    }
-
-    .toggle-switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 34px;
-    }
-
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 20px;
-      width: 20px;
-      left: 3px;
-      bottom: 3px;
-      background-color: white;
-      transition: .4s;
-      border-radius: 50%;
-    }
-
-    input:checked + .toggle-slider {
-      background-color: #3f51b5;
-    }
-
-    input:checked + .toggle-slider:before {
-      transform: translateX(24px);
-    }
-
-    .toggle-icons {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      padding: 0 6px;
-      pointer-events: none;
-    }
-
-    .toggle-icons i {
-      color: white;
-      font-size: 12px;
-    }
-
-    .toggle-label {
-      font-size: 0.9em;
-      white-space: nowrap;
-    }
-
-    /* Sidebar Toggle Button */
-    .sidebar-toggle {
-      position: fixed;
-      top: 70px;
-      right: 15px;
-      z-index: 300;
-      background: #3f51b5;
-      border: none;
-      border-radius: 50%;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      color: white;
-      font-size: 1em;
-      transition: all 0.3s ease;
-    }
-
-    .sidebar-open .sidebar-toggle {
-      right: calc(90% + 15px);
-    }
-
-    /* Mobile Responsive */
-    @media (max-width: 480px) {
-      .sidebar {
-        width: 90%;
-        right: -90%;
-        padding-right: 15px;
-      }
-      
-      .sidebar-open .sidebar {
-        transform: translateX(-90%);
-      }
-      
-      .question-palette {
-        grid-template-columns: repeat(5, 1fr);
-      }
-      
-      .option {
-        padding: 8px 10px;
+    .main-content { flex: 1; display: flex; overflow-y: auto; position: relative; }
+    .question-area { width: 100%; padding: 15px; overflow-y: auto; padding-bottom: 120px; transition: filter 0.3s ease; position: relative; z-index: 2; }
+    .question-header { font-size: 1.2em; margin-bottom: 15px; font-weight: 600; }
+    .question-content { margin-bottom: 15px; line-height: 1.5; font-size: 0.95em; }
+    .instructions-box { background: #fff; border: 1px solid #ddd; border-left: 4px solid #3f51b5; padding: 15px; margin: 20px 0; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .dark .instructions-box { background: #2c2c3c; border-color: #444; border-left-color: #8ab4f8; }
+    .instructions-box h3 { margin-bottom: 10px; color: #3f51b5; }
+    .dark .instructions-box h3 { color: #8ab4f8; }
+    .instructions-box ul { list-style-position: inside; padding-left: 5px; line-height: 1.6; }
+    .answer-writing-submit { margin-top: 20px; text-decoration: none; display: inline-flex; width: auto; padding: 12px 25px; }
+    .options-list { list-style: none; display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .option { padding: 10px 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: all 0.2s; background: white; display: flex; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.9em; position: relative; z-index: 2; }
+    .option:hover { transform: translateY(-1px); box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+    .option.selected { background: #4caf50; color: white; border-color: #4caf50; box-shadow: 0 1px 3px rgba(76,175,80,0.3); }
+    .option-radio { margin-right: 10px; min-width: 16px; height: 16px; border: 2px solid #ccc; border-radius: 50%; display: inline-block; position: relative; }
+    .option.selected .option-radio { border-color: white; background: white; box-shadow: inset 0 0 0 3px #4caf50; }
+    
+    /* Sidebar */
+    .sidebar { position: fixed; top: 121px; right: -280px; width: 280px; height: calc(100% - 121px); background: #f8f9fa; border-left: 1px solid #ccc; padding: 15px; padding-right: 20px; overflow-y: auto; transition: transform 0.3s ease; z-index: 200; }
+    .sidebar-open .sidebar { transform: translateX(-280px); box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+    .sidebar-open .question-area { filter: blur(2px); pointer-events: none; }
+    .question-palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 15px; }
+    .question-number { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 12px; margin: 0 auto; }
+    .question-number:hover { transform: scale(1.05); }
+    
+    /* Palette Status Colors - LIGHT MODE */
+    .answered { background: #4caf50; color: white; }
+    .not-answered { background: #f44336; color: white; }
+    .marked { background: #ff9800; color: white; }
+    .current { border: 2px solid #3f51b5; background: #3f51b5; color: white; }
+    .not-visited { background: #e9ecef; color: #333; border: 1px solid #ddd;}
+    
+    .palette-summary {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin: 15px 0;
+        padding: 12px;
+        background: #e0e0e0;
+        border-radius: 6px;
         font-size: 0.85em;
-      }
-      
-      .action-buttons {
-        gap: 4px;
-      }
-      
-      .btn-action {
-        padding: 6px;
-        font-size: 0.8em;
-      }
-      
-      .legend-item {
-        padding: 5px 6px;
-        font-size: 0.8em;
-      }
-      
-      .legend-color {
-        width: 14px;
-        height: 14px;
-      }
+    }
+    .summary-item { display: flex; align-items: center; gap: 8px; color: #333; }
+    .summary-item span {
+        font-weight: 700;
+        background-color: #fff;
+        border-radius: 50%;
+        padding: 2px;
+        min-width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    
+    .legend { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
+    .legend-title { font-weight: 600; margin-bottom: 12px; color: #3f51b5; font-size: 0.9em; }
+    .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em; padding: 6px 8px; border-radius: 4px; background: rgba(255,255,255,0.7); }
+    .legend-color { width: 16px; height: 16px; border-radius: 3px; margin-right: 8px; flex-shrink: 0; }
+    .legend-answered { background: #4caf50; }
+    .legend-not-answered { background: #f44336; }
+    .legend-marked { background: #ff9800; }
+    .legend-not-visited { background: #e9ecef; border: 1px solid #ccc; }
+    .legend-current { background: #3f51b5; }
+    
+    /* Fixed Action Area */
+    .fixed-action-area { position: fixed; bottom: 0; left: 0; right: 0; background: #fff; border-top: 1px solid #ccc; padding: 10px 12px; z-index: 100; }
+    .action-buttons { display: flex; gap: 6px; margin-bottom: 8px; flex-wrap: wrap; }
+    .btn-action { flex: 1; padding: 8px; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85em; min-width: 0; }
+    .btn-action:hover { opacity: 0.9; }
+    #btnPrevQuestion { background: #2196f3; color: white; }
+    #btnSaveNext { background: #4caf50; color: white; }
+    #btnMarkReview { background: #ff9800; color: white; }
+    #btnClearResponse { background: #f44336; color: white; }
+    .submit-button { width: 100%; padding: 10px; background: #3f51b5; color: white; border: none; border-radius: 4px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.9em; }
+    .submit-button:hover { background: #303f9f; }
+    .powered-by { text-align: center; font-size: 0.8em; color: #666; margin-bottom: 5px; }
 
-      .watermark-logo {
-        max-width: 80px;
-      }
+    /* Dark Mode */
+    .dark .sidebar, .dark .option { background: #2c2c3c; border-color: #444; }
+    .dark .sidebar { border-left: 1px solid #444; }
+    .dark .option:hover { background: #3d3d4a; }
+    
+    /* CORRECTED: Dark Mode Palette & Legend Styles */
+    .dark .question-number.not-visited { background: #3d3d4a; color: #eee; border-color: #555; }
+    .dark .question-number.answered { background-color: #4caf50; color: white; border-color: #4caf50; }
+    .dark .question-number.not-answered { background-color: #f44336; color: white; border-color: #f44336; }
+    .dark .question-number.marked { background-color: #ff9800; color: white; border-color: #ff9800; }
+    .dark .question-number.current { background-color: #3f51b5; color: white; border: 2px solid #8ab4f8; }
+    
+    .dark .legend-not-visited { background: #3d3d4a; border: 1px solid #555; }
+    .dark .palette-summary { background: #1e1e2f; border: 1px solid #444; }
+    .dark .summary-item { color: #ccc; }
+    .dark .summary-item span { background-color: #3d3d4a; color: #eee; }
 
-      .watermark-text {
-        font-size: 2em;
-      }
+    .dark .legend, .dark .fixed-action-area { border-top-color: #444; }
+    .dark .legend-item { background: rgba(255,255,255,0.05); }
+    .dark .legend-title { color: #8ab4f8; }
+    .dark .fixed-action-area { background: #1e1e2f; }
+    .dark .powered-by { color: #aaa; }
+    .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
+    .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+    .toggle-switch input { opacity: 0; width: 0; height: 0; }
+    .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+    .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+    input:checked + .toggle-slider { background-color: #3f51b5; }
+    input:checked + .toggle-slider:before { transform: translateX(24px); }
+    .toggle-label { font-size: 0.9em; white-space: nowrap; }
+
+    /* Sidebar Toggle */
+    .sidebar-toggle { position: fixed; top: 130px; right: 15px; z-index: 300; background: #3f51b5; border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); color: white; font-size: 1em; transition: all 0.3s ease; }
+    .sidebar-open .sidebar-toggle { right: calc(90% + 15px); }
+    
+    /* Result & Review Screens */
+    #resultScreenWrapper { display: none; text-align: center; padding: 40px 20px; flex-direction: column; align-items: center; justify-content: center; flex: 1; }
+    #resultScreenWrapper h2 { font-size: 2.5em; color: #3f51b5; margin-bottom: 10px; }
+    #resultScreenWrapper p { font-size: 1.2em; margin-bottom: 25px; }
+    #finalScore { font-weight: 600; font-size: 1.8em; color: #4caf50; }
+    .result-buttons { display: flex; gap: 15px; margin-top: 20px; }
+    #retestButton, #reviewAnswersButton { padding: 12px 30px; background-color: #3f51b5; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 1em; transition: background-color 0.3s; }
+    #reviewAnswersButton { background-color: #2196f3; }
+    #retestButton:hover { background-color: #303f9f; }
+    #reviewAnswersButton:hover { background-color: #1976d2; }
+    .dark #resultScreenWrapper h2 { color: #8ab4f8; }
+    .dark #finalScore { color: #81c784; }
+
+    #reviewScreenWrapper { display: none; width: 100%; flex-direction: column; }
+    .review-header { padding: 15px 20px; background: #fff; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; }
+    .review-title { font-size: 1.3em; font-weight: 600; color: #3f51b5; }
+    #backToResultsBtn { background-color: #6c757d; color: white; padding: 8px 15px; border-radius: 5px; flex-shrink: 0; }
+    #reviewContainer { padding: 20px; overflow-y: auto; flex-grow: 1; background-color: #f0f0f5; }
+    .review-question { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+    .review-question h4 { font-size: 1em; font-weight: 600; margin-bottom: 12px; line-height: 1.4; }
+    .review-option-list { list-style: none; padding: 0; margin: 0 0 10px 0; }
+    .review-option { padding: 8px 12px; margin-bottom: 5px; border-radius: 5px; border: 1px solid #e0e0e0; display: flex; align-items: center; gap: 10px; }
+    .review-option i { font-size: 1.1em; }
+    .review-option.review-correct { background-color: #e8f5e9; border-color: #4caf50; color: #1b5e20; font-weight: 500; }
+    .review-option.review-incorrect { background-color: #ffebee; border-color: #f44336; color: #b71c1c; text-decoration: line-through; }
+    .review-status { font-size: 0.9em; font-weight: 500; padding: 5px 10px; border-radius: 4px; display: inline-block; margin-top: 10px; }
+    .review-status.correct { background: #4caf50; color: white; }
+    .review-status.incorrect { background: #f44336; color: white; }
+    .review-status.unanswered { background: #ff9800; color: white; }
+    .dark .review-header { background: #2a2a3a; border-color: #444; }
+    .dark .review-title { color: #8ab4f8; }
+    .dark #reviewContainer { background-color: #1e1e2f; }
+    .dark .review-question { background: #2c2c3c; border-color: #444; }
+    .dark .review-option { border-color: #555; }
+    .dark .review-option.review-correct { background-color: #1a311b; border-color: #81c784; color: #c8e6c9; }
+    .dark .review-option.review-incorrect { background-color: #3e1c1f; border-color: #ef9a9a; color: #ffcdd2; }
+
+    /* Password Modal */
+    .password-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.5); }
+    .modal-content { background-color: #fefefe; margin: 15% auto; padding: 20px 30px; border: 1px solid #888; width: 90%; max-width: 400px; border-radius: 8px; text-align: center; position: relative; }
+    .close-modal { color: #aaa; position: absolute; top: 10px; right: 20px; font-size: 28px; font-weight: bold; cursor: pointer; }
+    #passwordInput { width: 100%; padding: 10px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; }
+    #passwordError { color: #f44336; font-size: 0.9em; height: 1.2em; margin-bottom: 10px;}
+    .contact-admin-text { font-size: 0.9em; margin-top: 20px; color: #666; }
+    .contact-admin-text a { color: #3f51b5; text-decoration: none; font-weight: 600; }
+    .dark .modal-content, .dark #passwordInput { background-color: #2c2c3c; border-color: #555; color: #eee; }
+    .dark .contact-admin-text { color: #aaa; }
+    .dark .contact-admin-text a { color: #8ab4f8; }
+
+    /* Unlock Popup */
+    .unlock-popup {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #2c2c3c;
+      color: #fff;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
+    }
+    .unlock-popup i { margin-right: 10px; color: #4caf50; }
+    @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 20px; opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; top: 20px; } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .navigation-tabs { order: -1; margin-bottom: 5px; width: 100%; justify-content: center; }
+        .topbar { justify-content: space-around; }
+        .site-header { flex-direction: column; text-align: center; gap: 5px; padding: 10px; }
+        .sidebar { top: 170px; height: calc(100% - 170px); }
+        .sidebar-toggle { top: 180px; }
+        .result-buttons { flex-direction: column; width: 80%; }
+    }
+    @media (max-width: 480px) {
+      .sidebar { width: 90%; right: -90%; padding-right: 15px; }
+      .sidebar-open .sidebar { transform: translateX(-90%); }
+      .question-palette { grid-template-columns: repeat(5, 1fr); }
+      .option, .btn-action, .legend-item { font-size: 0.85em; }
+      .watermark-text { font-size: 2em; }
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <header class="site-header">
+        <img src="images\LOGO.jpg" alt="UPSChub Logo" class="site-logo">
+        <div class="site-branding">
+            <div class="site-title">UPSChub</div>
+            <p class="site-tagline">Civil Services Exam Preparation</p>
+        </div>
+    </header>
+
     <header class="topbar">
       <div class="header-group">
-        <div class="timer" id="timer">60:00</div>
-        <div class="test-title">UPSChub Mock Test - Indian Polity</div>
+        <div id="countdownWrapper"><div class="timer" id="timer">60:00</div></div>
+        <div id="stopwatchWrapper" style="display: none;">
+            <div class="timer" id="stopwatchDisplay">00:00:00</div>
+            <div class="stopwatch-controls">
+                <button id="stopwatchStart" class="stopwatch-btn" title="Start"><i class="fas fa-play"></i></button>
+                <button id="stopwatchStop" class="stopwatch-btn hidden" title="Pause"><i class="fas fa-pause"></i></button>
+                <button id="stopwatchReset" class="stopwatch-btn" title="Reset"><i class="fas fa-sync-alt"></i></button>
+            </div>
+        </div>
       </div>
+      
+      <div class="navigation-tabs">
+        <button id="showMockTestTab" class="nav-tab active">Mock Test</button>
+        <button id="showAnswerWritingTab" class="nav-tab">Answer Writing</button>
+      </div>
+
       <div class="dark-mode-toggle">
         <span class="toggle-label" id="toggleLabel">Dark</span>
         <label class="toggle-switch">
           <input type="checkbox" id="darkModeToggle">
           <span class="toggle-slider"></span>
-          <div class="toggle-icons">
-            <i class="fas fa-moon"></i>
-            <i class="fas fa-sun"></i>
-          </div>
         </label>
       </div>
     </header>
 
-    <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar">
-      <i class="fas fa-bars"></i>
-    </button>
-
-    <div class="watermark">
-      <img src="images/LOGO.jpg" alt="UPSChub Logo" class="watermark-logo" />
-      <div class="watermark-text">UPSChub</div>
-    </div>
-
     <div class="main-content">
-      <section class="question-area">
-        <h2 class="question-header" id="questionNumber">Question 1 of 10</h2>
-        <div class="question-content" id="questionText">
-          What is the primary function of the Rajya Sabha in the Indian Parliamentary system?
+        <div id="mockTestWrapper" style="display: flex; width: 100%;">
+            <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
+            <div class="watermark"><img src="images\LOGO.jpg" alt="UPSChub Logo" class="watermark-logo" /><div class="watermark-text">UPSChub</div></div>
+            <section class="question-area">
+                <h2 class="question-header" id="questionNumber"></h2>
+                <div class="question-content" id="questionText"></div>
+                <ul class="options-list" id="optionsList"></ul>
+            </section>
+            <aside class="sidebar">
+                <div class="palette-title">Question Palette</div>
+                <div class="question-palette" id="questionPalette"></div>
+                <div class="palette-summary">
+                    <div class="summary-item"><span id="summaryAnswered">0</span> Answered</div>
+                    <div class="summary-item"><span id="summaryMarked">0</span> Marked</div>
+                    <div class="summary-item"><span id="summaryNotAnswered">0</span> Not Answered</div>
+                    <div class="summary-item"><span id="summaryNotVisited">0</span> Not Visited</div>
+                </div>
+                <div class="legend">
+                    <div class="legend-title">Answer Status Legend:</div>
+                    <div class="legend-item"><div class="legend-color legend-answered"></div><span>Answered</span></div>
+                    <div class="legend-item"><div class="legend-color legend-not-answered"></div><span>Not Answered</span></div>
+                    <div class="legend-item"><div class="legend-color legend-marked"></div><span>Marked for Review</span></div>
+                    <div class="legend-item"><div class="legend-color legend-not-visited"></div><span>Not Visited</span></div>
+                    <div class="legend-item"><div class="legend-color legend-current"></div><span>Current Question</span></div>
+                </div>
+            </aside>
         </div>
-        <ul class="options-list" id="optionsList">
-          <li class="option">
-            <span class="option-radio"></span>
-            <span class="option-text">Pass money bills</span>
-          </li>
-          <li class="option selected">
-            <span class="option-radio"></span>
-            <span class="option-text">Represent the states</span>
-          </li>
-          <li class="option">
-            <span class="option-radio"></span>
-            <span class="option-text">Conduct elections</span>
-          </li>
-          <li class="option">
-            <span class="option-radio"></span>
-            <span class="option-text">Enforce laws</span>
-          </li>
-        </ul>
-      </section>
 
-      <aside class="sidebar">
-        <div class="palette-title">Question Palette</div>
-        <div class="question-palette" id="questionPalette">
-          <!-- Generated by JavaScript -->
+        <div id="answerWritingWrapper" style="display: none; width: 100%;">
+            <section class="question-area">
+                <h2 class="question-header">Answer Writing Practice</h2>
+                <div class="question-content"><p><strong>Question:</strong> "The Indian Constitution is a 'bag of borrowings,' but it is more than a mere patchwork. It is a beautiful tapestry woven with threads of nationalistic ideals." Critically analyze the statement. (250 words)</p></div>
+                <div class="instructions-box">
+                    <h3>Instructions:</h3>
+                    <ul>
+                        <li>Read the question carefully and understand its core demands.</li>
+                        <li>Structure your answer with a clear introduction, body, and conclusion.</li>
+                        <li>Use the stopwatch above to time your writing.</li>
+                        <li>After writing your answer, click the submit button below to upload your file.</li>
+                    </ul>
+                </div>
+                <a href="https://drive.google.com/drive/folders/1QVN9twgnuhhfOvqBv8qybAZozFRsocks?usp=sharing" target="_blank" class="submit-button answer-writing-submit"><i class="fas fa-upload"></i> END AND SUBMIT</a>
+            </section>
         </div>
         
-        <div class="legend">
-          <div class="legend-title">Answer Status Legend:</div>
-          <div class="legend-item">
-            <div class="legend-color legend-answered"></div>
-            <span>Answered</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-not-answered"></div>
-            <span>Not Answered</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-marked"></div>
-            <span>Marked for Review</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-not-visited"></div>
-            <span>Not Visited</span>
-          </div>
-          <div class="legend-item">
-            <div class="legend-color legend-current"></div>
-            <span>Current Question</span>
-          </div>
+        <div id="resultScreenWrapper" style="display: none; width: 100%;">
+            <h2>Test Completed!</h2>
+            <p>Your final score is:</p>
+            <p id="finalScore">0/10</p>
+            <div class="result-buttons">
+              <button id="retestButton" class="submit-button"><i class="fas fa-redo"></i> Retest</button>
+              <button id="reviewAnswersButton" class="submit-button"><i class="fas fa-search"></i> Review Answers</button>
+            </div>
         </div>
-      </aside>
+
+        <div id="reviewScreenWrapper" style="display: none; width: 100%;">
+            <div class="review-header">
+                <h2 class="review-title">Review Your Answers</h2>
+                <button id="backToResultsBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Score</button>
+            </div>
+            <div id="reviewContainer"></div>
+        </div>
     </div>
 
-    <div class="fixed-action-area">
-      <div class="powered-by">Powered by UPSChub | Pratyush Swain</div>
-      <div class="action-buttons" id="actionButtons">
-        <button class="btn-action" id="btnPrevQuestion">
-          <i class="fas fa-arrow-left"></i> Prev
-        </button>
-        <button class="btn-action" id="btnSaveNext">
-          <i class="fas fa-save"></i> Save & Next
-        </button>
-        <button class="btn-action" id="btnMarkReview">
-          <i class="fas fa-flag"></i> Mark
-        </button>
-        <button class="btn-action" id="btnClearResponse">
-          <i class="fas fa-ban"></i> Clear
-        </button>
-      </div>
-      <button id="btnSubmit" class="submit-button" style="display: none;">
-        <i class="fas fa-paper-plane"></i> Submit Test
-      </button>
+    <div class="fixed-action-area" id="mcqFooter">
+        <div class="powered-by">Powered by UPSChub | Pratyush Swain</div>
+        <div class="action-buttons" id="actionButtons">
+            <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i> Prev</button>
+            <button class="btn-action" id="btnSaveNext"><i class="fas fa-save"></i> Save & Next</button>
+            <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i> Mark</button>
+            <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i> Clear</button>
+        </div>
+        <button id="btnSubmit" class="submit-button" style="display: none;"><i class="fas fa-paper-plane"></i> Submit Test</button>
     </div>
 
-    <div class="footer">
-      &copy; 2023 UPSChub. All rights reserved.
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close-modal">×</span>
+            <h3>Enter Password to Retest</h3>
+            <input type="password" id="passwordInput" placeholder="Enter password...">
+            <div id="passwordError"></div>
+            <button id="verifyPasswordButton" class="submit-button">Verify</button>
+            <p class="contact-admin-text">Don't have a password? <a href="https://api.whatsapp.com/send?phone=918658567727&text=I%20need%20the%20password%20for%20the%20mock%20test." target="_blank">Contact Admin</a></p>
+        </div>
     </div>
+    
+    <!-- Unlock Popup -->
+    <div id="unlockPopup" class="unlock-popup">
+        <i class="fas fa-check-circle"></i> <strong>Answer Writing Tab Unlocked!</strong>
+    </div>
+
   </div>
 
   <script>
-    // Initialize variables
+    // ### CONFIGURATION ###
+    const RETEST_PASSWORD = "UPSC2024";
+    const TEST_DURATION_SECONDS = 60 * 60; // 60 minutes
     const questions = [
-      {
-        text: "What is the primary function of the Rajya Sabha in the Indian Parliamentary system?",
-        options: ["Pass money bills", "Represent the states", "Conduct elections", "Enforce laws"],
-        answer: 1
-      },
-      {
-        text: "Which Article of the Constitution deals with the Election Commission?",
-        options: ["Article 320", "Article 324", "Article 330", "Article 300"],
-        answer: 1
-      },
-      {
-        text: "Who is known as the 'Father of the Indian Constitution'?",
-        options: ["Mahatma Gandhi", "B. R. Ambedkar", "Jawaharlal Nehru", "Rajendra Prasad"],
-        answer: 1
-      },
-      {
-        text: "The President of India is elected by:",
-        options: ["Only Lok Sabha", "Only Rajya Sabha", "Both Houses of Parliament", "An electoral college"],
-        answer: 3
-      },
-      {
-        text: "What is the maximum gap between two parliamentary sessions?",
-        options: ["4 months", "6 months", "8 months", "12 months"],
-        answer: 1
-      },
-      {
-        text: "Directive Principles are mentioned in which part of the Constitution?",
-        options: ["Part III", "Part IV", "Part V", "Part VI"],
-        answer: 1
-      },
-      {
-        text: "Which constitutional amendment added the Fundamental Duties?",
-        options: ["24th", "42nd", "44th", "52nd"],
-        answer: 1
-      },
-      {
-        text: "The first Lok Sabha elections were held in:",
-        options: ["1947", "1949", "1951-52", "1955"],
-        answer: 2
-      },
-      {
-        text: "How many members can the President nominate to the Rajya Sabha?",
-        options: ["10", "12", "14", "15"],
-        answer: 1
-      },
-      {
-        text: "Who appoints the Chief Election Commissioner?",
-        options: ["The Prime Minister", "The President", "The Parliament", "The Chief Justice"],
-        answer: 1
-      }
+        // Chapter 1: Historical Background
+        { text: "The Regulating Act of 1773 designated the Governor of Bengal as the:", options: ["Viceroy of India", "Governor-General of India", "Governor-General of Bengal", "Secretary of State for India"], answer: 2 },
+        { text: "Which Act established a Supreme Court at Calcutta in 1774?", options: ["Pitt’s India Act, 1784", "Regulating Act, 1773", "Charter Act, 1813", "Charter Act, 1833"], answer: 1 },
+        { text: "The Pitt’s India Act of 1784 distinguished between the:", options: ["Civil and military functions of the Company", "Legislative and executive functions of the Council", "Commercial and political functions of the Company", "British possessions in India and the Company's territories"], answer: 2 },
+        { text: "Which Act made the Governor-General of Bengal the Governor-General of India?", options: ["Charter Act of 1813", "Charter Act of 1833", "Charter Act of 1853", "Government of India Act of 1858"], answer: 1 },
+        { text: "The system of 'double government' was established by the:", options: ["Regulating Act, 1773", "Pitt's India Act, 1784", "Government of India Act, 1858", "Indian Councils Act, 1909"], answer: 1 },
+        { text: "The Government of India Act of 1858 transferred the powers of government, territories, and revenues from the East India Company to:", options: ["The British Parliament", "The British Crown", "The Secretary of State for India", "The Viceroy of India"], answer: 1 },
+        { text: "Who was the first Viceroy of India?", options: ["Lord Warren Hastings", "Lord William Bentinck", "Lord Canning", "Lord Mountbatten"], answer: 2 },
+        { text: "The system of communal representation through separate electorates was first introduced by the:", options: ["Indian Councils Act of 1892", "Morley-Minto Reforms (Indian Councils Act of 1909)", "Montagu-Chelmsford Reforms (Government of India Act of 1919)", "Government of India Act of 1935"], answer: 1 },
+        { text: "The concept of 'dyarchy' in the provinces was introduced by the:", options: ["Morley-Minto Reforms, 1909", "Montagu-Chelmsford Reforms, 1919", "Simon Commission", "Government of India Act, 1935"], answer: 1 },
+        { text: "Which Act introduced bicameralism and direct elections in the country for the first time?", options: ["Indian Councils Act, 1909", "Government of India Act, 1919", "Government of India Act, 1935", "Indian Independence Act, 1947"], answer: 1 },
+        { text: "The Government of India Act, 1935 provided for the establishment of:", options: ["A Federal Court", "The Reserve Bank of India", "Provincial autonomy", "All of the above"], answer: 3 },
+        { text: "The Indian Independence Act of 1947:", options: ["Provided for the partition of India", "Abolished the office of Viceroy", "Empowered the Constituent Assemblies to frame their respective constitutions", "All of the above"], answer: 3 },
+        { text: "Who was the first Governor-General of the Dominion of India?", options: ["C. Rajagopalachari", "Lord Mountbatten", "Dr. Rajendra Prasad", "Jawaharlal Nehru"], answer: 1 },
+        { text: "The office of the Secretary of State for India was created by which Act?", options: ["Charter Act, 1853", "Government of India Act, 1858", "Indian Councils Act, 1909", "Government of India Act, 1919"], answer: 1 },
+        { text: "For the first time, the legislative and executive functions of the Governor-General’s council were separated under the:", options: ["Charter Act of 1833", "Charter Act of 1853", "Government of India Act of 1858", "Indian Councils Act of 1861"], answer: 1 },
+        { text: "The foundation of central administration in India was laid by the:", options: ["Regulating Act of 1773", "Pitt's India Act of 1784", "Charter Act of 1833", "Government of India Act of 1858"], answer: 0 },
+        { text: "The Government of India Act, 1935 abolished dyarchy in the provinces and introduced:", options: ["Dyarchy at the Centre", "Provincial autonomy", "A bicameral legislature at the Centre", "Both A and B"], answer: 3 },
+        { text: "Lord Macaulay was associated with the:", options: ["Introduction of English education", "Abolition of Sati", "Codification of laws", "Both A and C"], answer: 3 },
+        { text: "The Act that ended the East India Company's activities as a commercial body was the:", options: ["Charter Act of 1813", "Charter Act of 1833", "Charter Act of 1853", "Government of India Act of 1858"], answer: 1 },
+        { text: "The Simon Commission was appointed to review the working of the:", options: ["Morley-Minto Reforms, 1909", "Government of India Act, 1919", "Government of India Act, 1935", "Indian Independence Act, 1947"], answer: 1 },
+        // Chapter 2: Making of the Constitution
+        { text: "The idea of a Constituent Assembly for India was first put forward by:", options: ["Mahatma Gandhi", "M.N. Roy", "Jawaharlal Nehru", "Sardar Patel"], answer: 1 },
+        { text: "The Constituent Assembly was formed in 1946 under the scheme of the:", options: ["Cripps Mission", "Simon Commission", "Cabinet Mission Plan", "Mountbatten Plan"], answer: 2 },
+        { text: "Who was the temporary President of the first meeting of the Constituent Assembly?", options: ["Dr. Rajendra Prasad", "Dr. B.R. Ambedkar", "Dr. Sachchidananda Sinha", "H.C. Mukherjee"], answer: 2 },
+        { text: "Who was elected as the permanent President of the Constituent Assembly?", options: ["Dr. Rajendra Prasad", "Jawaharlal Nehru", "Sardar Patel", "Dr. B.R. Ambedkar"], answer: 0 },
+        { text: "The historic 'Objectives Resolution' was moved in the Constituent Assembly by:", options: ["Dr. B.R. Ambedkar", "Jawaharlal Nehru", "Dr. Rajendra Prasad", "C. Rajagopalachari"], answer: 1 },
+        { text: "Who was the Chairman of the Drafting Committee of the Constituent Assembly?", options: ["N. Gopalaswamy Ayyangar", "Alladi Krishnaswamy Ayyar", "Dr. B.R. Ambedkar", "K.M. Munshi"], answer: 2 },
+        { text: "The Constitution of India was adopted by the Constituent Assembly on:", options: ["August 15, 1947", "January 26, 1950", "November 26, 1949", "December 9, 1946"], answer: 2 },
+        { text: "The Constitution of India came into full force on:", options: ["November 26, 1949", "January 26, 1950", "August 15, 1947", "January 30, 1948"], answer: 1 },
+        { text: "How many members were there in the Drafting Committee of the Constitution?", options: ["5", "6", "7", "8"], answer: 2 },
+        { text: "Who was the Constitutional Advisor to the Constituent Assembly?", options: ["Dr. B.R. Ambedkar", "K.M. Munshi", "Sir B.N. Rau", "H.V.R. Iengar"], answer: 2 },
+        { text: "The original Indian Constitution contained:", options: ["A Preamble, 395 Articles, and 8 Schedules", "A Preamble, 448 Articles, and 12 Schedules", "A Preamble, 395 Articles, and 10 Schedules", "A Preamble, 400 Articles, and 8 Schedules"], answer: 0 },
+        { text: "The first meeting of the Constituent Assembly was held on:", options: ["November 26, 1949", "December 9, 1946", "August 15, 1947", "January 26, 1950"], answer: 1 },
+        { text: "Who was the Chairman of the Union Powers Committee of the Constituent Assembly?", options: ["Sardar Patel", "Dr. B.R. Ambedkar", "J.B. Kripalani", "Jawaharlal Nehru"], answer: 3 },
+        { text: "The Constituent Assembly took how long to frame the Constitution?", options: ["2 years, 11 months, and 18 days", "3 years, 10 months, and 10 days", "2 years, 10 months, and 18 days", "3 years, 11 months, and 18 days"], answer: 0 },
+        { text: "The 'Objectives Resolution' later became the:", options: ["Preamble of the Constitution", "Fundamental Rights", "Directive Principles of State Policy", "Fundamental Duties"], answer: 0 },
+        { text: "The members of the Constituent Assembly were:", options: ["Directly elected by the people", "Nominated by the Governor-General", "Elected by the members of the Provincial Legislative Assemblies", "Nominated by the Indian National Congress and the Muslim League"], answer: 2 },
+        { text: "Who were the Vice-Presidents of the Constituent Assembly?", options: ["V.T. Krishnamachari", "H.C. Mukherjee", "K.M. Munshi", "Both H.C. Mukherjee and V.T. Krishnamachari"], answer: 3 },
+        { text: "The Indian National Flag was adopted by the Constituent Assembly on:", options: ["August 15, 1947", "July 22, 1947", "January 24, 1950", "January 26, 1950"], answer: 1 },
+        { text: "Which of the following personalities was NOT a member of the Drafting Committee?", options: ["N. Gopalaswamy Ayyangar", "K.M. Munshi", "Mahatma Gandhi", "T.T. Krishnamachari"], answer: 2 },
+        { text: "The final reading of the draft Constitution was completed on:", options: ["November 26, 1949", "January 24, 1950", "December 9, 1946", "October 17, 1949"], answer: 0 },
+        // Chapter 3: Salient Features of the Constitution
+        { text: "The Indian Constitution is known as the:", options: ["Shortest Written Constitution", "Lengthiest Written Constitution", "Unwritten Constitution", "Rigid Constitution"], answer: 1 },
+        { text: "The concept of Fundamental Rights in the Indian Constitution is borrowed from:", options: ["Constitution of the UK", "Constitution of the USA", "Constitution of Ireland", "Constitution of Canada"], answer: 1 },
+        { text: "The Directive Principles of State Policy (DPSP) are inspired by the:", options: ["Constitution of Germany", "Constitution of Australia", "Constitution of Ireland", "Constitution of South Africa"], answer: 2 },
+        { text: "The Indian Constitution is described as a 'blend of rigidity and flexibility' because:", options: ["All amendments require a special majority", "It can be amended by a simple majority only", "Some provisions can be amended by a special majority, while others by a simple majority", "The President can amend the Constitution"], answer: 2 },
+        { text: "The Parliamentary form of government in India is adopted from:", options: ["American model", "British model", "Swiss model", "French model"], answer: 1 },
+        { text: "Which feature of the Indian Constitution reflects a unitary bias in an otherwise federal system?", options: ["Division of powers", "Written Constitution", "Single Citizenship", "Independent Judiciary"], answer: 2 },
+        { text: "The term 'Federation' is:", options: ["Used in Article 1 of the Constitution", "Used in the Preamble of the Constitution", "Used several times in the Constitution", "Nowhere used in the Constitution"], answer: 3 },
+        { text: "The concept of an 'Integrated and Independent Judiciary' means:", options: ["There is no separation of powers", "The Supreme Court heads a single system of courts enforcing both central and state laws", "The judiciary is not accountable to anyone", "The states have their own separate Supreme Courts"], answer: 1 },
+        { text: "Fundamental Duties were added to the Constitution by the:", options: ["42nd Amendment Act, 1976", "44th Amendment Act, 1978", "1st Amendment Act, 1951", "24th Amendment Act, 1971"], answer: 0 },
+        { text: "The concept of Universal Adult Franchise means:", options: ["Only graduates can vote", "All citizens who are 21 years or older can vote", "All citizens who are 18 years or older can vote without discrimination", "Only property owners can vote"], answer: 2 },
+        { text: "The Emergency provisions in the Indian Constitution are taken from the:", options: ["Constitution of the USA", "Weimar Constitution of Germany", "Constitution of South Africa", "Constitution of Japan"], answer: 1 },
+        { text: "The Indian Constitution establishes a:", options: ["Theocratic State", "Secular State", "Atheistic State", "State with an official religion"], answer: 1 },
+        { text: "Which of the following is NOT a federal feature of the Indian Constitution?", options: ["All-India Services", "Written Constitution", "Supremacy of the Constitution", "Bicameralism"], answer: 0 },
+        { text: "The Indian parliamentary system is different from the British parliamentary system in that India has:", options: ["A real and a nominal executive", "A system of collective responsibility", "A system of judicial review", "A bicameral legislature"], answer: 2 },
+        { text: "The feature of 'procedure established by law' is borrowed from the:", options: ["Constitution of Britain", "Constitution of the USA", "Constitution of Japan", "Constitution of France"], answer: 2 },
+        { text: "The provision for a 'Federation with a strong Centre' is borrowed from the:", options: ["Constitution of the USA", "Constitution of Canada", "Constitution of Australia", "Constitution of the UK"], answer: 1 },
+        { text: "Part IV-A of the Indian Constitution deals with:", options: ["Fundamental Rights", "Directive Principles of State Policy", "Fundamental Duties", "The Union and its Territory"], answer: 2 },
+        { text: "In a parliamentary form of government, the executive is responsible to the:", options: ["President", "Judiciary", "Legislature", "People directly"], answer: 2 },
+        { text: "The concept of 'synthesis of Parliamentary Sovereignty and Judicial Supremacy' is a key feature of:", options: ["The British Constitution", "The American Constitution", "The Indian Constitution", "The Australian Constitution"], answer: 2 },
+        { text: "Three-tier government (local self-government) was constitutionally recognized by the:", options: ["42nd and 43rd Amendments", "63rd and 64th Amendments", "73rd and 74th Amendments", "86th Amendment"], answer: 2 },
+        // Chapter 4: Preamble of the Constitution
+        { text: "The Preamble to the Indian Constitution is based on the:", options: ["Government of India Act, 1935", "'Objectives Resolution' moved by Jawaharlal Nehru", "Nehru Report, 1928", "Preamble of the US Constitution"], answer: 1 },
+        { text: "Which words were added to the Preamble by the 42nd Constitutional Amendment Act, 1976?", options: ["Sovereign, Socialist, Secular", "Socialist, Secular, Integrity", "Republic, Democratic, Justice", "Liberty, Equality, Fraternity"], answer: 1 },
+        { text: "The Preamble declares that the authority of the Constitution is derived from:", options: ["The Parliament of India", "The President of India", "The People of India", "The Constituent Assembly"], answer: 2 },
+        { text: "The term 'We, the people of India' in the Preamble signifies:", options: ["Popular Sovereignty", "Parliamentary Sovereignty", "Judicial Supremacy", "Limited Government"], answer: 0 },
+        { text: "Which one of the following is NOT mentioned in the Preamble?", options: ["Justice", "Liberty", "Adult Franchise", "Fraternity"], answer: 2 },
+        { text: "The Preamble secures Justice in which of the following forms?", options: ["Social and Economic", "Political and Economic", "Social and Political", "Social, Economic, and Political"], answer: 3 },
+        { text: "In which landmark case did the Supreme Court hold that the Preamble is NOT a part of the Constitution?", options: ["Kesavananda Bharati case (1973)", "Berubari Union case (1960)", "Golaknath case (1967)", "Minerva Mills case (1980)"], answer: 1 },
+        { text: "In which case did the Supreme Court reverse its earlier decision and hold that the Preamble IS a part of the Constitution?", options: ["Berubari Union case (1960)", "S.R. Bommai case (1994)", "Kesavananda Bharati case (1973)", "Maneka Gandhi case (1978)"], answer: 2 },
+        { text: "The Preamble of the Constitution is:", options: ["Justiciable in nature (enforceable by courts)", "Non-justiciable in nature", "Justiciable only in matters of Fundamental Rights", "A source of power to the legislature"], answer: 1 },
+        { text: "How many times has the Preamble to the Constitution of India been amended?", options: ["Once", "Twice", "Thrice", "Never"], answer: 0 },
+        { text: "The term 'Secular' in the Indian Preamble means:", options: ["The state has no religion of its own", "The state treats all religions equally", "The state protects all religions impartially", "All of the above"], answer: 3 },
+        { text: "The word 'Liberty' in the Preamble does not include the liberty of:", options: ["Thought", "Expression", "Action", "Belief"], answer: 2 },
+        { text: "The ideal of 'Fraternity' in the Preamble is to assure:", options: ["The dignity of the individual", "The unity and integrity of the nation", "Both A and B", "Only the unity of the nation"], answer: 2 },
+        { text: "The Preamble specifies the date of adoption of the Constitution as:", options: ["15th August, 1947", "26th January, 1950", "26th November, 1949", "9th December, 1946"], answer: 2 },
+        { text: "What is the correct sequence of the following words in the Preamble?", options: ["Sovereign, Socialist, Secular, Democratic, Republic", "Sovereign, Democratic, Socialist, Secular, Republic", "Sovereign, Socialist, Democratic, Secular, Republic", "Socialist, Sovereign, Democratic, Secular, Republic"], answer: 0 },
+        { text: "The term 'Socialist' in the Preamble implies:", options: ["A commitment to a purely communist form of state", "The state's ownership of all means of production", "A commitment to democratic socialism for ending poverty and inequality", "A commitment to a laissez-faire economy"], answer: 2 },
+        { text: "Who described the Preamble as the 'political horoscope' of the Indian Constitution?", options: ["N.A. Palkhivala", "K.M. Munshi", "Dr. B.R. Ambedkar", "Sir Ernest Barker"], answer: 1 },
+        { text: "The Preamble can be amended under which Article of the Constitution?", options: ["Article 356", "Article 360", "Article 368", "It cannot be amended"], answer: 2 },
+        { text: "The concept of liberty, equality, and fraternity in our Preamble is inspired by the:", options: ["Russian Revolution", "French Revolution", "American War of Independence", "Irish Revolution"], answer: 1 },
+        { text: "The Preamble is important because it:", options: ["Contains the basic structure of the Constitution", "Embodies the philosophy and fundamental values of the Constitution", "Is the key to open the mind of the makers", "All of the above"], answer: 3 },
+        // Chapter 5: Union and its Territory
+        { text: "Which part of the Indian Constitution deals with the Union and its Territory?", options: ["Part I", "Part II", "Part III", "Part IV"], answer: 0 },
+        { text: "Article 1 of the Constitution describes India as a:", options: ["Federation of States", "Quasi-Federation", "Union of States", "Confederation of States"], answer: 2 },
+        { text: "The power to admit new states into the Union of India is vested in the:", options: ["President", "Supreme Court", "Parliament", "Prime Minister"], answer: 2 },
+        { text: "Which Article empowers the Parliament to form new states and alter the areas, boundaries, or names of existing states?", options: ["Article 1", "Article 2", "Article 3", "Article 4"], answer: 2 },
+        { text: "A bill for the purpose of altering the boundaries of a state can be introduced in the Parliament only with the prior recommendation of the:", options: ["Prime Minister", "President", "Speaker of the Lok Sabha", "Concerned State Legislature"], answer: 1 },
+        { text: "The phrase 'indestructible union of destructible states' applies to:", options: ["The USA", "Canada", "India", "Australia"], answer: 2 },
+        { text: "Which Article deals with the admission or establishment of new states that are not part of the Union of India?", options: ["Article 2", "Article 3", "Article 4", "Article 1"], answer: 0 },
+        { text: "Are the views of a state legislature on a bill to alter its boundaries binding on the Parliament?", options: ["Yes, always", "Yes, if passed by a special majority", "No, they are not binding", "Yes, if ratified by half of the states"], answer: 2 },
+        { text: "Article 4 of the Constitution declares that laws made under Articles 2 and 3 are:", options: ["Considered as constitutional amendments under Article 368", "Not considered as constitutional amendments under Article 368", "Require a special majority for passage", "Require ratification by the states"], answer: 1 },
+        { text: "The state of Sikkim became an integral part of India under the:", options: ["35th Amendment Act", "36th Amendment Act", "42nd Amendment Act", "44th Amendment Act"], answer: 1 },
+        { text: "The States Reorganisation Act of 1956 was based on the recommendations of the:", options: ["Dhar Commission", "JVP Committee", "Fazl Ali Commission", "Simon Commission"], answer: 2 },
+        { text: "The first linguistic state to be created in India was:", options: ["Tamil Nadu", "Kerala", "Andhra Pradesh", "Maharashtra"], answer: 2 },
+        { text: "The power to cede Indian territory to a foreign country lies with:", options: ["The President through an executive order", "The Parliament through a simple majority law", "The Parliament through a Constitutional Amendment under Article 368", "The Prime Minister"], answer: 2 },
+        { text: "The JVP Committee, which reviewed the issue of linguistic states, comprised:", options: ["Jawaharlal Nehru, Vallabhbhai Patel, Pattabhi Sitaramayya", "Jawaharlal Nehru, B. R. Ambedkar, K. M. Munshi", "Jawaharlal Nehru, Vallabhbhai Patel, Rajendra Prasad", "Jawaharlal Nehru, V.P. Menon, Pattabhi Sitaramayya"], answer: 0 },
+        { text: "The territory of India under Article 1 comprises:", options: ["The territories of the states", "The union territories", "Territories that may be acquired by the Government of India at any time", "All of the above"], answer: 3 },
+        { text: "The States Reorganisation Act of 1956 created:", options: ["16 States and 3 Union Territories", "14 States and 6 Union Territories", "15 States and 5 Union Territories", "22 States and 9 Union Territories"], answer: 1 },
+        { text: "Which of the following states was created in the year 2000?", options: ["Goa", "Sikkim", "Jharkhand", "Arunachal Pradesh"], answer: 2 },
+        { text: "The Dhar Commission (1948) recommended the reorganisation of states on the basis of:", options: ["Language", "Administrative convenience", "Geographic contiguity", "Religion"], answer: 1 },
+        { text: "Alteration of the name of a state requires an amendment to which Schedule of the Constitution?", options: ["First Schedule", "Second Schedule", "Third Schedule", "Fourth Schedule"], answer: 0 },
+        { text: "The choice of 'Union of States' over 'Federation of States' in Article 1 signifies that:", options: ["The states have the right to secede", "The Indian Federation is a result of an agreement among the states", "The states have no right to secede from the federation", "The Union is more powerful than the states"], answer: 2 }
     ];
 
-    const state = {
-      current: 0,
-      answers: Array(questions.length).fill(null),
-      marked: Array(questions.length).fill(false),
-      visited: Array(questions.length).fill(false)
-    };
+    // ### GLOBAL STATE ###
+    let state = {};
+    let timerInterval;
+    let timeLeft = TEST_DURATION_SECONDS;
+    let isTestCompleted = false;
 
-    // DOM Elements
+    // ### DOM ELEMENTS ###
+    const mockTestWrapper = document.getElementById('mockTestWrapper');
+    const answerWritingWrapper = document.getElementById('answerWritingWrapper');
+    const resultScreenWrapper = document.getElementById('resultScreenWrapper');
+    const reviewScreenWrapper = document.getElementById('reviewScreenWrapper');
+    const passwordModal = document.getElementById('passwordModal');
+    const mcqFooter = document.getElementById('mcqFooter');
     const questionText = document.getElementById('questionText');
     const questionNumber = document.getElementById('questionNumber');
     const optionsList = document.getElementById('optionsList');
     const questionPalette = document.getElementById('questionPalette');
-    const timerElement = document.getElementById('timer');
     const btnSubmit = document.getElementById('btnSubmit');
     const actionButtons = document.getElementById('actionButtons');
     const btnPrevQuestion = document.getElementById('btnPrevQuestion');
     const btnSaveNext = document.getElementById('btnSaveNext');
+    const countdownWrapper = document.getElementById('countdownWrapper');
+    const timerElement = document.getElementById('timer');
+    const stopwatchWrapper = document.getElementById('stopwatchWrapper');
+    const stopwatchDisplay = document.getElementById('stopwatchDisplay');
+    const stopwatchStartBtn = document.getElementById('stopwatchStart');
+    const stopwatchStopBtn = document.getElementById('stopwatchStop');
+    const stopwatchResetBtn = document.getElementById('stopwatchReset');
+    const reviewAnswersButton = document.getElementById('reviewAnswersButton');
+    const backToResultsBtn = document.getElementById('backToResultsBtn');
+    const reviewContainer = document.getElementById('reviewContainer');
+    const showMockTestTab = document.getElementById('showMockTestTab');
+    const showAnswerWritingTab = document.getElementById('showAnswerWritingTab');
+    const unlockPopup = document.getElementById('unlockPopup');
 
-    // Initialize the test
+    const summaryAnswered = document.getElementById('summaryAnswered');
+    const summaryNotAnswered = document.getElementById('summaryNotAnswered');
+    const summaryMarked = document.getElementById('summaryMarked');
+    const summaryNotVisited = document.getElementById('summaryNotVisited');
+
+    // ### STOPWATCH LOGIC ###
+    let stopwatchInterval;
+    let stopwatchSeconds = 0;
+    let isStopwatchRunning = false;
+    function formatTime(sec) {
+        const hours = Math.floor(sec / 3600);
+        const minutes = Math.floor((sec % 3600) / 60);
+        const seconds = sec % 60;
+        return [hours, minutes, seconds].map(v => v.toString().padStart(2, '0')).join(':');
+    }
+    function updateStopwatchDisplay() { stopwatchDisplay.textContent = formatTime(stopwatchSeconds); }
+    function startStopwatch() {
+        if (isStopwatchRunning) return;
+        isStopwatchRunning = true;
+        stopwatchStartBtn.classList.add('hidden');
+        stopwatchStopBtn.classList.remove('hidden');
+        stopwatchInterval = setInterval(() => { stopwatchSeconds++; updateStopwatchDisplay(); }, 1000);
+    }
+    function stopStopwatch() {
+        if (!isStopwatchRunning) return;
+        isStopwatchRunning = false;
+        stopwatchStartBtn.classList.remove('hidden');
+        stopwatchStopBtn.classList.add('hidden');
+        clearInterval(stopwatchInterval);
+    }
+    function resetStopwatch() { stopStopwatch(); stopwatchSeconds = 0; updateStopwatchDisplay(); }
+    stopwatchStartBtn.addEventListener('click', startStopwatch);
+    stopwatchStopBtn.addEventListener('click', stopStopwatch);
+    stopwatchResetBtn.addEventListener('click', resetStopwatch);
+
+    // ### MOCK TEST LOGIC ###
+    function resetState() { state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) }; }
+    
+    function updatePaletteSummary() {
+      if (!state.answers) return;
+      let answeredCount = 0, notAnsweredCount = 0, markedCount = 0, notVisitedCount = 0;
+      for (let i = 0; i < questions.length; i++) {
+        if (state.answers[i] !== null) { answeredCount++; } 
+        else if (state.marked[i]) { markedCount++; } 
+        else if (state.visited[i]) { notAnsweredCount++; } 
+        else { notVisitedCount++; }
+      }
+      summaryAnswered.textContent = answeredCount;
+      summaryNotAnswered.textContent = notAnsweredCount;
+      summaryMarked.textContent = markedCount;
+      summaryNotVisited.textContent = notVisitedCount;
+    }
+
     function initTest() {
+      resetState();
+      timeLeft = TEST_DURATION_SECONDS;
+      isTestCompleted = false;
+      showAnswerWritingTab.classList.add('locked');
+      showAnswerWritingTab.setAttribute('title', 'Complete the Mock Test to unlock this section.');
       state.visited[0] = true;
       loadQuestion(0);
-      updatePalette();
       updateNavigationButtons();
       startTimer();
     }
 
-    // Load a question
     function loadQuestion(index) {
       const q = questions[index];
       questionText.textContent = q.text;
       questionNumber.textContent = `Question ${index + 1} of ${questions.length}`;
-      
       optionsList.innerHTML = '';
       q.options.forEach((opt, i) => {
         const li = document.createElement('li');
         li.className = 'option';
         if (state.answers[index] === i) li.classList.add('selected');
-        
-        li.innerHTML = `
-          <span class="option-radio" style="${state.answers[index] === i ? 
-            'box-shadow: inset 0 0 0 3px #4caf50; border-color: white; background: white' : ''}"></span>
-          <span class="option-text">${opt}</span>
-        `;
-        
+        li.innerHTML = `<span class="option-radio"></span><span class="option-text">${opt}</span>`;
         li.onclick = () => selectOption(index, i);
         optionsList.appendChild(li);
       });
-      
       state.current = index;
       state.visited[index] = true;
       updatePalette();
+      updatePaletteSummary();
       updateNavigationButtons();
     }
 
-    // Select an option
     function selectOption(qIndex, optIndex) {
-      const options = optionsList.querySelectorAll('.option');
-      
-      // Clear previous selection
-      options.forEach(opt => {
-        opt.classList.remove('selected');
-        opt.querySelector('.option-radio').style.boxShadow = 'none';
-        opt.querySelector('.option-radio').style.borderColor = '#ccc';
-        opt.querySelector('.option-radio').style.background = 'transparent';
-      });
-      
-      // Set new selection
-      options[optIndex].classList.add('selected');
-      const radio = options[optIndex].querySelector('.option-radio');
-      radio.style.boxShadow = 'inset 0 0 0 3px #4caf50';
-      radio.style.borderColor = 'white';
-      radio.style.background = 'white';
-      
       state.answers[qIndex] = optIndex;
+      const options = optionsList.querySelectorAll('.option');
+      options.forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
       updatePalette();
+      updatePaletteSummary();
     }
 
-    // Update question palette
     function updatePalette() {
       questionPalette.innerHTML = '';
       questions.forEach((_, i) => {
         const btn = document.createElement('div');
         btn.className = 'question-number';
-        
-        // Set base class
-        if (state.visited[i]) {
-          if (state.answers[i] !== null) {
-            btn.classList.add('answered');
-          } else if (state.marked[i]) {
-            btn.classList.add('marked');
-          } else {
-            btn.classList.add('not-answered');
-          }
-        } else {
-          btn.classList.add('not-visited');
-        }
-        
-        // Highlight current question
-        if (i === state.current) {
-          btn.classList.add('current');
-        }
-        
+        if (state.answers[i] !== null) { btn.classList.add('answered'); } 
+        else if (state.marked[i]) { btn.classList.add('marked'); } 
+        else if (state.visited[i]) { btn.classList.add('not-answered'); } 
+        else { btn.classList.add('not-visited'); }
+        if (i === state.current) { btn.classList.add('current'); }
         btn.textContent = i + 1;
-        
-        btn.onclick = () => {
-          loadQuestion(i);
-          document.body.classList.remove('sidebar-open');
-        };
+        btn.onclick = () => { loadQuestion(i); document.body.classList.remove('sidebar-open'); };
         questionPalette.appendChild(btn);
       });
     }
 
-    // Update navigation buttons visibility
     function updateNavigationButtons() {
-      // Show/hide previous button
       btnPrevQuestion.style.display = state.current === 0 ? 'none' : 'flex';
-      
-      // Show submit button only on last question
-      if (state.current === questions.length - 1) {
-        btnSubmit.style.display = 'flex';
-        actionButtons.style.display = 'none';
-      } else {
-        btnSubmit.style.display = 'none';
-        actionButtons.style.display = 'flex';
-      }
-      
-      // Change next button text on last question
-      btnSaveNext.textContent = state.current === questions.length - 1 ? 'Save' : 'Save & Next';
+      actionButtons.style.display = state.current === questions.length - 1 ? 'none' : 'flex';
+      btnSubmit.style.display = state.current === questions.length - 1 ? 'flex' : 'none';
     }
 
-    // Timer functionality
     function startTimer() {
-      let timeLeft = 60 * 60; // 60 minutes
-      
-      const timerInterval = setInterval(() => {
+      clearInterval(timerInterval); // Clear any existing timer
+      timerInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
         timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-        
-        if (timeLeft <= 0) {
-          clearInterval(timerInterval);
-          submitTest();
-        } else {
-          timeLeft--;
-        }
+        if (timeLeft-- <= 0) { clearInterval(timerInterval); submitTest(); }
       }, 1000);
     }
 
-    // Submit test
+    function stopTimer() { clearInterval(timerInterval); }
+
     function submitTest() {
-      const score = state.answers.reduce((acc, ans, i) => 
-        ans === questions[i].answer ? acc + 1 : acc, 0);
+      stopTimer();
+      isTestCompleted = true;
+      showAnswerWritingTab.classList.remove('locked');
+      showAnswerWritingTab.removeAttribute('title');
       
-      alert(`Test submitted!\nYour score: ${score}/${questions.length}`);
+      const score = state.answers.reduce((acc, ans, i) => (ans === questions[i].answer ? acc + 1 : acc), 0);
+      const scoreText = `${score}/${questions.length}`;
+      localStorage.setItem('testTaken', 'true');
+      localStorage.setItem('lastScore', scoreText);
+      localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
+      
+      showResultScreen(scoreText);
+      showUnlockPopup();
+    }
+    
+    function showUnlockPopup() {
+        unlockPopup.style.display = 'block';
+        setTimeout(() => {
+            unlockPopup.style.display = 'none';
+        }, 4000); // Popup will hide after 4 seconds
     }
 
-    // Navigation functions
-    function goToNextQuestion() {
-      if (state.current < questions.length - 1) {
-        loadQuestion(state.current + 1);
-      } else {
-        submitTest();
-      }
+    function showResultScreen(scoreText) {
+        mockTestWrapper.style.display = 'none';
+        answerWritingWrapper.style.display = 'none';
+        reviewScreenWrapper.style.display = 'none';
+        resultScreenWrapper.style.display = 'flex';
+        mcqFooter.style.display = 'none';
+        countdownWrapper.style.display = 'none';
+        stopwatchWrapper.style.display = 'none';
+        document.getElementById('finalScore').textContent = scoreText;
     }
 
-    function goToPrevQuestion() {
-      if (state.current > 0) {
-        loadQuestion(state.current - 1);
-      }
+    function showReviewScreen() {
+      resultScreenWrapper.style.display = 'none';
+      reviewScreenWrapper.style.display = 'flex';
+      populateReviewScreen();
     }
 
-    // Event Listeners
-    document.getElementById('btnToggleSidebar').addEventListener('click', function() {
-      document.body.classList.toggle('sidebar-open');
+    function populateReviewScreen() {
+        reviewContainer.innerHTML = '';
+        const userAnswers = JSON.parse(localStorage.getItem('lastAnswers')) || state.answers;
+        questions.forEach((q, index) => {
+            const userAnswer = userAnswers[index];
+            const correctAnswer = q.answer;
+            const isCorrect = userAnswer === correctAnswer;
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'review-question';
+            let optionsHTML = '';
+            q.options.forEach((opt, optIndex) => {
+                let classes = 'review-option';
+                let icon = '<i class="far fa-circle"></i>';
+                if (optIndex === correctAnswer) { classes += ' review-correct'; icon = '<i class="fas fa-check-circle" style="color: #4caf50;"></i>'; }
+                if (optIndex === userAnswer && !isCorrect) { classes += ' review-incorrect'; icon = '<i class="fas fa-times-circle" style="color: #f44336;"></i>'; }
+                optionsHTML += `<li class="${classes}">${icon}<span>${opt}</span></li>`;
+            });
+            let statusHTML = '';
+            if(userAnswer === null) { statusHTML = '<div class="review-status unanswered">Status: Unanswered</div>'; } 
+            else if (isCorrect) { statusHTML = '<div class="review-status correct">Status: Correct</div>'; } 
+            else { statusHTML = '<div class="review-status incorrect">Status: Incorrect</div>'; }
+            questionDiv.innerHTML = `<h4>Q${index + 1}: ${q.text}</h4><ul class="review-option-list">${optionsHTML}</ul>${statusHTML}`;
+            reviewContainer.appendChild(questionDiv);
+        });
+    }
+    
+    // ### PAGE & NAVIGATION LOGIC ###
+    document.addEventListener('DOMContentLoaded', () => {
+        if (localStorage.getItem('testTaken') === 'true') {
+            isTestCompleted = true;
+            showAnswerWritingTab.classList.remove('locked');
+            showResultScreen(localStorage.getItem('lastScore'));
+        } else {
+            initTest();
+        }
     });
 
-    document.getElementById('darkModeToggle').addEventListener('change', function(e) {
-      document.body.classList.toggle('dark', e.target.checked);
-      document.getElementById('toggleLabel').textContent = e.target.checked ? 'Light' : 'Dark';
+    const sidebarToggleButton = document.getElementById('btnToggleSidebar');
+
+    showMockTestTab.addEventListener('click', () => {
+        showMockTestTab.classList.add('active');
+        showAnswerWritingTab.classList.remove('active');
+        countdownWrapper.style.display = 'flex';
+        stopwatchWrapper.style.display = 'none';
+        stopStopwatch();
+        
+        if (isTestCompleted) {
+            showResultScreen(localStorage.getItem('lastScore'));
+        } else {
+            answerWritingWrapper.style.display = 'none';
+            resultScreenWrapper.style.display = 'none';
+            reviewScreenWrapper.style.display = 'none';
+            mockTestWrapper.style.display = 'flex';
+            mcqFooter.style.display = 'block';
+            sidebarToggleButton.style.display = 'flex';
+            startTimer(); // Resume timer
+        }
     });
 
-    document.getElementById('btnSaveNext').addEventListener('click', goToNextQuestion);
-    document.getElementById('btnPrevQuestion').addEventListener('click', goToPrevQuestion);
-
-    document.getElementById('btnMarkReview').addEventListener('click', function() {
-      state.marked[state.current] = !state.marked[state.current];
-      updatePalette();
+    showAnswerWritingTab.addEventListener('click', (e) => {
+        if (showAnswerWritingTab.classList.contains('locked')) {
+            e.preventDefault();
+            return;
+        }
+        showAnswerWritingTab.classList.add('active');
+        showMockTestTab.classList.remove('active');
+        mockTestWrapper.style.display = 'none';
+        resultScreenWrapper.style.display = 'none';
+        reviewScreenWrapper.style.display = 'none';
+        answerWritingWrapper.style.display = 'block';
+        mcqFooter.style.display = 'none';
+        sidebarToggleButton.style.display = 'none';
+        document.body.classList.remove('sidebar-open');
+        stopTimer();
+        countdownWrapper.style.display = 'none';
+        stopwatchWrapper.style.display = 'flex';
+        resetStopwatch();
     });
 
-    document.getElementById('btnClearResponse').addEventListener('click', function() {
-      state.answers[state.current] = null;
-      const options = optionsList.querySelectorAll('.option');
-      options.forEach(opt => {
-        opt.classList.remove('selected');
-        const radio = opt.querySelector('.option-radio');
-        radio.style.boxShadow = 'none';
-        radio.style.borderColor = '#ccc';
-        radio.style.background = 'transparent';
-      });
-      updatePalette();
+    reviewAnswersButton.addEventListener('click', showReviewScreen);
+    backToResultsBtn.addEventListener('click', () => showResultScreen(localStorage.getItem('lastScore')));
+
+    document.getElementById('retestButton').addEventListener('click', () => { passwordModal.style.display = 'block'; });
+    document.getElementById('closeModal').addEventListener('click', () => { passwordModal.style.display = 'none'; document.getElementById('passwordError').textContent = ''; });
+    document.getElementById('verifyPasswordButton').addEventListener('click', () => {
+        const input = document.getElementById('passwordInput');
+        const error = document.getElementById('passwordError');
+        if (input.value === RETEST_PASSWORD) {
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('lastScore');
+            localStorage.removeItem('lastAnswers');
+            passwordModal.style.display = 'none';
+            input.value = '';
+            error.textContent = '';
+            resultScreenWrapper.style.display = 'none';
+            reviewScreenWrapper.style.display = 'none';
+            mockTestWrapper.style.display = 'flex';
+            mcqFooter.style.display = 'block';
+            countdownWrapper.style.display = 'flex';
+            initTest();
+        } else {
+            error.textContent = 'Incorrect password. Please try again.';
+        }
     });
-
-    document.getElementById('btnSubmit').addEventListener('click', submitTest);
-
-    // Initialize the test
-    initTest();
+    
+    sidebarToggleButton.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
+    document.getElementById('darkModeToggle').addEventListener('change', (e) => { document.body.classList.toggle('dark', e.target.checked); document.getElementById('toggleLabel').textContent = e.target.checked ? 'Light' : 'Dark'; });
+    btnSaveNext.addEventListener('click', () => { if (state.current < questions.length - 1) loadQuestion(state.current + 1); });
+    btnPrevQuestion.addEventListener('click', () => { if (state.current > 0) loadQuestion(state.current - 1); });
+    document.getElementById('btnMarkReview').addEventListener('click', () => { 
+        state.marked[state.current] = !state.marked[state.current]; 
+        updatePalette(); 
+        updatePaletteSummary();
+    });
+    document.getElementById('btnClearResponse').addEventListener('click', () => { 
+        state.answers[state.current] = null; 
+        loadQuestion(state.current);
+    });
+    btnSubmit.addEventListener('click', submitTest);
   </script>
 </body>
 </html>

@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta name="google-site-verification" content="e1dxCqTIBSM8IRzYzO2F7uUNiugJJaC-LD6A7tQHxS4" />
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <title>Test Library | UPSC Hub</title>
+
+   <!-- Font Awesome CDN -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+   <!-- Google Fonts -->
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@700&family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+   <!-- Custom Styles -->
+   <style>
+      :root {
+         --primary-start: #6a11cb;
+         --primary-end: #2575fc;
+         --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+         
+         /* Light Mode */
+         --bg-light: #f0f2f5;
+         --card-bg-light: #ffffff;
+         --text-primary-light: #1c1e21;
+         --text-secondary-light: #555c6e;
+         --border-light: rgba(0, 0, 0, 0.1);
+
+         /* Dark Mode */
+         --bg-dark: #101114;
+         --card-bg-dark: #1c1e23;
+         --text-primary-dark: #e4e6eb;
+         --text-secondary-dark: #b0b3b8;
+         --border-dark: rgba(255, 255, 255, 0.1);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+         font-family: 'Inter', sans-serif;
+         background-color: var(--bg-light);
+         color: var(--text-primary-light);
+         overflow-x: hidden;
+         transition: background-color 0.4s ease, color 0.4s ease;
+         padding-top: 110px; /* Space for header + runner bar */
+         padding-bottom: 80px; /* Space for bottom nav */
+         font-size: 15px; /* Base font for the body */
+      }
+      
+      body.dark-mode { background-color: var(--bg-dark); color: var(--text-primary-dark); }
+      h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; }
+      
+      /* --- HEADER & NAVIGATION (FROM YOUR CODE) --- */
+      .app-header {
+         position: fixed; top: 0; left: 0; right: 0; padding: 0 25px;
+         height: 65px; display: flex; align-items: center; justify-content: space-between;
+         background: rgba(255, 255, 255, 0.65);
+         backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+         border-bottom: 1px solid var(--border-light); z-index: 1000;
+         transition: all 0.4s ease;
+      }
+      body.dark-mode .app-header { background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none; }
+      .app-header .logo { font-size: 22px; font-weight: 700; text-decoration: none; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+      .header-right { display: flex; align-items: center; gap: 15px; }
+      #datetime-container { font-size: 0.75rem; color: var(--text-secondary-light); font-weight: 500; transition: color 0.4s ease; white-space: nowrap; }
+      body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
+      .app-header .icon-btn { font-size: 20px; color: var(--text-secondary-light); cursor: pointer; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; transition: all 0.2s; }
+      body.dark-mode .app-header .icon-btn { color: var(--text-secondary-dark); }
+      .app-header .icon-btn:hover { background-color: rgba(0,0,0,0.05); }
+      body.dark-mode .app-header .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
+      
+      .runner-bar { position: fixed; top: 65px; left: 0; right: 0; z-index: 999; background: var(--primary-gradient); color: white; padding: 8px 0; overflow: hidden; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+      .runner-bar .runner-text { display: inline-block; padding-left: 100%; animation: scroll-left 30s linear infinite; font-size: 0.9rem; }
+      .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
+      @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+
+      .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
+      body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
+      .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
+      .side-bar .profile img{width:90px;height:90px;border-radius:50%;object-fit:cover;}.side-bar .profile .name{margin-top:10px}
+      .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+
+      /* --- MAIN CONTENT (FROM PREVIOUS PREFERRED UI) --- */
+      .main-content {
+         max-width: 900px;
+         margin: 40px auto 0;
+         padding: 0 20px;
+         animation: fadeInUp 0.8s ease-out;
+      }
+      .page-title {
+         font-family: 'Cormorant Garamond', serif;
+         font-size: 2.8em;
+         text-align: center;
+         margin-bottom: 10px;
+         color: var(--text-primary-light);
+      }
+      body.dark-mode .page-title { color: var(--text-primary-dark); }
+      .page-title span { color: var(--primary-start); }
+      .hero-section p {
+         font-size: 1.05em; color: var(--text-secondary-light); max-width: 600px;
+         margin: 0 auto 30px auto; text-align: center;
+      }
+      body.dark-mode .hero-section p { color: var(--text-secondary-dark); }
+      .controls-container { display: flex; gap: 15px; margin-bottom: 30px; }
+      .search-bar { position: relative; flex-grow: 1; }
+      .search-bar input {
+         width: 100%; padding: 12px 15px 12px 40px; border-radius: 8px;
+         border: 1px solid var(--border-light); background-color: var(--card-bg-light);
+         color: var(--text-primary-light); font-size: 0.95em; transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      body.dark-mode .search-bar input { border-color: var(--border-dark); background-color: var(--card-bg-dark); color: var(--text-primary-dark); }
+      .search-bar input:focus { outline: none; border-color: var(--primary-start); box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2); }
+      .search-bar .fa-search { position: absolute; top: 50%; left: 15px; transform: translateY(-50%); color: var(--text-secondary-light); }
+      body.dark-mode .search-bar .fa-search { color: var(--text-secondary-dark); }
+      select#filter-subject {
+         padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-light);
+         background-color: var(--card-bg-light); color: var(--text-primary-light); font-size: 0.95em; cursor: pointer;
+      }
+      body.dark-mode select#filter-subject { border-color: var(--border-dark); background-color: var(--card-bg-dark); color: var(--text-primary-dark); }
+      select#filter-subject:focus { outline: none; border-color: var(--primary-start); }
+      
+      .test-list-container { display: grid; grid-template-columns: 1fr; gap: 15px; }
+      @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+      .test-card {
+         background: var(--card-bg-light); border-radius: 10px; border: 1px solid var(--border-light);
+         padding: 18px 22px; display: flex; align-items: center; justify-content: space-between;
+         flex-wrap: wrap; gap: 15px; transition: transform 0.2s ease, box-shadow 0.2s ease;
+         animation: fadeIn 0.5s ease-out forwards;
+      }
+      body.dark-mode .test-card { background: var(--card-bg-dark); border: 1px solid var(--border-dark); }
+      .test-card:hover { transform: translateY(-3px); box-shadow: 0 6px 15px rgba(0,0,0,0.07); }
+      body.dark-mode .test-card:hover { box-shadow: none; border-color: rgba(255, 255, 255, 0.2); }
+      .test-info { display: flex; flex-direction: column; gap: 4px; flex-grow: 1; }
+      .test-info h3 { font-size: 1.05em; font-weight: 500; }
+      .test-info .metadata { font-size: 0.85em; color: var(--text-secondary-light); display: flex; flex-wrap: wrap; gap: 15px; }
+      body.dark-mode .test-info .metadata { color: var(--text-secondary-dark); }
+      .metadata span { display: flex; align-items: center; gap: 5px; }
+
+      .test-actions { display: flex; gap: 10px; }
+      .btn {
+         display: inline-flex; align-items: center; justify-content: center;
+         gap: 6px; padding: 8px 15px; border-radius: 6px; border: 1px solid transparent;
+         font-weight: 500; cursor: pointer; text-decoration: none; transition: all 0.2s ease;
+         font-size: 0.9em;
+      }
+      .btn-download { background: var(--primary-gradient); color: white; }
+      .btn-solution { background-color: rgba(0,0,0,0.05); color: var(--text-primary-light); }
+      body.dark-mode .btn-solution { background-color: rgba(255,255,255,0.1); color: var(--text-primary-dark); }
+      .btn:hover { transform: translateY(-2px); }
+
+      #no-results { text-align: center; padding: 40px; color: var(--text-secondary-light); font-size: 1.1em; display: none; }
+      body.dark-mode #no-results { color: var(--text-secondary-dark); }
+      
+      /* --- FOOTER & BOTTOM NAV (FROM YOUR CODE) --- */
+      .site-footer {
+         background-color: var(--card-bg-light); color: var(--text-secondary-light);
+         padding: 50px 0 30px; margin-top: 60px; border-top: 1px solid var(--border-light);
+         transition: background-color 0.4s ease, color 0.4s ease;
+      }
+      body.dark-mode .site-footer { background-color: var(--card-bg-dark); color: var(--text-secondary-dark); border-top-color: var(--border-dark); }
+      .footer-container { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; margin-bottom: 40px; }
+      .footer-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; color: var(--text-primary-light); letter-spacing: 0.5px; }
+      body.dark-mode .footer-title { color: var(--text-primary-dark); }
+      .footer-about p, .footer-links li { font-size: 0.9rem; line-height: 1.6; }
+      .footer-links ul { list-style: none; padding: 0; margin: 0; }
+      .footer-links li { margin-bottom: 10px; }
+      .footer-links a { text-decoration: none; color: inherit; transition: color 0.2s ease; }
+      .footer-links a:hover { color: var(--primary-start); text-decoration: underline; }
+      .footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--primary-gradient); color: #fff; font-size: 1rem; margin-right: 10px; text-decoration: none; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+      .footer-social a:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+      .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-light); margin: 0 20px; font-size: 0.85rem; }
+      body.dark-mode .footer-bottom { border-top-color: var(--border-dark); }
+      .footer-bottom a { color: inherit; font-weight: 500; text-decoration: none; }
+      .footer-bottom a:hover { text-decoration: underline; color: var(--primary-end); }
+
+      .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: rgba(255, 255, 255, 0.65); backdrop-filter: blur(12px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; z-index: 1000; transition: transform 0.4s cubic-bezier(.25,.46,.45,.94); }
+      .bottom-nav.nav-hidden { transform: translateY(100%); }
+      body.dark-mode .bottom-nav { background: var(--card-bg-dark); border-top-color: var(--border-dark); backdrop-filter: none; }
+      .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color 0.2s, transform 0.2s; cursor: pointer; }
+      body.dark-mode .nav-item { color: var(--text-secondary-dark); }
+      .nav-item i { font-size: 22px; margin-bottom: 4px; }
+      .nav-item span { font-size: 11px; font-weight: 500; }
+      .nav-item.active { color: var(--primary-start); }
+      .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
+
+      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+   </style>
+</head>
+<body>
+
+<!-- App Header -->
+<header class="app-header">
+   <a href="index.html" class="logo">UPSC Hub</a>
+   <div class="header-right">
+      <div id="datetime-container"></div>
+      <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
+   </div>
+</header>
+
+<!-- Runner Bar -->
+<div class="runner-bar">
+   <div class="runner-text">
+      <span>Latest: Polity Mock Test VII is now LIVE! <i class="fas fa-star"></i> New PDFs added for Modern History <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily! <i class="fas fa-star"></i> </span>
+      <span>Latest: Polity Mock Test VII is now LIVE! <i class="fas fa-star"></i> New PDFs added for Modern History <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily! <i class="fas fa-star"></i> </span>
+   </div>
+</div>
+
+<!-- Sidebar (Drawer Menu) -->
+<div class="side-bar">
+    <div class="sidebar-header">
+       <h3 class="title">Complete Menu</h3>
+       <div id="close-btn"><i class="fas fa-times"></i></div>
+    </div>
+    <div class="profile">
+      <img src="images/LOGO.jpg" class="image" alt="UPSC Hub Logo">
+      <h3 class="name">UPSC Hub</h3>
+      <p class="role">Your Success Partner</p>
+    </div>
+    <nav class="navbar">
+        <div class="sidebar-category"><h4>Learn</h4></div>
+        <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
+        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+        <div class="sidebar-category"><h4>Practice & Tools</h4></div>
+        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+        <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test details</span></a>
+        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+        <div class="sidebar-category"><h4>Resources</h4></div>
+        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+        <div class="sidebar-category"><h4>Support & Info</h4></div>
+        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+    </nav>
+</div>
+
+<!-- Main Content Area -->
+<main class="main-content">
+  <div class="hero-section">
+      <h1 class="page-title">UPSChub | <span>Test Intel</span></h1>
+      <p>Your central archive for all mock tests. Search, filter, and download test PDFs to boost your preparation.</p>
+  </div>
+  
+  <div class="controls-container">
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="search-input" placeholder="Search for a test...">
+    </div>
+    <select id="filter-subject">
+      <option value="all">All Subjects</option>
+      <!-- Options will be dynamically inserted here -->
+    </select>
+  </div>
+  
+  <div id="test-list-container" class="test-list-container">
+      <!-- Test cards will be dynamically inserted here -->
+  </div>
+  
+  <div id="no-results">
+    <p>No tests found. Try adjusting your search or filter.</p>
+  </div>
+</main>
+
+<!-- Site Footer -->
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-about">
+            <h3 class="footer-title">UPSC Hub</h3>
+            <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources and expert analysis to help you achieve your goal.</p>
+        </div>
+        <div class="footer-links">
+            <h3 class="footer-title">Quick Links</h3>
+            <ul>
+                <li><a href="about.html">About Us</a></li>
+                <li><a href="contact.html">Contact Support</a></li>
+                <li><a href="courses.html">Courses</a></li>
+                <li><a href="#">Test Series</a></li>
+            </ul>
+        </div>
+        <div class="footer-social">
+            <h3 class="footer-title">Connect With Us</h3>
+            <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+            <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>© 2024 UPSC Hub. All Rights Reserved.</p>
+        <p><a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms of Use</a></p>
+    </div>
+</footer>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav">
+   <a href="homeUPSChub.html" class="nav-item"> <i class="fas fa-home"></i> <span>Home</span> </a>
+   <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>Planner</span> </a>
+   <a href="#" class="nav-item active"> <i class="fas fa-file-alt"></i> <span>Tests</span> </a>
+   <div id="menu-btn" class="nav-item"> <i class="fas fa-bars-staggered"></i> <span>Menu</span> </div>
+</nav>
+
+<script>
+   // ### EASY TO UPDATE: TEST PDF DATA ###
+   const testPdfs = [
+      {
+         id: 1, name: "Polity Mock Test - VII (Fundamental Rights)", date: "October 22, 2023", size: "2.1 MB",
+         category: "Polity", pdfUrl: "#", solutionUrl: "#"
+      },
+      {
+         id: 2, name: "Current Affairs Weekly - Oct Week 3", date: "October 20, 2023", size: "3.5 MB",
+         category: "Current Affairs", pdfUrl: "#", solutionUrl: "#"
+      },
+      {
+         id: 3, name: "History Mock Test - III (Modern India)", date: "October 15, 2023", size: "2.8 MB",
+         category: "History", pdfUrl: "#", solutionUrl: "#"
+      },
+      {
+         id: 4, name: "Geography Mock Test - IV (Climatology)", date: "October 08, 2023", size: "4.2 MB",
+         category: "Geography", pdfUrl: "#", solutionUrl: "#"
+      },
+      {
+         id: 5, name: "Full Length Mock Test - II", date: "October 01, 2023", size: "8.5 MB",
+         category: "Full Length Test", pdfUrl: "#", solutionUrl: "#"
+      },
+      {
+         id: 6, name: "Economy Mock Test - V (Banking & RBI)", date: "September 25, 2023", size: "3.1 MB",
+         category: "Economy", pdfUrl: "#", solutionUrl: "#"
+      },
+      {
+         id: 7, name: "Polity Mock Test - VI (Parliament)", date: "September 18, 2023", size: "2.5 MB",
+         category: "Polity", pdfUrl: "#", solutionUrl: "#"
+      }
+   ];
+
+   // ### SCRIPT FOR UI FUNCTIONALITY ###
+   document.addEventListener('DOMContentLoaded', () => {
+      // Sidebar toggle
+      const menuBtn = document.querySelector('#menu-btn');
+      const closeBtn = document.querySelector('#close-btn');
+      const sideBar = document.querySelector('.side-bar');
+      if (menuBtn && closeBtn && sideBar) {
+         menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
+         closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+      }
+      
+      // Theme toggle
+      const toggleBtn = document.querySelector('#toggle-btn');
+      const body = document.body;
+      const applyTheme = (theme) => {
+         body.classList.toggle('dark-mode', theme === 'dark');
+         if (toggleBtn) {
+            toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+            toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+         }
+      };
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      applyTheme(savedTheme);
+      if (toggleBtn) {
+         toggleBtn.addEventListener('click', () => {
+            const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+         });
+      }
+      
+      // Live Date and Time Script
+      const dateTimeContainer = document.getElementById('datetime-container');
+      const updateDateTime = () => {
+         const now = new Date();
+         const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
+         const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+         const dateStr = now.toLocaleDateString('en-US', dateOptions);
+         const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+         if (dateTimeContainer) {
+            dateTimeContainer.textContent = `${dateStr} | ${timeStr}`;
+         }
+      };
+      updateDateTime();
+      setInterval(updateDateTime, 1000);
+
+      // Auto-hide bottom navigation on scroll
+      const bottomNav = document.querySelector('.bottom-nav');
+      if (bottomNav) {
+         let lastScrollY = window.scrollY;
+         window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) { 
+               bottomNav.classList.add('nav-hidden');
+            } else {
+               bottomNav.classList.remove('nav-hidden');
+            }
+            lastScrollY = Math.max(0, currentScrollY); 
+         });
+      }
+      
+      // ### PDF LIBRARY LOGIC ###
+      const testListContainer = document.getElementById('test-list-container');
+      const searchInput = document.getElementById('search-input');
+      const filterSelect = document.getElementById('filter-subject');
+      const noResultsDiv = document.getElementById('no-results');
+
+      function populateFilters() {
+         if (!filterSelect) return;
+         const categories = [...new Set(testPdfs.map(test => test.category))];
+         categories.sort();
+         categories.forEach(category => {
+            const option = document.createElement('option');
+            option.value = category;
+            option.textContent = category;
+            filterSelect.appendChild(option);
+         });
+      }
+
+      function renderTestList() {
+         if (!testListContainer || !searchInput || !filterSelect) return;
+         
+         const searchTerm = searchInput.value.toLowerCase();
+         const selectedCategory = filterSelect.value;
+         const filteredPdfs = testPdfs.filter(test => {
+            const matchesCategory = selectedCategory === 'all' || test.category === selectedCategory;
+            const matchesSearch = test.name.toLowerCase().includes(searchTerm);
+            return matchesCategory && matchesSearch;
+         });
+
+         testListContainer.innerHTML = '';
+         noResultsDiv.style.display = filteredPdfs.length === 0 ? 'block' : 'none';
+
+         filteredPdfs.forEach(test => {
+            const card = document.createElement('div');
+            card.className = 'test-card';
+            card.innerHTML = `
+               <div class="test-info">
+                  <h3>${test.name}</h3>
+                  <div class="metadata">
+                     <span><i class="fas fa-calendar-alt"></i> ${test.date}</span>
+                     <span><i class="fas fa-file-archive"></i> ${test.size}</span>
+                  </div>
+               </div>
+               <div class="test-actions">
+                  <a href="${test.pdfUrl}" class="btn btn-download" target="_blank" rel="noopener noreferrer"><i class="fas fa-download"></i> Download PDF</a>
+                  <a href="${test.solutionUrl}" class="btn btn-solution" target="_blank" rel="noopener noreferrer"><i class="fas fa-book-open"></i> View Solution</a>
+               </div>
+            `;
+            testListContainer.appendChild(card);
+         });
+      }
+
+      // Initial PDF library setup
+      populateFilters();
+      renderTestList();
+
+      if (searchInput && filterSelect) {
+         searchInput.addEventListener('input', renderTestList);
+         filterSelect.addEventListener('change', renderTestList);
+      }
+   });
+</script>
+
+</body>
+</html>
