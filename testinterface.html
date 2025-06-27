@@ -119,8 +119,11 @@
     .header-group { display: flex; align-items: center; gap: 12px; min-width: 0; }
     .navigation-tabs { display: flex; gap: 5px; background: rgba(0,0,0,0.15); border-radius: 6px; padding: 3px; }
     .nav-tab { background: transparent; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s; font-size: 0.85em; }
-    .nav-tab:hover { background: rgba(255,255,255,0.2); }
+    .nav-tab:hover:not(.locked) { background: rgba(255,255,255,0.2); }
     .nav-tab.active { background: white; color: #3f51b5; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+    .nav-tab.locked { cursor: not-allowed; opacity: 0.6; position: relative; }
+    .nav-tab.locked::after { content: '\f023'; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-left: 8px; font-size: 0.9em; }
+    
     .timer { font-size: 0.95em; font-weight: bold; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; }
 
     /* Stopwatch Styles */
@@ -153,15 +156,16 @@
     .sidebar-open .sidebar { transform: translateX(-280px); box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
     .sidebar-open .question-area { filter: blur(2px); pointer-events: none; }
     .question-palette { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 15px; }
-    .question-number { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: #e9ecef; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 12px; margin: 0 auto; }
+    .question-number { width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; border-radius: 4px; border: 1px solid transparent; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 12px; margin: 0 auto; }
     .question-number:hover { transform: scale(1.05); }
+    
+    /* Palette Status Colors - LIGHT MODE */
     .answered { background: #4caf50; color: white; }
     .not-answered { background: #f44336; color: white; }
     .marked { background: #ff9800; color: white; }
     .current { border: 2px solid #3f51b5; background: #3f51b5; color: white; }
-    .not-visited { background: #e9ecef; color: #333; }
+    .not-visited { background: #e9ecef; color: #333; border: 1px solid #ddd;}
     
-    /* NEW: Palette Summary */
     .palette-summary {
         display: grid;
         grid-template-columns: 1fr 1fr;
@@ -186,10 +190,7 @@
         text-align: center;
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
     }
-    .dark .palette-summary { background: #1e1e2f; border: 1px solid #444; }
-    .dark .summary-item { color: #ccc; }
-    .dark .summary-item span { background-color: #3d3d4a; color: #eee; }
-
+    
     .legend { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; }
     .legend-title { font-weight: 600; margin-bottom: 12px; color: #3f51b5; font-size: 0.9em; }
     .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em; padding: 6px 8px; border-radius: 4px; background: rgba(255,255,255,0.7); }
@@ -216,11 +217,23 @@
     /* Dark Mode */
     .dark .sidebar, .dark .option { background: #2c2c3c; border-color: #444; }
     .dark .sidebar { border-left: 1px solid #444; }
-    .dark .question-number, .dark .not-visited, .dark .legend-not-visited, .dark .option:hover { background: #3d3d4a; color: #eee; }
+    .dark .option:hover { background: #3d3d4a; }
+    
+    /* CORRECTED: Dark Mode Palette & Legend Styles */
+    .dark .question-number.not-visited { background: #3d3d4a; color: #eee; border-color: #555; }
+    .dark .question-number.answered { background-color: #4caf50; color: white; border-color: #4caf50; }
+    .dark .question-number.not-answered { background-color: #f44336; color: white; border-color: #f44336; }
+    .dark .question-number.marked { background-color: #ff9800; color: white; border-color: #ff9800; }
+    .dark .question-number.current { background-color: #3f51b5; color: white; border: 2px solid #8ab4f8; }
+    
+    .dark .legend-not-visited { background: #3d3d4a; border: 1px solid #555; }
+    .dark .palette-summary { background: #1e1e2f; border: 1px solid #444; }
+    .dark .summary-item { color: #ccc; }
+    .dark .summary-item span { background-color: #3d3d4a; color: #eee; }
+
     .dark .legend, .dark .fixed-action-area { border-top-color: #444; }
     .dark .legend-item { background: rgba(255,255,255,0.05); }
     .dark .legend-title { color: #8ab4f8; }
-    .dark .legend-not-visited { border: 1px solid #555; }
     .dark .fixed-action-area { background: #1e1e2f; }
     .dark .powered-by { color: #aaa; }
     .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
@@ -284,6 +297,25 @@
     .dark .modal-content, .dark #passwordInput { background-color: #2c2c3c; border-color: #555; color: #eee; }
     .dark .contact-admin-text { color: #aaa; }
     .dark .contact-admin-text a { color: #8ab4f8; }
+
+    /* Unlock Popup */
+    .unlock-popup {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #2c2c3c;
+      color: #fff;
+      padding: 15px 25px;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
+    }
+    .unlock-popup i { margin-right: 10px; color: #4caf50; }
+    @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 20px; opacity: 1; } }
+    @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; top: 20px; } }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -352,7 +384,6 @@
             <aside class="sidebar">
                 <div class="palette-title">Question Palette</div>
                 <div class="question-palette" id="questionPalette"></div>
-                <!-- NEW: PALETTE SUMMARY -->
                 <div class="palette-summary">
                     <div class="summary-item"><span id="summaryAnswered">0</span> Answered</div>
                     <div class="summary-item"><span id="summaryMarked">0</span> Marked</div>
@@ -427,11 +458,18 @@
             <p class="contact-admin-text">Don't have a password? <a href="https://api.whatsapp.com/send?phone=918658567727&text=I%20need%20the%20password%20for%20the%20mock%20test." target="_blank">Contact Admin</a></p>
         </div>
     </div>
+    
+    <!-- Unlock Popup -->
+    <div id="unlockPopup" class="unlock-popup">
+        <i class="fas fa-check-circle"></i> <strong>Answer Writing Tab Unlocked!</strong>
+    </div>
+
   </div>
 
   <script>
     // ### CONFIGURATION ###
     const RETEST_PASSWORD = "UPSC2024";
+    const TEST_DURATION_SECONDS = 60 * 60; // 60 minutes
     const questions = [
         // Chapter 1: Historical Background
         { text: "The Regulating Act of 1773 designated the Governor of Bengal as the:", options: ["Viceroy of India", "Governor-General of India", "Governor-General of Bengal", "Secretary of State for India"], answer: 2 },
@@ -540,8 +578,11 @@
         { text: "The choice of 'Union of States' over 'Federation of States' in Article 1 signifies that:", options: ["The states have the right to secede", "The Indian Federation is a result of an agreement among the states", "The states have no right to secede from the federation", "The Union is more powerful than the states"], answer: 2 }
     ];
 
+    // ### GLOBAL STATE ###
     let state = {};
     let timerInterval;
+    let timeLeft = TEST_DURATION_SECONDS;
+    let isTestCompleted = false;
 
     // ### DOM ELEMENTS ###
     const mockTestWrapper = document.getElementById('mockTestWrapper');
@@ -568,8 +609,10 @@
     const reviewAnswersButton = document.getElementById('reviewAnswersButton');
     const backToResultsBtn = document.getElementById('backToResultsBtn');
     const reviewContainer = document.getElementById('reviewContainer');
+    const showMockTestTab = document.getElementById('showMockTestTab');
+    const showAnswerWritingTab = document.getElementById('showAnswerWritingTab');
+    const unlockPopup = document.getElementById('unlockPopup');
 
-    // ### NEW: SUMMARY DOM ELEMENTS ###
     const summaryAnswered = document.getElementById('summaryAnswered');
     const summaryNotAnswered = document.getElementById('summaryNotAnswered');
     const summaryMarked = document.getElementById('summaryMarked');
@@ -608,27 +651,15 @@
     // ### MOCK TEST LOGIC ###
     function resetState() { state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) }; }
     
-    // ### NEW: PALETTE SUMMARY FUNCTION ###
     function updatePaletteSummary() {
-      if (!state.answers) return; // Guard against running before state is initialized
-
-      let answeredCount = 0;
-      let notAnsweredCount = 0;
-      let markedCount = 0;
-      let notVisitedCount = 0;
-
+      if (!state.answers) return;
+      let answeredCount = 0, notAnsweredCount = 0, markedCount = 0, notVisitedCount = 0;
       for (let i = 0; i < questions.length; i++) {
-        if (state.answers[i] !== null) {
-          answeredCount++;
-        } else if (state.marked[i]) {
-          markedCount++;
-        } else if (state.visited[i]) {
-          notAnsweredCount++;
-        } else {
-          notVisitedCount++;
-        }
+        if (state.answers[i] !== null) { answeredCount++; } 
+        else if (state.marked[i]) { markedCount++; } 
+        else if (state.visited[i]) { notAnsweredCount++; } 
+        else { notVisitedCount++; }
       }
-
       summaryAnswered.textContent = answeredCount;
       summaryNotAnswered.textContent = notAnsweredCount;
       summaryMarked.textContent = markedCount;
@@ -637,11 +668,16 @@
 
     function initTest() {
       resetState();
+      timeLeft = TEST_DURATION_SECONDS;
+      isTestCompleted = false;
+      showAnswerWritingTab.classList.add('locked');
+      showAnswerWritingTab.setAttribute('title', 'Complete the Mock Test to unlock this section.');
       state.visited[0] = true;
       loadQuestion(0);
       updateNavigationButtons();
       startTimer();
     }
+
     function loadQuestion(index) {
       const q = questions[index];
       questionText.textContent = q.text;
@@ -658,51 +694,42 @@
       state.current = index;
       state.visited[index] = true;
       updatePalette();
-      updatePaletteSummary(); // Update summary
+      updatePaletteSummary();
       updateNavigationButtons();
     }
+
     function selectOption(qIndex, optIndex) {
       state.answers[qIndex] = optIndex;
       const options = optionsList.querySelectorAll('.option');
       options.forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
       updatePalette();
-      updatePaletteSummary(); // Update summary
+      updatePaletteSummary();
     }
+
     function updatePalette() {
       questionPalette.innerHTML = '';
       questions.forEach((_, i) => {
         const btn = document.createElement('div');
         btn.className = 'question-number';
-
-        // Logic based on state to assign class
-        if (state.answers[i] !== null) {
-            btn.classList.add('answered');
-        } else if (state.marked[i]) {
-            btn.classList.add('marked');
-        } else if (state.visited[i]) {
-            btn.classList.add('not-answered');
-        } else {
-            btn.classList.add('not-visited');
-        }
-
-        if (i === state.current) {
-            btn.classList.add('current');
-        }
-        
+        if (state.answers[i] !== null) { btn.classList.add('answered'); } 
+        else if (state.marked[i]) { btn.classList.add('marked'); } 
+        else if (state.visited[i]) { btn.classList.add('not-answered'); } 
+        else { btn.classList.add('not-visited'); }
+        if (i === state.current) { btn.classList.add('current'); }
         btn.textContent = i + 1;
         btn.onclick = () => { loadQuestion(i); document.body.classList.remove('sidebar-open'); };
         questionPalette.appendChild(btn);
       });
     }
+
     function updateNavigationButtons() {
       btnPrevQuestion.style.display = state.current === 0 ? 'none' : 'flex';
       actionButtons.style.display = state.current === questions.length - 1 ? 'none' : 'flex';
       btnSubmit.style.display = state.current === questions.length - 1 ? 'flex' : 'none';
     }
+
     function startTimer() {
-      let timeLeft = 60 * 60;
-      clearInterval(timerInterval);
-      timerElement.textContent = `60:00`;
+      clearInterval(timerInterval); // Clear any existing timer
       timerInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
@@ -710,16 +737,32 @@
         if (timeLeft-- <= 0) { clearInterval(timerInterval); submitTest(); }
       }, 1000);
     }
+
     function stopTimer() { clearInterval(timerInterval); }
+
     function submitTest() {
       stopTimer();
+      isTestCompleted = true;
+      showAnswerWritingTab.classList.remove('locked');
+      showAnswerWritingTab.removeAttribute('title');
+      
       const score = state.answers.reduce((acc, ans, i) => (ans === questions[i].answer ? acc + 1 : acc), 0);
       const scoreText = `${score}/${questions.length}`;
       localStorage.setItem('testTaken', 'true');
       localStorage.setItem('lastScore', scoreText);
-      localStorage.setItem('lastAnswers', JSON.stringify(state.answers)); // Save answers for review
+      localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
+      
       showResultScreen(scoreText);
+      showUnlockPopup();
     }
+    
+    function showUnlockPopup() {
+        unlockPopup.style.display = 'block';
+        setTimeout(() => {
+            unlockPopup.style.display = 'none';
+        }, 4000); // Popup will hide after 4 seconds
+    }
+
     function showResultScreen(scoreText) {
         mockTestWrapper.style.display = 'none';
         answerWritingWrapper.style.display = 'none';
@@ -730,52 +773,35 @@
         stopwatchWrapper.style.display = 'none';
         document.getElementById('finalScore').textContent = scoreText;
     }
+
     function showReviewScreen() {
       resultScreenWrapper.style.display = 'none';
       reviewScreenWrapper.style.display = 'flex';
       populateReviewScreen();
     }
+
     function populateReviewScreen() {
         reviewContainer.innerHTML = '';
         const userAnswers = JSON.parse(localStorage.getItem('lastAnswers')) || state.answers;
-
         questions.forEach((q, index) => {
             const userAnswer = userAnswers[index];
             const correctAnswer = q.answer;
             const isCorrect = userAnswer === correctAnswer;
-
             const questionDiv = document.createElement('div');
             questionDiv.className = 'review-question';
-
             let optionsHTML = '';
             q.options.forEach((opt, optIndex) => {
                 let classes = 'review-option';
                 let icon = '<i class="far fa-circle"></i>';
-                if (optIndex === correctAnswer) {
-                    classes += ' review-correct';
-                    icon = '<i class="fas fa-check-circle" style="color: #4caf50;"></i>';
-                }
-                if (optIndex === userAnswer && !isCorrect) {
-                    classes += ' review-incorrect';
-                    icon = '<i class="fas fa-times-circle" style="color: #f44336;"></i>';
-                }
+                if (optIndex === correctAnswer) { classes += ' review-correct'; icon = '<i class="fas fa-check-circle" style="color: #4caf50;"></i>'; }
+                if (optIndex === userAnswer && !isCorrect) { classes += ' review-incorrect'; icon = '<i class="fas fa-times-circle" style="color: #f44336;"></i>'; }
                 optionsHTML += `<li class="${classes}">${icon}<span>${opt}</span></li>`;
             });
-            
             let statusHTML = '';
-            if(userAnswer === null) {
-                statusHTML = '<div class="review-status unanswered">Status: Unanswered</div>';
-            } else if (isCorrect) {
-                statusHTML = '<div class="review-status correct">Status: Correct</div>';
-            } else {
-                statusHTML = '<div class="review-status incorrect">Status: Incorrect</div>';
-            }
-
-            questionDiv.innerHTML = `
-                <h4>Q${index + 1}: ${q.text}</h4>
-                <ul class="review-option-list">${optionsHTML}</ul>
-                ${statusHTML}
-            `;
+            if(userAnswer === null) { statusHTML = '<div class="review-status unanswered">Status: Unanswered</div>'; } 
+            else if (isCorrect) { statusHTML = '<div class="review-status correct">Status: Correct</div>'; } 
+            else { statusHTML = '<div class="review-status incorrect">Status: Incorrect</div>'; }
+            questionDiv.innerHTML = `<h4>Q${index + 1}: ${q.text}</h4><ul class="review-option-list">${optionsHTML}</ul>${statusHTML}`;
             reviewContainer.appendChild(questionDiv);
         });
     }
@@ -783,14 +809,14 @@
     // ### PAGE & NAVIGATION LOGIC ###
     document.addEventListener('DOMContentLoaded', () => {
         if (localStorage.getItem('testTaken') === 'true') {
+            isTestCompleted = true;
+            showAnswerWritingTab.classList.remove('locked');
             showResultScreen(localStorage.getItem('lastScore'));
         } else {
             initTest();
         }
     });
 
-    const showMockTestTab = document.getElementById('showMockTestTab');
-    const showAnswerWritingTab = document.getElementById('showAnswerWritingTab');
     const sidebarToggleButton = document.getElementById('btnToggleSidebar');
 
     showMockTestTab.addEventListener('click', () => {
@@ -799,7 +825,8 @@
         countdownWrapper.style.display = 'flex';
         stopwatchWrapper.style.display = 'none';
         stopStopwatch();
-        if (localStorage.getItem('testTaken') === 'true') {
+        
+        if (isTestCompleted) {
             showResultScreen(localStorage.getItem('lastScore'));
         } else {
             answerWritingWrapper.style.display = 'none';
@@ -808,11 +835,15 @@
             mockTestWrapper.style.display = 'flex';
             mcqFooter.style.display = 'block';
             sidebarToggleButton.style.display = 'flex';
-            startTimer();
+            startTimer(); // Resume timer
         }
     });
 
-    showAnswerWritingTab.addEventListener('click', () => {
+    showAnswerWritingTab.addEventListener('click', (e) => {
+        if (showAnswerWritingTab.classList.contains('locked')) {
+            e.preventDefault();
+            return;
+        }
         showAnswerWritingTab.classList.add('active');
         showMockTestTab.classList.remove('active');
         mockTestWrapper.style.display = 'none';
@@ -861,11 +892,11 @@
     document.getElementById('btnMarkReview').addEventListener('click', () => { 
         state.marked[state.current] = !state.marked[state.current]; 
         updatePalette(); 
-        updatePaletteSummary(); // Update summary
+        updatePaletteSummary();
     });
     document.getElementById('btnClearResponse').addEventListener('click', () => { 
         state.answers[state.current] = null; 
-        loadQuestion(state.current); // This will call updatePalette and updatePaletteSummary
+        loadQuestion(state.current);
     });
     btnSubmit.addEventListener('click', submitTest);
   </script>
