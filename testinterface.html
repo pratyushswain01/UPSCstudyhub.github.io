@@ -137,7 +137,7 @@
     .main-content { flex: 1; display: flex; overflow-y: auto; position: relative; }
     .question-area { width: 100%; padding: 15px; overflow-y: auto; padding-bottom: 120px; transition: filter 0.3s ease; position: relative; z-index: 2; }
     
-    /* NEW: Per-question timer styles */
+    /* Per-question timer styles */
     .question-timer-container {
       width: 100%;
       height: 8px;
@@ -151,7 +151,7 @@
       width: 100%;
       background-color: #2196f3;
       border-radius: 4px;
-      transition: width 1s linear; /* Smooth transition for the timer bar */
+      transition: width 1s linear;
     }
     .dark .question-timer-container {
       background-color: #3d3d4a;
@@ -243,7 +243,6 @@
     .dark .sidebar { border-left: 1px solid #444; }
     .dark .option:hover { background: #3d3d4a; }
     
-    /* CORRECTED: Dark Mode Palette & Legend Styles */
     .dark .question-number.not-visited { background: #3d3d4a; color: #eee; border-color: #555; }
     .dark .question-number.answered { background-color: #4caf50; color: white; border-color: #4caf50; }
     .dark .question-number.not-answered { background-color: #f44336; color: white; border-color: #f44336; }
@@ -338,8 +337,60 @@
       animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
     }
     .unlock-popup i { margin-right: 10px; color: #4caf50; }
+    
+    /* Animation Keyframes */
     @keyframes slideDown { from { top: -100px; opacity: 0; } to { top: 20px; opacity: 1; } }
     @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; top: 20px; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* NEW: Empty State for Answer Writing */
+    #answerWritingEmptyWrapper {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      text-align: center;
+      padding: 40px 20px;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    .empty-state-card {
+      background: #fff;
+      padding: 40px 50px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      max-width: 450px;
+      width: 90%;
+    }
+    .empty-state-svg {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 25px;
+    }
+    .empty-state-svg .calendar-base { stroke: #333; }
+    .empty-state-svg .cross-mark { stroke: #f44336; }
+    .empty-state-title {
+      font-size: 2em;
+      color: #3f51b5;
+      margin-bottom: 10px;
+    }
+    .empty-state-text {
+      font-size: 1.1em;
+      color: #666;
+      margin-bottom: 30px;
+    }
+    #backToScoreFromAnswerWriting {
+      padding: 12px 30px;
+      width: auto;
+    }
+    .dark .empty-state-card {
+      background: #2c2c3c;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+    .dark .empty-state-svg .calendar-base { stroke: #aaa; }
+    .dark .empty-state-svg .cross-mark { stroke: #ef9a9a; }
+    .dark .empty-state-title { color: #8ab4f8; }
+    .dark .empty-state-text { color: #aaa; }
 
     /* Responsive */
     @media (max-width: 768px) {
@@ -349,6 +400,10 @@
         .sidebar { top: 170px; height: calc(100% - 170px); }
         .sidebar-toggle { top: 180px; }
         .result-buttons { flex-direction: column; width: 80%; }
+        .empty-state-card { padding: 30px 20px; }
+        .empty-state-title { font-size: 1.8em; }
+        .empty-state-text { font-size: 1em; }
+        .empty-state-svg { width: 100px; height: 100px; }
     }
     @media (max-width: 480px) {
       .sidebar { width: 90%; right: -90%; padding-right: 15px; }
@@ -371,7 +426,7 @@
 
     <header class="topbar">
       <div class="header-group">
-        <div id="countdownWrapper"><div class="timer" id="timer">90:00</div></div>
+        <div id="countdownWrapper"><div class="timer" id="timer">60:00</div></div>
         <div id="stopwatchWrapper" style="display: none;">
             <div class="timer" id="stopwatchDisplay">00:00:00</div>
             <div class="stopwatch-controls">
@@ -401,7 +456,6 @@
             <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Sidebar"><i class="fas fa-bars"></i></button>
             <div class="watermark"><img src="images\LOGO.jpg" alt="UPSChub Logo" class="watermark-logo" /><div class="watermark-text">UPSChub</div></div>
             <section class="question-area">
-                <!-- NEW: Per-question timer bar -->
                 <div class="question-timer-container">
                     <div id="questionTimerBar" class="question-timer-bar"></div>
                 </div>
@@ -429,23 +483,27 @@
             </aside>
         </div>
 
+        <!-- This wrapper is now legacy and will not be shown -->
         <div id="answerWritingWrapper" style="display: none; width: 100%;">
             <section class="question-area">
                 <h2 class="question-header">Answer Writing Practice</h2>
                 <div class="question-content"><p><strong>Question:</strong> "The Indian Constitution is a 'bag of borrowings,' but it is more than a mere patchwork. It is a beautiful tapestry woven with threads of nationalistic ideals." Critically analyze the statement. (250 words)</p></div>
-                <div class="instructions-box">
-                    <h3>Instructions:</h3>
-                    <ul>
-                        <li>Read the question carefully and understand its core demands.</li>
-                        <li>Structure your answer with a clear introduction, body, and conclusion.</li>
-                        <li>Use the stopwatch above to time your writing.</li>
-                        <li>After writing your answer, click the submit button below to upload your file.</li>
-                    </ul>
-                </div>
-                <a href="https://drive.google.com/drive/folders/1QVN9twgnuhhfOvqBv8qybAZozFRsocks?usp=sharing" target="_blank" class="submit-button answer-writing-submit"><i class="fas fa-upload"></i> END AND SUBMIT</a>
             </section>
         </div>
         
+        <!-- NEW: Empty state for Answer Writing section -->
+        <div id="answerWritingEmptyWrapper" style="display: none; width: 100%;">
+            <div class="empty-state-card">
+                <svg class="empty-state-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path class="calendar-base" d="M8 7V3M16 7V3M7 11H17M5 21H19C20.1046 21 21 20.1046 21 19V7C21 5.89543 20.1046 5 19 5H5C3.89543 5 3 5.89543 3 7V19C3 20.1046 3.89543 21 5 21Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path class="cross-mark" d="M14.1213 13.1213L9.87868 17.364M9.87868 13.1213L14.1213 17.364" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                <h2 class="empty-state-title">No Test Today</h2>
+                <p class="empty-state-text">The Answer Writing section is not available today. Please check back later.</p>
+                <button id="backToScoreFromAnswerWriting" class="submit-button">Go Back to Score</button>
+            </div>
+        </div>
+
         <div id="resultScreenWrapper" style="display: none; width: 100%;">
             <h2>Test Completed!</h2>
             <p>Your final score is:</p>
@@ -487,7 +545,6 @@
         </div>
     </div>
     
-    <!-- Unlock Popup -->
     <div id="unlockPopup" class="unlock-popup">
         <i class="fas fa-check-circle"></i> <strong>Answer Writing Tab Unlocked!</strong>
     </div>
@@ -657,20 +714,19 @@
         { text: "The writ jurisdiction of High Courts under Article 226, as compared to the Supreme Court under Article 32, is:", options: ["Narrower", "Wider", "Exactly the same", "Applicable only to state governments"], answer: 1 },
         { text: "The doctrine of 'severability' means that if a part of a law violates a Fundamental Right:", options: ["The entire law is struck down", "The Fundamental Right is suspended", "Only the violating part is struck down, not the whole law", "The law can be amended by the court"], answer: 2 }
     ];
-
-    // NEW: Calculate time per question
     const TIME_PER_QUESTION = Math.floor(TEST_DURATION_SECONDS / questions.length);
 
     // ### GLOBAL STATE ###
     let state = {};
     let timerInterval;
-    let questionTimerInterval; // NEW: Interval for per-question timer
+    let questionTimerInterval;
     let timeLeft = TEST_DURATION_SECONDS;
     let isTestCompleted = false;
 
     // ### DOM ELEMENTS ###
     const mockTestWrapper = document.getElementById('mockTestWrapper');
     const answerWritingWrapper = document.getElementById('answerWritingWrapper');
+    const answerWritingEmptyWrapper = document.getElementById('answerWritingEmptyWrapper'); // NEW
     const resultScreenWrapper = document.getElementById('resultScreenWrapper');
     const reviewScreenWrapper = document.getElementById('reviewScreenWrapper');
     const passwordModal = document.getElementById('passwordModal');
@@ -679,7 +735,7 @@
     const questionNumber = document.getElementById('questionNumber');
     const optionsList = document.getElementById('optionsList');
     const questionPalette = document.getElementById('questionPalette');
-    const questionTimerBar = document.getElementById('questionTimerBar'); // NEW: Reference to the timer bar
+    const questionTimerBar = document.getElementById('questionTimerBar');
     const btnSubmit = document.getElementById('btnSubmit');
     const actionButtons = document.getElementById('actionButtons');
     const btnPrevQuestion = document.getElementById('btnPrevQuestion');
@@ -725,7 +781,7 @@
         if (!isStopwatchRunning) return;
         isStopwatchRunning = false;
         stopwatchStartBtn.classList.remove('hidden');
-        stopwatchStopBtn.add('hidden');
+        stopwatchStopBtn.classList.add('hidden');
         clearInterval(stopwatchInterval);
     }
     function resetStopwatch() { stopStopwatch(); stopwatchSeconds = 0; updateStopwatchDisplay(); }
@@ -764,9 +820,7 @@
     }
 
     function loadQuestion(index) {
-      // Clear previous question's timer
       clearInterval(questionTimerInterval);
-
       const q = questions[index];
       questionText.textContent = q.text;
       questionNumber.textContent = `Question ${index + 1} of ${questions.length}`;
@@ -780,12 +834,9 @@
         optionsList.appendChild(li);
       });
       
-      // NEW: Reset and start new timer for this question
       let questionTimeLeft = TIME_PER_QUESTION;
-      // Instantly reset the bar to 100% without animation
       questionTimerBar.style.transition = 'none';
       questionTimerBar.style.width = '100%';
-      // Force a reflow to apply the change immediately, then re-enable animation
       void questionTimerBar.offsetWidth;
       questionTimerBar.style.transition = 'width 1s linear';
 
@@ -793,16 +844,11 @@
         questionTimeLeft--;
         const widthPercentage = Math.max(0, (questionTimeLeft / TIME_PER_QUESTION) * 100);
         questionTimerBar.style.width = `${widthPercentage}%`;
-
         if (questionTimeLeft <= 0) {
             clearInterval(questionTimerInterval);
-            // Auto-move to next question if not the last one
-            if (state.current < questions.length - 1) {
-                loadQuestion(state.current + 1);
-            }
+            if (state.current < questions.length - 1) { loadQuestion(state.current + 1); }
         }
       }, 1000);
-
 
       state.current = index;
       state.visited[index] = true;
@@ -842,7 +888,7 @@
     }
 
     function startTimer() {
-      clearInterval(timerInterval); // Clear any existing timer
+      clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         const minutes = Math.floor(timeLeft / 60);
         const seconds = timeLeft % 60;
@@ -853,7 +899,7 @@
 
     function stopTimer() { 
         clearInterval(timerInterval); 
-        clearInterval(questionTimerInterval); // NEW: Stop the per-question timer as well
+        clearInterval(questionTimerInterval);
     }
 
     function submitTest() {
@@ -874,14 +920,13 @@
     
     function showUnlockPopup() {
         unlockPopup.style.display = 'block';
-        setTimeout(() => {
-            unlockPopup.style.display = 'none';
-        }, 4000); // Popup will hide after 4 seconds
+        setTimeout(() => { unlockPopup.style.display = 'none'; }, 4000);
     }
 
     function showResultScreen(scoreText) {
         mockTestWrapper.style.display = 'none';
         answerWritingWrapper.style.display = 'none';
+        answerWritingEmptyWrapper.style.display = 'none'; // NEW
         reviewScreenWrapper.style.display = 'none';
         resultScreenWrapper.style.display = 'flex';
         mcqFooter.style.display = 'none';
@@ -945,14 +990,14 @@
         if (isTestCompleted) {
             showResultScreen(localStorage.getItem('lastScore'));
         } else {
-            answerWritingWrapper.style.display = 'none';
+            answerWritingEmptyWrapper.style.display = 'none';
             resultScreenWrapper.style.display = 'none';
             reviewScreenWrapper.style.display = 'none';
             mockTestWrapper.style.display = 'flex';
             mcqFooter.style.display = 'block';
             sidebarToggleButton.style.display = 'flex';
-            startTimer(); // Resume main timer
-            loadQuestion(state.current); // Re-initialize per-question timer
+            startTimer();
+            loadQuestion(state.current);
         }
     });
 
@@ -966,14 +1011,22 @@
         mockTestWrapper.style.display = 'none';
         resultScreenWrapper.style.display = 'none';
         reviewScreenWrapper.style.display = 'none';
-        answerWritingWrapper.style.display = 'block';
+        answerWritingWrapper.style.display = 'none';
+        answerWritingEmptyWrapper.style.display = 'flex'; // Show the new page
         mcqFooter.style.display = 'none';
         sidebarToggleButton.style.display = 'none';
         document.body.classList.remove('sidebar-open');
-        stopTimer(); // Stop both timers
+        stopTimer();
         countdownWrapper.style.display = 'none';
-        stopwatchWrapper.style.display = 'flex';
-        resetStopwatch();
+        stopwatchWrapper.style.display = 'none'; // Hide stopwatch too
+    });
+
+    // NEW: Event listener for the "Go Back" button on the empty answer writing page
+    document.getElementById('backToScoreFromAnswerWriting').addEventListener('click', () => {
+        answerWritingEmptyWrapper.style.display = 'none';
+        showResultScreen(localStorage.getItem('lastScore'));
+        showMockTestTab.classList.add('active');
+        showAnswerWritingTab.classList.remove('active');
     });
 
     reviewAnswersButton.addEventListener('click', showReviewScreen);
@@ -993,6 +1046,7 @@
             error.textContent = '';
             resultScreenWrapper.style.display = 'none';
             reviewScreenWrapper.style.display = 'none';
+            answerWritingEmptyWrapper.style.display = 'none';
             mockTestWrapper.style.display = 'flex';
             mcqFooter.style.display = 'block';
             countdownWrapper.style.display = 'flex';
