@@ -113,7 +113,8 @@
     .option.selected { background: #4caf50; color: white; border-color: #4caf50; box-shadow: 0 2px 5px rgba(76,175,80,0.3); }
     .option-radio { margin-right: 12px; min-width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; display: inline-block; position: relative; }
     .option.selected .option-radio { border-color: white; background: white; box-shadow: inset 0 0 0 4px #4caf50; }
-    .sidebar { position: fixed; top: 111px; right: -300px; width: 300px; height: calc(100% - 111px); background: #f8f9fa; border-left: 1px solid #ccc; display: flex; flex-direction: column; transition: right 0.3s ease-in-out; z-index: 200; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+    
+    .sidebar { position: fixed; top: 111px; /* This will be set by JS */ right: -300px; width: 300px; height: calc(100% - 111px); /* This will be set by JS */ background: #f8f9fa; border-left: 1px solid #ccc; display: flex; flex-direction: column; transition: right 0.3s ease-in-out; z-index: 200; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
     .sidebar-open .sidebar { right: 0; }
     .sidebar-content { padding: 15px; overflow-y: auto; flex-grow: 1;}
     .palette-title { font-weight: 600; margin-bottom: 10px; color: #3f51b5; font-size: 1.1em; text-align: center; }
@@ -138,8 +139,11 @@
     .legend-marked { background: #ff9800; }
     .legend-marked-answered { background: linear-gradient(135deg, #4caf50 50%, #ff9800 50%); }
     .legend-not-visited { background: #e9ecef; border: 1px solid #ccc; }
-    .sidebar-toggle { position: fixed; top: 120px; right: 15px; z-index: 300; background: #3f51b5; border: none; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.3); color: white; font-size: 1.1em; transition: all 0.3s ease; }
-    .sidebar-open .sidebar-toggle { right: 315px; transform: rotate(180deg); }
+    
+    .sidebar-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; cursor: pointer; font-size: 0.9em; padding: 5px; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+    .sidebar-toggle:hover { background-color: rgba(255,255,255,0.2); }
+    .sidebar-open .sidebar-toggle { transform: rotate(180deg); }
+
     .fixed-action-area { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #ccc; padding: 10px 15px; z-index: 100; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); }
     .action-buttons { display: flex; justify-content: center; align-items: center; gap: 8px; }
     .btn-action { padding: 8px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85em; flex-grow: 1; flex-basis: 0; }
@@ -236,7 +240,6 @@
         .site-header { flex-direction: column; text-align: center; gap: 5px; }
         .topbar { flex-wrap: wrap; justify-content: center; }
         .navigation-tabs { position: static; transform: none; order: 3; width: 100%; justify-content: center; margin-top: 10px; }
-        .sidebar { top: 159px; height: calc(100% - 159px); }
         .sidebar-open .question-area { padding-right: 20px; }
     }
     @media (max-width: 480px) {
@@ -294,15 +297,16 @@
 
   <!-- STAGE 3: EXAM UI WRAPPER (Hidden by default) -->
   <div id="examUIWrapper">
-    <header class="site-header">
+    <header class="site-header" id="siteHeader">
         <img src="https://i.imgur.com/8fS1w7f.png" alt="UPSChub Logo" class="site-logo">
         <div class="site-branding">
             <div class="site-title">UPSChub</div>
             <p class="site-tagline">Civil Services Exam Preparation</p>
         </div>
     </header>
-    <header class="topbar">
+    <header class="topbar" id="topbar">
       <div class="topbar-left-group">
+        <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Palette"><i class="fas fa-chevron-left"></i></button>
         <div class="timer" id="timer">02:30:00</div>
         <div id="stopwatchWrapper">
           <span id="stopwatchDisplay">00:00:00</span>
@@ -326,14 +330,13 @@
     </header>
     <div class="main-content">
         <div id="mockTestWrapper" style="display: flex; width: 100%;">
-            <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Palette"><i class="fas fa-chevron-left"></i></button>
             <section class="question-area">
                 <h2 class="question-header" id="questionNumber"></h2>
                 <div class="question-timer-bar-container"><div id="questionTimerBar" class="question-timer-bar"></div></div>
                 <div class="question-content" id="questionText"></div>
                 <ul class="options-list" id="optionsList"></ul>
             </section>
-            <aside class="sidebar">
+            <aside class="sidebar" id="sidebar">
               <div class="sidebar-content">
                 <div class="palette-title">Question Palette</div>
                 <div class="question-palette" id="questionPalette"></div>
@@ -462,6 +465,9 @@
       totalQuestionsEl: document.getElementById('totalQuestionsEl'),
       // Stage 3: Main Exam UI
       examUIWrapper: document.getElementById('examUIWrapper'),
+      siteHeader: document.getElementById('siteHeader'),
+      topbar: document.getElementById('topbar'),
+      sidebar: document.getElementById('sidebar'),
       mockTestWrapper: document.getElementById('mockTestWrapper'),
       mcqFooter: document.getElementById('mcqFooter'),
       questionText: document.getElementById('questionText'),
@@ -544,6 +550,7 @@
         dom.instructionsScreen.style.display = 'none';
         dom.examUIWrapper.style.display = 'flex';
         dom.body.classList.add('exam-active');
+        updateSidebarPosition();
         window.removeEventListener('online', validateStartConditions);
         window.removeEventListener('offline', validateStartConditions);
         window.addEventListener('online', forceSubmitOnReconnect);
@@ -553,7 +560,7 @@
     function forceSubmitOnReconnect() {
         if (!isTestCompleted) {
             alert("Internet connection detected. Submitting the test as per rules.");
-            submitTest();
+            submitTest(true); // Force submit without confirmation
         }
     }
 
@@ -581,7 +588,7 @@
         dom.reviewScreenWrapper.style.display = 'none';
         dom.answerWritingWrapper.style.display = 'none';
         dom.mcqFooter.style.display = 'none';
-        dom.sidebarToggle.style.display = 'none';
+        dom.sidebar.style.display = 'none';
         dom.timer.style.display = 'none';
         dom.stopwatchWrapper.style.display = 'none';
         dom.showMockTestTab.classList.remove('active');
@@ -597,7 +604,7 @@
             } else {
                 dom.mockTestWrapper.style.display = 'flex';
                 dom.mcqFooter.style.display = 'block';
-                dom.sidebarToggle.style.display = 'flex';
+                dom.sidebar.style.display = 'flex';
             }
         } else if (viewName === 'answerWriting') {
             if (dom.showAnswerWritingTab.classList.contains('locked')) return;
@@ -636,8 +643,11 @@
 
     function handleSaveAndNext() {
       if (isTestCompleted) return;
-      if (state.current < questions.length - 1) loadQuestion(state.current + 1);
-      else submitTest();
+      if (state.current < questions.length - 1) {
+          loadQuestion(state.current + 1);
+      } else {
+          submitTest(true); // Auto-submit on last question
+      }
     }
 
     function handleMarkAndNext() {
@@ -652,13 +662,14 @@
         updatePalette();
     }
 
-    function submitTest() {
+    function submitTest(isForced = false) {
         if (isTestCompleted) return;
-        const isAutoSubmit = timeLeft <= 0 || state.current === questions.length - 1;
-        if (!isAutoSubmit) {
+        
+        if (!isForced) {
              const confirmed = confirm('Are you sure you want to submit the test?');
              if (!confirmed) return;
         }
+
         stopTimer();
         isTestCompleted = true;
         window.removeEventListener('online', forceSubmitOnReconnect);
@@ -719,7 +730,7 @@
           if (timeLeft <= 0) {
               clearInterval(timerInterval);
               alert("Time's up! The test will be submitted automatically.");
-              submitTest();
+              submitTest(true); // Force submit
               return;
           }
           timeLeft--;
@@ -778,6 +789,14 @@
         }
     }
     
+    function updateSidebarPosition() {
+        const headerHeight = dom.siteHeader.offsetHeight;
+        const topbarHeight = dom.topbar.offsetHeight;
+        const totalHeaderHeight = headerHeight + topbarHeight;
+        dom.sidebar.style.top = `${totalHeaderHeight}px`;
+        dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
+    }
+
     // ### STAGE 4: RESULT & REVIEW FUNCTIONS ###
     function calculateTopicStats() {
       const topicStats = {};
@@ -795,8 +814,8 @@
         dom.mockTestWrapper.style.display = 'none';
         dom.reviewScreenWrapper.style.display = 'none';
         dom.mcqFooter.style.display = 'none';
-        dom.sidebarToggle.style.display = 'none';
-        dom.btnSubmitTest.style.display = 'none'; // Hide the submit button on the results page
+        dom.sidebar.style.display = 'none';
+        dom.btnSubmitTest.style.display = 'none'; // Hide submit button on result page
         dom.resultScreenWrapper.style.display = 'flex';
         dom.finalScore.textContent = scoreText;
         populatePerformanceTable(topicStats);
@@ -857,6 +876,7 @@
     function populateReviewScreen() {
         dom.reviewContainer.innerHTML = '';
         const userAnswers = JSON.parse(localStorage.getItem('lastAnswers'));
+        if (!userAnswers) return;
         questions.forEach((q, index) => {
             const userAnswer = userAnswers[index];
             const correctAnswer = q.answer;
@@ -881,6 +901,12 @@
     }
 
     function handleRetest() {
+      // Network check before retest
+      if (navigator.onLine) {
+          dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
+          return;
+      }
+      
       if (dom.passwordRetestInput.value === RETEST_PASSWORD) {
           localStorage.clear();
           dom.passwordModal.style.display = 'none';
@@ -889,7 +915,7 @@
           dom.body.classList.remove('exam-active');
           dom.resultScreenWrapper.style.display = 'none';
           dom.examUIWrapper.style.display = 'none';
-          dom.instructionsScreen.style.display = 'flex';
+          dom.loginScreen.style.display = 'flex'; // Go back to login screen
       } else {
           dom.passwordError.textContent = 'Incorrect password.';
       }
@@ -909,6 +935,7 @@
             dom.loginScreen.style.display = 'none';
             dom.examUIWrapper.style.display = 'flex';
             dom.body.classList.add('exam-active');
+            updateSidebarPosition();
             const scoreText = localStorage.getItem('lastScore');
             const topicStats = JSON.parse(localStorage.getItem('topicStats'));
             showResultScreen(scoreText, topicStats);
@@ -931,7 +958,7 @@
         dom.btnPrevQuestion.addEventListener('click', () => { if(state.current > 0 && !isTestCompleted) loadQuestion(state.current - 1); });
         dom.btnMarkReview.addEventListener('click', handleMarkAndNext);
         dom.btnClearResponse.addEventListener('click', handleClearResponse);
-        dom.btnSubmitTest.addEventListener('click', submitTest);
+        dom.btnSubmitTest.addEventListener('click', () => submitTest(false)); // Manual submit asks for confirmation
         dom.sidebarToggle.addEventListener('click', () => dom.body.classList.toggle('sidebar-open'));
         dom.darkModeToggle.addEventListener('change', (e) => {
             toggleDarkMode(e.target.checked);
@@ -958,6 +985,9 @@
             }
         });
         dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
+
+        // Handle window resize to adjust sidebar position dynamically
+        window.addEventListener('resize', updateSidebarPosition);
     });
   </script>
 </body>
