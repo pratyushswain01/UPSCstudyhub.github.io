@@ -286,7 +286,8 @@
         <h2>Exam Portal Login</h2>
         <div class="input-group"> <label for="userIdInput">User ID</label> <input type="text" id="userIdInput" value="UPSC2025"> </div>
         <div class="input-group"> <label for="passwordLoginInput">Password</label> <input type="password" id="passwordLoginInput" value="UPSChub@123"> </div>
-        <button id="loginBtn" class="btn-primary">Login</button> <p id="loginError"></p>
+        <button id="loginBtn" class="btn-primary">Login</button>
+        <p id="loginError"></p>
     </div>
   </div>
 
@@ -576,6 +577,13 @@
 
     function handleLogin() {
         if (dom.userIdInput.value === CORRECT_USER_ID && dom.passwordLoginInput.value === CORRECT_PASSWORD) {
+            // ** CORRECTED LOGIC **
+            // Add network listeners ONLY after successful login.
+            window.addEventListener('online', validateStartConditions);
+            window.addEventListener('offline', validateStartConditions);
+            // Run once to set the initial state of the instructions screen.
+            validateStartConditions(); 
+
             dom.loginScreen.style.display = 'none';
             dom.instructionsScreen.style.display = 'flex';
         } else {
@@ -1039,15 +1047,18 @@
         });
     }
 
+    // ** CORRECTED RETEST FUNCTION **
     function handleRetest() {
+        // The user MUST be offline to retest. If they are online, show an error.
         if (navigator.onLine) {
             dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
             return;
         }
       
+        // If offline, proceed with the password check.
         if (dom.passwordRetestInput.value === RETEST_PASSWORD) {
             localStorage.clear();
-            location.reload(); // Reloads the page, providing a clean slate and fixing the network check bug.
+            location.reload(); 
         } else {
             dom.passwordError.textContent = 'Incorrect password.';
         }
@@ -1062,6 +1073,7 @@
         }
         
         if (localStorage.getItem('testTaken') === 'true') {
+            // This part is for users who have already completed the test and are returning to the page.
             isTestCompleted = true;
             dom.showAnswerWritingTab.classList.remove('locked');
             dom.loginScreen.style.display = 'none';
@@ -1072,9 +1084,8 @@
             const topicStats = JSON.parse(localStorage.getItem('topicStats'));
             showResultScreen(breakdown, topicStats);
         } else {
-            window.addEventListener('online', validateStartConditions);
-            window.addEventListener('offline', validateStartConditions);
-            validateStartConditions(); 
+            // This is for a fresh start or after a retest.
+            // NO network listeners are added here. The login page will just display.
         }
         
         const phone = "918658567727";
