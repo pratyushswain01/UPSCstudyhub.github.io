@@ -1,421 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-   <meta name="google-site-verification" content="e1dxCqTIBSM8IRzYzO2F7uUNiugJJaC-LD6A7tQHxS4" />
-   <meta charset="UTF-8">
-   <meta http-equiv="X-UA-Compatible" content="IE=edge">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <title>Dashboard: UPSC Hub</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Hub: Ultimate Dashboard</title>
 
-   <!-- Font Awesome CDN -->
-   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
 
-   <!-- Google Fonts -->
-   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-start: #4c51bf;
+            --primary-end: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+            --primary-bg-gradient: radial-gradient(circle at 10% 20%, #90a5f8, transparent 50%),
+                                  radial-gradient(circle at 80% 70%, #9d6efc, transparent 50%);
 
-   <!-- Custom Styles -->
-   <style>
-      :root {
-         --primary-start: #6a11cb;
-         --primary-end: #2575fc;
-         --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
-         
-         /* Light Mode */
-         --bg-light: #f0f2f5;
-         --card-bg-light: rgba(255, 255, 255, 0.65);
-         --text-primary-light: #1c1e21;
-         --text-secondary-light: #555c6e;
-         --border-light: rgba(0, 0, 0, 0.1);
+            /* Light Mode */
+            --bg-light: #f1f5f9;
+            --card-bg-light: #ffffff;
+            --text-primary-light: #1e293b;
+            --text-secondary-light: #64748b;
+            --border-light: #e2e8f0;
 
-         /* --- REFINED: Dark Mode Variables --- */
-         --bg-dark: #101114; /* Deep, almost black background */
-         --card-bg-dark: #1c1e23; /* Solid, slightly lighter dark for surfaces */
-         --text-primary-dark: #e4e6eb;
-         --text-secondary-dark: #b0b3b8;
-         --border-dark: rgba(255, 255, 255, 0.1); /* Slightly more subtle border */
-      }
-      * { margin: 0; padding: 0; box-sizing: border-box; }
-      html { scroll-behavior: smooth; }
-      body {
-         font-family: 'Inter', sans-serif;
-         background-color: var(--bg-light);
-         color: var(--text-primary-light);
-         overflow-x: hidden;
-         transition: background-color 0.4s ease, color 0.4s ease;
-         padding-top: 110px; /* Space for header + runner bar */
-         padding-bottom: 80px;
-      }
-      body::before {
-         content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-         z-index: -1;
-         background: radial-gradient(circle at 10% 20%, #d9c2ff, transparent 40%),
-                     radial-gradient(circle at 80% 70%, #b5d8ff, transparent 40%);
-         animation: moveGradient 20s linear infinite;
-         transition: opacity 0.5s ease;
-      }
-      @keyframes moveGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-      
-      body.dark-mode { background-color: var(--bg-dark); color: var(--text-primary-dark); }
-      
-      body.dark-mode::before {
-         opacity: 0; /* Hide the glowing background in dark mode */
-      }
-      h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; }
-      
-      .app-header {
-         position: fixed; top: 0; left: 0; right: 0; padding: 0 25px;
-         height: 65px; display: flex; align-items: center; justify-content: space-between;
-         background: var(--card-bg-light);
-         backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-         border-bottom: 1px solid var(--border-light); z-index: 1000;
-         transition: all 0.4s ease;
-      }
-      
-      body.dark-mode .app-header { 
-         background: var(--card-bg-dark); 
-         border-color: var(--border-dark);
-         backdrop-filter: none; /* No blur needed for solid background */
-      }
-      .app-header .logo {
-         font-size: 22px; font-weight: 700; text-decoration: none;
-         background: var(--primary-gradient); -webkit-background-clip: text;
-         -webkit-text-fill-color: transparent; background-clip: text;
-      }
-      .header-right { display: flex; align-items: center; gap: 15px; }
-      #datetime-container {
-         font-size: 0.75rem;
-         color: var(--text-secondary-light);
-         font-weight: 500;
-         transition: color 0.4s ease;
-         white-space: nowrap;
-      }
-      body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
-      .app-header .icon-btn {
-         font-size: 20px; color: var(--text-secondary-light); cursor: pointer;
-         width: 40px; height: 40px; display: grid; place-items: center;
-         border-radius: 50%; transition: all 0.2s;
-      }
-      body.dark-mode .app-header .icon-btn { color: var(--text-secondary-dark); }
-      .app-header .icon-btn:hover { background-color: rgba(0,0,0,0.05); }
-      body.dark-mode .app-header .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
-      
-      .runner-bar {
-         position: fixed; top: 65px; left: 0; right: 0; z-index: 999;
-         background: var(--primary-gradient); color: white;
-         padding: 8px 0; overflow: hidden; white-space: nowrap;
-         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      }
-      .runner-bar .runner-text { display: inline-block; padding-left: 100%; animation: scroll-left 30s linear infinite; font-size: 0.9rem; }
-      .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
-      @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+            /* Dark Mode */
+            --bg-dark: #0f172a;
+            --card-bg-dark: #1e293b;
+            --text-primary-dark: #f8fafc;
+            --text-secondary-dark: #94a3b8;
+            --border-dark: #334155;
+        }
 
-      .hero-section { text-align: center; padding: 30px 20px 0; }
-      .hero-section h1 {
-         font-size: 2.5rem; font-weight: 700; margin-bottom: 8px;
-         background: var(--primary-gradient); -webkit-background-clip: text;
-         -webkit-text-fill-color: transparent;
-         animation: fadeInDown 0.8s ease-out;
-      }
-      .hero-section p {
-         font-size: 1.1rem; color: var(--text-secondary-light); max-width: 600px;
-         margin: 0 auto; animation: fadeInUp 0.8s ease-out 0.2s; animation-fill-mode: both;
-      }
-      body.dark-mode .hero-section p { color: var(--text-secondary-dark); }
-      
-      .dashboard-grid { max-width: 1200px; margin: 40px auto 0; padding: 0 20px; }
-      .card-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-      .card {
-         background: var(--card-bg-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light);
-         border-radius: 16px; padding: 24px; position: relative; display: flex;
-         flex-direction: column; transition: all 0.4s ease; animation: popIn 0.5s ease-out forwards;
-         opacity: 0;
-      }
-      .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
-      
-      body.dark-mode .card { 
-         background: var(--card-bg-dark); 
-         border-color: var(--border-dark);
-         backdrop-filter: none;
-      }
-      body.dark-mode .card:hover {
-         transform: translateY(-8px);
-         box-shadow: none; /* Disable default shadow */
-         border-color: rgba(255, 255, 255, 0.25); /* Brighten border on hover */
-      }
-      .card-header { display: flex; align-items: center; gap: 16px; margin-bottom: 12px; }
-      .card-icon {
-         width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px;
-         background: var(--primary-gradient); color: white; font-size: 20px; flex-shrink: 0;
-      }
-      .card h3 { font-size: 1.1rem; }
-      .card p { font-size: 0.9rem; color: var(--text-secondary-light); margin-bottom: 20px; flex-grow: 1; }
-      body.dark-mode .card p { color: var(--text-secondary-dark); }
-      .action-btn {
-         display: block; background: var(--primary-gradient); color: white; padding: 12px 20px;
-         border-radius: 10px; text-decoration: none; font-size: 0.9rem; font-weight: 500;
-         text-align: center; margin-top: auto; transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-      .action-btn:hover { transform: scale(1.05); box-shadow: 0 8px 25px rgba(106, 17, 203, 0.3); }
-      
-      .card.topic-list { grid-column: 1 / -1; }
-      .card .topic-tags { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; flex-grow: 1; }
-      .card .topic-tags a {
-         background-color: rgba(106, 17, 203, 0.08); color: var(--primary-start); padding: 8px 15px;
-         border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 500;
-         transition: all 0.2s ease; border: 1px solid transparent;
-      }
-      body.dark-mode .card .topic-tags a { background-color: rgba(181, 216, 255, 0.1); color: #b5d8ff; }
-      .card .topic-tags a:hover { background-color: var(--primary-start); color: white; transform: translateY(-2px); border-color: var(--primary-end); }
-      .card .topic-tags a i { margin-right: 6px; }
-      
-      .bottom-nav {
-         position: fixed; bottom: 0; left: 0; right: 0; height: 65px;
-         background: var(--card-bg-light); backdrop-filter: blur(12px);
-         border-top: 1px solid var(--border-light); display: flex; justify-content: space-around;
-         z-index: 1000;
-         transition: transform 0.4s cubic-bezier(.25,.46,.45,.94);
-      }
-      .bottom-nav.nav-hidden {
-         transform: translateY(100%);
-      }
-      body.dark-mode .bottom-nav { 
-         background: var(--card-bg-dark); 
-         border-top-color: var(--border-dark);
-         backdrop-filter: none;
-      }
-      .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color 0.2s, transform 0.2s; cursor: pointer; }
-      body.dark-mode .nav-item { color: var(--text-secondary-dark); }
-      .nav-item i { font-size: 22px; margin-bottom: 4px; } .nav-item span { font-size: 11px; font-weight: 500; }
-      .nav-item.active { color: var(--primary-start); }
-      .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
-      
-      /* --- Sidebar Styles --- */
-      .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
-      body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
-      .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
-      .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
-      .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-      /* --- Site Footer Styles --- */
-      .site-footer {
-         background-color: #e9ecef; /* A slightly off-white for light mode */
-         color: var(--text-secondary-light);
-         padding: 50px 0 30px;
-         margin-top: 60px; /* Space above the footer */
-         border-top: 1px solid var(--border-light);
-         transition: background-color 0.4s ease, color 0.4s ease;
-      }
-      body.dark-mode .site-footer {
-         background-color: var(--card-bg-dark); /* Using card background for dark mode */
-         color: var(--text-secondary-dark);
-         border-top-color: var(--border-dark);
-      }
-      .footer-container {
-         max-width: 1200px;
-         margin: 0 auto;
-         padding: 0 20px;
-         display: grid;
-         grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-         gap: 40px;
-         margin-bottom: 40px;
-      }
-      .footer-title {
-         font-size: 1rem;
-         font-weight: 700;
-         margin-bottom: 15px;
-         color: var(--text-primary-light);
-         text-transform: ;
-         letter-spacing: 0.5px;
-      }
-      body.dark-mode .footer-title {
-         color: var(--text-primary-dark);
-      }
-      .footer-about p, .footer-links li {
-         font-size: 0.9rem;
-         line-height: 1.6;
-      }
-      .footer-links ul {
-         list-style: none;
-         padding: 0;
-         margin: 0;
-      }
-      .footer-links li {
-         margin-bottom: 10px;
-      }
-      .footer-links a {
-         text-decoration: none;
-         color: inherit;
-         transition: color 0.2s ease;
-      }
-      .footer-links a:hover {
-         color: var(--primary-start);
-         text-decoration: underline;
-      }
-      .footer-social a {
-         display: inline-flex;
-         align-items: center;
-         justify-content: center;
-         width: 40px;
-         height: 40px;
-         border-radius: 50%;
-         background: var(--primary-gradient);
-         color: #fff;
-         font-size: 1rem;
-         margin-right: 10px;
-         text-decoration: none;
-         transition: transform 0.2s ease, box-shadow 0.2s ease;
-      }
-      .footer-social a:hover {
-         transform: translateY(-3px);
-         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-      }
-      .footer-bottom {
-         text-align: center;
-         padding-top: 20px;
-         border-top: 1px solid var(--border-light);
-         margin: 0 20px;
-         font-size: 0.85rem;
-      }
-      body.dark-mode .footer-bottom {
-         border-top-color: var(--border-dark);
-      }
-      .footer-bottom a {
-         color: inherit;
-         font-weight: 500;
-         text-decoration: none;
-      }
-      .footer-bottom a:hover {
-         text-decoration: underline;
-         color: var(--primary-end);
-      }
+        html {
+            scroll-behavior: smooth;
+        }
 
-      @keyframes popIn { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-      @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-      @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-   </style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary-light);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            padding-top: 100px;
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-primary-dark);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        /* --- Header --- */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--card-bg-light);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            z-index: 1000;
+            transition: all 0.4s ease;
+            padding: 0; /* Ensures 100% width */
+        }
+        body.dark-mode .app-header {
+            background: var(--card-bg-dark);
+            box-shadow: 0 1px 5px rgba(255, 255, 255, 0.05);
+        }
+        .header-content-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 24px;
+        }
+        .app-header .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        #datetime-container {
+            font-size: 0.8rem;
+            color: var(--text-secondary-light);
+            font-weight: 500;
+            transition: color 0.4s ease;
+            white-space: nowrap;
+        }
+        body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
+        .icon-btn {
+            font-size: 20px;
+            color: var(--text-secondary-light);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        body.dark-mode .icon-btn {
+            color: var(--text-secondary-dark);
+        }
+        .icon-btn:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        body.dark-mode .icon-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* --- Runner Bar --- */
+        .runner-bar {
+            position: fixed; top: 64px; left: 0; right: 0; z-index: 999;
+            background: var(--primary-gradient); color: white;
+            padding: 8px 0; overflow: hidden; white-space: nowrap;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .runner-bar .runner-text { display: inline-block; padding-left: 100%; animation: scroll-left 30s linear infinite; font-size: 0.9rem; }
+        .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
+        @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+
+        /* --- Main Content & Hero Section --- */
+        .main-content {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 24px;
+        }
+        .hero-section {
+            padding: 24px 0;
+            text-align: center;
+        }
+        .hero-section h1 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-section p {
+            font-size: clamp(0.9rem, 2.5vw, 1.1rem);
+            color: var(--text-secondary-light);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        body.dark-mode .hero-section p {
+            color: var(--text-secondary-dark);
+        }
+
+        /* --- Focus Card --- */
+        .focus-card {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            animation: fadeIn 0.8s ease-out;
+        }
+        .focus-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 0.2;
+            pointer-events: none;
+        }
+        .focus-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 8px;
+        }
+        .focus-card p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+        .focus-card .focus-btn {
+            background-color: white;
+            color: var(--primary-start);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .focus-card .focus-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Quick Actions --- */
+        .quick-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 30px;
+            animation: fadeInUp 0.8s ease-out 0.2s;
+            animation-fill-mode: both;
+        }
+        .quick-action-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-primary-light);
+            padding: 15px;
+            background-color: var(--card-bg-light);
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+        body.dark-mode .quick-action-item {
+            color: var(--text-primary-dark);
+            background-color: var(--card-bg-dark);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .quick-action-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .quick-action-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .quick-action-item .label {
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        /* --- Dashboard Grid & Cards --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+        .card {
+            background: var(--card-bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+            animation: popIn 0.5s ease-out forwards;
+            opacity: 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        body.dark-mode .card {
+            background: var(--card-bg-dark);
+            border-color: var(--border-dark);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .card:hover {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .card-icon-circle {
+            width: 48px;
+            height: 48px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+        .card h3 {
+            font-size: 1.2rem;
+        }
+        .card p {
+            font-size: 0.95rem;
+            color: var(--text-secondary-light);
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+        body.dark-mode .card p {
+            color: var(--text-secondary-dark);
+        }
+        .action-btn {
+            display: block;
+            background: var(--primary-gradient);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-align: center;
+            margin-top: auto;
+            transition: all 0.2s ease;
+        }
+        .action-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        /* --- Topic Tags Section --- */
+        .topic-list {
+            grid-column: 1 / -1;
+        }
+        .topic-tags-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .topic-tags-grid a {
+            background-color: var(--bg-light);
+            color: var(--text-primary-light);
+            padding: 8px 15px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        body.dark-mode .topic-tags-grid a {
+            background-color: var(--border-dark);
+            color: var(--text-primary-dark);
+        }
+        .topic-tags-grid a:hover {
+            transform: translateY(-3px);
+            background: var(--primary-gradient);
+            color: white;
+        }
+        
+        /* --- Sidebar & Overlay --- */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); z-index: 1001; display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+        .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--card-bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
+        body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
+        .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
+        .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
+        .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+
+        /* --- Footer --- */
+        .site-footer {
+            width: 100%;
+            background-color: var(--card-bg-light);
+            color: var(--text-secondary-light);
+            padding: 50px 0 30px;
+            margin-top: 40px;
+            border-top: 1px solid var(--border-light);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        body.dark-mode .site-footer {
+            background-color: var(--card-bg-dark);
+            color: var(--text-secondary-dark);
+            border-top-color: var(--border-dark);
+        }
+        .footer-content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary-light);
+        }
+        body.dark-mode .footer-title {
+            color: var(--text-primary-dark);
+        }
+        .footer-links ul {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: var(--primary-start);
+        }
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 1rem;
+            margin-right: 10px;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .footer-social a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid var(--border-light);
+            margin-top: 20px;
+            font-size: 0.85rem;
+        }
+        body.dark-mode .footer-bottom {
+            border-top-color: var(--border-dark);
+        }
+        .footer-bottom a {
+            color: inherit;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        .footer-bottom a:hover {
+            text-decoration: underline;
+            color: var(--primary-end);
+        }
+        
+        /* --- Bottom Navigation --- */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 64px;
+            background: var(--card-bg-light);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+            transition: transform 0.4s cubic-bezier(.25, .46, .45, .94);
+        }
+        body.dark-mode .bottom-nav {
+            background: var(--card-bg-dark);
+            border-top-color: var(--border-dark);
+        }
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary-light);
+            text-decoration: none;
+            flex-grow: 1;
+            transition: color 0.2s, transform 0.2s;
+            cursor: pointer;
+        }
+        body.dark-mode .nav-item {
+            color: var(--text-secondary-dark);
+        }
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+        .nav-item span {
+            font-size: 11px;
+            font-weight: 500;
+        }
+        .nav-item.active {
+            color: var(--primary-start);
+        }
+        .nav-item:hover {
+            transform: translateY(-3px);
+            color: var(--primary-end);
+        }
+        
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes popIn { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+    </style>
 </head>
 <body>
 
-<!-- App Header -->
-<header class="app-header">
-   <a href="index.html" class="logo">UPSC Hub</a>
-   <div class="header-right">
-      <div id="datetime-container"></div>
-      <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
-   </div>
-</header>
+    <header class="app-header">
+        <div class="header-content-wrapper">
+            <a href="index.html" class="logo">UPSC Hub</a>
+            <div class="header-right">
+                <div id="datetime-container"></div>
+                <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
+            </div>
+        </div>
+    </header>
 
-<!-- Runner Bar -->
-<div class="runner-bar">
-   <div class="runner-text">
-      <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
-      <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
-   </div>
-</div>
-
-<!-- Sidebar (Drawer Menu) with Categories -->
-<div class="side-bar">
-    <div class="sidebar-header">
-       <h3 class="title">Complete Menu</h3>
-       <div id="close-btn"><i class="fas fa-times"></i></div>
+    <div class="runner-bar">
+        <div class="runner-text">
+            <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
+            <span>Latest: Daily Current Affairs Quiz is now LIVE! <i class="fas fa-star"></i> New Mock Test Added for GS Paper 1 <i class="fas fa-star"></i> Mains Answer Writing Challenge starts this Friday <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
+        </div>
     </div>
-    <div class="profile">
-      <img src="images/LOGO.jpg" class="image" alt="UPSC Hub Logo">
-      <h3 class="name">UPSC Hub</h3>
-      <p class="role">Your Success Partner</p>
-    </div>
-      <nav class="navbar">
-        <div class="sidebar-category"><h4>Learn</h4></div>
-        <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
-        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
-        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
-        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-        <div class="sidebar-category"><h4>Practice & Tools</h4></div>
-        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
-        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
-        <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test details</span></a>
-        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
-        <div class="sidebar-category"><h4>Resources</h4></div>
-        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
-        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
-        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
-        <div class="sidebar-category"><h4>Support & Info</h4></div>
-        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
-        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
-        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
-        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
-    </nav>
-</div>
-
-<!-- Main Content Area -->
-<main>
-    <section class="hero-section">
-        <h1>UPSC Preparation Hub</h1>
-        <p>Your journey to success starts here. Seize the day and conquer your goals.</p>
-    </section>
     
-    <section class="dashboard-grid">
-        <div class="card-container">
-            <!-- Cards are unchanged -->
+    <div class="sidebar-overlay"></div>
+    
+    <div class="side-bar">
+        <div class="sidebar-header">
+            <h3 class="title">Complete Menu</h3>
+            <div id="close-btn"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="profile">
+            <img src="images/LOGO.jpg" alt="UPSC Hub Logo">
+            <h3 class="name">UPSC Hub</h3>
+            <p class="role">Your Success Partner</p>
+        </div>
+        <nav class="navbar">
+            <div class="sidebar-category"><h4>Learn</h4></div>
+            <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+            <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
+            <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+            <div class="sidebar-category"><h4>Practice & Tools</h4></div>
+            <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+            <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+            <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test details</span></a>
+            <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+            <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+            <div class="sidebar-category"><h4>Resources</h4></div>
+            <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+            <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+            <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+            <div class="sidebar-category"><h4>Support & Info</h4></div>
+            <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+            <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+            <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+            <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+        </nav>
+    </div>
+
+    <main class="main-content">
+        <section class="hero-section">
+            <h1>Your Ultimate UPSC Guide</h1>
+            <p>Structured resources, expert analysis, and powerful tools to ace the Civil Services Exam.</p>
+        </section>
+
+        <section class="focus-card">
+            <h3>Today's Focus: Polity and Governance</h3>
+            <p>Revise Chapter 12: Fundamental Rights. Take the practice quiz to test your knowledge.</p>
+            <a href="#" class="focus-btn">Start Practice Quiz <i class="fas fa-arrow-right"></i></a>
+        </section>
+
+        <section class="quick-actions">
+            <a href="focustimer.html" class="quick-action-item">
+                <div class="quick-action-icon"><i class="fas fa-clock"></i></div>
+                <span class="label">Focus Timer</span>
+            </a>
+            <a href="newsupdate.html" class="quick-action-item">
+                <div class="quick-action-icon"><i class="fas fa-newspaper"></i></div>
+                <span class="label">Daily News</span>
+            </a>
+            <a href="testinterface.html" class="quick-action-item">
+                <div class="quick-action-icon"><i class="fas fa-tasks"></i></div>
+                <span class="label">Mock Tests</span>
+            </a>
+        </section>
+        
+        <div class="card-grid">
             <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-book-open"></i></div><h3>UPSC Syllabus</h3></div>
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-book-open"></i></div>
+                    <h3>UPSC Syllabus</h3>
+                </div>
                 <p>Access the complete and detailed Prelims & Mains syllabi to structure your preparation.</p>
-                <a href="syllabus.html" class="action-btn">View Syllabus <i class="fas fa-arrow-right"></i></a>
+                <a href="syllabus.html" class="action-btn">View Syllabus</a>
             </div>
             <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-landmark"></i></div><h3>Polity: Laxhmikant</h3></div>
-                <p>Master Indian Polity with the bible for civil service aspirants. Chapter-wise notes and tests.</p>
-                <a href="Polity_Laxhmikant.html" class="action-btn">Study Now <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-spa"></i></div><h3>Meditation Zone</h3></div>
-                <p>Boost your concentration, reduce stress, and improve mental clarity for long study hours.</p>
-                <a href="yoga_meditation.html" class="action-btn">Begin Session <i class="fas fa-brain"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-folder-open"></i></div><h3>Resource Files</h3></div>
-                <p>Find all your confidential study materials, notes, and downloaded resources in one place.</p>
-                <a href="TESTseries-daily.html" class="action-btn">Access Files <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-video"></i></div><h3>Video Lectures</h3></div>
-                <p>Explore our comprehensive video learning section covering all subjects and topics.</p>
-                <a href="preplibrary.html" class="action-btn">Watch Videos <i class="fas fa-play"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-clock"></i></div><h3>Focus Timer</h3></div>
-                <p>Use the Pomodoro technique to track and improve your study session efficiency.</p>
-                <a href="focustimer.html" class="action-btn">Start Timer <i class="fas fa-hourglass-start"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-newspaper"></i></div><h3>Daily News Update</h3></div>
-                <p>Stay on top of current affairs with daily news digests relevant to the UPSC exam.</p>
-                <a href="newsupdate.html" class="action-btn">Read Now <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-search"></i></div><h3>Newspaper Analysis</h3></div>
-                <p>Get daily in-depth analysis of The Hindu and Indian Express editorials and important articles.</p>
-                <a href="newspaper.html" class="action-btn">View Analysis <i class="fas fa-arrow-right"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-pen-fancy"></i></div><h3>Answer Writing</h3></div>
-                <p>Upload your Mains answers for peer and expert evaluation to hone your writing skills.</p>
-                <a href="drive.doc.html" class="action-btn">Upload Document <i class="fas fa-upload"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-tasks"></i></div><h3>Mock Test Series</h3></div>
-                <p>Simulate the real exam environment and assess your preparation with full-length tests.</p>
-                <a href="test.html" class="action-btn">Start Test <i class="fas fa-pen"></i></a>
-            </div>
-            <div class="card">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-chart-line"></i></div><h3>Performance Analysis</h3></div>
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-chart-line"></i></div>
+                    <h3>Performance Analysis</h3>
+                </div>
                 <p>Get detailed, insightful reports after each test to identify your strengths and weaknesses.</p>
-                <a href="testinfo.html" class="action-btn">View Report <i class="fas fa-chart-pie"></i></a>
+                <a href="testinfo.html" class="action-btn">View Report</a>
             </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-pen-fancy"></i></div>
+                    <h3>Answer Writing</h3>
+                </div>
+                <p>Upload your Mains answers for peer and expert evaluation to hone your writing skills.</p>
+                <a href="drive.doc.html" class="action-btn">Upload Document</a>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-video"></i></div>
+                    <h3>Video Lectures</h3>
+                </div>
+                <p>Explore our comprehensive video learning section covering all subjects and topics.</p>
+                <a href="preplibrary.html" class="action-btn">Watch Videos</a>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-book-reader"></i></div>
+                    <h3>Revision Tools</h3>
+                </div>
+                <p>Use smart flashcards and spaced repetition to master key topics and improve retention.</p>
+                <a href="revision.html" class="action-btn">Start Revising</a>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-folder-open"></i></div>
+                    <h3>Resource Files</h3>
+                </div>
+                <p>Find all your confidential study materials, notes, and downloaded resources in one place.</p>
+                <a href="TESTseries-daily.html" class="action-btn">Access Files</a>
+            </div>
+            
             <div class="card topic-list">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-book-atlas"></i></div><h3>Core Subjects</h3></div>
-                <div class="topic-tags">
+                <div class="card-header">
+                    <div class="card-icon-circle"><i class="fas fa-book-atlas"></i></div>
+                    <h3>Core Subjects</h3>
+                </div>
+                <div class="topic-tags-grid">
                     <a href="#"><i class="fas fa-globe-asia"></i> Geography</a>
                     <a href="#"><i class="fas fa-landmark"></i> Polity</a>
                     <a href="#"><i class="fas fa-history"></i> History</a>
@@ -426,125 +669,122 @@
                     <a href="#"><i class="fas fa-rupee-sign"></i> Economy</a>
                 </div>
             </div>
-            <div class="card topic-list">
-                <div class="card-header"><div class="card-icon"><i class="fas fa-fire"></i></div><h3>Popular Topics</h3></div>
-                <div class="topic-tags">
-                    <a href="#"><i class="fas fa-bolt"></i> Current Affairs</a>
-                    <a href="#"><i class="fas fa-file-alt"></i> Important Articles</a>
-                    <a href="#"><i class="fas fa-edit"></i> Editorials Explained</a>
-                    <a href="#"><i class="fas fa-chart-bar"></i> Infographics</a>
-                    <a href="#"><i class="fas fa-lightbulb"></i> Mains Questions</a>
-                    <a href="#"><i class="fas fa-check-double"></i> Prelims MCQs</a>
+        </div>
+    </main>
+    
+    <footer class="site-footer">
+        <div class="footer-content-wrapper">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <h3 class="footer-title">UPSC Hub</h3>
+                    <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
+                </div>
+                <div class="footer-links">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Support</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="TESTseries-daily.html">Test Series</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h3 class="footer-title">Connect With Us</h3>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- NEW: Site Footer -->
-    <footer class="site-footer">
-        <div class="footer-container">
-            <div class="footer-about">
-                <h3 class="footer-title">UPSC Hub</h3>
-                <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
+            <div class="footer-bottom">
+                <p>© 2024 UPSC Hub. All Rights Reserved.</p>
+                <p><a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms of Use</a></p>
             </div>
-            <div class="footer-links">
-                <h3 class="footer-title">Quick Links</h3>
-                <ul>
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="contact.html">Contact Support</a></li>
-                    <li><a href="courses.html">Courses</a></li>
-                    <li><a href="TESTseries-daily.html">Test Series</a></li>
-                </ul>
-            </div>
-            <div class="footer-social">
-                <h3 class="footer-title">Connect With Us</h3>
-                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>© 2024 UPSC Hub. All Rights Reserved.</p>
-            <p><a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms of Use</a></p>
         </div>
     </footer>
-</main>
+    
+    <nav class="bottom-nav">
+        <a href="homeUPSChub.html" class="nav-item active"> <i class="fas fa-home"></i> <span>Home</span> </a>
+        <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>Planner</span> </a>
+        <a href="testinterface.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Tests</span> </a>
+        <div id="menu-btn" class="nav-item"> <i class="fas fa-bars"></i> <span>Menu</span> </div>
+    </nav>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme toggle
+            const toggleBtn = document.querySelector('#toggle-btn');
+            const body = document.body;
+            const applyTheme = (theme) => {
+                body.classList.toggle('dark-mode', theme === 'dark');
+                toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+                toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+            };
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+            toggleBtn.addEventListener('click', () => {
+                const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
 
-<!-- Bottom Navigation Bar -->
-<nav class="bottom-nav">
-   <a href="homeUPSChub.html" class="nav-item active"> <i class="fas fa-home"></i> <span>Home</span> </a>
-   <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>UPSC-28 Planner</span> </a>
-   <a href="testinterface.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Mock Tests</span> </a>
-   <div id="menu-btn" class="nav-item"> <i class="fas fa-bars-staggered"></i> <span>Menu</span> </div>
-</nav>
+            // Sidebar toggle
+            const menuBtn = document.querySelector('#menu-btn');
+            const closeBtn = document.querySelector('#close-btn');
+            const sideBar = document.querySelector('.side-bar');
+            const sidebarOverlay = document.querySelector('.sidebar-overlay');
+            if (menuBtn && sideBar && sidebarOverlay) {
+                menuBtn.addEventListener('click', () => {
+                    sideBar.classList.add('active');
+                    sidebarOverlay.classList.add('active');
+                });
+            }
+            if (closeBtn && sideBar && sidebarOverlay) {
+                closeBtn.addEventListener('click', () => {
+                    sideBar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
+            if (sidebarOverlay && sideBar) {
+                sidebarOverlay.addEventListener('click', () => {
+                    sideBar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
 
-<script>
-   // Sidebar toggle
-   const menuBtn = document.querySelector('#menu-btn');
-   const closeBtn = document.querySelector('#close-btn');
-   const sideBar = document.querySelector('.side-bar');
-   menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
-   closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+            // Staggered card animation on DOM load
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.05}s`;
+            });
+            
+            // Live date and time display
+            const datetimeContainer = document.getElementById('datetime-container');
+            const updateDateTime = () => {
+                const now = new Date();
+                const dateOptions = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+                const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+                const dateStr = now.toLocaleDateString('en-US', dateOptions);
+                const timeStr = now.toLocaleTimeString('en-US', timeOptions);
+                datetimeContainer.textContent = `${dateStr} | ${timeStr}`;
+            };
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        });
 
-   // Theme toggle
-   const toggleBtn = document.querySelector('#toggle-btn');
-   const body = document.body;
-   const applyTheme = (theme) => {
-      body.classList.toggle('dark-mode', theme === 'dark');
-      toggleBtn.classList.toggle('fa-moon', theme === 'dark');
-      toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
-   };
-   const savedTheme = localStorage.getItem('theme') || 'light';
-   applyTheme(savedTheme);
-   toggleBtn.addEventListener('click', () => {
-      const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-      localStorage.setItem('theme', newTheme);
-      applyTheme(newTheme);
-   });
-   
-   // Live Date and Time Script
-   const dateTimeContainer = document.getElementById('datetime-container');
-   const updateDateTime = () => {
-      const now = new Date();
-      const dateOptions = { year: 'numeric', month: 'short', day: 'numeric' };
-      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
-      const dateStr = now.toLocaleDateString('en-US', dateOptions);
-      const timeStr = now.toLocaleTimeString('en-US', timeOptions);
-      dateTimeContainer.textContent = `${dateStr} | ${timeStr}`;
-   };
-   
-   document.addEventListener('DOMContentLoaded', () => {
-      // Staggered card animation
-      const cards = document.querySelectorAll('.card');
-      cards.forEach((card, index) => {
-         card.style.animationDelay = `${index * 0.05}s`;
-      });
-      
-      // Initialize and update the clock
-      updateDateTime();
-      setInterval(updateDateTime, 1000);
-   });
-
-   // --- Auto-hide bottom navigation on scroll ---
-   const bottomNav = document.querySelector('.bottom-nav');
-   let lastScrollY = window.scrollY;
-
-   window.addEventListener('scroll', () => {
-      const currentScrollY = window.scrollY;
-      
-      // Hide nav if scrolling down and not near the top, show if scrolling up
-      if (currentScrollY > lastScrollY && currentScrollY > 100) { 
-         bottomNav.classList.add('nav-hidden');
-      } else {
-         bottomNav.classList.remove('nav-hidden');
-      }
-
-      // Update last scroll position
-      lastScrollY = Math.max(0, currentScrollY); 
-   });
-
-</script>
-
+        // Auto-hide bottom navigation on scroll
+        const bottomNav = document.querySelector('.bottom-nav');
+        let lastScrollY = window.scrollY;
+        
+        window.addEventListener('scroll', () => {
+            const currentScrollY = window.scrollY;
+            if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                bottomNav.classList.add('nav-hidden');
+            } else {
+                bottomNav.classList.remove('nav-hidden');
+            }
+            lastScrollY = Math.max(0, currentScrollY);
+        });
+    </script>
 </body>
 </html>
