@@ -379,7 +379,7 @@
         .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
         .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
         .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
-
+       
         /* --- Footer --- */
         .site-footer {
             width: 100%;
@@ -582,11 +582,19 @@
             <p>Structured resources, expert analysis, and powerful tools to ace the Civil Services Exam.</p>
         </section>
 
-        <section class="focus-card">
-            <h3>Today's Focus: Polity and Governance</h3>
-            <p>Revise Chapter 12: Fundamental Rights. Take the practice quiz to test your knowledge.</p>
-            <a href="#" class="focus-btn">Start Practice Quiz <i class="fas fa-arrow-right"></i></a>
-        </section>
+    <section class="focus-card">
+    <h3>Today's Polity Test</h3>
+    <p>Chapter 5-1.0: 150 Questions | +1 / -1 Concept | 15 Seconds per Question</p>
+    
+    <!-- Countdown Timer -->
+    <div id="countdown" style="font-size: 1.2rem; font-weight: bold; margin: 10px 0; color: #d9534f;">
+        Test starts in: --
+    </div>
+
+    <a href="testinterface.html" class="focus-btn">
+        Start Test <i class="fas fa-arrow-right"></i>
+    </a>
+</section>
 
         <section class="quick-actions">
             <a href="focustimer.html" class="quick-action-item">
@@ -771,7 +779,34 @@
             updateDateTime();
             setInterval(updateDateTime, 1000);
         });
+        // Set test time for today at 9:30 PM
+    const now = new Date();
+    const testTime = new Date();
+    testTime.setHours(21, 30, 0, 0); // 21:30 hrs today
 
+    // If current time is past 9:30 PM, set for tomorrow
+    if (now > testTime) {
+        testTime.setDate(testTime.getDate() + 1);
+    }
+
+    // Update countdown every second
+    const countdownElement = document.getElementById("countdown");
+    const interval = setInterval(() => {
+        const currentTime = new Date().getTime();
+        const distance = testTime - currentTime;
+
+        if (distance <= 0) {
+            clearInterval(interval);
+            countdownElement.innerHTML = "✅ Test is Live!";
+            return;
+        }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        countdownElement.innerHTML = `Test starts in: ${hours}h ${minutes}m ${seconds}s`;
+    }, 1000);
         // Auto-hide bottom navigation on scroll
         const bottomNav = document.querySelector('.bottom-nav');
         let lastScrollY = window.scrollY;
