@@ -261,6 +261,25 @@
             font-size: 0.8rem;
             font-weight: 500;
         }
+        .quick-action-item {
+            position: relative;
+            display: inline-block;
+        }
+        .new-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #ff0000;
+            color: #fff;
+            font-size: 10px;
+            font-weight: bold;
+            padding: 2px 5px;
+            border-radius: 10px;
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
 
         /* --- Dashboard Grid & Cards --- */
         .card-grid {
@@ -292,6 +311,16 @@
         body.dark-mode .card:hover {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
+        
+        /* --- NEW: Syllabus Card Image Style --- */
+        .card-img {
+            width: calc(100% + 48px); /* Counteract padding */
+            height: 150px;
+            object-fit: cover;
+            margin: -24px -24px 20px -24px; /* Negative margin to make it flush, plus bottom margin */
+            border-radius: 16px 16px 0 0;
+        }
+
         .card-header {
             display: flex;
             align-items: center;
@@ -339,98 +368,6 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* --- UPSChub Notes Section (NEW) --- */
-        #upschub-notes-section {
-            grid-column: 1 / -1; /* Make it span the full width of the grid */
-            border: 2px solid;
-            border-image-slice: 1;
-            border-image-source: var(--primary-gradient);
-            background-color: var(--card-bg-light);
-            box-shadow: 0 10px 30px rgba(76, 81, 191, 0.15);
-            animation-delay: 0.3s; /* Delay its appearance slightly */
-        }
-
-        body.dark-mode #upschub-notes-section {
-            background-color: var(--card-bg-dark);
-            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
-        }
-
-        .notes-list {
-            list-style: none;
-            margin: 20px 0;
-            padding: 0;
-        }
-
-        .notes-list li {
-            margin-bottom: 10px;
-        }
-
-        .notes-list li a {
-            display: block;
-            padding: 12px 15px;
-            background-color: var(--bg-light);
-            border-radius: 8px;
-            text-decoration: none;
-            color: var(--text-primary-light);
-            transition: all 0.2s ease;
-            border-left: 3px solid var(--primary-end);
-        }
-        
-        body.dark-mode .notes-list li a {
-            background-color: var(--border-dark);
-            color: var(--text-primary-dark);
-        }
-
-        .notes-list li a:hover {
-            background-color: var(--primary-start);
-            color: white;
-            transform: translateX(5px);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        
-        body.dark-mode .notes-list li a:hover {
-             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-        }
-
-        .notes-list li a span {
-            font-weight: 600;
-            color: var(--primary-start);
-            margin-right: 8px;
-        }
-
-        .notes-list li a:hover span {
-            color: white;
-        }
-
-        /* --- Topic Tags Section --- */
-        .topic-list {
-            grid-column: 1 / -1;
-        }
-        .topic-tags-grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .topic-tags-grid a {
-            background-color: var(--bg-light);
-            color: var(--text-primary-light);
-            padding: 8px 15px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all 0.2s ease;
-        }
-        body.dark-mode .topic-tags-grid a {
-            background-color: var(--border-dark);
-            color: var(--text-primary-dark);
-        }
-        .topic-tags-grid a:hover {
-            transform: translateY(-3px);
-            background: var(--primary-gradient);
-            color: white;
-        }
-        
         /* --- Sidebar & Overlay --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -530,27 +467,6 @@
             color: var(--primary-end);
         }
         
-.quick-action-item {
-    position: relative;
-    display: inline-block;
-}
-
-.new-badge {
-    position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #ff0000;
-    color: #fff;
-    font-size: 10px;
-    font-weight: bold;
-    padding: 2px 5px;
-    border-radius: 10px;
-    animation: blink 1s infinite;
-}
-
-@keyframes blink {
-    50% { opacity: 0; }
-}
         /* --- Bottom Navigation --- */
         .bottom-nav {
             position: fixed;
@@ -681,11 +597,10 @@
 
         <section class="quick-actions">
             <a href="notes.html" class="quick-action-item">
-    <div class="quick-action-icon"><i class="fas fa-sticky-note"></i></div>
-    <span class="label">Notes</span>
-    <span class="new-badge">New</span>
-</a>
-
+                <div class="quick-action-icon"><i class="fas fa-sticky-note"></i></div>
+                <span class="label">Notes</span>
+                <span class="new-badge">New</span>
+            </a>
             <a href="newsupdate.html" class="quick-action-item">
                 <div class="quick-action-icon"><i class="fas fa-newspaper"></i></div>
                 <span class="label">Daily News</span>
@@ -697,7 +612,9 @@
         </section>
         
         <div class="card-grid">
+            
             <div class="card">
+                <img src="images\UPSC.syllabus.jpg" alt="Stack of books representing the UPSC Syllabus" class="card-img">
                 <div class="card-header">
                     <div class="card-icon-circle"><i class="fas fa-book-open"></i></div>
                     <h3>UPSC Syllabus</h3>
@@ -744,38 +661,6 @@
                 </div>
                 <p>Find all your confidential study materials, notes, and downloaded resources in one place.</p>
                 <a href="TESTseries-daily.html" class="action-btn">Access Files</a>
-            </div>
-            
-            <div class="card" id="upschub-notes-section">
-                <div class="card-header">
-                    <div class="card-icon-circle"><i class="fas fa-feather-alt"></i></div>
-                    <h3>UPSChub Notes</h3>
-                </div>
-                <p>Quick access to curated notes on high-yield topics, designed for efficient revision.</p>
-                <ul class="notes-list">
-                    <li><a href="#"><span>Ancient History:</span> Indus Valley Civilization Key Sites</a></li>
-                    <li><a href="#"><span>Polity:</span> Landmark Supreme Court Judgements Summary</a></li>
-                    <li><a href="#"><span>Economy:</span> Types of Inflation and their Impact</a></li>
-                    <li><a href="#"><span>Environment:</span> Major National Parks & Tiger Reserves</a></li>
-                </ul>
-                <a href="notes-archive.html" class="action-btn">View All Notes</a>
-            </div>
-
-            <div class="card topic-list">
-                <div class="card-header">
-                    <div class="card-icon-circle"><i class="fas fa-book-atlas"></i></div>
-                    <h3>Core Subjects</h3>
-                </div>
-                <div class="topic-tags-grid">
-                    <a href="#"><i class="fas fa-globe-asia"></i> Geography</a>
-                    <a href="#"><i class="fas fa-landmark"></i> Polity</a>
-                    <a href="#"><i class="fas fa-history"></i> History</a>
-                    <a href="#"><i class="fas fa-map-marked-alt"></i> Mapping</a>
-                    <a href="#"><i class="fas fa-atom"></i> Science & Tech</a>
-                    <a href="#"><i class="fas fa-book"></i> General Studies</a>
-                    <a href="#"><i class="fas fa-leaf"></i> Environment</a>
-                    <a href="#"><i class="fas fa-rupee-sign"></i> Economy</a>
-                </div>
             </div>
         </div>
     </main>
@@ -914,9 +799,9 @@
         window.addEventListener('scroll', () => {
             const currentScrollY = window.scrollY;
             if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                bottomNav.classList.add('nav-hidden');
+                bottomNav.style.transform = 'translateY(100%)';
             } else {
-                bottomNav.classList.remove('nav-hidden');
+                bottomNav.style.transform = 'translateY(0)';
             }
             lastScrollY = Math.max(0, currentScrollY);
         });
