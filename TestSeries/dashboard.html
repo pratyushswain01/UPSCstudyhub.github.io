@@ -21,19 +21,15 @@
             100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
         }
         .confetti-piece {
-            position: absolute;
-            width: 10px;
-            height: 20px;
-            border-radius: 50%;
-            opacity: 0;
-            animation: fall 5s linear infinite;
+            position: absolute; width: 10px; height: 20px; border-radius: 50%;
+            opacity: 0; animation: fall 5s linear infinite;
         }
-        .toggle-checkbox:checked + .toggle-label {
-            background-color: #3B82F6;
-        }
-        .toggle-checkbox:checked + .toggle-label .toggle-dot {
-            transform: translateX(100%);
-        }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
+        .toggle-checkbox:checked + .toggle-label .toggle-dot { transform: translateX(100%); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+        .faq-question.open + .faq-answer { max-height: 200px; }
+        .faq-question .icon { transition: transform 0.3s ease-in-out; }
+        .faq-question.open .icon { transform: rotate(180deg); }
     </style>
     <script>
       tailwind.config = { darkMode: 'class' }
@@ -55,7 +51,7 @@
                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
                         </button>
                         <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-1 z-20">
-                            <div class="px-4 py-2 text-sm text-slate-500 dark:text-slate-400 truncate" id="user-email-display">user@example.com</div>
+                            <div class="px-4 py-2 text-sm text-slate-500 dark:text-slate-400 truncate" id="user-email-display"></div>
                             <div class="border-t border-slate-200 dark:border-slate-700"></div>
                             <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
                         </div>
@@ -133,15 +129,15 @@
                                     </div>
                                     <div>
                                         <p class="font-bold" id="settings-display-name">UPSC Aspirant</p>
-                                        <p class="text-sm text-slate-500 dark:text-slate-400" id="settings-user-email">user@example.com</p>
+                                        <p class="text-sm text-slate-500 dark:text-slate-400" id="settings-user-email"></p>
                                     </div>
                                 </div>
                                 <button id="edit-profile-btn" class="text-sm font-semibold text-blue-600 hover:underline">Edit</button>
                             </div>
                             <div id="subscription-item" class="p-4 flex items-center justify-between"></div>
                             <button id="change-password-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span class="font-semibold">Change Password</span></div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span class="font-semibold">Change Password</span></div>
+                                <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </button>
                         </div>
                     </div>
@@ -150,19 +146,33 @@
                         <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Preferences</h2>
                          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
                             <div class="p-4 flex items-center justify-between">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg><span class="font-semibold">Dark Mode</span></div>
+                                <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg><span class="font-semibold">Dark Mode</span></div>
                                 <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
                                     <input type="checkbox" id="settings-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
                                     <label for="settings-theme-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
                                 </div>
                             </div>
                             <button id="notification-prefs-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="font-semibold">Notification Settings</span></div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="font-semibold">Notification Settings</span></div>
+                                <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
                             </button>
                          </div>
                     </div>
 
+                    <div>
+                        <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Support & Legal</h2>
+                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
+                             <button id="faq-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="font-semibold">FAQs</span></div>
+                                <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                            <button id="contact-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><span class="font-semibold">Contact Us</span></div>
+                                <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                            </button>
+                         </div>
+                    </div>
+                    
                     <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                         <button id="logout-btn-settings" class="w-full text-left font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700/50">Logout</button>
                         <button id="delete-account-btn" class="w-full text-left font-semibold text-red-600 dark:text-red-500 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm hover:bg-red-50 dark:hover:bg-red-500/10">Delete Account</button>
@@ -182,36 +192,30 @@
     </div>
     
     <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
-            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Edit Profile</h3></div>
-            <form id="profile-form"><div class="p-6 space-y-4"><div><label for="display-name" class="text-sm font-medium text-gray-700 dark:text-slate-300">Display Name</label><input type="text" id="display-name" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-profile" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save Changes</button></div></form>
-        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Edit Profile</h3></div><form id="profile-form"><div class="p-6 space-y-4"><div><label for="display-name" class="text-sm font-medium">Display Name</label><input type="text" id="display-name" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-profile" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save</button></div></form></div>
     </div>
     <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
-         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
-            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Change Password</h3></div>
-            <form id="password-form"><div class="p-6 space-y-4"><div><label for="current-password" class="text-sm font-medium text-gray-700 dark:text-slate-300">Current Password</label><input type="password" id="current-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div><div><label for="new-password" class="text-sm font-medium text-gray-700 dark:text-slate-300">New Password</label><input type="password" id="new-password" required minlength="6" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-password" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Update Password</button></div></form>
-        </div>
+         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Change Password</h3></div><form id="password-form"><div class="p-6 space-y-4"><div><label for="current-password" class="text-sm font-medium">Current Password</label><input type="password" id="current-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div><div><label for="new-password" class="text-sm font-medium">New Password</label><input type="password" id="new-password" required minlength="6" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-password" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Update</button></div></form></div>
     </div>
     <div id="notification-prefs-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
-            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Notification Preferences</h3></div>
-            <div class="p-6 space-y-4 divide-y divide-slate-200 dark:divide-slate-700"><div class="pt-4 first:pt-0"><div class="flex items-center justify-between"><label for="email-toggle" class="font-semibold cursor-pointer">Email Newsletters</label><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="email-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="email-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div><p class="text-sm text-slate-500 mt-1">Receive occasional emails about new features.</p></div><div class="pt-4"><div class="flex items-center justify-between"><label for="in-app-toggle" class="font-semibold cursor-pointer">In-App Announcements</label><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="in-app-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="in-app-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div><p class="text-sm text-slate-500 mt-1">Get notified about new tests inside the app.</p></div></div>
-             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end"><button type="button" id="close-notification-prefs" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Done</button></div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Notification Preferences</h3></div><div class="p-6 space-y-4 divide-y divide-slate-200 dark:divide-slate-700"><div class="pt-4 first:pt-0"><div class="flex items-center justify-between"><label for="email-toggle" class="font-semibold cursor-pointer">Email Newsletters</label><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="email-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="email-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div><p class="text-sm text-slate-500 mt-1">Receive occasional emails about new features.</p></div><div class="pt-4"><div class="flex items-center justify-between"><label for="in-app-toggle" class="font-semibold cursor-pointer">In-App Announcements</label><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="in-app-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="in-app-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div><p class="text-sm text-slate-500 mt-1">Get notified about new tests inside the app.</p></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end"><button type="button" id="close-notification-prefs" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Done</button></div>
         </div>
     </div>
     <div id="delete-account-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
-            <div class="p-6 border-b dark:border-slate-700 text-center"><h3 class="text-xl font-bold text-red-600">Delete Account</h3><p class="text-sm text-slate-500 mt-1">This action is permanent.</p></div>
-            <form id="delete-account-form"><div class="p-6 space-y-4"><p class="text-sm">To confirm, please enter your password. All your data, including test history, will be permanently erased.</p><div><label for="delete-confirm-password" class="text-sm font-medium">Your Password</label><input type="password" id="delete-confirm-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-delete-account" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700">Permanently Delete</button></div></form>
-        </div>
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700 text-center"><h3 class="text-xl font-bold text-red-600">Delete Account</h3><p class="text-sm text-slate-500 mt-1">This action is permanent.</p></div><form id="delete-account-form"><div class="p-6 space-y-4"><p class="text-sm">To confirm, please enter your password. All your data will be permanently erased.</p><div><label for="delete-confirm-password" class="text-sm font-medium">Your Password</label><input type="password" id="delete-confirm-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-delete-account" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700">Permanently Delete</button></div></form></div>
+    </div>
+    <div id="contact-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700 flex justify-between items-center"><h3 class="text-xl font-bold">Contact Support</h3><button id="close-contact-modal" class="text-2xl leading-none">&times;</button></div><div class="p-6 space-y-4"><a href="mailto:pratyushkumarswain01@gmail.com?subject=UPSChub Support" class="block text-center w-full p-4 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600">Send an Email</a><a href="https://wa.me/918658567727?text=Hello" target="_blank" class="block text-center w-full p-4 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600">Message on WhatsApp</a><a href="tel:+918249395283" class="block text-center w-full p-4 rounded-lg bg-slate-600 text-white font-semibold hover:bg-slate-700">Request a Call Back</a><p class="text-xs text-center text-slate-500">Tapping "Request a Call Back" will open your phone's dialer.</p></div></div>
+    </div>
+    <div id="faq-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-lg"><div class="p-6 border-b dark:border-slate-700 flex justify-between items-center"><h3 class="text-xl font-bold">FAQs</h3><button id="close-faq-modal" class="text-2xl leading-none">&times;</button></div><div id="faq-container" class="p-6 space-y-2 max-h-[60vh] overflow-y-auto"></div></div>
     </div>
     <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6"><p id="alert-message" class="font-medium"></p><button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button></div>
     </div>
     <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center modal-backdrop">
         <div id="confetti-container" class="absolute inset-0 overflow-hidden"></div>
-        <div class="text-center text-white transform transition-all scale-95 opacity-0" id="success-message-content"><svg class="w-24 h-24 mx-auto text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h2 class="text-4xl font-bold mt-4">Welcome to Premium!</h2><p class="mt-2 text-lg opacity-80">You now have lifetime access.</p><button id="close-success-animation" class="mt-8 bg-white text-blue-600 font-bold px-8 py-3 rounded-lg shadow-lg hover:bg-slate-200 transition">Start Exploring</button></div>
+        <div class="text-center text-white" id="success-message-content"><svg class="w-24 h-24 mx-auto text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h2 class="text-4xl font-bold mt-4">Welcome to Premium!</h2><p class="mt-2 text-lg opacity-80">You now have lifetime access.</p><button id="close-success-animation" class="mt-8 bg-white text-blue-600 font-bold px-8 py-3 rounded-lg shadow-lg">Start Exploring</button></div>
     </div>
 
 <script type="module">
@@ -221,15 +225,7 @@
     import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- FIREBASE CONFIG ---
-    const firebaseConfig = {
-      apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
-      authDomain: "upscstudyhub-github.firebaseapp.com",
-      projectId: "upscstudyhub-github",
-      storageBucket: "upscstudyhub-github.firebasestorage.app",
-      messagingSenderId: "451692540885",
-      appId: "1:451692540885:web:b425e85128e5de97c7c35c",
-      measurementId: "G-33F0XSLP53"
-    };
+    const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
     const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
@@ -267,12 +263,16 @@
     const deleteAccountModal = document.getElementById('delete-account-modal');
     const deleteAccountForm = document.getElementById('delete-account-form');
     const cancelDeleteAccountBtn = document.getElementById('cancel-delete-account');
+    const contactBtn = document.getElementById('contact-btn');
+    const contactModal = document.getElementById('contact-modal');
+    const closeContactModalBtn = document.getElementById('close-contact-modal');
+    const faqBtn = document.getElementById('faq-btn');
+    const faqModal = document.getElementById('faq-modal');
+    const closeFaqModalBtn = document.getElementById('close-faq-modal');
+    const faqContainer = document.getElementById('faq-container');
 
     // --- HELPER FUNCTION ---
-    function showAlert(message) {
-        alertMessage.textContent = message;
-        alertModal.classList.remove('hidden');
-    }
+    function showAlert(message) { alertMessage.textContent = message; alertModal.classList.remove('hidden'); }
     document.getElementById('alert-ok').addEventListener('click', () => alertModal.classList.add('hidden'));
 
     // --- AUTHENTICATION & REAL-TIME DATA ---
@@ -295,9 +295,7 @@
                     }
                 }
             });
-        } else {
-            window.location.href = 'auth.html';
-        }
+        } else { window.location.href = 'auth.html'; }
     });
     
     // --- PROFILE LOGIC ---
@@ -310,15 +308,14 @@
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const newName = document.getElementById('display-name').value;
-        const user = auth.currentUser;
-        if (!user || !newName) return;
+        const user = auth.currentUser; if (!user || !newName) return;
         try {
             await updateProfile(user, { displayName: newName });
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
             await updateDoc(userDocRef, { displayName: newName });
             profileModal.classList.add('hidden');
-            showAlert('Profile updated successfully!');
-        } catch (error) { showAlert('Failed to update profile. ' + error.message); }
+            showAlert('Profile updated!');
+        } catch (error) { showAlert('Failed to update profile.'); }
     });
 
     // --- PASSWORD LOGIC ---
@@ -335,7 +332,7 @@
             await updatePassword(user, newPassword);
             passwordModal.classList.add('hidden');
             showAlert('Password updated successfully!');
-        } catch (error) { showAlert('Failed to change password. Make sure your current password is correct.'); }
+        } catch (error) { showAlert('Failed to change password. Check current password.'); }
     });
 
     // --- NOTIFICATION PREFS LOGIC ---
@@ -361,13 +358,23 @@
         try {
             await reauthenticateWithCredential(user, credential);
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
-            await deleteDoc(userDocRef); // Deletes Firestore data
-            await deleteUser(user); // Deletes Auth account
-            showAlert('Account deleted successfully.');
+            await deleteDoc(userDocRef);
+            await deleteUser(user);
         } catch (error) { showAlert('Failed to delete account. Please check your password.'); }
     });
 
-    // --- SUBSCRIPTION LOGIC ---
+    // --- CONTACT & FAQ LOGIC ---
+    contactBtn.addEventListener('click', () => contactModal.classList.remove('hidden'));
+    closeContactModalBtn.addEventListener('click', () => contactModal.classList.add('hidden'));
+    const faqs = [{ q: "Is the payment secure?", a: "Yes, all payments are processed through Razorpay, a PCI DSS Level 1 compliant, secure payment gateway." },{ q: "What is the validity of the test series?", a: "You get lifetime access to all current and future tests in this series." }];
+    function renderFAQs() {
+        faqContainer.innerHTML = faqs.map(faq => `<div class="border-b dark:border-slate-700 last:border-b-0"><button class="faq-question w-full flex justify-between items-center text-left py-4"><span class="font-semibold">${faq.q}</span><svg class="icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button><div class="faq-answer pb-4 text-slate-600 dark:text-slate-300"><p>${faq.a}</p></div></div>`).join('');
+    }
+    faqBtn.addEventListener('click', () => { renderFAQs(); faqModal.classList.remove('hidden'); });
+    closeFaqModalBtn.addEventListener('click', () => faqModal.classList.add('hidden'));
+    faqContainer.addEventListener('click', (e) => { const question = e.target.closest('.faq-question'); if (question) { question.classList.toggle('open'); } });
+
+    // --- SUBSCRIPTION & PAYMENT LOGIC ---
     function updateSubscriptionUI(isPremium) {
         if (isPremium) {
             subscriptionItem.innerHTML = `<div class="flex items-center gap-4"><svg class="h-6 w-6 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg><div><p class="font-semibold">Premium Member</p><p class="text-sm text-slate-500">Lifetime Access</p></div></div><span class="text-sm font-semibold text-green-600">Active</span>`;
@@ -378,20 +385,16 @@
     }
     function handleUpgrade() {
         const user = auth.currentUser; if (!user) return;
-        var options = { "key": "rzp_test_YourTestKey", "amount": 9900, "currency": "INR", "name": "UPSChub", "description": "Lifetime Access", "handler": function (response){ const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); updateDoc(userDocRef, { isPremium: true }).then(() => showSuccessAnimation()).catch(err => showAlert("Payment failed to update account.")); }, "prefill": { "email": user.email }, "theme": { "color": "#2563EB" } };
+        var options = { "key": "rzp_test_YourTestKey", "amount": 9900, "currency": "INR", "name": "UPSChub", "description": "Lifetime Access", "handler": function (response){ const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); updateDoc(userDocRef, { isPremium: true }).then(() => showSuccessAnimation()); }, "prefill": { "email": user.email }, "theme": { "color": "#2563EB" } };
         var rzp1 = new Razorpay(options); rzp1.open();
     }
-    
-    // --- SUCCESS ANIMATION LOGIC ---
     function showSuccessAnimation() {
         successAnimationModal.classList.remove('hidden');
         setTimeout(() => { successMessageContent.classList.remove('scale-95', 'opacity-0'); successMessageContent.classList.add('scale-100', 'opacity-100'); }, 100);
         confettiContainer.innerHTML = '';
         for (let i = 0; i < 100; i++) {
-            const confetti = document.createElement('div');
-            confetti.classList.add('confetti-piece');
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.animationDelay = Math.random() * 2 + 's';
+            const confetti = document.createElement('div'); confetti.classList.add('confetti-piece');
+            confetti.style.left = Math.random() * 100 + 'vw'; confetti.style.animationDelay = Math.random() * 2 + 's';
             confetti.style.backgroundColor = ['#fde68a', '#fca5a5', '#818cf8', '#67e8f9'][Math.floor(Math.random() * 4)];
             if (Math.random() > 0.5) { confetti.style.animationDirection = 'reverse'; }
             confettiContainer.appendChild(confetti);
@@ -400,7 +403,7 @@
     closeSuccessAnimationBtn.addEventListener('click', () => { successAnimationModal.classList.add('hidden'); confettiContainer.innerHTML = ''; });
     
     // --- LOGOUT & SPA NAVIGATION ---
-    function handleLogout(e) { e.preventDefault(); signOut(auth).catch(error => console.error("Logout Error:", error)); }
+    function handleLogout(e) { e.preventDefault(); signOut(auth); }
     logoutBtn.addEventListener('click', handleLogout);
     logoutBtnSettings.addEventListener('click', handleLogout);
     
@@ -419,12 +422,7 @@
     const darkIcon = document.getElementById('theme-toggle-dark-icon');
     const lightIcon = document.getElementById('theme-toggle-light-icon');
     function applyTheme(theme) { if (theme === 'dark') { document.documentElement.classList.add('dark'); lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); settingsThemeToggleBtn.checked = true; } else { document.documentElement.classList.remove('dark'); darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); settingsThemeToggleBtn.checked = false; } }
-    function toggleTheme() {
-        const isDark = document.documentElement.classList.toggle('dark');
-        const newTheme = isDark ? 'dark' : 'light';
-        localStorage.setItem('color-theme', newTheme);
-        applyTheme(newTheme);
-    }
+    function toggleTheme() { const isDark = !document.documentElement.classList.contains('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
     themeToggleBtn.addEventListener('click', toggleTheme);
     if(settingsThemeToggleBtn) { settingsThemeToggleBtn.addEventListener('change', toggleTheme); }
     const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
