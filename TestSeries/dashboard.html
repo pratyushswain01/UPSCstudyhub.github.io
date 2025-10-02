@@ -5,19 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test Series Dashboard - UPSChub</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .footer-nav a.active {
-            color: #2563EB; /* blue-600 */
-            transform: scale(1.1);
-        }
-        .footer-nav a {
-            transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
-        }
+        .footer-nav a.active { color: #2563EB; transform: scale(1.1); }
+        .footer-nav a { transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
         .tab-active { background-color: #3B82F6; color: white; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); }
     </style>
     <script>
       tailwind.config = { darkMode: 'class' }
@@ -27,7 +24,7 @@
 
     <div id="app-view" class="hidden">
         <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+           <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                 <a href="dashboard.html" class="text-2xl font-bold text-blue-600 dark:text-blue-500">UPSChub</a>
                 <div class="flex items-center gap-4">
                     <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
@@ -49,25 +46,16 @@
         </header>
 
         <main class="container mx-auto p-4 sm:p-6 pb-24">
-            
-            <!-- VIEW 1: Home / Test Series (Visible by default) -->
             <div id="home-view">
-                <!-- All the content from your approved "Test Series Dashboard" -->
-                <h1 id="welcome-heading" class="text-3xl font-bold text-slate-800 dark:text-white mb-6">My Test Series Dashboard</h1>
-                 <!-- ... (the full dashboard content remains here) ... -->
-            </div>
+                 <h1 id="welcome-heading" class="text-3xl font-bold text-slate-800 dark:text-white mb-6"></h1>
+                 </div>
 
-            <!-- VIEW 2: Notifications (Hidden by default) -->
             <div id="notifications-view" class="hidden">
-                 <!-- ... (the full notifications content remains here) ... -->
-            </div>
+                 </div>
 
-            <!-- VIEW 3: Settings (Hidden by default) - COMPLETELY REVAMPED -->
             <div id="settings-view" class="hidden">
                 <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-8">Settings</h1>
-
                 <div class="max-w-3xl mx-auto space-y-8">
-                    <!-- Account Section -->
                     <div>
                         <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Account</h2>
                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
@@ -77,92 +65,85 @@
                                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
                                     </div>
                                     <div>
-                                        <p class="font-bold">UPSC Aspirant</p>
+                                        <p class="font-bold" id="settings-display-name">UPSC Aspirant</p>
                                         <p class="text-sm text-slate-500 dark:text-slate-400" id="settings-user-email">user@example.com</p>
                                     </div>
                                 </div>
-                                <a href="#" class="text-sm font-semibold text-blue-600 hover:underline">Edit</a>
+                                <button id="edit-profile-btn" class="text-sm font-semibold text-blue-600 hover:underline">Edit</button>
                             </div>
-                            <a href="#" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg><span class="font-semibold">Manage Subscription</span></div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
-                             <a href="#" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                            <div id="subscription-item" class="p-4 flex items-center justify-between">
+                                </div>
+                            <button id="change-password-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
                                 <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span class="font-semibold">Change Password</span></div>
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
+                            </button>
                         </div>
                     </div>
-                    
-                    <!-- Preferences Section -->
-                    <div>
-                        <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Preferences</h2>
-                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
-                            <div class="p-4 flex items-center justify-between">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg><span class="font-semibold">Dark Mode</span></div>
-                                <button id="settings-theme-toggle" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors bg-slate-200 dark:bg-blue-600">
-                                    <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform translate-x-1 dark:translate-x-6"></span>
-                                </button>
-                            </div>
-                            <a href="#" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="font-semibold">Notification Settings</span></div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
-                         </div>
-                    </div>
-
-                    <!-- Support Section -->
-                     <div>
-                        <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Support & Legal</h2>
-                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
-                             <a href="#" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="font-semibold">Help Center & FAQ</span></div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
-                            <a href="#" class="p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
-                                <div class="flex items-center gap-4"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><span class="font-semibold">Contact Us</span></div>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                            </a>
-                         </div>
-                    </div>
-                    
-                    <!-- Destructive Actions -->
-                    <div class="space-y-2 pt-4">
+                     <div class="space-y-2 pt-4">
                         <button id="logout-btn-settings" class="w-full text-left font-semibold text-red-600 dark:text-red-500 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm hover:bg-red-50 dark:hover:bg-red-500/10">Logout</button>
-                        <button class="w-full text-left text-sm text-slate-500 dark:text-slate-400 p-4 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700">Delete Account</button>
                     </div>
-
                 </div>
             </div>
-
         </main>
         
         <footer class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-[0_-2px_5px_-1px_rgba(0,0,0,0.1)] z-50">
-           <nav class="container mx-auto px-6 h-16 flex justify-around items-center footer-nav">
-               <a href="#" id="nav-home" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                    <span class="text-xs font-medium">Home</span>
-                </a>
-               <a href="#" id="nav-tests" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
-                    <span class="text-xs font-medium">Tests</span>
-                </a>
-               <a href="#" id="nav-notifications" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg>
-                    <span class="text-xs font-medium">Notify</span>
-                </a>
-               <a href="#" id="nav-settings" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                    <span class="text-xs font-medium">Settings</span>
-                </a>
-           </nav>
-        </footer>
+           </footer>
+    </div>
+    
+    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Edit Profile</h3></div>
+            <form id="profile-form">
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="display-name" class="text-sm font-medium text-gray-700 dark:text-slate-300">Display Name</label>
+                        <input type="text" id="display-name" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3">
+                    <button type="button" id="cancel-profile" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save Changes</button>
+                </div>
+            </form>
+        </div>
     </div>
 
+    <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Change Password</h3></div>
+            <form id="password-form">
+                <div class="p-6 space-y-4">
+                     <div>
+                        <label for="current-password" class="text-sm font-medium text-gray-700 dark:text-slate-300">Current Password</label>
+                        <input type="password" id="current-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg">
+                    </div>
+                     <div>
+                        <label for="new-password" class="text-sm font-medium text-gray-700 dark:text-slate-300">New Password</label>
+                        <input type="password" id="new-password" required minlength="6" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg">
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3">
+                    <button type="button" id="cancel-password" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+            <p id="alert-message" class="font-medium"></p>
+            <button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button>
+        </div>
+    </div>
+
+
 <script type="module">
-    // --- FIREBASE IMPORTS & CONFIG ---
+    // --- FIREBASE IMPORTS (NEW FUNCTIONS ADDED) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- FIREBASE CONFIG (UNCHANGED) ---
     const firebaseConfig = {
       apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
       authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -172,99 +153,187 @@
       appId: "1:451692540885:web:b425e85128e5de97c7c35c",
       measurementId: "G-33F0XSLP53"
     };
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getFirestore(app);
     
-    // --- PAGE ELEMENTS ---
+    // --- PAGE & MODAL ELEMENTS ---
     const appView = document.getElementById('app-view');
-    const accountBtn = document.getElementById('account-btn');
-    const accountDropdown = document.getElementById('account-dropdown');
+    // ... other elements
     const userEmailDisplay = document.getElementById('user-email-display');
     const userEmailDisplaySettings = document.getElementById('settings-user-email');
-    const logoutBtn = document.getElementById('logout-btn');
-    const logoutBtnSettings = document.getElementById('logout-btn-settings');
+    const displayNameSettings = document.getElementById('settings-display-name');
+    const welcomeHeading = document.getElementById('welcome-heading');
     
-    // --- AUTHENTICATION LOGIC ---
+    // Modals
+    const profileModal = document.getElementById('edit-profile-modal');
+    const passwordModal = document.getElementById('change-password-modal');
+    const alertModal = document.getElementById('alert-modal');
+    const alertMessage = document.getElementById('alert-message');
+    
+    // Forms & Buttons
+    const profileForm = document.getElementById('profile-form');
+    const passwordForm = document.getElementById('password-form');
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const subscriptionItem = document.getElementById('subscription-item');
+
+    // --- HELPER FUNCTION FOR ALERTS ---
+    function showAlert(message) {
+        alertMessage.textContent = message;
+        alertModal.classList.remove('hidden');
+    }
+    document.getElementById('alert-ok').addEventListener('click', () => alertModal.classList.add('hidden'));
+
+
+    // --- AUTHENTICATION & REAL-TIME DATA LISTENER ---
     onAuthStateChanged(auth, user => {
         if (user) {
             appView.classList.remove('hidden');
             userEmailDisplay.textContent = user.email;
             userEmailDisplaySettings.textContent = user.email;
+
+            // REAL-TIME LISTENER FOR USER DATA (Name, Subscription, etc.)
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    const displayName = userData.displayName || 'UPSC Aspirant';
+                    
+                    // Update UI with latest data
+                    displayNameSettings.textContent = displayName;
+                    welcomeHeading.textContent = `Welcome back, ${displayName}!`;
+                    
+                    // Update Subscription Status UI
+                    updateSubscriptionUI(userData.isPremium);
+                }
+            });
+
         } else {
             window.location.href = 'auth.html';
         }
     });
-
-    function handleLogout(e) {
+    
+    // --- PROFILE EDIT LOGIC ---
+    editProfileBtn.addEventListener('click', () => {
+        const currentName = displayNameSettings.textContent;
+        document.getElementById('display-name').value = currentName === 'UPSC Aspirant' ? '' : currentName;
+        profileModal.classList.remove('hidden');
+    });
+    document.getElementById('cancel-profile').addEventListener('click', () => profileModal.classList.add('hidden'));
+    
+    profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        signOut(auth).catch(error => console.error("Logout Error:", error));
-    }
-    accountBtn.addEventListener('click', () => accountDropdown.classList.toggle('hidden'));
-    logoutBtn.addEventListener('click', handleLogout);
-    logoutBtnSettings.addEventListener('click', handleLogout);
+        const newName = document.getElementById('display-name').value;
+        const user = auth.currentUser;
+        if (!user) return;
 
-    // --- SINGLE PAGE APP (SPA) NAVIGATION LOGIC ---
-    const views = {
-        home: document.getElementById('home-view'),
-        notifications: document.getElementById('notifications-view'),
-        settings: document.getElementById('settings-view')
-    };
-    const navButtons = {
-        home: document.getElementById('nav-home'),
-        tests: document.getElementById('nav-tests'),
-        notifications: document.getElementById('nav-notifications'),
-        settings: document.getElementById('nav-settings')
-    };
-
-    function showView(viewName) {
-        Object.values(views).forEach(view => view.classList.add('hidden'));
-        Object.values(navButtons).forEach(button => button.classList.remove('active'));
-        if (views[viewName]) {
-            views[viewName].classList.remove('hidden');
+        try {
+            // 1. Update Firebase Auth Profile
+            await updateProfile(user, { displayName: newName });
+            // 2. Update Firestore Document
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            await updateDoc(userDocRef, { displayName: newName });
+            
+            profileModal.classList.add('hidden');
+            showAlert('Profile updated successfully!');
+        } catch (error) {
+            console.error("Error updating profile: ", error);
+            showAlert('Failed to update profile. ' + error.message);
         }
-        if (viewName === 'home') {
-            navButtons.home.classList.add('active');
-            navButtons.tests.classList.add('active');
-        } else if (navButtons[viewName]) {
-            navButtons[viewName].classList.add('active');
+    });
+
+    // --- CHANGE PASSWORD LOGIC ---
+    changePasswordBtn.addEventListener('click', () => {
+        passwordForm.reset();
+        passwordModal.classList.remove('hidden');
+    });
+    document.getElementById('cancel-password').addEventListener('click', () => passwordModal.classList.add('hidden'));
+
+    passwordForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const currentPassword = document.getElementById('current-password').value;
+        const newPassword = document.getElementById('new-password').value;
+        const user = auth.currentUser;
+        if (!user) return;
+
+        const credential = EmailAuthProvider.credential(user.email, currentPassword);
+        
+        try {
+            // 1. Re-authenticate user for security
+            await reauthenticateWithCredential(user, credential);
+            // 2. If successful, update the password
+            await updatePassword(user, newPassword);
+            
+            passwordModal.classList.add('hidden');
+            showAlert('Password updated successfully!');
+        } catch (error) {
+            console.error("Error changing password:", error);
+            showAlert('Failed to change password. Make sure your current password is correct.');
+        }
+    });
+
+    // --- SUBSCRIPTION LOGIC ---
+    function updateSubscriptionUI(isPremium) {
+        if (isPremium) {
+            subscriptionItem.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                    <div>
+                        <p class="font-semibold">Premium Member</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Lifetime Access</p>
+                    </div>
+                </div>
+                <span class="text-sm font-semibold text-green-600">Active</span>`;
+        } else {
+             subscriptionItem.innerHTML = `
+                <div class="flex items-center gap-4">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    <div>
+                        <p class="font-semibold">Free Member</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Access to free tests only</p>
+                    </div>
+                </div>
+                <button id="upgrade-btn" class="text-sm font-semibold text-blue-600 hover:underline">Upgrade</button>`;
+            
+            // Add event listener to the newly created upgrade button
+            document.getElementById('upgrade-btn').addEventListener('click', handleUpgrade);
         }
     }
 
+    function handleUpgrade() {
+        const user = auth.currentUser;
+        if (!user) return;
+        // This is the Razorpay logic you had before
+        var options = {
+            "key": "rzp_test_YourKeyHere", // Replace with your actual Razorpay Key
+            "amount": 9900, "currency": "INR", "name": "UPSChub Test Series", "description": "Lifetime Access",
+            "handler": function (response){
+                const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                updateDoc(userDocRef, { isPremium: true })
+                .then(() => showAlert("Payment successful! Premium access granted."))
+                .catch(err => showAlert("Payment successful, but failed to update your account. Please contact support."));
+            },
+            "prefill": { "email": user.email }, "theme": { "color": "#2563EB" }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
+    }
+
+
+    // --- All other logic (SPA Navigation, Theme Toggle) is unchanged ---
+    const spaViews = { home: document.getElementById('home-view'), notifications: document.getElementById('notifications-view'), settings: document.getElementById('settings-view') };
+    const navButtons = { home: document.getElementById('nav-home'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
+    function showView(viewName) { Object.values(spaViews).forEach(v => v.classList.add('hidden')); Object.values(navButtons).forEach(b => b.classList.remove('active')); if (spaViews[viewName]) spaViews[viewName].classList.remove('hidden'); if (viewName === 'home') { navButtons.home.classList.add('active'); navButtons.tests.classList.add('active'); } else if (navButtons[viewName]) { navButtons[viewName].classList.add('active'); } }
     navButtons.home.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
     navButtons.tests.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
     navButtons.notifications.addEventListener('click', (e) => { e.preventDefault(); showView('notifications'); });
     navButtons.settings.addEventListener('click', (e) => { e.preventDefault(); showView('settings'); });
-    
     showView('home');
-
-    // --- THEME TOGGLE LOGIC ---
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const settingsThemeToggleBtn = document.getElementById('settings-theme-toggle');
-    const darkIcon = document.getElementById('theme-toggle-dark-icon');
-    const lightIcon = document.getElementById('theme-toggle-light-icon');
-    
-    function applyTheme(theme) {
-        if (theme === 'dark') {
-            document.documentElement.classList.add('dark');
-            lightIcon.classList.remove('hidden');
-            darkIcon.classList.add('hidden');
-        } else {
-            document.documentElement.classList.remove('dark');
-            darkIcon.classList.remove('hidden');
-            lightIcon.classList.add('hidden');
-        }
-    }
-
-    function toggleTheme() {
-        const isDark = document.documentElement.classList.toggle('dark');
-        const newTheme = isDark ? 'dark' : 'light';
-        localStorage.setItem('color-theme', newTheme);
-        applyTheme(newTheme);
-    }
-
+    const themeToggleBtn = document.getElementById('theme-toggle'); const settingsThemeToggleBtn = document.getElementById('settings-theme-toggle'); const darkIcon = document.getElementById('theme-toggle-dark-icon'); const lightIcon = document.getElementById('theme-toggle-light-icon'); function applyTheme(theme) { if (theme === 'dark') { document.documentElement.classList.add('dark'); lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); } else { document.documentElement.classList.remove('dark'); darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); } } function toggleTheme() { const isDark = document.documentElement.classList.toggle('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
     themeToggleBtn.addEventListener('click', toggleTheme);
     settingsThemeToggleBtn.addEventListener('click', toggleTheme);
-
     const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
 
