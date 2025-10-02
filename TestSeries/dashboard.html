@@ -74,7 +74,6 @@
                 <div class="flex items-center space-x-2 mb-6 overflow-x-auto pb-2">
                     <button class="tab-active px-4 py-2 text-sm font-semibold rounded-full whitespace-nowrap">All Tests</button>
                     <button class="bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 text-sm font-semibold rounded-full whitespace-nowrap">Full Mocks</button>
-                    <button class="bg-white dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 px-4 py-2 text-sm font-semibold rounded-full whitespace-nowrap">Sectional</button>
                 </div>
                  <div class="space-y-4">
                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -144,9 +143,50 @@
         </footer>
     </div>
     
-    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop"> </div>
+    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Edit Profile</h3></div>
+            <form id="profile-form">
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="display-name" class="text-sm font-medium text-gray-700 dark:text-slate-300">Display Name</label>
+                        <input type="text" id="display-name" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3">
+                    <button type="button" id="cancel-profile" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Change Password</h3></div>
+            <form id="password-form">
+                <div class="p-6 space-y-4">
+                     <div>
+                        <label for="current-password" class="text-sm font-medium text-gray-700 dark:text-slate-300">Current Password</label>
+                        <input type="password" id="current-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg">
+                    </div>
+                     <div>
+                        <label for="new-password" class="text-sm font-medium text-gray-700 dark:text-slate-300">New Password</label>
+                        <input type="password" id="new-password" required minlength="6" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-lg">
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3">
+                    <button type="button" id="cancel-password" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Update Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+            <p id="alert-message" class="font-medium"></p>
+            <button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button>
+        </div>
+    </div>
 
 
 <script type="module">
@@ -278,15 +318,46 @@
     // --- SUBSCRIPTION LOGIC ---
     function updateSubscriptionUI(isPremium) {
         if (isPremium) {
-            subscriptionItem.innerHTML = `...`; // Premium UI
+            subscriptionItem.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                    <div>
+                        <p class="font-semibold">Premium Member</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Lifetime Access</p>
+                    </div>
+                </div>
+                <span class="text-sm font-semibold text-green-600">Active</span>`;
         } else {
-             subscriptionItem.innerHTML = `...`; // Free UI
+             subscriptionItem.innerHTML = `
+                <div class="flex items-center gap-4">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>
+                    <div>
+                        <p class="font-semibold">Free Member</p>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Access to free tests only</p>
+                    </div>
+                </div>
+                <button id="upgrade-btn" class="text-sm font-semibold text-blue-600 hover:underline">Upgrade</button>`;
+            
             document.getElementById('upgrade-btn').addEventListener('click', handleUpgrade);
         }
     }
 
     function handleUpgrade() {
-        // Razorpay logic
+        const user = auth.currentUser;
+        if (!user) return;
+        var options = {
+            "key": "rzp_test_YourKeyHere", // Replace with your actual Razorpay Key
+            "amount": 9900, "currency": "INR", "name": "UPSChub Test Series", "description": "Lifetime Access",
+            "handler": function (response){
+                const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                updateDoc(userDocRef, { isPremium: true })
+                .then(() => showAlert("Payment successful! Premium access granted."))
+                .catch(err => showAlert("Payment successful, but failed to update your account. Please contact support."));
+            },
+            "prefill": { "email": user.email }, "theme": { "color": "#2563EB" }
+        };
+        var rzp1 = new Razorpay(options);
+        rzp1.open();
     }
     
     // --- LOGOUT & SPA NAVIGATION ---
@@ -294,11 +365,34 @@
     logoutBtn.addEventListener('click', handleLogout);
     logoutBtnSettings.addEventListener('click', handleLogout);
     
-    // ... SPA navigation functions (showView, etc.)
+    const spaViews = { home: document.getElementById('home-view'), notifications: document.getElementById('notifications-view'), settings: document.getElementById('settings-view') };
+    const navButtons = { home: document.getElementById('nav-home'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
+    function showView(viewName) { Object.values(spaViews).forEach(v => v.classList.add('hidden')); Object.values(navButtons).forEach(b => b.classList.remove('active')); if (spaViews[viewName]) spaViews[viewName].classList.remove('hidden'); if (viewName === 'home') { navButtons.home.classList.add('active'); navButtons.tests.classList.add('active'); } else if (navButtons[viewName]) { navButtons[viewName].classList.add('active'); } }
+    navButtons.home.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+    navButtons.tests.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+    navButtons.notifications.addEventListener('click', (e) => { e.preventDefault(); showView('notifications'); });
+    navButtons.settings.addEventListener('click', (e) => { e.preventDefault(); showView('settings'); });
+    showView('home');
     
     // --- THEME TOGGLE LOGIC ---
-    // ... Theme toggle functions (applyTheme, toggleTheme)
-    
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const settingsThemeToggleBtn = document.getElementById('settings-theme-toggle');
+    const darkIcon = document.getElementById('theme-toggle-dark-icon');
+    const lightIcon = document.getElementById('theme-toggle-light-icon');
+    function applyTheme(theme) { if (theme === 'dark') { document.documentElement.classList.add('dark'); lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); } else { document.documentElement.classList.remove('dark'); darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); } }
+    function toggleTheme() {
+        const isDark = document.documentElement.classList.toggle('dark');
+        const newTheme = isDark ? 'dark' : 'light';
+        localStorage.setItem('color-theme', newTheme);
+        applyTheme(newTheme);
+    }
+    themeToggleBtn.addEventListener('click', toggleTheme);
+    if(settingsThemeToggleBtn) { // Check if the settings toggle exists before adding listener
+      settingsThemeToggleBtn.addEventListener('click', toggleTheme);
+    }
+    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+
 </script>
 </body>
 </html>
