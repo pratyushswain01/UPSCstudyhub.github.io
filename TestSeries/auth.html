@@ -1,0 +1,32 @@
+<script type="module">
+    // --- Firebase SDK Imports ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- Firebase Configuration is the same ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+      authDomain: "upscstudyhub-github.firebaseapp.com",
+      projectId: "upscstudyhub-github",
+      storageBucket: "upscstudyhub-github.firebasestorage.app",
+      messagingSenderId: "451692540885",
+      appId: "1:451692540885:web:b425e85128e5de97c7c35c",
+      measurementId: "G-33F0XSLP53"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // KEY LOGIC UPDATE: If a user is already logged in, or after they log in,
+    // send them to the new dashboard.html page.
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            window.location.href = 'dashboard.html'; // CHANGED from 'index.html'
+        }
+    });
+
+    // --- The rest of the login/registration form handling JS is exactly the same ---
+    // ...
+</script>
