@@ -46,9 +46,20 @@
         </header>
 
         <main class="container mx-auto p-4 sm:p-6 pb-24">
+            
             <div id="home-view">
-                 <h1 id="welcome-heading" class="text-3xl font-bold text-slate-800 dark:text-white mb-6"></h1>
-                 </div>
+                <h1 id="welcome-heading" class="text-3xl font-bold text-slate-800 dark:text-white mb-6"></h1>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                        <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Accuracy</p><p class="text-lg font-bold">82.5%</p></div>
+                    </div>
+                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                        <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></div>
+                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Tests Attempted</p><p class="text-lg font-bold">14</p></div>
+                    </div>
+                </div>
+            </div>
 
             <div id="notifications-view" class="hidden">
                  </div>
@@ -138,12 +149,12 @@
 
 
 <script type="module">
-    // --- FIREBASE IMPORTS (NEW FUNCTIONS ADDED) ---
+    // --- FIREBASE IMPORTS (WITH NEW FUNCTIONS FOR SETTINGS) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- FIREBASE CONFIG (UNCHANGED) ---
+    // --- FIREBASE CONFIG ---
     const firebaseConfig = {
       apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
       authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -160,19 +171,18 @@
     
     // --- PAGE & MODAL ELEMENTS ---
     const appView = document.getElementById('app-view');
-    // ... other elements
     const userEmailDisplay = document.getElementById('user-email-display');
     const userEmailDisplaySettings = document.getElementById('settings-user-email');
     const displayNameSettings = document.getElementById('settings-display-name');
     const welcomeHeading = document.getElementById('welcome-heading');
-    
-    // Modals
+    const accountBtn = document.getElementById('account-btn');
+    const accountDropdown = document.getElementById('account-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+    const logoutBtnSettings = document.getElementById('logout-btn-settings');
     const profileModal = document.getElementById('edit-profile-modal');
     const passwordModal = document.getElementById('change-password-modal');
     const alertModal = document.getElementById('alert-modal');
     const alertMessage = document.getElementById('alert-message');
-    
-    // Forms & Buttons
     const profileForm = document.getElementById('profile-form');
     const passwordForm = document.getElementById('password-form');
     const editProfileBtn = document.getElementById('edit-profile-btn');
@@ -194,18 +204,15 @@
             userEmailDisplay.textContent = user.email;
             userEmailDisplaySettings.textContent = user.email;
 
-            // REAL-TIME LISTENER FOR USER DATA (Name, Subscription, etc.)
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
             onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
-                    const displayName = userData.displayName || 'UPSC Aspirant';
+                    const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
                     
-                    // Update UI with latest data
                     displayNameSettings.textContent = displayName;
                     welcomeHeading.textContent = `Welcome back, ${displayName}!`;
                     
-                    // Update Subscription Status UI
                     updateSubscriptionUI(userData.isPremium);
                 }
             });
@@ -227,19 +234,16 @@
         e.preventDefault();
         const newName = document.getElementById('display-name').value;
         const user = auth.currentUser;
-        if (!user) return;
+        if (!user || !newName) return;
 
         try {
-            // 1. Update Firebase Auth Profile
             await updateProfile(user, { displayName: newName });
-            // 2. Update Firestore Document
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
             await updateDoc(userDocRef, { displayName: newName });
             
             profileModal.classList.add('hidden');
             showAlert('Profile updated successfully!');
         } catch (error) {
-            console.error("Error updating profile: ", error);
             showAlert('Failed to update profile. ' + error.message);
         }
     });
@@ -261,15 +265,12 @@
         const credential = EmailAuthProvider.credential(user.email, currentPassword);
         
         try {
-            // 1. Re-authenticate user for security
             await reauthenticateWithCredential(user, credential);
-            // 2. If successful, update the password
             await updatePassword(user, newPassword);
             
             passwordModal.classList.add('hidden');
             showAlert('Password updated successfully!');
         } catch (error) {
-            console.error("Error changing password:", error);
             showAlert('Failed to change password. Make sure your current password is correct.');
         }
     });
@@ -297,7 +298,6 @@
                 </div>
                 <button id="upgrade-btn" class="text-sm font-semibold text-blue-600 hover:underline">Upgrade</button>`;
             
-            // Add event listener to the newly created upgrade button
             document.getElementById('upgrade-btn').addEventListener('click', handleUpgrade);
         }
     }
@@ -305,7 +305,6 @@
     function handleUpgrade() {
         const user = auth.currentUser;
         if (!user) return;
-        // This is the Razorpay logic you had before
         var options = {
             "key": "rzp_test_YourKeyHere", // Replace with your actual Razorpay Key
             "amount": 9900, "currency": "INR", "name": "UPSChub Test Series", "description": "Lifetime Access",
@@ -320,9 +319,12 @@
         var rzp1 = new Razorpay(options);
         rzp1.open();
     }
-
-
-    // --- All other logic (SPA Navigation, Theme Toggle) is unchanged ---
+    
+    // --- LOGOUT & SPA NAVIGATION ---
+    function handleLogout(e) { e.preventDefault(); signOut(auth).catch(error => console.error("Logout Error:", error)); }
+    logoutBtn.addEventListener('click', handleLogout);
+    logoutBtnSettings.addEventListener('click', handleLogout);
+    
     const spaViews = { home: document.getElementById('home-view'), notifications: document.getElementById('notifications-view'), settings: document.getElementById('settings-view') };
     const navButtons = { home: document.getElementById('nav-home'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
     function showView(viewName) { Object.values(spaViews).forEach(v => v.classList.add('hidden')); Object.values(navButtons).forEach(b => b.classList.remove('active')); if (spaViews[viewName]) spaViews[viewName].classList.remove('hidden'); if (viewName === 'home') { navButtons.home.classList.add('active'); navButtons.tests.classList.add('active'); } else if (navButtons[viewName]) { navButtons[viewName].classList.add('active'); } }
@@ -331,6 +333,8 @@
     navButtons.notifications.addEventListener('click', (e) => { e.preventDefault(); showView('notifications'); });
     navButtons.settings.addEventListener('click', (e) => { e.preventDefault(); showView('settings'); });
     showView('home');
+    
+    // --- THEME TOGGLE LOGIC ---
     const themeToggleBtn = document.getElementById('theme-toggle'); const settingsThemeToggleBtn = document.getElementById('settings-theme-toggle'); const darkIcon = document.getElementById('theme-toggle-dark-icon'); const lightIcon = document.getElementById('theme-toggle-light-icon'); function applyTheme(theme) { if (theme === 'dark') { document.documentElement.classList.add('dark'); lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); } else { document.documentElement.classList.remove('dark'); darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); } } function toggleTheme() { const isDark = document.documentElement.classList.toggle('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
     themeToggleBtn.addEventListener('click', toggleTheme);
     settingsThemeToggleBtn.addEventListener('click', toggleTheme);
