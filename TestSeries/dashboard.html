@@ -381,21 +381,30 @@
     document.getElementById('alert-ok').addEventListener('click', () => alertModal.classList.add('hidden'));
 
     // --- SIDEBAR LOGIC ---
-    function toggleSidebar() {
-        sidebar.classList.toggle('-translate-x-full');
-        if (window.innerWidth < 768) {
-            sidebarBackdrop.classList.toggle('hidden');
+    function handleSidebarState() {
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebarBackdrop.classList.add('hidden');
+            mainContent.classList.remove('md:ml-64');
         } else {
-            mainContent.classList.toggle('md:ml-64');
+            if (window.innerWidth < 768) {
+                sidebarBackdrop.classList.remove('hidden');
+                mainContent.classList.remove('md:ml-64');
+            } else {
+                sidebarBackdrop.classList.add('hidden');
+                mainContent.classList.add('md:ml-64');
+            }
         }
     }
-    
-    // Set initial state based on screen size
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+        handleSidebarState();
+    }
+
     if (window.innerWidth >= 768) {
         sidebar.classList.remove('-translate-x-full');
-    } else {
-        sidebar.classList.add('-translate-x-full');
     }
+    handleSidebarState();
 
     sidebarToggle.addEventListener('click', toggleSidebar);
     sidebarBackdrop.addEventListener('click', toggleSidebar);
@@ -410,13 +419,11 @@
 
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 768) {
-            sidebarBackdrop.classList.add('hidden'); // Ensure backdrop is hidden on desktop
-            if (!sidebar.classList.contains('-translate-x-full')) {
-                mainContent.classList.add('md:ml-64');
-            }
+            sidebar.classList.remove('-translate-x-full');
         } else {
-            mainContent.classList.remove('md:ml-64');
+            sidebar.classList.add('-translate-x-full');
         }
+        handleSidebarState();
     });
 
 
@@ -427,7 +434,7 @@
             userEmailDisplay.textContent = user.email;
             userEmailDisplaySettings.textContent = user.email;
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
-            onSnapshot(userDocRef, (docSnap) => {
+            onSnapshot(docSnap => {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
