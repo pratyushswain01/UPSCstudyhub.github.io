@@ -31,6 +31,7 @@
         .faq-question.open + .faq-answer { max-height: 200px; }
         .faq-question .icon { transition: transform 0.3s ease-in-out; }
         .faq-question.open .icon { transform: rotate(180deg); }
+        .calendar-day.has-activity { background-color: #bfdbfe; color: #1e40af; border-radius: 50%; font-weight: bold; }
     </style>
     <script>
       tailwind.config = { darkMode: 'class' }
@@ -43,16 +44,42 @@
             <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                 <a href="dashboard.html" class="text-2xl font-bold text-blue-600 dark:text-blue-500">UPSChub</a>
                 <div class="flex items-center gap-4">
-                    <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        <svg id="theme-toggle-dark-icon" class="hidden h-5 w-5 text-slate-500" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
-                        <svg id="theme-toggle-light-icon" class="hidden h-5 w-5 text-amber-500" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 5.05A1 1 0 016.465 3.636l.707.707a1 1 0 01-1.414 1.414l-.707-.707zm1.414 12.364a1 1 0 10-1.414-1.414l-.707.707a1 1 0 101.414 1.414l.707-.707zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>
+                    <div class="relative">
+                        <button id="streak-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
+                        </button>
+                        <div id="streak-tooltip" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl p-3 z-20 text-sm">
+                            <p><strong>Current Streak:</strong> <span id="current-streak">0</span> days</p>
+                            <p><strong>Highest Streak:</strong> <span id="highest-streak">0</span> days</p>
+                            <p><strong>Today's Tests:</strong> <span id="today-tests">0</span></p>
+                            <p class="text-xs text-slate-500 mt-2">Complete 2 tests to extend your streak!</p>
+                        </div>
+                    </div>
+                    <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </button>
                     <div id="account-info-div" class="relative">
                         <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
                         </button>
-                        <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-1 z-20">
-                            <div class="px-4 py-2 text-sm text-slate-500 dark:text-slate-400 truncate" id="user-email-display"></div>
+                        <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20">
+                            <div class="px-4 py-2 border-b dark:border-slate-700">
+                                <p class="font-semibold text-sm" id="dropdown-display-name">UPSC Aspirant</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate" id="user-email-display"></p>
+                            </div>
+                            <div class="py-1">
+                                <a href="#" id="dropdown-profile-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">My Profile</a>
+                                <a href="#" id="dropdown-settings-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Settings</a>
+                                <div class="p-2">
+                                    <div class="p-2 flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50">
+                                        <span class="text-sm font-medium">Dark Mode</span>
+                                        <div class="relative inline-block w-10 align-middle select-none">
+                                            <input type="checkbox" id="dropdown-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                            <label for="dropdown-theme-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="border-t border-slate-200 dark:border-slate-700"></div>
                             <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
                         </div>
@@ -146,13 +173,6 @@
                     <div>
                         <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Preferences</h2>
                          <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
-                            <div class="p-4 flex items-center justify-between">
-                                <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg><span class="font-semibold">Dark Mode</span></div>
-                                <div class="relative inline-block w-10 align-middle select-none transition duration-200 ease-in">
-                                    <input type="checkbox" id="settings-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                    <label for="settings-theme-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
-                                </div>
-                            </div>
                             <button id="notification-prefs-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
                                 <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="font-semibold">Notification Settings</span></div>
                                 <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
@@ -204,6 +224,25 @@
         </footer>
     </div>
     
+    <div id="calendar-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700 flex justify-between items-center">
+                <div id="calendar-header" class="flex items-center gap-4">
+                    <button id="prev-month" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">&lt;</button>
+                    <h3 id="month-year" class="text-lg font-bold"></h3>
+                    <button id="next-month" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">&gt;</button>
+                </div>
+                <button id="close-calendar-modal" class="text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-4">
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+            </div>
+            <div id="activity-log" class="p-4 border-t dark:border-slate-700 max-h-40 overflow-y-auto">
+                <p class="text-sm text-slate-500">Select a date to see activity.</p>
+            </div>
+        </div>
+    </div>
+
     <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Edit Profile</h3></div><form id="profile-form"><div class="p-6 space-y-4"><div><label for="display-name" class="text-sm font-medium">Display Name</label><input type="text" id="display-name" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-profile" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save</button></div></form></div>
     </div>
@@ -241,7 +280,7 @@
     // --- FIREBASE IMPORTS ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- FIREBASE CONFIG ---
     const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
@@ -295,7 +334,19 @@
     const privacyBtn = document.getElementById('privacy-btn');
     const privacyModal = document.getElementById('privacy-modal');
     const closePrivacyModalBtn = document.getElementById('close-privacy-modal');
-
+    const dropdownDisplayName = document.getElementById('dropdown-display-name');
+    const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
+    const dropdownProfileBtn = document.getElementById('dropdown-profile-btn');
+    const dropdownSettingsBtn = document.getElementById('dropdown-settings-btn');
+    const streakBtn = document.getElementById('streak-btn');
+    const streakTooltip = document.getElementById('streak-tooltip');
+    const currentStreakSpan = document.getElementById('current-streak');
+    const highestStreakSpan = document.getElementById('highest-streak');
+    const todayTestsSpan = document.getElementById('today-tests');
+    const calendarBtn = document.getElementById('calendar-btn');
+    const calendarModal = document.getElementById('calendar-modal');
+    const closeCalendarModalBtn = document.getElementById('close-calendar-modal');
+    
     // --- HELPER FUNCTION ---
     function showAlert(message) { alertMessage.textContent = message; alertModal.classList.remove('hidden'); }
     document.getElementById('alert-ok').addEventListener('click', () => alertModal.classList.add('hidden'));
@@ -312,23 +363,59 @@
                     const userData = docSnap.data();
                     const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
                     displayNameSettings.textContent = displayName;
+                    dropdownDisplayName.textContent = displayName;
                     welcomeHeading.textContent = `Welcome back, ${displayName}!`;
                     updateSubscriptionUI(userData.isPremium);
+                    updateStreakUI(userData.streak);
                     if (userData.preferences) {
                         emailToggle.checked = userData.preferences.receiveEmails ?? true;
                         inAppToggle.checked = userData.preferences.receiveInAppAnnouncements ?? true;
                     }
+                } else {
+                    // Create user document if it doesn't exist
+                    setDoc(userDocRef, {
+                        displayName: user.displayName || 'UPSC Aspirant',
+                        email: user.email,
+                        createdAt: new Date(),
+                        isPremium: false,
+                        preferences: { receiveEmails: true, receiveInAppAnnouncements: true },
+                        streak: { current: 0, highest: 0, lastTestDate: null },
+                        activity: {}
+                    });
                 }
             });
         } else { window.location.href = 'auth.html'; }
     });
     
     // --- PROFILE LOGIC ---
+    accountBtn.addEventListener('click', () => accountDropdown.classList.toggle('hidden'));
+    document.addEventListener('click', (e) => {
+        if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
+            accountDropdown.classList.add('hidden');
+        }
+    });
+
+    dropdownProfileBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showView('settings');
+        accountDropdown.classList.add('hidden');
+        const currentName = displayNameSettings.textContent;
+        document.getElementById('display-name').value = currentName === 'UPSC Aspirant' ? '' : currentName;
+        profileModal.classList.remove('hidden');
+    });
+
+    dropdownSettingsBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        showView('settings');
+        accountDropdown.classList.add('hidden');
+    });
+
     editProfileBtn.addEventListener('click', () => {
         const currentName = displayNameSettings.textContent;
         document.getElementById('display-name').value = currentName === 'UPSC Aspirant' ? '' : currentName;
         profileModal.classList.remove('hidden');
     });
+
     document.getElementById('cancel-profile').addEventListener('click', () => profileModal.classList.add('hidden'));
     profileForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -432,6 +519,93 @@
     }
     closeSuccessAnimationBtn.addEventListener('click', () => { successAnimationModal.classList.add('hidden'); confettiContainer.innerHTML = ''; });
     
+    // --- STREAK LOGIC ---
+    streakBtn.addEventListener('mouseenter', () => streakTooltip.classList.remove('hidden'));
+    streakBtn.addEventListener('mouseleave', () => streakTooltip.classList.add('hidden'));
+
+    function updateStreakUI(streakData) {
+        if (!streakData) return;
+        const today = new Date().toISOString().split('T')[0];
+        const todayTests = streakData.activity && streakData.activity[today] ? streakData.activity[today].length : 0;
+        
+        currentStreakSpan.textContent = streakData.current || 0;
+        highestStreakSpan.textContent = streakData.highest || 0;
+        todayTestsSpan.textContent = todayTests;
+    }
+
+    // --- CALENDAR LOGIC ---
+    const calendarGrid = document.getElementById('calendar-grid');
+    const monthYearEl = document.getElementById('month-year');
+    const activityLog = document.getElementById('activity-log');
+    let currentDate = new Date();
+
+    async function renderCalendar() {
+        const user = auth.currentUser;
+        if (!user) return;
+        
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+        monthYearEl.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+        
+        calendarGrid.innerHTML = '';
+        ['S','M','T','W','T','F','S'].forEach(day => {
+            const dayEl = document.createElement('div');
+            dayEl.className = "font-bold text-slate-500";
+            dayEl.textContent = day;
+            calendarGrid.appendChild(dayEl);
+        });
+
+        const firstDay = new Date(year, month, 1).getDay();
+        for (let i = 0; i < firstDay; i++) {
+            calendarGrid.appendChild(document.createElement('div'));
+        }
+
+        const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+        const docSnap = await getDoc(userDocRef);
+        const activityData = docSnap.exists() ? docSnap.data().activity || {} : {};
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayEl = document.createElement('div');
+            dayEl.textContent = day;
+            dayEl.className = "p-2 cursor-pointer rounded-full hover:bg-slate-200 dark:hover:bg-slate-700";
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            if (activityData[dateStr]) {
+                dayEl.classList.add('calendar-day', 'has-activity');
+            }
+            dayEl.addEventListener('click', () => {
+                activityLog.innerHTML = '';
+                if (activityData[dateStr]) {
+                    const activities = activityData[dateStr];
+                    activities.forEach(item => {
+                        const p = document.createElement('p');
+                        p.textContent = `Completed: ${item.testName}`;
+                        p.className = "text-sm";
+                        activityLog.appendChild(p);
+                    });
+                } else {
+                    activityLog.innerHTML = '<p class="text-sm text-slate-500">No activity on this day.</p>';
+                }
+            });
+            calendarGrid.appendChild(dayEl);
+        }
+    }
+
+    document.getElementById('prev-month').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() - 1);
+        renderCalendar();
+    });
+    document.getElementById('next-month').addEventListener('click', () => {
+        currentDate.setMonth(currentDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    calendarBtn.addEventListener('click', () => {
+        renderCalendar();
+        calendarModal.classList.remove('hidden');
+    });
+    closeCalendarModalBtn.addEventListener('click', () => calendarModal.classList.add('hidden'));
+
     // --- LOGOUT & SPA NAVIGATION ---
     function handleLogout(e) { e.preventDefault(); signOut(auth); }
     logoutBtn.addEventListener('click', handleLogout);
@@ -447,14 +621,24 @@
     showView('home');
     
     // --- THEME TOGGLE LOGIC ---
-    const themeToggleBtn = document.getElementById('theme-toggle');
-    const settingsThemeToggleBtn = document.getElementById('settings-theme-toggle');
-    const darkIcon = document.getElementById('theme-toggle-dark-icon');
-    const lightIcon = document.getElementById('theme-toggle-light-icon');
-    function applyTheme(theme) { if (theme === 'dark') { document.documentElement.classList.add('dark'); lightIcon.classList.remove('hidden'); darkIcon.classList.add('hidden'); settingsThemeToggleBtn.checked = true; } else { document.documentElement.classList.remove('dark'); darkIcon.classList.remove('hidden'); lightIcon.classList.add('hidden'); settingsThemeToggleBtn.checked = false; } }
-    function toggleTheme() { const isDark = !document.documentElement.classList.contains('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
-    themeToggleBtn.addEventListener('click', toggleTheme);
-    if(settingsThemeToggleBtn) { settingsThemeToggleBtn.addEventListener('change', toggleTheme); }
+    function applyTheme(theme) { 
+        if (theme === 'dark') { 
+            document.documentElement.classList.add('dark'); 
+            dropdownThemeToggle.checked = true; 
+        } else { 
+            document.documentElement.classList.remove('dark'); 
+            dropdownThemeToggle.checked = false;
+        } 
+    }
+    function toggleTheme() { 
+        const isDark = !document.documentElement.classList.contains('dark'); 
+        const newTheme = isDark ? 'dark' : 'light'; 
+        localStorage.setItem('color-theme', newTheme); 
+        applyTheme(newTheme); 
+    }
+    
+    dropdownThemeToggle.addEventListener('change', toggleTheme);
+
     const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
 
