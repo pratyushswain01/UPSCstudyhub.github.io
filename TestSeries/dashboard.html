@@ -388,9 +388,7 @@
         } else {
             if (window.innerWidth < 768) {
                 sidebarBackdrop.classList.remove('hidden');
-                mainContent.classList.remove('md:ml-64');
             } else {
-                sidebarBackdrop.classList.add('hidden');
                 mainContent.classList.add('md:ml-64');
             }
         }
@@ -420,8 +418,9 @@
     window.addEventListener('resize', () => {
         if (window.innerWidth >= 768) {
             sidebar.classList.remove('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
         } else {
-            sidebar.classList.add('-translate-x-full');
+             sidebar.classList.add('-translate-x-full');
         }
         handleSidebarState();
     });
@@ -434,7 +433,7 @@
             userEmailDisplay.textContent = user.email;
             userEmailDisplaySettings.textContent = user.email;
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
-            onSnapshot(docSnap => {
+            onSnapshot(userDocRef, (docSnap) => {
                 if (docSnap.exists()) {
                     const userData = docSnap.data();
                     const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
