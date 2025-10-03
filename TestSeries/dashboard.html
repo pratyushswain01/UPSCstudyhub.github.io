@@ -46,7 +46,10 @@
                     <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
-                    <a href="dashboard.html" class="text-2xl font-bold text-blue-600 dark:text-blue-500">UPSChub</a>
+                    <a href="dashboard.html" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
+                        <img src="https://placehold.co/32x32/3B82F6/FFFFFF?text=U" alt="UPSChub Logo" class="h-8 w-8 rounded-lg">
+                        <span>UPSChub</span>
+                    </a>
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="relative">
@@ -381,16 +384,16 @@
     function toggleSidebar() {
         sidebar.classList.toggle('-translate-x-full');
         sidebarBackdrop.classList.toggle('hidden');
-        if (window.innerWidth >= 768) { // md breakpoint
-            if (!sidebar.classList.contains('-translate-x-full')) {
-                mainContent.classList.add('md:ml-64');
-            } else {
-                mainContent.classList.remove('md:ml-64');
-            }
-        }
     }
     sidebarToggle.addEventListener('click', toggleSidebar);
     sidebarBackdrop.addEventListener('click', toggleSidebar);
+    document.querySelectorAll('#sidebar nav a').forEach(link => {
+        link.addEventListener('click', () => {
+            if (window.innerWidth < 768) { // Only close sidebar on mobile when a link is clicked
+                toggleSidebar();
+            }
+        });
+    });
 
 
     // --- AUTHENTICATION & REAL-TIME DATA ---
@@ -653,10 +656,21 @@
     logoutBtnSettings.addEventListener('click', handleLogout);
     
     const spaViews = { home: document.getElementById('home-view'), notifications: document.getElementById('notifications-view'), settings: document.getElementById('settings-view') };
-    const navButtons = { home: document.getElementById('nav-home'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
-    function showView(viewName) { Object.values(spaViews).forEach(v => v.classList.add('hidden')); if(spaViews[viewName]) spaViews[viewName].classList.remove('hidden'); Object.values(navButtons).forEach(b => b.classList.remove('active')); if (viewName === 'home') { navButtons.home.classList.add('active'); navButtons.dashboard.classList.add('active'); } else if (navButtons[viewName]) { navButtons[viewName].classList.add('active'); } }
+    const navButtons = { home: document.getElementById('nav-home'), dashboard: document.getElementById('nav-dashboard'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
+    function showView(viewName) { 
+        Object.values(spaViews).forEach(v => v.classList.add('hidden')); 
+        if(spaViews[viewName]) spaViews[viewName].classList.remove('hidden'); 
+        
+        Object.values(navButtons).forEach(b => b.classList.remove('active')); 
+        
+        if (viewName === 'home') { 
+            navButtons.dashboard.classList.add('active'); 
+        } else if (navButtons[viewName]) { 
+            navButtons[viewName].classList.add('active'); 
+        } 
+    }
     navButtons.home.addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'homeUPSChub.html'; });
-    document.getElementById('nav-dashboard').addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
+    navButtons.dashboard.addEventListener('click', (e) => { e.preventDefault(); showView('home'); });
     navButtons.tests.addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'Test_premium.html'; });
     navButtons.notifications.addEventListener('click', (e) => { e.preventDefault(); showView('notifications'); });
     navButtons.settings.addEventListener('click', (e) => { e.preventDefault(); showView('settings'); });
