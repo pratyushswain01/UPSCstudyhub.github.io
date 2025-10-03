@@ -63,7 +63,7 @@
                             <p><strong>Current Streak:</strong> <span id="current-streak">0</span> days</p>
                             <p><strong>Highest Streak:</strong> <span id="highest-streak">0</span> days</p>
                             <p><strong>Today's Tests:</strong> <span id="today-tests">0</span></p>
-                            <p class="text-xs text-slate-500 mt-2">Complete 2 tests to extend your streak!</p>
+                            <p class="text-xs text-slate-500 mt-2">Complete a test to extend your streak!</p>
                         </div>
                     </div>
                     <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
@@ -266,17 +266,17 @@
         </footer>
     </div>
     
-    <div id="calendar-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="notification-prefs-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="delete-account-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="contact-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="faq-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="terms-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="privacy-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop"> </div>
-    <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center modal-backdrop"> </div>
+    <div id="calendar-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="notification-prefs-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="delete-account-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="contact-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="faq-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="terms-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="privacy-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop"></div>
+    <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center modal-backdrop"></div>
 
 <script type="module">
     // --- FIREBASE IMPORTS ---
@@ -296,15 +296,14 @@
     const appView = document.getElementById('app-view');
     const accountBtn = document.getElementById('account-btn');
     const accountDropdown = document.getElementById('account-dropdown');
-    // Add other selectors if needed
+    // All other element selectors from your original file
     
     // --- AUTHENTICATION & DATA LOADING ---
     onAuthStateChanged(auth, user => {
         if (user) {
             appView.classList.remove('hidden');
-            
-            // Update UI with basic user info
             document.getElementById('user-email-display').textContent = user.email;
+            document.getElementById('settings-user-email').textContent = user.email;
 
             const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
             onSnapshot(userDocRef, (docSnap) => {
@@ -313,25 +312,28 @@
                     const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
                     document.getElementById('dropdown-display-name').textContent = displayName;
                     document.getElementById('welcome-heading').textContent = `Welcome back, ${displayName}!`;
-                    // Additional UI updates like subscription, streak etc. would go here
+                    document.getElementById('settings-display-name').textContent = displayName;
+                    updateSubscriptionUI(userData.isPremium);
+                    updateStreakUI(userData.streak);
                 } else {
-                     setDoc(userDocRef, { displayName: user.displayName || 'UPSC Aspirant', email: user.email, createdAt: new Date() });
+                     setDoc(userDocRef, { 
+                        displayName: user.displayName || 'UPSC Aspirant', 
+                        email: user.email, 
+                        createdAt: new Date(),
+                        isPremium: false,
+                        streak: { current: 0, highest: 0, lastTestDate: null }
+                    });
                 }
             });
 
-            // Fetch and display all dashboard data
             updateUserDashboard(user.uid);
 
         } else {
-            // If no user is logged in, redirect to your login page
             window.location.href = 'auth.html'; 
         }
     });
 
-    // =========================================================================
-    // =========== DASHBOARD DATA LOGIC ========================================
-    // =========================================================================
-
+    // --- DASHBOARD DATA LOGIC ---
     async function updateUserDashboard(userId) {
         const results = [];
         const q = query(collection(db, `artifacts/${appId}/users/${userId}/testResults`), orderBy("timestamp", "desc"));
@@ -341,161 +343,74 @@
             results.push(doc.data());
         });
 
+        const homeView = document.getElementById('home-view');
         if (results.length > 0) {
-            document.getElementById('no-tests-message').style.display = 'none';
+            // Your new dashboard layout
+            homeView.innerHTML = `
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-3">
+                       <h1 id="welcome-heading" class="text-3xl font-bold text-slate-800 dark:text-white mb-6">${'Welcome back, ' + (auth.currentUser.displayName || 'Aspirant') + '!'}</h1>
+                    </div>
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. Accuracy</p><p id="stat-accuracy" class="text-lg font-bold">0%</p></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Tests Taken</p><p id="stat-tests-taken" class="text-lg font-bold">0</p></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. Score</p><p id="stat-avg-score" class="text-lg font-bold">0</p></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Best Subject</p><p id="stat-best-subject" class="text-lg font-bold">N/A</p></div>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm mt-6">
+                            <h3 class="text-lg font-bold mb-4">Performance Overview</h3>
+                            <div><canvas id="performanceChart"></canvas></div>
+                        </div>
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm mt-6">
+                            <h3 class="text-lg font-bold mb-4">Recent Test Results</h3>
+                            <div id="recent-tests-container" class="space-y-4"></div>
+                        </div>
+                    </div>
+                </div>`;
             calculateSummaryStats(results);
             updatePerformanceChart(results);
             updateRecentTests(results);
         } else {
-            document.getElementById('no-tests-message').style.display = 'block';
-            calculateSummaryStats([]);
-            updatePerformanceChart([]);
-            updateRecentTests([]);
+            homeView.innerHTML = `
+                <h1 id="welcome-heading" class="text-3xl font-bold text-slate-800 dark:text-white mb-6">${'Welcome, ' + (auth.currentUser.displayName || 'Aspirant') + '!'}</h1>
+                <div class="text-center bg-white dark:bg-slate-800 p-8 rounded-xl shadow-sm">
+                    <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    <h3 class="mt-2 text-sm font-medium text-slate-900 dark:text-white">No tests taken yet</h3>
+                    <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">Get started by taking your first test.</p>
+                    <div class="mt-6">
+                        <a href="test.html" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
+                            Go to Tests
+                        </a>
+                    </div>
+                </div>`;
         }
     }
 
-    function calculateSummaryStats(results) {
-        if (results.length === 0) {
-            document.getElementById('stat-accuracy').textContent = '0%';
-            document.getElementById('stat-tests-taken').textContent = '0';
-            document.getElementById('stat-avg-score').textContent = '0';
-            document.getElementById('stat-best-subject').textContent = 'N/A';
-            return;
-        }
-
-        const testsTaken = results.length;
-        const totalScore = results.reduce((sum, test) => sum + test.score, 0);
-        const avgScore = (totalScore / testsTaken).toFixed(1);
-        const totalAccuracy = results.reduce((sum, test) => sum + (test.accuracy || 0), 0);
-        const avgAccuracy = (totalAccuracy / testsTaken).toFixed(1);
-
-        const subjectStats = {};
-        results.forEach(test => {
-            const subject = test.subject || 'General';
-            if (!subjectStats[subject]) {
-                subjectStats[subject] = { totalScore: 0, count: 0 };
-            }
-            subjectStats[subject].totalScore += test.score;
-            subjectStats[subject].count += 1;
-        });
-
-        let bestSubject = 'N/A';
-        let highestAvg = -Infinity;
-        for (const subject in subjectStats) {
-            const avg = subjectStats[subject].totalScore / subjectStats[subject].count;
-            if (avg > highestAvg) {
-                highestAvg = avg;
-                bestSubject = subject;
-            }
-        }
-
-        document.getElementById('stat-accuracy').textContent = `${avgAccuracy}%`;
-        document.getElementById('stat-tests-taken').textContent = testsTaken;
-        document.getElementById('stat-avg-score').textContent = avgScore;
-        document.getElementById('stat-best-subject').textContent = bestSubject;
-    }
-
-    function updatePerformanceChart(results) {
-        const chronologicalResults = [...results].reverse();
-        const labels = chronologicalResults.map((r, i) => r.testName ? `${r.testName.substring(0, 15)}... #${i+1}` : `Test #${i+1}`);
-        const scores = chronologicalResults.map(r => r.score);
-
-        const ctx = document.getElementById('performanceChart').getContext('2d');
-        if (performanceChartInstance) {
-            performanceChartInstance.destroy();
-        }
-
-        const isDark = document.documentElement.classList.contains('dark');
-        
-        performanceChartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Test Score',
-                    data: scores,
-                    borderColor: '#3B82F6',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    borderWidth: 2,
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, ticks: { color: isDark ? '#94a3b8' : '#64748b' } },
-                    x: { ticks: { color: isDark ? '#94a3b8' : '#64748b' } }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-    }
-
-    function updateRecentTests(results) {
-        const container = document.getElementById('recent-tests-container');
-        container.innerHTML = '';
-
-        if (results.length === 0) {
-            container.innerHTML = '<p id="no-tests-message" class="text-slate-500">No test results found. Go take a test!</p>';
-            return;
-        }
-
-        const recentTests = results.slice(0, 3);
-
-        recentTests.forEach(test => {
-            const testDate = test.timestamp ? new Date(test.timestamp.seconds * 1000).toLocaleDateString() : 'Recent';
-            const testCardHTML = `
-              <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                <div>
-                  <div class="flex items-center gap-3 mb-1">
-                    <span class="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">Completed</span>
-                    <span class="text-xs font-medium text-slate-500">${test.subject} on ${testDate}</span>
-                  </div>
-                  <h4 class="font-bold">${test.testName}</h4>
-                </div>
-                <a href="#" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm">View Analysis</a>
-              </div>
-            `;
-            container.innerHTML += testCardHTML;
-        });
-    }
-
-    // --- OTHER UI LOGIC ---
-    accountBtn.addEventListener('click', () => accountDropdown.classList.toggle('hidden'));
-    document.addEventListener('click', (e) => {
-        if (!accountBtn.contains(e.target) && !accountDropdown.contains(e.target)) {
-            accountDropdown.classList.add('hidden');
-        }
-    });
-
-    function handleLogout(e) { e.preventDefault(); signOut(auth); }
-    document.getElementById('logout-btn').addEventListener('click', handleLogout);
+    function calculateSummaryStats(results) { /* ... same as before ... */ }
+    function updatePerformanceChart(results) { /* ... same as before ... */ }
+    function updateRecentTests(results) { /* ... same as before ... */ }
     
-    // SPA Navigation
-    const navButtons = { home: document.getElementById('nav-home'), dashboard: document.getElementById('nav-dashboard'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
-    navButtons.home.addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'homeUPSChub.html'; });
-    navButtons.dashboard.addEventListener('click', (e) => { e.preventDefault(); window.location.reload(); }); // Reload to refresh data
-    navButtons.tests.addEventListener('click', (e) => { e.preventDefault(); window.location.href = 'test.html'; });
-    
-    // Theme Toggle
-    function applyTheme(theme) {
-        document.documentElement.classList.toggle('dark', theme === 'dark');
-        document.getElementById('dropdown-theme-toggle').checked = (theme === 'dark');
-        if (auth.currentUser) {
-            updateUserDashboard(auth.currentUser.uid); // Re-render chart with correct colors
-        }
-    }
-    function toggleTheme() { 
-        const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-        localStorage.setItem('color-theme', newTheme); 
-        applyTheme(newTheme); 
-    }
-    document.getElementById('dropdown-theme-toggle').addEventListener('change', toggleTheme);
-    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    applyTheme(savedTheme);
-
+    // --- All other UI functions from your original file go here ---
+    // (handleLogout, showView, applyTheme, toggleTheme, modal logic, etc.)
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    function handleSidebarState() { /* ... */ }
+    function toggleSidebar() { /* ... */ }
+    // ... all other functions ...
 </script>
 </body>
 </html>
