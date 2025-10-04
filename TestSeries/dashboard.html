@@ -657,7 +657,7 @@
         const querySnapshot = await getDocs(q);
         const allResults = [];
         querySnapshot.forEach((doc) => {
-            allResults.push(doc.data());
+            results.push({ id: doc.id, data: doc.data() });
         });
         
         if (allResults.length === 0) {
@@ -713,36 +713,40 @@
         document.getElementById('best-subject-value').textContent = bestSubject;
     }
 
-    function updateRecentResults(results) {
-        const container = document.getElementById('recent-tests-container');
-        container.innerHTML = '';
-
-        if (results.length === 0) {
-            container.innerHTML = `<p class="text-sm text-center text-slate-500">Complete a test to see your results here.</p>`;
-            return;
-        }
-
-        const recentTests = results.slice(0, 2); 
-        recentTests.forEach(test => {
-            const testHTML = `
-                <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div>
-                        <div class="flex items-center gap-3 mb-1">
-                            <span class="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">Completed</span>
-                            <span class="text-xs font-medium text-slate-500">${test.subject}</span>
-                        </div>
-                        <h4 class="font-bold">${test.testName}</h4>
-                    </div>
-                    <a href="#" class="w-full sm:w-auto text-center bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm">View Analysis</a>
-                </div>`;
-            container.innerHTML += testHTML;
-        });
-    }
+   
+ 
 
     function updatePerformanceChart(results) {
         if (!performanceChartInstance) return;
 
-        const labels = results.map((test, index) => `Test ${index + 1}`);
+        const labels = results.map((test, index) => `Test ${index + 1}`);function updateRecentResults(results) {
+    const container = document.getElementById('recent-tests-container');
+    container.innerHTML = '';
+
+    if (results.length === 0) {
+        container.innerHTML = `<p class="text-sm text-center text-slate-500">Complete a test to see your results here.</p>`;
+        return;
+    }
+
+    const recentTests = results.slice(0, 2); 
+    recentTests.forEach(result => {
+        const test = result.data; // The data of the test result
+        const resultId = result.id;   // The unique ID of the test result document
+
+        const testHTML = `
+            <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <span class="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">Completed</span>
+                        <span class="text-xs font-medium text-slate-500">${test.subject}</span>
+                    </div>
+                    <h4 class="font-bold">${test.testName}</h4>
+                </div>
+                <a href="test.html?testId=${test.testId}&resultId=${resultId}" class="w-full sm:w-auto text-center bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm">View Analysis</a>
+            </div>`;
+        container.innerHTML += testHTML;
+    });
+}
         const scores = results.map(test => test.score);
 
         performanceChartInstance.data.labels = labels;
