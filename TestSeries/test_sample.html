@@ -13,7 +13,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <style>
-    /* All your CSS styles remain the same... */
+    /* All your original CSS styles are included and unchanged */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body { font-family: 'Poppins', sans-serif; background: #f0f0f5; color: #333; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
@@ -459,7 +459,7 @@
 <script>
 // ### CONFIGURATION ###
 const RETEST_PASSWORD = "UPSChub";
-// const TEST_DURATION_SECONDS = 150 * 60; // Now loaded from DB
+// const TEST_DURATION_SECONDS = 150 * 60; // This is now loaded dynamically
 const PER_QUESTION_TIME = 15;
 
 // =====================================================================
@@ -490,7 +490,7 @@ let isTestCompleted = false;
 let performanceChart = null;
 let stopwatchTime = 0;
 let isStopwatchRunning = false;
-let currentUser = null; 
+let currentUser = null; 
 
 const dom = {
     body: document.body,
@@ -505,8 +505,8 @@ const dom = {
     agreementCheckbox: document.getElementById('agreementCheckbox'),
     startError: document.getElementById('startError'),
     totalQuestionsEl: document.getElementById('totalQuestionsEl'),
-    durationEl: document.getElementById('durationEl'), // Added for dynamic duration
-    instructionsTitle: document.getElementById('instructions-title'), // Added for dynamic title
+    durationEl: document.getElementById('durationEl'),
+    instructionsTitle: document.getElementById('instructions-title'),
     examUIWrapper: document.getElementById('examUIWrapper'),
     siteHeader: document.getElementById('siteHeader'),
     topbar: document.getElementById('topbar'),
@@ -562,7 +562,6 @@ const dom = {
     syncStatus: document.getElementById('syncStatus'),
 };
 
-
 // ### DYNAMIC TEST LOADING LOGIC ###
 async function loadTestFromURL() {
     const params = new URLSearchParams(window.location.search);
@@ -574,19 +573,16 @@ async function loadTestFromURL() {
     }
 
     try {
-        // Fetch test metadata
         const testDocRef = db.collection('quizzes').doc(testId);
         const testDoc = await testDocRef.get();
         if (!testDoc.exists) throw new Error("Test not found.");
         testMetadata = testDoc.data();
 
-        // Fetch questions subcollection
         const questionsSnapshot = await testDocRef.collection('questions').get();
         questions = questionsSnapshot.docs.map(doc => doc.data());
 
         if (questions.length === 0) throw new Error("This test has no questions.");
 
-        // Update instructions with dynamic data
         dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
         dom.totalQuestionsEl.textContent = testMetadata.totalQuestions;
         dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
@@ -594,7 +590,6 @@ async function loadTestFromURL() {
         timeLeft = testMetadata.durationMinutes * 60;
         dom.timer.textContent = formatTime(timeLeft);
         
-        // Show login screen now that test data is ready
         dom.loginScreen.style.display = 'flex';
 
     } catch (error) {
@@ -605,83 +600,458 @@ async function loadTestFromURL() {
 
 // ### STAGE 1 & 2: PRE-EXAM LOGIC ###
 function handleLogin() {
-    const email = dom.emailInput.value;
-    const password = dom.passwordInput.value;
-    dom.loginError.textContent = '';
-    dom.loginBtn.disabled = true;
-    dom.loginBtn.textContent = 'Logging in...';
+    const email = dom.emailInput.value;
+    const password = dom.passwordInput.value;
+    dom.loginError.textContent = '';
+    dom.loginBtn.disabled = true;
+    dom.loginBtn.textContent = 'Logging in...';
 
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            currentUser = userCredential.user;
-            window.addEventListener('online', validateStartConditions);
-            window.addEventListener('offline', validateStartConditions);
-            validateStartConditions(); 
-            dom.loginScreen.style.display = 'none';
-            dom.instructionsScreen.style.display = 'flex';
-        })
-        .catch((error) => {
-            dom.loginError.textContent = error.message;
-        })
-        .finally(() => {
-            dom.loginBtn.disabled = false;
-            dom.loginBtn.textContent = 'Login';
-        });
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            currentUser = userCredential.user;
+            window.addEventListener('online', validateStartConditions);
+            window.addEventListener('offline', validateStartConditions);
+            validateStartConditions(); 
+            dom.loginScreen.style.display = 'none';
+            dom.instructionsScreen.style.display = 'flex';
+        })
+        .catch((error) => {
+            dom.loginError.textContent = error.message;
+        })
+        .finally(() => {
+            dom.loginBtn.disabled = false;
+            dom.loginBtn.textContent = 'Login';
+        });
 }
 
-// All other functions from your original script are here...
-function validateStartConditions() { /* ... */ }
-function startExam() { /* ... */ }
-function forceSubmitOnReconnect() { /* ... */ }
+function validateStartConditions() {
+    const isOffline = !navigator.onLine;
+    const isAgreed = dom.agreementCheckbox.checked;
+    dom.startExamBtn.disabled = !(isOffline && isAgreed);
+    let errorMsg = '';
+    if (!isOffline && !isAgreed) errorMsg = 'Please agree to terms and enable Aeroplane Mode.';
+    else if (!isOffline) errorMsg = 'Please enable Aeroplane Mode to continue.';
+    else if (!isAgreed) errorMsg = 'Please agree to the instructions to start.';
+    dom.startError.textContent = errorMsg;
+    if (isOffline) {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-check-circle"></i> You are offline. Ready to begin.';
+        dom.offlineStatus.className = 'status-ready';
+    } else {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
+        dom.offlineStatus.className = 'status-waiting';
+    }
+}
+function startExam() {
+    if (dom.startExamBtn.disabled) return;
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'flex';
+    dom.body.classList.add('exam-active');
+    updateSidebarPosition();
+    window.removeEventListener('online', validateStartConditions);
+    window.removeEventListener('offline', validateStartConditions);
+    window.addEventListener('online', forceSubmitOnReconnect);
+    initTest();
+}
+function forceSubmitOnReconnect() {
+    if (!isTestCompleted) {
+        alert("Internet connection detected. Submitting the test as per rules.");
+        submitTest(true);
+    }
+}
 async function saveResultToFirestore(scoreData) {
-    const syncStatusEl = dom.syncStatus;
-    if (!currentUser) { /* ... error handling ... */ return; }
-    const userId = currentUser.uid;
-    syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result...`;
-    syncStatusEl.className = 'syncing';
-    // ...
-    try {
-        await db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testResults").add({
-            testId: new URLSearchParams(window.location.search).get('testId'),
-            testName: testMetadata.testName,
-            subject: testMetadata.subject,
-            score: scoreData.totalScore,
-            correctAnswers: scoreData.correctCount,
-            totalQuestions: scoreData.totalQuestions,
-            dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
-        });
-        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result synced to dashboard.`;
-        syncStatusEl.className = 'synced';
-    } catch (error) { /* ... error handling ... */ }
+    const syncStatusEl = dom.syncStatus;
+    if (!currentUser) {
+        syncStatusEl.textContent = 'Error: User not logged in.';
+        syncStatusEl.className = 'error';
+        return;
+    }
+    const userId = currentUser.uid;
+    syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result...`;
+    syncStatusEl.className = 'syncing';
+    
+    try {
+        await db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testResults").add({
+            testId: new URLSearchParams(window.location.search).get('testId'),
+            testName: testMetadata.testName,
+            subject: testMetadata.subject,
+            score: scoreData.totalScore,
+            correctAnswers: scoreData.correctCount,
+            totalQuestions: scoreData.totalQuestions,
+            dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result synced to dashboard.`;
+        syncStatusEl.className = 'synced';
+    } catch (error) {
+        console.error("Error writing to Firestore cache: ", error);
+        syncStatusEl.textContent = 'Error saving result locally.';
+        syncStatusEl.className = 'error';
+    }
 }
-function initTest() { /* ... */ }
-function resetState() { /* ... */ }
-function setView(viewName) { /* ... */ }
-function loadQuestion(index) { /* ... */ }
-function selectOption(optIndex) { /* ... */ }
-function handleSaveAndNext() { /* ... */ }
-function handleMarkAndNext() { /* ... */ }
-function handleClearResponse() { /* ... */ }
-function submitTest(isForced = false) { /* ... */ }
-function calculateScoreBreakdown() { /* ... */ }
-function updatePalette() { /* ... */ }
-function updateNavigationButtons() { /* ... */ }
-function formatTime(totalSeconds) { /* ... */ }
-function startTimer() { /* ... */ }
-function startQuestionTimer() { /* ... */ }
-function stopTimer() { /* ... */ }
-function toggleStopwatch() { /* ... */ }
-function resetStopwatch() { /* ... */ }
-function toggleDarkMode(isDark) { /* ... */ }
-function updateSidebarPosition() { /* ... */ }
-function showResultScreen(breakdown, topicStats) { /* ... */ }
-function animateScorecard(data) { /* ... */ }
-function calculateTopicStats() { /* ... */ }
-function populatePerformanceTable(topicStats) { /* ... */ }
-function renderPerformanceChart(topicStats) { /* ... */ }
-function showReviewScreen() { /* ... */ }
-function populateReviewScreen() { /* ... */ }
-function handleRetest() { /* ... */ }
+
+// ### STAGE 3: MAIN TEST LOGIC ###
+function initTest() {
+    resetState();
+    timeLeft = testMetadata.durationMinutes * 60; // Use dynamic duration
+    isTestCompleted = false;
+    dom.showAnswerWritingTab.classList.add('locked');
+    state.visited[0] = true;
+    resetStopwatch();
+    setView('mockTest');
+    loadQuestion(0);
+    startTimer();
+}
+function resetState() {
+    state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) };
+}
+function setView(viewName) {
+    dom.mockTestWrapper.style.display = 'none';
+    dom.resultScreenWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.answerWritingWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.timer.style.display = 'none';
+    dom.stopwatchWrapper.style.display = 'none';
+    dom.showMockTestTab.classList.remove('active');
+    dom.showAnswerWritingTab.classList.remove('active');
+    clearInterval(animationInterval);
+    if (viewName === 'mockTest') {
+        dom.showMockTestTab.classList.add('active');
+        dom.timer.style.display = 'block';
+        if (isTestCompleted) {
+            const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+            const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+            showResultScreen(breakdown, topicStats);
+        } else {
+            dom.mockTestWrapper.style.display = 'flex';
+            dom.mcqFooter.style.display = 'block';
+            dom.sidebar.style.display = 'flex';
+        }
+    } else if (viewName === 'answerWriting') {
+        if (dom.showAnswerWritingTab.classList.contains('locked')) return;
+        dom.showAnswerWritingTab.classList.add('active');
+        dom.stopwatchWrapper.style.display = 'flex';
+        dom.answerWritingWrapper.style.display = 'flex';
+    }
+}
+function loadQuestion(index) {
+    state.current = index;
+    if (!state.visited[index]) { state.visited[index] = true; }
+    startQuestionTimer();
+    const q = questions[index];
+    dom.questionNumber.textContent = `Question ${index + 1}`;
+    dom.questionText.textContent = q.text;
+    dom.optionsList.innerHTML = '';
+    q.options.forEach((opt, i) => {
+        const li = document.createElement('li');
+        li.className = 'option';
+        if (state.answers[index] === i) li.classList.add('selected');
+        li.innerHTML = `<span class="option-radio"></span><span class="option-text">${opt}</span>`;
+        li.onclick = () => selectOption(i);
+        dom.optionsList.appendChild(li);
+    });
+    dom.btnSubmitTest.style.display = (state.current === questions.length - 1) ? 'flex' : 'none';
+    updatePalette();
+    updateNavigationButtons();
+}
+function selectOption(optIndex) {
+    state.answers[state.current] = optIndex;
+    dom.optionsList.querySelectorAll('.option').forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
+    updatePalette();
+}
+function handleSaveAndNext() {
+    if (isTestCompleted) return;
+    if (state.current < questions.length - 1) {
+        loadQuestion(state.current + 1);
+    } else {
+        submitTest(true);
+    }
+}
+function handleMarkAndNext() {
+    if (isTestCompleted) return;
+    state.marked[state.current] = true;
+    handleSaveAndNext();
+}
+function handleClearResponse() {
+    state.answers[state.current] = null;
+    dom.optionsList.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+    updatePalette();
+}
+function submitTest(isForced = false) {
+    if (isTestCompleted) return;
+    if (!isForced) {
+        if (!confirm('Are you sure you want to submit the test?')) return;
+    }
+    stopTimer();
+    isTestCompleted = true;
+    window.removeEventListener('online', forceSubmitOnReconnect);
+    dom.showAnswerWritingTab.classList.remove('locked');
+    const scoreBreakdown = calculateScoreBreakdown();
+    const topicStats = calculateTopicStats();
+    saveResultToFirestore(scoreBreakdown);
+    localStorage.setItem('testTaken', 'true');
+    localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
+    localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
+    localStorage.setItem('topicStats', JSON.stringify(topicStats));
+    showResultScreen(scoreBreakdown, topicStats);
+}
+function calculateScoreBreakdown() {
+    let correctCount = 0, incorrectCount = 0;
+    state.answers.forEach((ans, i) => {
+        if (ans !== null) {
+            if (ans === questions[i].answer) correctCount++;
+            else incorrectCount++;
+        }
+    });
+    const unattemptedCount = questions.length - correctCount - incorrectCount;
+    const totalScore = correctCount - incorrectCount;
+    return {
+        correctCount, incorrectCount, unattemptedCount,
+        totalScore, totalQuestions: questions.length,
+        correctMarks: correctCount * 1, incorrectMarks: incorrectCount * -1,
+    };
+}
+function updatePalette() {
+    dom.questionPalette.innerHTML = '';
+    let answered = 0, notAnswered = 0, marked = 0, notVisited = 0;
+    questions.forEach((_, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'question-number';
+        const isAnswered = state.answers[i] !== null;
+        const isMarked = state.marked[i];
+        if(isAnswered && isMarked) btn.classList.add('marked-answered');
+        else if(isAnswered) btn.classList.add('answered');
+        else if(isMarked) btn.classList.add('marked');
+        else if(state.visited[i]) btn.classList.add('not-answered');
+        else btn.classList.add('not-visited');
+        if (i === state.current) btn.classList.add('current');
+        if (isAnswered) answered++;
+        if (isMarked) marked++;
+        if (!state.visited[i]) notVisited++;
+        btn.textContent = i + 1;
+        btn.onclick = () => { if (!isTestCompleted) loadQuestion(i); };
+        dom.questionPalette.appendChild(btn);
+    });
+    notAnswered = state.visited.filter((v, i) => v && state.answers[i] === null && !state.marked[i]).length;
+    dom.summaryAnswered.textContent = answered;
+    dom.summaryMarked.textContent = marked;
+    dom.summaryNotAnswered.textContent = notAnswered;
+    dom.summaryNotVisited.textContent = notVisited;
+}
+function updateNavigationButtons() {
+    dom.btnPrevQuestion.style.display = state.current === 0 ? 'none' : 'flex';
+    dom.btnSaveNext.querySelector('span').textContent = (state.current === questions.length - 1) ? "Save & Finish" : "Save & Next";
+}
+function formatTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Time's up! The test will be submitted automatically.");
+            submitTest(true);
+            return;
+        }
+        timeLeft--;
+        dom.timer.textContent = formatTime(timeLeft);
+    }, 1000);
+}
+function startQuestionTimer() {
+    if (onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+    onTimerEnd = () => handleSaveAndNext();
+    dom.questionTimerBar.style.transition = 'none';
+    dom.questionTimerBar.style.width = '100%';
+    dom.questionTimerBar.offsetHeight;
+    dom.questionTimerBar.style.transition = `width ${PER_QUESTION_TIME}s linear`;
+    dom.questionTimerBar.style.width = '0%';
+    dom.questionTimerBar.addEventListener('transitionend', onTimerEnd, { once: true });
+}
+function stopTimer() {
+    clearInterval(timerInterval);
+    if(onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+}
+function toggleStopwatch() {
+    const icon = dom.stopwatchPlayPause.querySelector('i');
+    if (isStopwatchRunning) {
+        clearInterval(stopwatchInterval);
+        icon.classList.replace('fa-pause', 'fa-play');
+    } else {
+        stopwatchInterval = setInterval(() => {
+            stopwatchTime++;
+            dom.stopwatchDisplay.textContent = formatTime(stopwatchTime);
+        }, 1000);
+        icon.classList.replace('fa-play', 'fa-pause');
+    }
+    isStopwatchRunning = !isStopwatchRunning;
+}
+function resetStopwatch() {
+    clearInterval(stopwatchInterval);
+    isStopwatchRunning = false;
+    stopwatchTime = 0;
+    dom.stopwatchDisplay.textContent = formatTime(0);
+    const icon = dom.stopwatchPlayPause.querySelector('i');
+    if(icon) {
+       icon.classList.replace('fa-pause', 'fa-play');
+    }
+}
+function toggleDarkMode(isDark) {
+    dom.body.classList.toggle('dark', isDark);
+    dom.toggleLabel.textContent = isDark ? 'Light' : 'Dark';
+    if (isTestCompleted && performanceChart) {
+        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        renderPerformanceChart(topicStats);
+    }
+}
+function updateSidebarPosition() {
+    const headerHeight = dom.siteHeader.offsetHeight;
+    const topbarHeight = dom.topbar.offsetHeight;
+    const totalHeaderHeight = headerHeight + topbarHeight;
+    dom.sidebar.style.top = `${totalHeaderHeight}px`;
+    dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
+}
+
+// ### STAGE 4: RESULT & REVIEW FUNCTIONS ###
+function showResultScreen(breakdown, topicStats) {
+    dom.mockTestWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.btnSubmitTest.style.display = 'none';
+    dom.resultScreenWrapper.style.display = 'flex';
+    if (breakdown) {
+         dom.totalPossibleScore.textContent = breakdown.totalQuestions;
+         animateScorecard(breakdown);
+    }
+    populatePerformanceTable(topicStats);
+    setTimeout(() => renderPerformanceChart(topicStats), 100);
+}
+function animateScorecard(data) {
+    let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
+    const animationSpeed = 20;
+    const duration = 1200;
+    const steps = duration / animationSpeed;
+    const stepValues = {};
+    for (const key in current) {
+        stepValues[key] = data[key] / steps;
+    }
+    clearInterval(animationInterval);
+    animationInterval = setInterval(() => {
+        let finished = true;
+        for (const key in current) {
+            if (stepValues[key] > 0) {
+                if (current[key] < data[key]) {
+                    current[key] += stepValues[key];
+                    finished = false;
+                } else {
+                    current[key] = data[key];
+                }
+            } else {
+                 if (current[key] > data[key]) {
+                    current[key] += stepValues[key]; 
+                    finished = false;
+                } else {
+                    current[key] = data[key];
+                }
+            }
+        }
+        dom.correctCount.textContent = Math.round(current.correctCount);
+        dom.correctMarks.textContent = `+${Math.round(current.correctMarks)}`;
+        dom.incorrectCount.textContent = Math.round(current.incorrectCount);
+        dom.incorrectMarks.textContent = Math.round(current.incorrectMarks);
+        dom.unattemptedCount.textContent = Math.round(current.unattemptedCount);
+        dom.finalScoreAnimated.textContent = Math.round(current.totalScore);
+        if(finished) clearInterval(animationInterval);
+    }, animationSpeed);
+}
+function calculateTopicStats() {
+    const topicStats = {};
+    questions.forEach((q, i) => {
+        if (!topicStats[q.topic]) { topicStats[q.topic] = { correct: 0, attempted: 0 }; }
+        if (state.answers[i] !== null) {
+            topicStats[q.topic].attempted++;
+            if (state.answers[i] === q.answer) { topicStats[q.topic].correct++; }
+        }
+    });
+    return topicStats;
+}
+function populatePerformanceTable(topicStats) {
+    dom.performanceTableBody.innerHTML = '';
+    if (!topicStats) return;
+    Object.keys(topicStats).forEach(topicName => {
+        const stats = topicStats[topicName];
+        const accuracy = stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
+        const barColor = accuracy > 75 ? '#4caf50' : accuracy >= 40 ? '#ff9800' : '#f44336';
+        const row = `<tr><td>${topicName}</td><td>${stats.correct}</td><td>${stats.attempted}</td><td><div class="accuracy-bar-container"><div class="accuracy-bar" style="width: ${accuracy}%; background-color: ${barColor};"></div><span class="accuracy-text">${accuracy}%</span></div></td></tr>`;
+        dom.performanceTableBody.innerHTML += row;
+    });
+}
+function renderPerformanceChart(topicStats) {
+    if (performanceChart) performanceChart.destroy();
+    if (!topicStats) return;
+    const isDark = dom.body.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : '#666';
+    const labels = Object.keys(topicStats);
+    const marksData = labels.map(label => topicStats[label].correct);
+    const accuracyData = labels.map(label => {
+        const stats = topicStats[label];
+        return stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
+    });
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    performanceChart = new Chart(ctx, {
+        type: 'bar', data: { labels: labels, datasets: [{ label: 'Correct Answers (Marks)', data: marksData, backgroundColor: '#3f51b5', yAxisID: 'y' }, { label: 'Accuracy (%)', data: accuracyData, type: 'line', borderColor: '#4caf50', tension: 0.1, yAxisID: 'y1' }] },
+        options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { type: 'linear', position: 'left', title: { display: true, text: 'Correct Answers', color: textColor }, ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true }, y1: { type: 'linear', position: 'right', min: 0, max: 100, title: { display: true, text: 'Accuracy (%)', color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false } } }, plugins: { legend: { labels: { color: textColor } } } }
+    });
+}
+function showReviewScreen() {
+    dom.resultScreenWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'flex';
+    populateReviewScreen();
+}
+function populateReviewScreen() {
+    dom.reviewContainer.innerHTML = '';
+    const userAnswers = JSON.parse(localStorage.getItem('lastAnswers'));
+    if (!userAnswers) return;
+    questions.forEach((q, index) => {
+        const userAnswer = userAnswers[index];
+        const correctAnswer = q.answer;
+        const isCorrect = userAnswer === correctAnswer;
+        let optionsHTML = '';
+        q.options.forEach((opt, optIndex) => {
+            let classes = 'review-option';
+            let icon = '<i class="far fa-circle"></i>';
+            if (optIndex === correctAnswer) { classes += ' review-correct'; icon = '<i class="fas fa-check-circle"></i>'; }
+            if (optIndex === userAnswer && !isCorrect) { classes += ' review-incorrect'; icon = '<i class="fas fa-times-circle"></i>'; }
+            optionsHTML += `<li class="${classes}">${icon}<span>${opt}</span></li>`;
+        });
+        let statusHTML = '';
+        if (userAnswer === null) { statusHTML = '<div class="review-status unanswered">Status: Unanswered</div>'; } 
+        else if (isCorrect) { statusHTML = '<div class="review-status correct">Status: Correct</div>'; } 
+        else { statusHTML = '<div class="review-status incorrect">Status: Incorrect</div>'; }
+        const explanationHTML = `<div class="review-explanation"><strong>Explanation:</strong> ${q.explanation}</div>`;
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'review-question';
+        questionDiv.innerHTML = `<h4>Q${index + 1}: ${q.text}</h4><ul class="review-option-list">${optionsHTML}</ul>${statusHTML}${explanationHTML}`;
+        dom.reviewContainer.appendChild(questionDiv);
+    });
+}
+function handleRetest() {
+    if (navigator.onLine) {
+        dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
+        return;
+    }
+    if (dom.passwordRetestInput.value === RETEST_PASSWORD) {
+        localStorage.clear();
+        location.reload(); 
+    } else {
+        dom.passwordError.textContent = 'Incorrect password.';
+    }
+}
 
 // ### MASTER EVENT LISTENERS SETUP ###
 document.addEventListener('DOMContentLoaded', () => {
@@ -692,14 +1062,44 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // The rest of your event listeners...
     const storedTheme = localStorage.getItem('theme');
-    if (storedTheme === 'dark') { /* ... */ }
-    if (localStorage.getItem('testTaken') === 'true') { /* ... */ }
-    // ... all other listeners
+    if (storedTheme === 'dark') {
+        dom.darkModeToggle.checked = true;
+        toggleDarkMode(true);
+    }
+    // Logic to resume a finished test has been removed to simplify the flow.
+    // A fresh test is loaded every time.
+    
+    const phone = "918658567727";
+    const message = "I need the password for the mock test.";
+    dom.whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
     dom.loginBtn.addEventListener('click', handleLogin);
     dom.startExamBtn.addEventListener('click', startExam);
-    // etc.
+    dom.agreementCheckbox.addEventListener('change', validateStartConditions);
+    dom.btnSaveNext.addEventListener('click', handleSaveAndNext);
+    dom.btnPrevQuestion.addEventListener('click', () => { if(state.current > 0 && !isTestCompleted) loadQuestion(state.current - 1); });
+    dom.btnMarkReview.addEventListener('click', handleMarkAndNext);
+    dom.btnClearResponse.addEventListener('click', handleClearResponse);
+    dom.btnSubmitTest.addEventListener('click', () => submitTest(false));
+    dom.sidebarToggle.addEventListener('click', () => dom.body.classList.toggle('sidebar-open'));
+    dom.darkModeToggle.addEventListener('change', (e) => {
+        toggleDarkMode(e.target.checked);
+        localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
+    });
+    dom.retestButton.addEventListener('click', () => { dom.passwordModal.style.display = 'flex'; });
+    dom.reviewAnswersButton.addEventListener('click', showReviewScreen);
+    dom.backToResultsBtn.addEventListener('click', () => {
+        const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        showResultScreen(breakdown, topicStats);
+    });
+    dom.closeModal.addEventListener('click', () => { dom.passwordModal.style.display = 'none'; });
+    dom.verifyPasswordButton.addEventListener('click', handleRetest);
+    dom.stopwatchPlayPause.addEventListener('click', toggleStopwatch);
+    dom.stopwatchReset.addEventListener('click', resetStopwatch);
+    dom.showMockTestTab.addEventListener('click', () => setView('mockTest'));
+    dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
+    window.addEventListener('resize', updateSidebarPosition);
 });
-
 </script>
 </body>
 </html>
