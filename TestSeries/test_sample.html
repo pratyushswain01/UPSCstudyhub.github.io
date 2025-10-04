@@ -691,13 +691,14 @@ async function saveResultToFirestore(scoreData) {
     const resultsCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testResults");
     
     try {
-       await resultsCollectionRef.add({
+      await resultsCollectionRef.add({
     testId: new URLSearchParams(window.location.search).get('testId'),
     testName: testMetadata.testName,
     subject: testMetadata.subject,
     score: scoreData.totalScore,
     correctAnswers: scoreData.correctCount,
     totalQuestions: scoreData.totalQuestions,
+    userAnswers: state.answers, // <-- ADD THIS LINE
     dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
 });
         
@@ -710,6 +711,61 @@ async function saveResultToFirestore(scoreData) {
         syncStatusEl.className = 'error';
     }
 }
+
+
+
+
+
+
+
+  
+
+
+async function loadAndReviewTest(testId, resultId) {
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+
+    try {
+        // 1. Authenticate the user to get their UID
+        const auth = firebase.auth();
+        const user = auth.currentUser;
+        if (!user) {
+            throw new Error("You must be logged in to review results.");
+        }
+
+        // 2. Fetch the test questions (same as before)
+        const testDocRef = db.collection('quizzes').doc(testId);
+        const testDoc = await testDocRef.get();
+        if (!testDoc.exists) throw new Error("Test not found.");
+        testMetadata = testDoc.data();
+        
+        const questionsSnapshot = await testDocRef.collection('questions').get();
+        questions = questionsSnapshot.docs.map(doc => doc.data());
+        
+        // 3. Fetch the user's saved answers for that specific result
+        const resultDocRef = db.collection(`artifacts/${appId}/users/${user.uid}/testResults`).doc(resultId);
+        const resultDoc = await resultDocRef.get();
+        if (!resultDoc.exists) throw new Error("Your test result could not be found.");
+        
+        // Temporarily store answers in localStorage for the review function to use
+        localStorage.setItem('lastAnswers', JSON.stringify(resultDoc.data().userAnswers));
+
+        // 4. Show the review screen
+        showReviewScreen();
+        dom.examUIWrapper.style.display = 'flex'; // Make sure the main wrapper is visible
+
+    } catch (error) {
+        console.error("Failed to load review:", error);
+        document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>${error.message}</p><a href="dashboard.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Dashboard</a></div></div>`;
+    }
+}
+
+
+
+
+
+
+  
 
 // ### STAGE 3: MAIN TEST LOGIC ###
 function initTest() {
@@ -1078,32 +1134,51 @@ function handleRetest() {
 
 // ### MASTER EVENT LISTENERS SETUP ###
 document.addEventListener('DOMContentLoaded', () => {
+    // --- 1. Initial Setup (Theme, etc.) ---
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme === 'dark') {
         dom.darkModeToggle.checked = true;
         toggleDarkMode(true);
     }
-   if (localStorage.getItem('testTaken') === 'true') {
-    isTestCompleted = true;
-    dom.showAnswerWritingTab.classList.remove('locked');
-    dom.loginScreen.style.display = 'none';
-    dom.instructionsScreen.style.display = 'none'; // This line is added
-    dom.examUIWrapper.style.display = 'flex';
-    dom.body.classList.add('exam-active');
-    updateSidebarPosition();
-    const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
-    const topicStats = JSON.parse(localStorage.getItem('topicStats'));
-    showResultScreen(breakdown, topicStats);
-}
+
+    // --- 2. Determine Page Mode (Review, Resume, or New Test) ---
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get('testId');
+    const resultId = params.get('resultId');
+
+    if (resultId && testId) {
+        // MODE 1: Review Mode (Clicked "View Analysis" from dashboard)
+        loadAndReviewTest(testId, resultId);
+
+    } else if (localStorage.getItem('testTaken') === 'true') {
+        // MODE 2: Resume Result Mode (Refreshed the result page)
+        isTestCompleted = true;
+        dom.showAnswerWritingTab.classList.remove('locked');
+        dom.loginScreen.style.display = 'none';
+        dom.instructionsScreen.style.display = 'none';
+        dom.examUIWrapper.style.display = 'flex';
+        dom.body.classList.add('exam-active');
+        updateSidebarPosition();
+        const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        showResultScreen(breakdown, topicStats);
+
+    } else {
+        // MODE 3: New Test Mode (Clicked a test from the series page)
+        dom.loginScreen.style.display = 'none';
+        dom.instructionsScreen.style.display = 'none';
+        loadTestFromURL();
+    }
+
+    // --- 3. Setup All Other Event Listeners ---
     const phone = "918658567727";
     const message = "I need the password for the mock test.";
-    loadTestFromURL();
     dom.whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
     dom.loginBtn.addEventListener('click', handleLogin);
     dom.startExamBtn.addEventListener('click', startExam);
     dom.agreementCheckbox.addEventListener('change', validateStartConditions);
     dom.btnSaveNext.addEventListener('click', handleSaveAndNext);
-    dom.btnPrevQuestion.addEventListener('click', () => { if(state.current > 0 && !isTestCompleted) loadQuestion(state.current - 1); });
+    dom.btnPrevQuestion.addEventListener('click', () => { if (state.current > 0 && !isTestCompleted) loadQuestion(state.current - 1); });
     dom.btnMarkReview.addEventListener('click', handleMarkAndNext);
     dom.btnClearResponse.addEventListener('click', handleClearResponse);
     dom.btnSubmitTest.addEventListener('click', () => submitTest(false));
