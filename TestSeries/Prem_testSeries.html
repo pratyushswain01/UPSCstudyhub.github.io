@@ -10,114 +10,140 @@
     <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        
+        /* --- Animations & Transitions --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes scaleOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.95); opacity: 0; } }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotateZ(0deg); }
+            100% { transform: translateY(100vh) rotateZ(360deg); }
+        }
+
+        .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-leave { animation: fadeOut 0.3s ease-in forwards; }
+        .modal-content-enter { animation: scaleIn 0.3s ease-out forwards; }
+        .modal-content-leave { animation: scaleOut 0.3s ease-in forwards; }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            top: -50px;
+            animation: confetti-fall 4s linear infinite;
+        }
+
+        /* --- Custom Styles --- */
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
         .premium-overlay {
             position: absolute;
             inset: 0;
-            background: linear-gradient(to bottom, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.9) 70%, rgba(255,255,255,0.95) 100%);
-            backdrop-filter: blur(4px);
+            background: linear-gradient(to top, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0.95) 100%);
+            backdrop-filter: blur(6px);
             display: flex;
             align-items: center;
-            justify-center: center;
+            justify-content: center;
             flex-direction: column;
             text-align: center;
-            padding: 24px;
-            border-radius: 12px;
+            padding: 1rem;
+            border-radius: 0.75rem; /* 12px */
             z-index: 10;
         }
         .dark .premium-overlay {
-            background: linear-gradient(to bottom, rgba(30,41,59,0.7) 0%, rgba(30,41,59,0.9) 70%, rgba(30,41,59,0.95) 100%);
+            background: linear-gradient(to top, rgba(15, 23, 42, 0.8) 0%, rgba(15, 23, 42, 0.95) 100%);
         }
-        .upgrade-btn-fixed {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 20;
-            width: calc(100% - 40px); /* Adjust based on padding */
-            max-width: 400px; /* Max width for larger screens */
+        
+        .skeleton-card {
+            background-color: #e5e7eb; /* bg-gray-200 */
+        }
+        .dark .skeleton-card {
+            background-color: #334155; /* dark:bg-slate-700 */
         }
     </style>
     <script>
       tailwind.config = { darkMode: 'class' }
     </script>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 antialiased">
 
-    <header class="bg-white dark:bg-slate-800 shadow-sm sticky top-0 z-50">
+    <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700 sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-            <a href="TestSeries/dashboard.html" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
-                <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-8 w-8 rounded-lg">
+            <a href="TestSeries/dashboard.html" class="flex items-center gap-3 text-2xl font-bold text-blue-600 dark:text-blue-500">
+                <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
                 <span>UPSChub</span>
             </a>
-            <a href="TestSeries/dashboard.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Go to Dashboard</a>
+            <a href="TestSeries/dashboard.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Go to Dashboard</a>
         </div>
     </header>
 
-    <div id="premium-access-banner" class="hidden bg-gradient-to-r from-amber-400 to-orange-500 dark:from-amber-600 dark:to-orange-700 p-3 text-white text-center font-bold text-sm">
-        <div class="container mx-auto">
-            <svg class="inline-block w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
-            Unlock All Test Series with <span class="uppercase">Premium Access!</span>
+    <div id="premium-access-banner" class="hidden bg-gradient-to-r from-amber-400 to-orange-500 dark:from-amber-500 dark:to-orange-600 p-3 text-white text-center font-bold text-sm shadow-md">
+        <div class="container mx-auto flex items-center justify-center gap-2">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path></svg>
+            <span>Unlock All Test Series with <strong>Premium Access!</strong></span>
         </div>
     </div>
 
-    <main id="main-content" class="container mx-auto p-4 sm:p-6 hidden relative">
-        <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Chapter-wise Test Series</h1>
+    <main id="main-content" class="container mx-auto p-4 sm:p-6 hidden">
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800 dark:text-white mb-8 tracking-tight">Chapter-wise Test Series</h1>
         <div id="test-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md text-center text-slate-500">
-                <p>Loading tests...</p>
-            </div>
+            <div class="p-6 h-44 bg-white dark:bg-slate-800 rounded-xl shadow-md skeleton-card animate-pulse"></div>
+            <div class="p-6 h-44 bg-white dark:bg-slate-800 rounded-xl shadow-md skeleton-card animate-pulse hidden md:block"></div>
+            <div class="p-6 h-44 bg-white dark:bg-slate-800 rounded-xl shadow-md skeleton-card animate-pulse hidden lg:block"></div>
         </div>
     </main>
     
-    <div id="loader" class="flex justify-center items-center h-screen">
-        <p class="text-slate-500">Checking authentication...</p>
+    <div id="loader" class="flex justify-center items-center h-screen flex-col">
+        <svg class="animate-spin h-8 w-8 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-slate-500 dark:text-slate-400">Checking authentication...</p>
     </div>
 
     <div id="upgrade-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg w-full max-w-md transform transition-all scale-95 opacity-0" id="upgrade-modal-content">
-            <div class="p-6 text-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-800 dark:to-slate-900 rounded-t-2xl">
-                <svg class="w-12 h-12 mx-auto text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                <h3 class="text-2xl font-bold mt-3">Go Premium!</h3>
+        <div class="bg-white dark:bg-slate-800 rounded-2xl shadow-lg w-full max-w-md" id="upgrade-modal-content">
+            <div class="p-6 text-center bg-gradient-to-br from-blue-100 to-indigo-200 dark:from-slate-800 dark:to-slate-900 rounded-t-2xl">
+                <div class="w-16 h-16 mx-auto bg-blue-600/10 dark:bg-blue-500/10 rounded-full flex items-center justify-center">
+                    <svg class="w-10 h-10 text-blue-600 dark:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h3 class="text-2xl font-bold mt-4 text-slate-800 dark:text-white">Go Premium!</h3>
                 <p class="text-slate-500 dark:text-slate-400 mt-1">Unlock your full potential with lifetime access.</p>
             </div>
             <div class="p-6">
                 <ul class="space-y-3 text-slate-700 dark:text-slate-300">
-                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>Access to <span class="font-semibold">All Test Series</span></span></li>
-                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>Detailed <span class="font-semibold">Performance Analytics</span></span></li>
-                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>Unlimited <span class="font-semibold">Practice Questions</span></span></li>
-                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg><span>Priority <span class="font-semibold">Support</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Access to <span class="font-semibold">All Test Series</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Detailed <span class="font-semibold">Performance Analytics</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Unlimited <span class="font-semibold">Practice Questions</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Priority <span class="font-semibold">Support</span></span></li>
                 </ul>
             </div>
             <div class="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-b-2xl flex flex-col sm:flex-row justify-end gap-3">
-                <button type="button" id="close-upgrade-modal" class="px-4 py-2.5 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Maybe Later</button>
-                <button type="button" id="upgrade-btn-modal" class="px-6 py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">
-                    Upgrade Now <span class="line-through opacity-70 ml-1">₹199</span> <span class="ml-1">₹99</span>
+                <button type="button" id="close-upgrade-modal" class="px-4 py-2.5 text-sm font-semibold rounded-lg bg-slate-200/80 dark:bg-slate-700/80 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">Maybe Later</button>
+                <button type="button" id="upgrade-btn-modal" class="px-6 py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg shadow-blue-500/20 transition-all">
+                    Upgrade Now <span class="line-through opacity-70 ml-1">₹199</span> <span class="ml-1 font-bold">₹99</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center modal-backdrop">
-        <div class="relative w-full h-full flex items-center justify-center">
-            <div class="absolute inset-0 bg-gradient-to-br from-blue-500 to-indigo-600 dark:from-blue-800 dark:to-indigo-900 opacity-90 animate-pulse"></div>
-            <div class="relative z-10 text-white text-center p-8 rounded-lg">
-                <svg class="mx-auto h-24 w-24 text-white mb-4 animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <h2 class="text-4xl font-extrabold mb-2">Upgrade Successful!</h2>
-                <p class="text-xl font-medium">Welcome to UPSChub Premium!</p>
-                <p class="mt-4 text-lg">You now have unlimited access to all features.</p>
-            </div>
+    <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div id="confetti-container" class="absolute inset-0 overflow-hidden"></div>
+        <div class="relative z-10 bg-white dark:bg-slate-800 text-center p-8 rounded-2xl shadow-2xl max-w-sm w-full">
+            <svg class="mx-auto h-20 w-20 text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <h2 class="text-3xl font-extrabold text-slate-800 dark:text-white mb-2">Upgrade Successful!</h2>
+            <p class="text-slate-500 dark:text-slate-400">Welcome to UPSChub Premium! You now have unlimited access to all features.</p>
+            <button id="close-success-modal" class="mt-6 w-full px-4 py-2.5 font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Learning</button>
         </div>
-        <button id="close-success-modal" class="absolute top-4 right-4 text-white text-opacity-80 hover:text-opacity-100 text-2xl font-bold z-20">&times;</button>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // Define appId
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -125,15 +151,12 @@
         const mainContent = document.getElementById('main-content');
         const loader = document.getElementById('loader');
         const premiumAccessBanner = document.getElementById('premium-access-banner');
-        const testListContainer = document.getElementById('test-list-container');
-
-        // Upgrade Modal Elements
+        
         const upgradeModal = document.getElementById('upgrade-modal');
         const upgradeModalContent = document.getElementById('upgrade-modal-content');
         const closeUpgradeModalBtn = document.getElementById('close-upgrade-modal');
         const upgradeBtnModal = document.getElementById('upgrade-btn-modal');
 
-        // Success Animation Modal Elements
         const successAnimationModal = document.getElementById('success-animation-modal');
         const closeSuccessModalBtn = document.getElementById('close-success-modal');
 
@@ -141,30 +164,54 @@
 
         function showUpgradeModal() {
             upgradeModal.classList.remove('hidden');
-            setTimeout(() => {
-                upgradeModalContent.classList.remove('scale-95', 'opacity-0');
-                upgradeModalContent.classList.add('scale-100', 'opacity-100');
-            }, 50);
+            upgradeModal.classList.add('modal-enter');
+            upgradeModalContent.classList.add('modal-content-enter');
+            upgradeModal.classList.remove('modal-leave');
+            upgradeModalContent.classList.remove('modal-content-leave');
         }
 
         function hideUpgradeModal() {
-            upgradeModalContent.classList.add('scale-95', 'opacity-0');
+            upgradeModal.classList.add('modal-leave');
+            upgradeModalContent.classList.add('modal-content-leave');
             setTimeout(() => {
                 upgradeModal.classList.add('hidden');
-            }, 200);
+                upgradeModal.classList.remove('modal-enter', 'modal-leave');
+                upgradeModalContent.classList.remove('modal-content-enter', 'modal-content-leave');
+            }, 300);
         }
 
         function showSuccessAnimation() {
             successAnimationModal.classList.remove('hidden');
-            // Hide after a few seconds
+            startConfetti();
             setTimeout(() => {
-                hideSuccessAnimation();
-                window.location.reload(); // Reload to reflect premium status
-            }, 4000); 
+                hideSuccessAnimation(true);
+            }, 5000);
+        }
+        
+        function hideSuccessAnimation(shouldReload = false) {
+            successAnimationModal.classList.add('hidden');
+            stopConfetti();
+            if (shouldReload) {
+                window.location.reload();
+            }
+        }
+        
+        function startConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#60a5fa', '#3b82f6', '#fbbf24', '#f97316', '#10b981'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${Math.random() * 4}s`;
+                container.appendChild(confetti);
+            }
         }
 
-        function hideSuccessAnimation() {
-            successAnimationModal.classList.add('hidden');
+        function stopConfetti() {
+            document.getElementById('confetti-container').innerHTML = '';
         }
 
         async function handleUpgrade() {
@@ -176,31 +223,25 @@
 
             var options = {
                 "key": "rzp_test_YourKey", // Replace with your actual Razorpay Key
-                "amount": 9900, // Amount in paise (e.g., 9900 = ₹99)
+                "amount": 9900,
                 "currency": "INR",
                 "name": "UPSChub",
                 "description": "UPSChub Lifetime Premium Access",
                 "handler": async function (response){
-                    // Payment successful, update user's premium status in Firestore
                     const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     try {
                         await updateDoc(userDocRef, { isPremium: true });
                         console.log("User premium status updated successfully!");
-                        isPremiumUser = true; // Update local variable immediately
-                        showSuccessAnimation();
+                        isPremiumUser = true;
                         hideUpgradeModal();
+                        showSuccessAnimation();
                     } catch (error) {
                         console.error("Error updating premium status: ", error);
                         alert("Upgrade successful but failed to update your status. Please contact support.");
                     }
                 },
-                "prefill": {
-                    "email": user.email,
-                    "contact": "" // Optional: User's phone number
-                },
-                "theme": {
-                    "color": "#2563EB"
-                }
+                "prefill": { "email": user.email },
+                "theme": { "color": "#2563EB" }
             };
             var rzp1 = new Razorpay(options);
             rzp1.open();
@@ -208,24 +249,20 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                // Fetch user's premium status
                 const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                 const docSnap = await getDoc(userDocRef);
                 if (docSnap.exists()) {
                     isPremiumUser = docSnap.data().isPremium || false;
                 } else {
-                    // If user doc doesn't exist, create it as free
                     await setDoc(userDocRef, { isPremium: false }, { merge: true });
                     isPremiumUser = false;
                 }
 
-                // Show/hide premium banner based on status
                 if (!isPremiumUser) {
                     premiumAccessBanner.classList.remove('hidden');
-                    // Add the fixed upgrade button for free users
                     const fixedUpgradeButton = `
-                        <button id="fixed-upgrade-btn" class="upgrade-btn-fixed px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg>
+                        <button id="fixed-upgrade-btn" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transform-gpu transition-all flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                             Go Premium: <span class="line-through opacity-70 ml-1">₹199</span> <span class="ml-1">₹99</span>
                         </button>`;
                     document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
@@ -245,61 +282,56 @@
 
         async function loadAndDisplayTests() {
             const container = document.getElementById('test-list-container');
-            container.innerHTML = '';
-
+            
             try {
                 const querySnapshot = await getDocs(collection(db, "quizzes"));
                 if (querySnapshot.empty) {
                     container.innerHTML = '<p class="text-slate-500 col-span-full text-center">No tests are available at the moment.</p>';
                     return;
                 }
+                
+                // Clear skeleton loader
+                container.innerHTML = '';
 
                 querySnapshot.forEach((doc) => {
                     const test = doc.data();
                     const testId = doc.id;
-
                     let testCardHTML;
+
                     if (isPremiumUser) {
-                        // Premium user: direct link
                         testCardHTML = `
-                            <a href="TestSeries/test_sample.html?testId=${testId}" class="block p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg transition-shadow relative">
-                                <div class="flex items-center justify-between">
-                                    <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">${test.subject}</span>
-                                </div>
+                            <a href="TestSeries/test_sample.html?testId=${testId}" class="group block p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+                                <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">${test.subject}</span>
                                 <h3 class="mt-4 text-xl font-bold text-slate-800 dark:text-white">${test.testName}</h3>
-                                <div class="mt-4 flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                                <div class="mt-4 flex justify-between text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-3">
                                     <span>${test.totalQuestions} Questions</span>
                                     <span>${test.durationMinutes} Minutes</span>
                                 </div>
                             </a>
                         `;
                     } else {
-                        // Free user: show locked card
                         testCardHTML = `
-                            <div class="relative p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md cursor-pointer hover:shadow-lg transition-shadow test-card-locked">
-                                <div class="flex items-center justify-between">
-                                    <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">${test.subject}</span>
-                                </div>
+                            <div class="relative p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md test-card-locked overflow-hidden">
+                                <span class="px-3 py-1 text-xs font-semibold text-blue-800 bg-blue-100 dark:text-blue-200 dark:bg-blue-900/50 rounded-full">${test.subject}</span>
                                 <h3 class="mt-4 text-xl font-bold text-slate-800 dark:text-white">${test.testName}</h3>
-                                <div class="mt-4 flex justify-between text-sm text-slate-500 dark:text-slate-400">
+                                <div class="mt-4 flex justify-between text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-700 pt-3">
                                     <span>${test.totalQuestions} Questions</span>
                                     <span>${test.durationMinutes} Minutes</span>
                                 </div>
                                 <div class="premium-overlay">
-                                    <svg class="w-10 h-10 text-slate-600 dark:text-slate-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                                    <p class="font-bold text-lg text-slate-700 dark:text-slate-200 mb-2">Premium Test</p>
-                                    <p class="text-sm text-slate-600 dark:text-slate-400">Upgrade to unlock all test series.</p>
+                                    <svg class="w-10 h-10 text-slate-600 dark:text-slate-400 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                    <p class="font-bold text-lg text-slate-700 dark:text-slate-200 mb-4">Premium Test</p>
+                                    <button class="unlock-btn px-5 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Unlock Now</button>
                                 </div>
                             </div>
                         `;
                     }
-                    container.innerHTML += testCardHTML;
+                    container.insertAdjacentHTML('beforeend', testCardHTML);
                 });
 
-                // Add event listeners to locked cards for free users
                 if (!isPremiumUser) {
-                    document.querySelectorAll('.test-card-locked').forEach(card => {
-                        card.addEventListener('click', showUpgradeModal);
+                    document.querySelectorAll('.test-card-locked, .unlock-btn').forEach(el => {
+                        el.addEventListener('click', showUpgradeModal);
                     });
                 }
 
@@ -309,17 +341,15 @@
             }
         }
 
-        // Event listeners for the upgrade modal
         closeUpgradeModalBtn.addEventListener('click', hideUpgradeModal);
         upgradeBtnModal.addEventListener('click', handleUpgrade);
-        closeSuccessModalBtn.addEventListener('click', hideSuccessAnimation);
+        closeSuccessModalBtn.addEventListener('click', () => hideSuccessAnimation(true));
 
-        // Dark mode toggle (basic) - you'd likely have a more robust system
-        const html = document.documentElement;
+        // Basic Dark Mode Toggle Logic
         if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
+            document.documentElement.classList.add('dark');
         } else {
-            html.classList.remove('dark');
+            document.documentElement.classList.remove('dark');
         }
     </script>
 </body>
