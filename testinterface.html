@@ -13,13 +13,11 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
   <style>
-    /* General Styles & Reset */
+    /* All your CSS styles remain the same... */
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; overflow: hidden; }
     body { font-family: 'Poppins', sans-serif; background: #f0f0f5; color: #333; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
     .dark { background: #1e1e2f; color: #eee; }
-
-    /* Full-Page Watermark - Activated During Exam */
     body.exam-active::after {
         content: "UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A           UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A";
         position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; font-size: 8vw; font-weight: 700; color: rgba(0, 0, 0, 0.05); text-align: center; line-height: 2; transform-origin: center; transform: rotate(-30deg); z-index: 9999; pointer-events: none; white-space: pre-wrap; overflow: hidden;
@@ -175,6 +173,10 @@
     .dark .scorecard-table .total-val { color: #8ab4f8; }
     #finalScore { display: none; }
     .result-buttons { display: flex; gap: 15px; margin-top: 30px; margin-bottom: 30px; }
+    #syncStatus { margin-top: 10px; font-weight: 500; font-size: 0.95em; padding: 8px 12px; border-radius: 6px; }
+    #syncStatus.syncing { color: #1565c0; background-color: #e3f2fd; }
+    #syncStatus.synced { color: #2e7d32; background-color: #e8f5e9; }
+    #syncStatus.error { color: #c62828; background-color: #ffebee; }
     .performance-analysis-container { width: 100%; max-width: 800px; margin: 30px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .chart-container { width: 100%; max-width: 800px; margin: 30px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
     .performance-analysis-container h3 { text-align: center; margin-bottom: 20px; font-size: 1.5em; color: #3f51b5; }
@@ -274,8 +276,14 @@
   <div id="loginScreen" class="pre-exam-screen" style="display: flex;">
       <div class="login-card">
           <h2>Exam Portal Login</h2>
-          <div class="input-group"> <label for="userIdInput">User ID</label> <input type="text" id="userIdInput" value="UPSC2025"> </div>
-          <div class="input-group"> <label for="passwordLoginInput">Password</label> <input type="password" id="passwordLoginInput" value="UPSChub@123"> </div>
+          <div class="input-group">
+              <label for="emailInput">Email Address</label>
+              <input type="email" id="emailInput" placeholder="Enter your email" autocomplete="email">
+          </div>
+          <div class="input-group">
+              <label for="passwordInput">Password</label>
+              <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password">
+          </div>
           <button id="loginBtn" class="btn-primary">Login</button>
           <p id="loginError"></p>
       </div>
@@ -381,7 +389,10 @@
           <div id="resultScreenWrapper">
               <h2>Test Completed!</h2>
               <p>Here is your score summary:</p>
-              <p id="finalScore"></p> <div class="scorecard-details">
+              
+              <div id="syncStatus"></div>
+
+              <div class="scorecard-details">
                   <table class="scorecard-table">
                       <tbody>
                           <tr>
@@ -447,30 +458,128 @@
 
 <script>
 // ### CONFIGURATION ###
-const CORRECT_USER_ID = "UPSC2025";
-const CORRECT_PASSWORD = "UPSChub@123";
 const RETEST_PASSWORD = "UPSChub";
 const TEST_DURATION_SECONDS = 150 * 60;
 const PER_QUESTION_TIME = 15;
 
 // =====================================================================
-// ============ START: ADDED FIREBASE CONFIGURATION ====================
+// ============ START: FIREBASE CONFIGURATION ==========================
 // =====================================================================
 const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
-const appId = 'default-app-id'; // As defined in your dashboard code
+const appId = 'default-app-id';
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
+
+try {
+    db.enablePersistence()
+      .then(() => console.log("Firebase offline persistence enabled."))
+      .catch((err) => {
+          if (err.code == 'failed-precondition') {
+              console.warn("Persistence failed: multiple tabs open?");
+          } else if (err.code == 'unimplemented') {
+              console.warn("Persistence is not available in this browser.");
+          }
+      });
+} catch (e) {
+    console.error("Error enabling persistence:", e);
+}
 // =====================================================================
-// ============= END: ADDED FIREBASE CONFIGURATION =====================
+// ============= END: FIREBASE CONFIGURATION ===========================
 // =====================================================================
 
 const questions = [
-    // ------------------ Indian Polity - Parliament (Q1–Q100) ------------------
+    // Your 100 questions...
     {"topic": "Indian Polity - Parliament", "text": "Which part of the Constitution deals with the Parliament of India?", "options": ["Part IV", "Part V", "Part VI", "Part VII"], "answer": 1, "explanation": "Part V of the Constitution (Articles 79 to 122) deals with the Parliament."},
     {"topic": "Indian Polity - Parliament", "text": "Parliament consists of the President and how many Houses?", "options": ["One", "Two", "Three", "Four"], "answer": 1, "explanation": "Parliament consists of the President, the Rajya Sabha, and the Lok Sabha."},
     {"topic": "Indian Polity - Parliament", "text": "Which of the following is not a House of the Indian Parliament?", "options": ["Lok Sabha", "Rajya Sabha", "Legislative Assembly", "President"], "answer": 2, "explanation": "Legislative Assembly is a State legislature, not part of Parliament."},
     {"topic": "Indian Polity - Parliament", "text": "Who summons each House of Parliament?", "options": ["Prime Minister", "Speaker", "President", "Home Minister"], "answer": 2, "explanation": "The President summons each House of Parliament."},
-       {"topic": "Indian Polity - Parliament", "text": "The term 'budget' has been mentioned in:", "options": ["Constitution", "Finance Act", "Rules of Procedure", "Not mentioned"], "answer": 3, "explanation": "The term 'budget' is not used in the Constitution, which uses 'Annual Financial Statement'."},
+    {"topic": "Indian Polity - Parliament", "text": "The maximum strength of the Lok Sabha is:", "options": ["500", "545", "552", "560"], "answer": 2, "explanation": "The Constitution provides a maximum strength of 552 for Lok Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "Out of 552 Lok Sabha seats, how many are allotted to Union Territories?", "options": ["10", "20", "25", "30"], "answer": 1, "explanation": "20 seats are allotted to Union Territories in Lok Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "The representation of Anglo-Indians in the Lok Sabha was abolished by which amendment?", "options": ["101st Amendment", "102nd Amendment", "104th Amendment", "105th Amendment"], "answer": 2, "explanation": "The 104th Constitutional Amendment Act, 2019 abolished the Anglo-Indian representation."},
+    {"topic": "Indian Polity - Parliament", "text": "The maximum strength of Rajya Sabha is:", "options": ["200", "220", "238", "250"], "answer": 3, "explanation": "Rajya Sabha has a maximum strength of 250 members."},
+    {"topic": "Indian Polity - Parliament", "text": "Out of 250 members of Rajya Sabha, how many are nominated by the President?", "options": ["10", "12", "15", "20"], "answer": 1, "explanation": "12 members are nominated by the President for their expertise in fields of art, literature, science, and social service."},
+    {"topic": "Indian Polity - Parliament", "text": "Rajya Sabha represents:", "options": ["The people of India", "The States of India", "The Union Territories only", "The Anglo-Indian community"], "answer": 1, "explanation": "Rajya Sabha represents the States of India."},
+    {"topic": "Indian Polity - Parliament", "text": "Who decides questions regarding disqualification of members of Parliament under the Tenth Schedule?", "options": ["President", "Speaker/Chairman", "Supreme Court", "Election Commission"], "answer": 1, "explanation": "The Speaker (for Lok Sabha) and the Chairman (for Rajya Sabha) decide such cases."},
+    {"topic": "Indian Polity - Parliament", "text": "The quorum required to hold a sitting of Lok Sabha is:", "options": ["1/6th of total membership", "1/8th of total membership", "1/10th of total membership", "1/12th of total membership"], "answer": 2, "explanation": "One-tenth of the total membership is required for quorum."},
+    {"topic": "Indian Polity - Parliament", "text": "Money Bills can be introduced only in:", "options": ["Lok Sabha", "Rajya Sabha", "Both Houses", "Joint Sitting"], "answer": 0, "explanation": "Money Bills can only be introduced in Lok Sabha on the recommendation of the President."},
+    {"topic": "Indian Polity - Parliament", "text": "Joint sitting of Parliament is presided over by:", "options": ["President", "Vice President", "Speaker of Lok Sabha", "Prime Minister"], "answer": 2, "explanation": "The Speaker of Lok Sabha presides over a joint sitting of Parliament."},
+    {"topic": "Indian Polity - Parliament", "text": "Which of the following is not a Parliamentary Committee?", "options": ["Public Accounts Committee", "Estimates Committee", "Committee on Privileges", "Cabinet Committee on Security"], "answer": 3, "explanation": "Cabinet Committees are executive bodies, not Parliamentary Committees."},
+    {"topic": "Indian Polity - Parliament", "text": "The Speaker of Lok Sabha is elected by:", "options": ["Rajya Sabha", "Lok Sabha", "Both Houses of Parliament", "President"], "answer": 1, "explanation": "The Speaker is elected by the members of Lok Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article of the Constitution provides that the Vice President shall be ex-officio Chairman of the Rajya Sabha?", "options": ["Article 63", "Article 64", "Article 66", "Article 68"], "answer": 1, "explanation": "Article 64 provides that the Vice President shall be the ex-officio Chairman of the Rajya Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "Zero Hour in Parliament refers to:", "options": ["Time immediately after Question Hour", "Lunch break time", "Emergency session", "Time before adjournment"], "answer": 0, "explanation": "Zero Hour starts immediately after Question Hour and is an informal device."},
+    {"topic": "Indian Polity - Parliament", "text": "The maximum life of Lok Sabha is:", "options": ["4 years", "5 years", "6 years", "Indefinite"], "answer": 1, "explanation": "The normal term of Lok Sabha is 5 years, unless dissolved earlier."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion seeks to cut down expenditure on a particular item in the Demand for Grants?", "options": ["Adjournment Motion", "Censure Motion", "Cut Motion", "Privilege Motion"], "answer": 2, "explanation": "Cut Motions are used to reduce demands for grants."},
+    {"topic": "Indian Polity - Parliament", "text": "Who decides whether a Bill is a Money Bill or not?", "options": ["President", "Speaker of Lok Sabha", "Finance Minister", "Chairman of Rajya Sabha"], "answer": 1, "explanation": "The Speaker of the Lok Sabha has final authority to decide whether a Bill is a Money Bill."},
+    {"topic": "Indian Polity - Parliament", "text": "Which session of Parliament is addressed by the President?", "options": ["First session after general elections", "Budget session every year", "Monsoon session", "Winter session"], "answer": 0, "explanation": "The President addresses the first session of each year and the first session after general elections."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House of Parliament is a continuing chamber?", "options": ["Lok Sabha", "Rajya Sabha", "Both", "None"], "answer": 1, "explanation": "Rajya Sabha is a permanent body and is not subject to dissolution."},
+    {"topic": "Indian Polity - Parliament", "text": "Who can dissolve the Lok Sabha?", "options": ["President", "Prime Minister", "Speaker", "Rajya Sabha"], "answer": 0, "explanation": "The President has the power to dissolve the Lok Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "What is the minimum age to be elected as a Rajya Sabha member?", "options": ["25 years", "30 years", "35 years", "21 years"], "answer": 1, "explanation": "A person must be at least 30 years old to be elected to the Rajya Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "The Speaker of Lok Sabha submits resignation to:", "options": ["President", "Prime Minister", "Deputy Speaker", "Rajya Sabha Chairman"], "answer": 2, "explanation": "The Speaker resigns by writing to the Deputy Speaker."},
+    {"topic": "Indian Polity - Parliament", "text": "Which schedule of the Constitution contains provisions regarding disqualification of MPs on grounds of defection?", "options": ["Eighth Schedule", "Ninth Schedule", "Tenth Schedule", "Eleventh Schedule"], "answer": 2, "explanation": "The Tenth Schedule, added by the 52nd Amendment, deals with defection."},
+    {"topic": "Indian Polity - Parliament", "text": "The Rajya Sabha has equal powers with Lok Sabha in which matter?", "options": ["Money Bills", "No-confidence motion", "Amendment of Constitution", "Demand for Grants"], "answer": 2, "explanation": "Both Houses have equal power in constitutional amendment bills."},
+    {"topic": "Indian Polity - Parliament", "text": "Which device is used in Parliament to raise a discussion on a matter of urgent public importance?", "options": ["Adjournment Motion", "Calling Attention Motion", "Censure Motion", "Privilege Motion"], "answer": 1, "explanation": "Calling Attention Motion is used for urgent matters of public importance."},
+    {"topic": "Indian Polity - Parliament", "text": "Who presides over Rajya Sabha in absence of Chairman?", "options": ["President", "Deputy Chairman", "Prime Minister", "Speaker"], "answer": 1, "explanation": "The Deputy Chairman presides in the absence of the Vice President."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House cannot be dissolved?", "options": ["Lok Sabha", "Rajya Sabha", "Both", "None"], "answer": 1, "explanation": "Rajya Sabha is a permanent body and is not subject to dissolution."},
+    {"topic": "Indian Polity - Parliament", "text": "The maximum gap between two sessions of Parliament cannot be more than:", "options": ["3 months", "4 months", "6 months", "9 months"], "answer": 2, "explanation": "Six months is the maximum gap allowed between two sessions."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article gives the President the power to summon Parliament?", "options": ["Article 79", "Article 85", "Article 101", "Article 108"], "answer": 1, "explanation": "Article 85 empowers the President to summon and prorogue Parliament."},
+    {"topic": "Indian Polity - Parliament", "text": "Who decides on questions of disqualification of MPs under Articles 102?", "options": ["Election Commission", "President", "Supreme Court", "Speaker/Chairman"], "answer": 1, "explanation": "The President decides disqualification of MPs, consulting the Election Commission."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House has special powers over Money Bills?", "options": ["Lok Sabha", "Rajya Sabha", "Both", "None"], "answer": 0, "explanation": "Money Bills can only be introduced in and decided by Lok Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House initiates impeachment of the President?", "options": ["Lok Sabha", "Rajya Sabha", "Either House", "Supreme Court"], "answer": 2, "explanation": "Either House of Parliament can initiate impeachment proceedings against the President."},
+    {"topic": "Indian Polity - Parliament", "text": "Which of the following committees is a financial committee?", "options": ["Public Accounts Committee", "Committee on Privileges", "Rules Committee", "Business Advisory Committee"], "answer": 0, "explanation": "Public Accounts Committee is a financial committee."},
+    {"topic": "Indian Polity - Parliament", "text": "When was the Department Related Standing Committee system introduced?", "options": ["1987", "1990", "1993", "2000"], "answer": 2, "explanation": "Department Related Standing Committees were introduced in 1993."},
+    {"topic": "Indian Polity - Parliament", "text": "How many Department Related Standing Committees currently exist (after reorganization in 2004)?", "options": ["17", "20", "24", "30"], "answer": 2, "explanation": "There are currently 24 Department Related Standing Committees."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion is moved to remove a minister for lack of confidence?", "options": ["Privilege Motion", "Adjournment Motion", "Censure Motion", "Calling Attention Motion"], "answer": 2, "explanation": "Censure Motion is used to express lack of confidence in a minister or government."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House alone can introduce a no-confidence motion?", "options": ["Lok Sabha", "Rajya Sabha", "Both", "Either"], "answer": 0, "explanation": "Only Lok Sabha can introduce and pass a no-confidence motion."},
+    {"topic": "Indian Polity - Parliament", "text": "How is the Speaker of Lok Sabha removed?", "options": ["By resignation to President", "By resolution of Lok Sabha passed by majority", "By Supreme Court order", "By joint sitting"], "answer": 1, "explanation": "The Speaker can be removed by a resolution passed by a majority of Lok Sabha members."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House participates in election of Vice President?", "options": ["Lok Sabha only", "Rajya Sabha only", "Both Houses", "Neither House"], "answer": 2, "explanation": "Both Houses of Parliament participate in the Vice President’s election."},
+    {"topic": "Indian Polity - Parliament", "text": "In which House is the Question Hour conducted?", "options": ["Lok Sabha only", "Rajya Sabha only", "Both Houses", "Neither House"], "answer": 2, "explanation": "Question Hour is conducted in both Houses of Parliament."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article provides for joint sitting of Parliament?", "options": ["Article 107", "Article 108", "Article 110", "Article 111"], "answer": 1, "explanation": "Article 108 provides for joint sitting of Parliament."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Bill cannot be referred to a Joint Sitting?", "options": ["Money Bill", "Ordinary Bill", "Constitution Amendment Bill", "Both 1 and 3"], "answer": 3, "explanation": "Money Bills and Constitutional Amendment Bills cannot be referred to a joint sitting."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article deals with the privileges of Parliament?", "options": ["Article 105", "Article 106", "Article 107", "Article 108"], "answer": 0, "explanation": "Article 105 deals with the powers, privileges, and immunities of Parliament and its members."},
+    {"topic": "Indian Polity - Parliament", "text": "Parliamentary privileges are based on conventions of which country?", "options": ["USA", "UK", "Canada", "France"], "answer": 1, "explanation": "Parliamentary privileges in India are modeled on those of the British Parliament."},
+    {"topic": "Indian Polity - Parliament", "text": "Who has the final authority to make rules for the procedure of Parliament?", "options": ["President", "Prime Minister", "Each House of Parliament", "Cabinet"], "answer": 2, "explanation": "Each House of Parliament makes rules for its own procedure."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article provides that English shall continue to be used for Acts of Parliament?", "options": ["Article 343", "Article 344", "Article 348", "Article 351"], "answer": 2, "explanation": "Article 348 provides that English shall be used for Acts, Bills, and proceedings in Parliament."},
+    {"topic": "Indian Polity - Parliament", "text": "When a Bill is reserved by the President for reconsideration, Parliament must pass it again by:", "options": ["Simple majority", "Absolute majority", "Special majority", "Two-thirds present and voting"], "answer": 0, "explanation": "The Bill must be passed again by a simple majority."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion seeks to adjourn the business of the House for discussing a definite matter of urgent public importance?", "options": ["Censure Motion", "Privilege Motion", "Adjournment Motion", "Calling Attention Motion"], "answer": 2, "explanation": "Adjournment Motion is used for matters of urgent public importance."},
+    {"topic": "Indian Polity - Parliament", "text": "In Parliament, 'Point of Order' is raised to:", "options": ["Seek information", "Enforce House rules", "Adjourn the House", "Remove a Minister"], "answer": 1, "explanation": "Point of Order is raised to enforce rules of procedure in the House."},
+    {"topic": "Indian Polity - Parliament", "text": "Which of the following is not a financial committee?", "options": ["Estimates Committee", "Public Accounts Committee", "Committee on Public Undertakings", "Rules Committee"], "answer": 3, "explanation": "Rules Committee is not a financial committee."},
+    {"topic": "Indian Polity - Parliament", "text": "The tenure of members of the Estimates Committee is:", "options": ["1 year", "2 years", "5 years", "6 years"], "answer": 0, "explanation": "Members of the Estimates Committee are elected for one year."},
+    {"topic": "Indian Polity - Parliament", "text": "Public Accounts Committee examines:", "options": ["Estimates of expenditure", "Audit reports of CAG", "Government policies", "Budget allocations only"], "answer": 1, "explanation": "PAC examines CAG reports on government accounts."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House has greater control over executive?", "options": ["Lok Sabha", "Rajya Sabha", "Both equally", "Neither"], "answer": 0, "explanation": "Lok Sabha exercises direct control since the Council of Ministers is collectively responsible to it."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Bill requires prior recommendation of the President before introduction?", "options": ["Ordinary Bill", "Private Bill", "Money Bill", "All Finance Bills"], "answer": 3, "explanation": "Money Bills and certain Financial Bills need prior recommendation of the President."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House is called the House of the People?", "options": ["Rajya Sabha", "Lok Sabha", "Legislative Council", "None"], "answer": 1, "explanation": "Lok Sabha is called the House of the People as it directly represents citizens."},
+    {"topic": "Indian Polity - Parliament", "text": "How many types of majorities are used in the Indian Parliament?", "options": ["Two", "Three", "Four", "Five"], "answer": 2, "explanation": "Indian Parliament recognizes four types of majorities: simple, absolute, effective, and special."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House alone can initiate a motion of thanks to the President's address?", "options": ["Lok Sabha", "Rajya Sabha", "Both Houses", "Neither"], "answer": 2, "explanation": "Both Houses discuss and pass the motion of thanks."},
+    {"topic": "Indian Polity - Parliament", "text": "A Bill pending in Rajya Sabha but not passed before Lok Sabha is dissolved:", "options": ["Lapses", "Does not lapse", "Referred to President", "Converted to Ordinance"], "answer": 1, "explanation": "A Bill pending in Rajya Sabha does not lapse on dissolution of Lok Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion requires 50 members’ support to be admitted in Lok Sabha?", "options": ["Adjournment Motion", "Privilege Motion", "No-Confidence Motion", "Cut Motion"], "answer": 0, "explanation": "Adjournment Motion requires support of 50 members for admission."},
+    {"topic": "Indian Polity - Parliament", "text": "Which financial committee consists entirely of Lok Sabha members?", "options": ["PAC", "Estimates Committee", "Committee on Public Undertakings", "Rules Committee"], "answer": 1, "explanation": "The Estimates Committee has only Lok Sabha members."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House can initiate a Constitutional Amendment Bill?", "options": ["Lok Sabha", "Rajya Sabha", "Either House", "Only Lok Sabha with President’s consent"], "answer": 2, "explanation": "A Constitutional Amendment Bill can be introduced in either House."},
+    {"topic": "Indian Polity - Parliament", "text": "Who certifies a Bill as Money Bill?", "options": ["Prime Minister", "President", "Finance Minister", "Speaker of Lok Sabha"], "answer": 3, "explanation": "Only the Speaker of Lok Sabha certifies a Bill as a Money Bill."},
+    {"topic": "Indian Polity - Parliament", "text": "Which article deals with the voting in Parliament on demands for grants?", "options": ["Article 110", "Article 112", "Article 113", "Article 114"], "answer": 2, "explanation": "Article 113 deals with the voting on demands for grants."},
+    {"topic": "Indian Polity - Parliament", "text": "Which is the largest committee of Parliament?", "options": ["PAC", "Estimates Committee", "Petitions Committee", "Committee on Public Undertakings"], "answer": 1, "explanation": "The Estimates Committee is the largest with 30 members."},
+    {"topic": "Indian Polity - Parliament", "text": "Which session is also called the Budget Session?", "options": ["First session of the year", "Monsoon Session", "Winter Session", "Special Session"], "answer": 0, "explanation": "The first session every year is called the Budget Session."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House alone can move a Motion of No Confidence?", "options": ["Rajya Sabha", "Lok Sabha", "Both Houses", "Neither"], "answer": 1, "explanation": "Only Lok Sabha can move and pass a no-confidence motion."},
+    {"topic": "Indian Polity - Parliament", "text": "The power to decide whether a Bill is an ordinary Bill or not lies with:", "options": ["President", "Prime Minister", "Speaker of Lok Sabha", "Cabinet"], "answer": 2, "explanation": "The Speaker decides whether a Bill is an ordinary Bill or a Money Bill."},
+    {"topic": "Indian Polity - Parliament", "text": "In Parliament, who appoints the Leader of Opposition?", "options": ["President", "Speaker/Chairman", "Prime Minister", "Party leaders"], "answer": 1, "explanation": "The Speaker (Lok Sabha) and Chairman (Rajya Sabha) recognize the Leader of Opposition."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House alone can initiate a motion for removal of Vice President?", "options": ["Lok Sabha", "Rajya Sabha", "Both Houses", "Joint Sitting"], "answer": 1, "explanation": "Rajya Sabha initiates the process to remove Vice President."},
+    {"topic": "Indian Polity - Parliament", "text": "Who presides over joint sitting if the Speaker is absent?", "options": ["President", "Chairman of Rajya Sabha", "Deputy Speaker", "Prime Minister"], "answer": 2, "explanation": "In absence of Speaker, the Deputy Speaker presides over joint sitting."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion cannot be moved in Rajya Sabha?", "options": ["Censure Motion", "Calling Attention", "Discussion under Rule 267", "Motion of Thanks"], "answer": 0, "explanation": "No-confidence or censure motions cannot be moved in Rajya Sabha."},
+    {"topic": "Indian Polity - Parliament", "text": "The Speaker votes in Lok Sabha:", "options": ["Always", "Only to break a tie", "Never", "Only on Money Bills"], "answer": 1, "explanation": "The Speaker has a casting vote in case of a tie."},
+    {"topic": "Indian Polity - Parliament", "text": "Which of the following is an All-India Service?", "options": ["Indian Foreign Service", "Indian Police Service", "Indian Revenue Service", "Indian Trade Service"], "answer": 1, "explanation": "The Indian Police Service is an All-India Service along with IAS and IFoS."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion is used to seek information from Government in Parliament?", "options": ["Adjournment Motion", "Privilege Motion", "Calling Attention Motion", "Censure Motion"], "answer": 2, "explanation": "Calling Attention Motion allows MPs to seek information from the government."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article allows Parliament to create new All-India Services?", "options": ["Article 308", "Article 312", "Article 320", "Article 323"], "answer": 1, "explanation": "Article 312 empowers Parliament to create new All-India Services."},
+    {"topic": "Indian Polity - Parliament", "text": "The 'Rule of Lapse' applies to:", "options": ["Demand for Grants", "Cut Motions", "Appropriation Bill", "Finance Bill"], "answer": 0, "explanation": "Demands for Grants not passed by the end of financial year lapse."},
+    {"topic": "Indian Polity - Parliament", "text": "The Appropriation Bill is introduced to:", "options": ["Seek approval of budget", "Provide for withdrawal from Consolidated Fund", "Levy taxes", "Distribute grants to States"], "answer": 1, "explanation": "Appropriation Bill allows withdrawal of money from Consolidated Fund of India."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House has equal powers with respect to ordinary bills?", "options": ["Lok Sabha", "Rajya Sabha", "Both Houses", "Neither"], "answer": 2, "explanation": "Both Houses have equal power with respect to ordinary bills."},
+    {"topic": "Indian Polity - Parliament", "text": "The first hour of every sitting in Parliament is reserved for:", "options": ["Zero Hour", "Question Hour", "Adjournment Motion", "Budget Discussion"], "answer": 1, "explanation": "The first hour is devoted to Question Hour."},
+    {"topic": "Indian Polity - Parliament", "text": "Who has the power to prorogue either House of Parliament?", "options": ["Prime Minister", "Speaker", "President", "Vice President"], "answer": 2, "explanation": "The President has the power to prorogue either House."},
+    {"topic": "Indian Polity - Parliament", "text": "Which committee examines money spent by public sector undertakings?", "options": ["PAC", "Estimates Committee", "Committee on Public Undertakings", "Petitions Committee"], "answer": 2, "explanation": "Committee on Public Undertakings examines reports and accounts of PSUs."},
+    {"topic": "Indian Polity - Parliament", "text": "Which House can make laws on State List during national emergency?", "options": ["Lok Sabha", "Rajya Sabha", "Both", "Neither"], "answer": 2, "explanation": "During national emergency, Parliament (both Houses) can legislate on State subjects."},
+    {"topic": "Indian Polity - Parliament", "text": "Which motion is used to discuss policy of Government as a whole?", "options": ["Censure Motion", "Privilege Motion", "No-Confidence Motion", "Adjournment Motion"], "answer": 0, "explanation": "Censure Motion is used to criticize policies of the Government."},
+    {"topic": "Indian Polity - Parliament", "text": "The Rajya Sabha represents:", "options": ["States and UTs", "Only States", "Only People of India", "Only UTs"], "answer": 0, "explanation": "Rajya Sabha represents the States and Union Territories of India."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article gives Parliament residuary powers?", "options": ["Article 245", "Article 246", "Article 248", "Article 249"], "answer": 2, "explanation": "Article 248 gives Parliament residuary powers of legislation."},
+    {"topic": "Indian Polity - Parliament", "text": "Which Article provides for the Budget or Annual Financial Statement?", "options": ["Article 110", "Article 111", "Article 112", "Article 113"], "answer": 2, "explanation": "Article 112 mandates the President to present the Annual Financial Statement (Budget)."},
+    {"topic": "Indian Polity - Parliament", "text": "The term 'budget' has been mentioned in:", "options": ["Constitution", "Finance Act", "Rules of Procedure", "Not mentioned"], "answer": 3, "explanation": "The term 'budget' is not used in the Constitution, which uses 'Annual Financial Statement'."},
     {"topic": "Indian Polity - Parliament", "text": "Which of the following is a Parliamentary device to criticize government policy?", "options": ["Question Hour", "Zero Hour", "Censure Motion", "Calling Attention Motion"], "answer": 2, "explanation": "Censure Motion is used to criticize the Government’s policies."}
 ];
 
@@ -482,13 +591,14 @@ let isTestCompleted = false;
 let performanceChart = null;
 let stopwatchTime = 0;
 let isStopwatchRunning = false;
+let currentUser = null; // To hold the logged-in user object
 
 const dom = {
     body: document.body,
     loginScreen: document.getElementById('loginScreen'),
     loginBtn: document.getElementById('loginBtn'),
-    userIdInput: document.getElementById('userIdInput'),
-    passwordLoginInput: document.getElementById('passwordLoginInput'),
+    emailInput: document.getElementById('emailInput'), // Changed from userIdInput
+    passwordInput: document.getElementById('passwordInput'), // Changed from passwordLoginInput
     loginError: document.getElementById('loginError'),
     instructionsScreen: document.getElementById('instructionsScreen'),
     startExamBtn: document.getElementById('startExamBtn'),
@@ -548,19 +658,34 @@ const dom = {
     unattemptedCount: document.getElementById('unattemptedCount'),
     finalScoreAnimated: document.getElementById('finalScoreAnimated'),
     totalPossibleScore: document.getElementById('totalPossibleScore'),
+    syncStatus: document.getElementById('syncStatus'),
 };
 
 // ### STAGE 1 & 2: PRE-EXAM LOGIC ###
 function handleLogin() {
-    if (dom.userIdInput.value === CORRECT_USER_ID && dom.passwordLoginInput.value === CORRECT_PASSWORD) {
-        window.addEventListener('online', validateStartConditions);
-        window.addEventListener('offline', validateStartConditions);
-        validateStartConditions(); 
-        dom.loginScreen.style.display = 'none';
-        dom.instructionsScreen.style.display = 'flex';
-    } else {
-        dom.loginError.textContent = 'Invalid User ID or Password.';
-    }
+    const email = dom.emailInput.value;
+    const password = dom.passwordInput.value;
+    dom.loginError.textContent = '';
+    dom.loginBtn.disabled = true;
+    dom.loginBtn.textContent = 'Logging in...';
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            currentUser = userCredential.user; // Store the authenticated user
+            console.log("Login successful for:", currentUser.email);
+            window.addEventListener('online', validateStartConditions);
+            window.addEventListener('offline', validateStartConditions);
+            validateStartConditions(); 
+            dom.loginScreen.style.display = 'none';
+            dom.instructionsScreen.style.display = 'flex';
+        })
+        .catch((error) => {
+            dom.loginError.textContent = error.message;
+        })
+        .finally(() => {
+            dom.loginBtn.disabled = false;
+            dom.loginBtn.textContent = 'Login';
+        });
 }
 function validateStartConditions() {
     const isOffline = !navigator.onLine;
@@ -597,40 +722,43 @@ function forceSubmitOnReconnect() {
     }
 }
 
-// ===================================================================================
-// ============ START: NEW FUNCTION TO SAVE RESULTS TO FIRESTORE =====================
-// ===================================================================================
 async function saveResultToFirestore(scoreData) {
-    const userId = dom.userIdInput.value;
-    if (!userId) {
-        console.error("User ID is not available. Cannot save result.");
+    const syncStatusEl = dom.syncStatus;
+    if (!currentUser) {
+        console.error("User is not logged in. Cannot save result.");
+        syncStatusEl.textContent = 'Error: User not logged in.';
+        syncStatusEl.className = 'error';
         return;
     }
+    const userId = currentUser.uid;
+
+    syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
+    syncStatusEl.className = 'syncing';
+
     const attemptedCount = scoreData.correctCount + scoreData.incorrectCount;
     const accuracy = attemptedCount > 0 ? (scoreData.correctCount / attemptedCount) * 100 : 0;
+    
     const resultsCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testResults");
+    
     try {
         await resultsCollectionRef.add({
             testName: "Polity Mock: Parliament",
             subject: "Polity",
             score: scoreData.totalScore,
-            totalMarks: scoreData.totalQuestions,
-            accuracy: parseFloat(accuracy.toFixed(2)),
-            questionsCorrect: scoreData.correctCount,
+            correctAnswers: scoreData.correctCount,
             totalQuestions: scoreData.totalQuestions,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
         });
-        console.log("Test result saved to Firestore successfully!");
-        alert("Your result has been saved to your online dashboard!");
+        
+        console.log("Write to Firestore initiated. Will sync when online.");
+        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. Syncing to your dashboard.`;
+        syncStatusEl.className = 'synced';
     } catch (error) {
-        console.error("Error saving result to Firestore: ", error);
-        alert("Could not save your result online. Please check your connection.");
+        console.error("Error writing to Firestore cache: ", error);
+        syncStatusEl.textContent = 'Error saving result locally.';
+        syncStatusEl.className = 'error';
     }
 }
-// ===================================================================================
-// ============= END: NEW FUNCTION TO SAVE RESULTS TO FIRESTORE ======================
-// ===================================================================================
-
 
 // ### STAGE 3: MAIN TEST LOGIC ###
 function initTest() {
@@ -732,10 +860,7 @@ function submitTest(isForced = false) {
     dom.showAnswerWritingTab.classList.remove('locked');
     const scoreBreakdown = calculateScoreBreakdown();
     const topicStats = calculateTopicStats();
-
-    // --- MODIFICATION: Call the save function when the test is submitted ---
     saveResultToFirestore(scoreBreakdown);
-
     localStorage.setItem('testTaken', 'true');
     localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
     localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
