@@ -22,27 +22,47 @@
         </div>
     </header>
 
-    <main class="container mx-auto p-4 sm:p-6">
+    <main id="main-content" class="container mx-auto p-4 sm:p-6 hidden">
         <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Chapter-wise Test Series</h1>
-
         <div id="test-list-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div class="p-6 bg-white dark:bg-slate-800 rounded-xl shadow-md text-center text-slate-500">
                 <p>Loading tests...</p>
             </div>
         </div>
     </main>
+    
+    <div id="loader" class="flex justify-center items-center h-screen">
+        <p class="text-slate-500">Checking authentication...</p>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const mainContent = document.getElementById('main-content');
+        const loader = document.getElementById('loader');
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // User is signed in, show the test list
+                loader.style.display = 'none';
+                mainContent.classList.remove('hidden');
+                loadAndDisplayTests();
+            } else {
+                // User is not signed in, redirect to login page
+                window.location.href = 'auth.html';
+            }
+        });
 
         async function loadAndDisplayTests() {
             const container = document.getElementById('test-list-container');
-            container.innerHTML = ''; // Clear loading message
+            container.innerHTML = ''; 
 
             try {
                 const querySnapshot = await getDocs(collection(db, "quizzes"));
@@ -71,11 +91,9 @@
                 });
             } catch (error) {
                 console.error("Error fetching tests: ", error);
-                container.innerHTML = '<p class="text-red-500 col-span-full text-center">Failed to load tests. Please try again later.</p>';
+                container.innerHTML = '<p class="text-red-500 col-span-full text-center">Failed to load tests. Please check your security rules.</p>';
             }
         }
-
-        loadAndDisplayTests();
     </script>
 </body>
 </html>
