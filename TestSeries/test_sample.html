@@ -672,10 +672,14 @@ async function loadTestFromURL() {
     }
 }
   
+// =====================================================================
+// ============ START: STREAK AND RESULT SAVING LOGIC ==================
+// =====================================================================
+
 async function saveResultToFirestore(scoreData) {
     const syncStatusEl = dom.syncStatus;
     if (!currentUser) {
-        console.error("User is not logged in. Cannot save result.");
+        console.error("User not logged in. Cannot save result.");
         syncStatusEl.textContent = 'Error: User not logged in.';
         syncStatusEl.className = 'error';
         return;
@@ -685,40 +689,112 @@ async function saveResultToFirestore(scoreData) {
     syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
     syncStatusEl.className = 'syncing';
 
-    const attemptedCount = scoreData.correctCount + scoreData.incorrectCount;
-    const accuracy = attemptedCount > 0 ? (scoreData.correctCount / attemptedCount) * 100 : 0;
-    
     const resultsCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testResults");
     
     try {
-      await resultsCollectionRef.add({
-    testId: new URLSearchParams(window.location.search).get('testId'),
-    testName: testMetadata.testName,
-    subject: testMetadata.subject,
-    score: scoreData.totalScore,
-    correctAnswers: scoreData.correctCount,
-    totalQuestions: scoreData.totalQuestions,
-    userAnswers: state.answers, // <-- ADD THIS LINE
-    dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
-});
+        // Save the test result
+        await resultsCollectionRef.add({
+            testId: new URLSearchParams(window.location.search).get('testId'),
+            testName: testMetadata.testName,
+            subject: testMetadata.subject,
+            score: scoreData.totalScore,
+            correctAnswers: scoreData.correctCount,
+            totalQuestions: scoreData.totalQuestions,
+            userAnswers: state.answers,
+            dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
+        });
         
-        console.log("Write to Firestore initiated. Will sync when online.");
+        console.log("Result write to Firestore initiated.");
         syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. Syncing to your dashboard.`;
         syncStatusEl.className = 'synced';
+        
+        // After successfully saving, log the activity and update the streak
+        await logTestActivityAndUpdateStreak(userId);
+
     } catch (error) {
-        console.error("Error writing to Firestore cache: ", error);
+        console.error("Error writing result to Firestore cache: ", error);
         syncStatusEl.textContent = 'Error saving result locally.';
         syncStatusEl.className = 'error';
     }
 }
 
+async function logTestActivityAndUpdateStreak(userId) {
+    const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(userId);
+    const todayStr = new Date().toISOString().split('T')[0];
 
+    try {
+        const docSnap = await userDocRef.get();
+        if (!docSnap.exists()) return;
 
+        const userData = docSnap.data();
+        const activities = userData.activity || {};
+        const dayActivities = activities[todayStr] || [];
 
+        // Add this test to today's activity log
+        dayActivities.push({
+            type: 'TEST',
+            testName: testMetadata.testName,
+            time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+        });
+        activities[todayStr] = dayActivities;
+        
+        // Update the activity log in Firestore
+        await userDocRef.set({ activity: activities }, { merge: true });
+        
+        console.log("Test activity logged. Now updating streak.");
+        // Now call the streak logic
+        await updateStreakAfterTest(userId);
 
+    } catch (error) {
+        console.error("Error logging test activity:", error);
+    }
+}
 
+async function updateStreakAfterTest(userId) {
+    if (!userId) return;
 
-  
+    const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(userId);
+    
+    try {
+        // We need to get the most up-to-date data, including the activity we just logged
+        const docSnap = await userDocRef.get();
+        if (!docSnap.exists()) return;
+
+        const userData = docSnap.data();
+        const streakData = userData.streak || { current: 0, highest: 0, lastUpdatedDate: null };
+        const activityData = userData.activity || {};
+
+        const today = new Date();
+        const todayStr = today.toISOString().split('T')[0];
+        const yesterday = new Date(today);
+        yesterday.setDate(today.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        
+        const todaysActivities = activityData[todayStr] || [];
+        const testsTodayCount = todaysActivities.filter(item => item.type === 'TEST').length;
+
+        // Condition: Must complete at least 2 tests AND streak must not have been updated today yet
+        if (testsTodayCount >= 2 && streakData.lastUpdatedDate !== todayStr) {
+            let newCurrentStreak = (streakData.lastUpdatedDate === yesterdayStr) ? (streakData.current || 0) + 1 : 1;
+            const newHighestStreak = Math.max(streakData.highest || 0, newCurrentStreak);
+
+            await userDocRef.update({
+                'streak.current': newCurrentStreak,
+                'streak.highest': newHighestStreak,
+                'streak.lastUpdatedDate': todayStr
+            });
+            console.log(`Streak updated to ${newCurrentStreak} days!`);
+        } else {
+             console.log(`Streak condition not met. Tests today: ${testsTodayCount}, Last update: ${streakData.lastUpdatedDate}`);
+        }
+    } catch (error) {
+        console.error("Error updating streak:", error);
+    }
+}
+
+// =====================================================================
+// ============== END: STREAK AND RESULT SAVING LOGIC ==================
+// =====================================================================
 
 
 async function loadAndReviewTest(testId, resultId) {
