@@ -411,7 +411,14 @@
         </div>
     </div>
 
-
+// FIX: A helper function to get the date in YYYY-MM-DD format in the LOCAL timezone
+    const getLocalDateString = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+    
 <script type="module">
     // --- FIREBASE IMPORTS ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -501,10 +508,13 @@
     const closeCongratsModalBtn = document.getElementById('close-congrats-modal');
     const congratsConfettiContainer = document.getElementById('congrats-confetti-container');
     
-    let selectedDateStr = new Date().toISOString().split('T')[0];
-    let performanceChartInstance = null;
+let performanceChartInstance = null;
     let timeUpdateInterval = null;
-    let currentDayString = new Date().toISOString().split('T')[0];
+    
+    // FIX: Initialize all date variables using the local date helper
+    let currentDayString = getLocalDateString(new Date());
+    let selectedDateStr = currentDayString;
+    let currentDate = new Date();
 
     // --- HELPER FUNCTION ---
     function showAlert(message) { alertMessage.textContent = message; alertModal.classList.remove('hidden'); }
@@ -586,18 +596,47 @@ function updateTimeAndGreeting() {
         const now = new Date();
         const hour = now.getHours();
         
-        // --- FIX: Check if the day has changed ---
-   // ... inside updateTimeAndGreeting()
-const newDayString = now.toISOString().split('T')[0];
-if (newDayString !== currentDayString) {
-    console.log("Day has changed! Updating dashboard for new day.");
-    currentDayString = newDayString;        
-    selectedDateStr = newDayString;         
-    currentDate = new Date();               
-    updateDashboardActivity(selectedDateStr); 
-    renderCalendar(); // <-- ADD THIS LINE TO REDRAW THE CALENDAR
-}
-// ...
+        // --- FIX: Use local date string for checking day change ---
+        const newDayString = getLocalDateString(now);
+        if (newDayString !== currentDayString) {
+            console.log("Day has changed! Updating dashboard for new day.");
+            currentDayString = newDayString;        
+            selectedDateStr = newDayString;         
+            currentDate = new Date();               
+            updateDashboardActivity(selectedDateStr); 
+            // Only redraw the calendar if the modal is currently open
+            if (!calendarModal.classList.contains('hidden')) {
+                renderCalendar();                       
+            }
+        }
+        // --- END FIX ---
+
+        const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
+        let greetingText, backgroundImageUrl;
+
+        if (hour >= 5 && hour < 12) {
+            greetingText = `Good Morning, ${name}!`;
+            backgroundImageUrl = morningImage;
+        } else if (hour >= 12 && hour < 18) {
+            greetingText = `Good Afternoon, ${name}!`;
+            backgroundImageUrl = afternoonImage;
+        } else {
+            greetingText = `Good Evening, ${name}!`;
+            backgroundImageUrl = eveningImage;
+        }
+
+        welcomeHeading.textContent = greetingText;
+        welcomeBanner.style.backgroundImage = `url('${backgroundImageUrl}')`;
+
+        timeDisplay.textContent = now.toLocaleTimeString('en-US');
+        dateDisplay.textContent = now.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+    
         // --- END FIX ---
 
         const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
