@@ -587,14 +587,17 @@ function updateTimeAndGreeting() {
         const hour = now.getHours();
         
         // --- FIX: Check if the day has changed ---
-        const newDayString = now.toISOString().split('T')[0];
-        if (newDayString !== currentDayString) {
-            console.log("Day has changed! Updating dashboard for new day.");
-            currentDayString = newDayString;        // Update the current day tracker
-            selectedDateStr = newDayString;         // Set the selected date to the new day
-            currentDate = new Date();               // <-- FIX ADDED HERE: This updates the calendar's date object
-            updateDashboardActivity(selectedDateStr); // Refresh the schedule panel
-        }
+   // ... inside updateTimeAndGreeting()
+const newDayString = now.toISOString().split('T')[0];
+if (newDayString !== currentDayString) {
+    console.log("Day has changed! Updating dashboard for new day.");
+    currentDayString = newDayString;        
+    selectedDateStr = newDayString;         
+    currentDate = new Date();               
+    updateDashboardActivity(selectedDateStr); 
+    renderCalendar(); // <-- ADD THIS LINE TO REDRAW THE CALENDAR
+}
+// ...
         // --- END FIX ---
 
         const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
