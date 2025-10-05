@@ -78,7 +78,7 @@
                                         <span class="text-sm font-medium">Dark Mode</span>
                                         <div class="relative inline-block w-10 align-middle select-none">
                                             <input type="checkbox" id="dropdown-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
-                                            <label for="dropdown-theme-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
+                                            <label for="dropdown-theme-toggle" class="toggle-label block overflow:hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
                                         </div>
                                     </div>
                                 </div>
@@ -135,9 +135,7 @@
                                 </div>
                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
                                     <h3 class="text-lg font-bold mb-4">Performance Overview</h3>
-                                    <div>
-                                        <canvas id="performanceChart"></canvas>
-                                    </div>
+                                    <div><canvas id="performanceChart"></canvas></div>
                                 </div>
                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
                                     <h3 class="text-lg font-bold mb-4">Recent Test Results</h3>
@@ -461,16 +459,9 @@
         }
     }
     
-    // --- FULL SCRIPT OF ALL OTHER FUNCTIONS AND EVENT LISTENERS ---
-    // The rest of the script is included here without any omissions.
-    
     function handleSidebarState() { if (window.innerWidth >= 768) mainContent.classList.add('md:ml-64'); else mainContent.classList.remove('md:ml-64'); }
     function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); sidebarBackdrop.classList.toggle('hidden', sidebar.classList.contains('-translate-x-full')); }
-    if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); }
-    handleSidebarState();
-    sidebarToggle.addEventListener('click', toggleSidebar);
-    sidebarBackdrop.addEventListener('click', toggleSidebar);
-    window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); sidebarBackdrop.classList.add('hidden'); } else { sidebar.classList.add('-translate-x-full'); } handleSidebarState(); });
+
     onAuthStateChanged(auth, user => {
         if (user) {
             appView.classList.remove('hidden');
@@ -496,6 +487,12 @@
             });
         } else { window.location.href = 'TestSeries/auth.html'; }
     });
+    
+    if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); }
+    handleSidebarState();
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarBackdrop.addEventListener('click', toggleSidebar);
+    window.addEventListener('resize', () => { if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); sidebarBackdrop.classList.add('hidden'); } else { sidebar.classList.add('-translate-x-full'); } handleSidebarState(); });
     accountBtn.addEventListener('click', () => accountDropdown.classList.toggle('hidden'));
     document.addEventListener('click', (e) => { if (!accountBtn.parentElement.contains(e.target)) { accountDropdown.classList.add('hidden'); }});
     dropdownProfileBtn.addEventListener('click', (e) => { e.preventDefault(); showView('settings'); accountDropdown.classList.add('hidden'); document.getElementById('display-name').value = displayNameSettings.textContent === 'UPSC Aspirant' ? '' : displayNameSettings.textContent; profileModal.classList.remove('hidden'); });
@@ -537,6 +534,11 @@
     navButtons.notifications.addEventListener('click', (e) => { e.preventDefault(); showView('notifications'); });
     navButtons.settings.addEventListener('click', (e) => { e.preventDefault(); showView('settings'); });
     showView('home');
+    function applyTheme(theme) { document.documentElement.classList.toggle('dark', theme === 'dark'); dropdownThemeToggle.checked = theme === 'dark'; if (performanceChartInstance) { const isDark = theme === 'dark'; const tickColor = isDark ? '#94a3b8' : '#64748b'; const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'; performanceChartInstance.options.scales.y.ticks.color = tickColor; performanceChartInstance.options.scales.x.ticks.color = tickColor; performanceChartInstance.options.scales.y.grid.color = gridColor; performanceChartInstance.options.scales.x.grid.color = gridColor; performanceChartInstance.update(); } }
+    function toggleTheme() { const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
+    dropdownThemeToggle.addEventListener('change', toggleTheme);
+    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
     addTaskBtn.addEventListener('click', () => { addTaskForm.reset(); addTaskModal.classList.remove('hidden'); });
     cancelAddTaskBtn.addEventListener('click', () => addTaskModal.classList.add('hidden'));
     addTaskForm.addEventListener('submit', async (e) => { e.preventDefault(); const user = auth.currentUser; if (!user) return; const newTask = { id: 'task_' + Date.now(), title: document.getElementById('task-title').value, type: document.getElementById('task-type').value, startTime: document.getElementById('task-start-time').value, endTime: document.getElementById('task-end-time').value, status: 'PENDING' }; const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); try { const docSnap = await getDoc(userDocRef); const { activity = {} } = docSnap.exists() ? docSnap.data() : {}; const dayActivities = activity[selectedDateStr] || []; dayActivities.push(newTask); activity[selectedDateStr] = dayActivities; await setDoc(userDocRef, { activity }, { merge: true }); addTaskModal.classList.add('hidden'); } catch (error) { showAlert("Failed to add the task."); } });
