@@ -550,25 +550,21 @@
  * Checks Firestore for new notifications and displays the latest one as a pop-up.
  * It compares the notification timestamps with the user's 'lastSeenNotificationTimestamp'.
  */
+// REPLACE your old function with this new temporary test version
 async function checkAndDisplayNotifications(user) {
     if (!user) return;
 
-    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
-    const userDoc = await getDoc(userDocRef);
-    const userData = userDoc.exists() ? userDoc.data() : {};
-    const lastSeenTimestamp = userData.lastSeenNotificationTimestamp || null;
+    console.log("Running a direct test to fetch ANY notification...");
 
-    // Query for notifications newer than the last one the user has seen
+    // TEMPORARY TEST: We will just try to get the very first notification we can find
     const notificationsRef = collection(db, 'notifications');
-    const q = lastSeenTimestamp 
-        ? query(notificationsRef, where("timestamp", ">", lastSeenTimestamp), orderBy("timestamp", "desc"), limit(1))
-        : query(notificationsRef, orderBy("timestamp", "desc"), limit(1));
+    const q = query(notificationsRef, limit(1)); // This is the simplified query
     
     const querySnapshot = await getDocs(q);
 
     if (!querySnapshot.empty) {
+        console.log("SUCCESS: Found a notification!");
         const latestNotification = querySnapshot.docs[0].data();
-        const latestTimestamp = latestNotification.timestamp;
 
         // Display the pop-up
         const flash = document.getElementById('flash-notification');
@@ -583,6 +579,18 @@ async function checkAndDisplayNotifications(user) {
             actionBtn.classList.add('hidden');
         }
 
+        flash.classList.remove('hidden');
+        setTimeout(() => {
+            flash.querySelector('.transform').classList.remove('translate-y-8', 'opacity-0');
+        }, 100);
+
+        // NOTE: We are NOT updating the user's timestamp in this test version.
+
+    } else {
+        console.error("FAILURE: Still could not find any notifications. Check collection name.");
+        showAlert("Test failed: Could not find any documents in the 'notifications' collection. Please check the collection name in your Firebase console.");
+    }
+}
         flash.classList.remove('hidden');
         setTimeout(() => {
             flash.querySelector('.transform').classList.remove('translate-y-8', 'opacity-0');
