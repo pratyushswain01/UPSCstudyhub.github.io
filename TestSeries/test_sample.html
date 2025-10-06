@@ -1070,6 +1070,56 @@ function updateSidebarPosition() {
     dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
 }
 
+
+// ==========================================================
+// ADD THIS ENTIRE NEW FUNCTION
+// ==========================================================
+async function resumeResultSession() {
+    console.log("Resuming result session...");
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get('testId');
+
+    if (!testId) {
+        console.error("Cannot resume session without a testId in the URL.");
+        return;
+    }
+
+    try {
+        // Fetch the test data in the background
+        const testDocRef = db.collection('quizzes').doc(testId);
+        const testDoc = await testDocRef.get();
+        if (testDoc.exists) {
+            testMetadata = testDoc.data();
+        }
+
+        const questionsSnapshot = await testDocRef.collection('questions').get();
+        questions = questionsSnapshot.docs.map(doc => doc.data());
+        console.log(`Successfully re-loaded ${questions.length} questions for review.`);
+
+        // Now that questions are loaded, show the result screen from localStorage
+        isTestCompleted = true;
+        dom.showAnswerWritingTab.classList.remove('locked');
+        dom.loginScreen.style.display = 'none';
+        dom.instructionsScreen.style.display = 'none';
+        dom.examUIWrapper.style.display = 'flex';
+        dom.body.classList.add('exam-active');
+        updateSidebarPosition();
+        
+        const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        showResultScreen(breakdown, topicStats);
+
+    } catch (error) {
+        console.error("Failed to resume and load test data:", error);
+        dom.resultScreenWrapper.innerHTML = `<p>Error: Could not load question data for review. ${error.message}</p>`;
+    }
+}
+// ==========================================================
+// END OF NEW FUNCTION
+// ==========================================================
+
+
+  
 // ### STAGE 4: RESULT & REVIEW FUNCTIONS ###
 function showResultScreen(breakdown, topicStats) {
     dom.mockTestWrapper.style.display = 'none';
@@ -1226,18 +1276,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // MODE 1: Review Mode (Clicked "View Analysis" from dashboard)
         loadAndReviewTest(testId, resultId);
 
-    } else if (localStorage.getItem('testTaken') === 'true') {
-        // MODE 2: Resume Result Mode (Refreshed the result page)
-        isTestCompleted = true;
-        dom.showAnswerWritingTab.classList.remove('locked');
-        dom.loginScreen.style.display = 'none';
-        dom.instructionsScreen.style.display = 'none';
-        dom.examUIWrapper.style.display = 'flex';
-        dom.body.classList.add('exam-active');
-        updateSidebarPosition();
-        const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
-        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
-        showResultScreen(breakdown, topicStats);
+    // REPLACE THE DELETED BLOCK WITH THIS
+else if (localStorage.getItem('testTaken') === 'true') {
+        // MODE 2: Resume Result Mode (Refreshed the result page)
+        resumeResultSession(); // This now handles everything
+}
 
     } else {
         // MODE 3: New Test Mode (Clicked a test from the series page)
