@@ -943,6 +943,8 @@ function submitTest(isForced = false) {
     dom.showAnswerWritingTab.classList.remove('locked');
     const scoreBreakdown = calculateScoreBreakdown();
     const topicStats = calculateTopicStats();
+    const chapterPerformance = calculateChapterPerformance();
+    updateChapterAccuracyInFirestore(chapterPerformance);
     saveResultToFirestore(scoreBreakdown);
     localStorage.setItem('testTaken', 'true');
     localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
@@ -966,6 +968,101 @@ function calculateScoreBreakdown() {
         correctMarks: correctCount * 1, incorrectMarks: incorrectCount * -1,
     };
 }
+
+
+  /**
+ * Calculates the number of correct and total attempted questions for each chapter/topic.
+ * @returns {Object} An object with chapter names as keys. 
+ * e.g., {"Preamble": {correct: 3, total: 5}, "Fundamental Rights": {correct: 8, total: 10}}
+ */
+function calculateChapterPerformance() {
+    const chapterStats = {};
+
+    questions.forEach((q, index) => {
+        const chapter = q.topic; // 'topic' from your Firestore question data acts as the chapter name
+        const userAnswer = state.answers[index];
+
+        // Only count attempted questions
+        if (userAnswer !== null) {
+            // Initialize the chapter if it's the first time we see it
+            if (!chapterStats[chapter]) {
+                chapterStats[chapter] = { correct: 0, total: 0 };
+            }
+
+            // Increment the total questions attempted for this chapter
+            chapterStats[chapter].total++;
+
+            // Check if the answer was correct and increment if so
+            if (userAnswer === q.answer) {
+                chapterStats[chapter].correct++;
+            }
+        }
+    });
+    return chapterStats;
+}
+
+
+
+  /**
+ * Reads, updates, and saves the user's chapter-wise accuracy in Firestore.
+ * This function safely merges new test results with the user's existing performance data.
+ * @param {Object} newChapterStats - The performance data calculated from the current test.
+ */
+async function updateChapterAccuracyInFirestore(newChapterStats) {
+    if (!currentUser || Object.keys(newChapterStats).length === 0) {
+        console.log("User not logged in or no new stats to update. Skipping accuracy update.");
+        return;
+    }
+
+    const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid);
+    const subject = testMetadata.subject; // e.g., "Indian Polity"
+
+    try {
+        await db.runTransaction(async (transaction) => {
+            const userDoc = await transaction.get(userDocRef);
+            
+            // Get the existing accuracy data, or create a new object if it doesn't exist
+            const existingData = userDoc.exists() ? userDoc.data().chapterAccuracy || {} : {};
+
+            // For each chapter in the test we just finished...
+            for (const chapterName in newChapterStats) {
+                const newStats = newChapterStats[chapterName]; // {correct: 3, total: 5}
+
+                // Get old performance for this specific chapter, or default to 0
+                const oldPerformance = existingData[subject]?.[chapterName] || { correct: 0, total: 0 };
+                
+                // Combine old and new results
+                const combinedCorrect = (oldPerformance.correct || 0) + newStats.correct;
+                const combinedTotal = (oldPerformance.total || 0) + newStats.total;
+
+                // Calculate the new overall accuracy percentage for this chapter
+                const newAccuracy = combinedTotal > 0 ? Math.round((combinedCorrect / combinedTotal) * 100) : 0;
+                
+                // Prepare the data to be saved back to Firestore
+                if (!existingData[subject]) {
+                    existingData[subject] = {};
+                }
+                existingData[subject][chapterName] = {
+                    correct: combinedCorrect,
+                    total: combinedTotal,
+                    accuracy: newAccuracy // We will save the accuracy directly
+                };
+            }
+
+            // Save the entire updated object back to Firestore
+            transaction.set(userDocRef, { chapterAccuracy: existingData }, { merge: true });
+        });
+
+        console.log("Chapter accuracy successfully updated in Firestore!");
+
+    } catch (error) {
+        console.error("Error updating chapter accuracy in transaction:", error);
+    }
+}
+
+
+
+  
 function updatePalette() {
     dom.questionPalette.innerHTML = '';
     let answered = 0, notAnswered = 0, marked = 0, notVisited = 0;
