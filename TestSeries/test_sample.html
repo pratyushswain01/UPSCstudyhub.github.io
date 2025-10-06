@@ -1260,39 +1260,16 @@ function handleRetest() {
 
 // ### MASTER EVENT LISTENERS SETUP ###
 document.addEventListener('DOMContentLoaded', () => {
-    // --- 1. Initial Setup (Theme, etc.) ---
+    // --- Universal Setup: Set up listeners that are always active ---
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme === 'dark') {
         dom.darkModeToggle.checked = true;
         toggleDarkMode(true);
     }
-
-    // --- 2. Determine Page Mode (Review, Resume, or New Test) ---
-    const params = new URLSearchParams(window.location.search);
-    const testId = params.get('testId');
-    const resultId = params.get('resultId');
-
-    if (resultId && testId) {
-        // MODE 1: Review Mode (Clicked "View Analysis" from dashboard)
-        loadAndReviewTest(testId, resultId);
-
-    // REPLACE THE DELETED BLOCK WITH THIS
-else if (localStorage.getItem('testTaken') === 'true') {
-        // MODE 2: Resume Result Mode (Refreshed the result page)
-        resumeResultSession(); // This now handles everything
-}
-
-    } else {
-        // MODE 3: New Test Mode (Clicked a test from the series page)
-        dom.loginScreen.style.display = 'none';
-        dom.instructionsScreen.style.display = 'none';
-        loadTestFromURL();
-    }
-
-    // --- 3. Setup All Other Event Listeners ---
     const phone = "918658567727";
     const message = "I need the password for the mock test.";
     dom.whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+
     dom.loginBtn.addEventListener('click', handleLogin);
     dom.startExamBtn.addEventListener('click', startExam);
     dom.agreementCheckbox.addEventListener('change', validateStartConditions);
@@ -1320,6 +1297,38 @@ else if (localStorage.getItem('testTaken') === 'true') {
     dom.showMockTestTab.addEventListener('click', () => setView('mockTest'));
     dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
     window.addEventListener('resize', updateSidebarPosition);
+
+    // --- Main Initializer: Determines what the page should do on load ---
+    async function initializePage() {
+        const params = new URLSearchParams(window.location.search);
+        const testId = params.get('testId');
+        const resultId = params.get('resultId');
+
+        // CRITICAL: A testId is required for almost all operations.
+        if (!testId) {
+            document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
+            return;
+        }
+
+        // SCENARIO 1: Reviewing a specific, completed test result.
+        if (resultId) {
+            console.log("Mode: Reviewing a past result.");
+            await loadAndReviewTest(testId, resultId);
+        
+        // SCENARIO 2: Resuming a finished test (e.g., after a refresh on the result page).
+        } else if (localStorage.getItem('testTaken') === 'true') {
+            console.log("Mode: Resuming a finished test session.");
+            await resumeResultSession(); // This is the function we added before
+
+        // SCENARIO 3: Starting a brand new test.
+        } else {
+            console.log("Mode: Starting a new test.");
+            await loadTestFromURL(); // This will load data and then show the login screen.
+        }
+    }
+
+    // Run the initializer function to start the page
+    initializePage();
 });
 </script>
 </body>
