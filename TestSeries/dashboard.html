@@ -63,6 +63,25 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
 
+
+    <div id="flash-notification" class="hidden fixed bottom-5 right-5 w-full max-w-sm z-[100]">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border dark:border-slate-700 p-4 transform transition-all duration-300 translate-y-8 opacity-0">
+        <div class="flex items-start gap-3">
+            <div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-full">
+                <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div class="flex-1">
+                <p id="flash-title" class="font-bold text-slate-800 dark:text-white"></p>
+                <p id="flash-message" class="text-sm text-slate-600 dark:text-slate-300 mt-1"></p>
+                <button id="flash-action-btn" class="hidden mt-3 text-sm font-semibold text-blue-600 hover:underline">View Now</button>
+            </div>
+            <button id="flash-close-btn" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
     <div id="app-view" class="hidden">
         <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
             <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
@@ -414,6 +433,11 @@
 
 
 <script type="module">
+
+
+
+
+    
     // --- FIREBASE IMPORTS ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -517,11 +541,109 @@
     if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); }
     handleSidebarState();
 
+
+
+
+    // Add these two new functions anywhere inside your <script type="module"> tag
+
+/**
+ * Checks Firestore for new notifications and displays the latest one as a pop-up.
+ * It compares the notification timestamps with the user's 'lastSeenNotificationTimestamp'.
+ */
+async function checkAndDisplayNotifications(user) {
+    if (!user) return;
+
+    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+    const userDoc = await getDoc(userDocRef);
+    const userData = userDoc.exists() ? userDoc.data() : {};
+    const lastSeenTimestamp = userData.lastSeenNotificationTimestamp || null;
+
+    // Query for notifications newer than the last one the user has seen
+    const notificationsRef = collection(db, 'notifications');
+    const q = lastSeenTimestamp 
+        ? query(notificationsRef, where("timestamp", ">", lastSeenTimestamp), orderBy("timestamp", "desc"), limit(1))
+        : query(notificationsRef, orderBy("timestamp", "desc"), limit(1));
+    
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        const latestNotification = querySnapshot.docs[0].data();
+        const latestTimestamp = latestNotification.timestamp;
+
+        // Display the pop-up
+        const flash = document.getElementById('flash-notification');
+        document.getElementById('flash-title').textContent = latestNotification.title;
+        document.getElementById('flash-message').textContent = latestNotification.message;
+        
+        const actionBtn = document.getElementById('flash-action-btn');
+        if (latestNotification.actionLink) {
+            actionBtn.classList.remove('hidden');
+            actionBtn.onclick = () => { window.location.href = latestNotification.actionLink; };
+        } else {
+            actionBtn.classList.add('hidden');
+        }
+
+        flash.classList.remove('hidden');
+        setTimeout(() => {
+            flash.querySelector('.transform').classList.remove('translate-y-8', 'opacity-0');
+        }, 100);
+
+        // Update the user's record with the latest timestamp so they don't see this pop-up again
+        await updateDoc(userDocRef, { lastSeenNotificationTimestamp: latestTimestamp });
+    }
+}
+
+
+/**
+ * Fetches ALL notifications from Firestore and renders them on the dedicated notifications page.
+ */
+async function renderAllNotifications() {
+    const container = document.querySelector('#notifications-view .divide-y');
+    container.innerHTML = '<p class="p-4 text-center text-slate-500">Loading notifications...</p>';
+    
+    const notificationsRef = collection(db, 'notifications');
+    const q = query(notificationsRef, orderBy("timestamp", "desc"));
+    const querySnapshot = await getDocs(q);
+
+    if (querySnapshot.empty) {
+        container.innerHTML = '<p class="p-4 text-center text-slate-500">No notifications yet.</p>';
+        return;
+    }
+
+    container.innerHTML = ''; // Clear loading text
+    querySnapshot.forEach(doc => {
+        const notification = doc.data();
+        const date = notification.timestamp ? notification.timestamp.toDate().toLocaleDateString() : 'Just now';
+
+        const notificationHTML = `
+            <div class="p-4 flex items-start gap-4">
+                <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg>
+                </div>
+                <div class="flex-1">
+                    <p class="font-semibold">${notification.title}</p>
+                    <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">${notification.message}</p>
+                    <p class="text-xs text-slate-500 mt-2">${date}</p>
+                </div>
+                ${notification.actionLink ? `<a href="${notification.actionLink}" class="text-sm text-blue-600 hover:underline font-semibold flex-shrink-0">View</a>` : ''}
+            </div>
+        `;
+        container.insertAdjacentHTML('beforeend', notificationHTML);
+    });
+}
+
+
+
+
+    
     // --- AUTHENTICATION & REAL-TIME DATA ---
     onAuthStateChanged(auth, user => {
         if (user) {
             appView.classList.remove('hidden');
-            
+
+
+            checkAndDisplayNotifications(user); // <-- ADD THIS LINE
+
             renderPerformanceChart();
             processUserPerformance(user.uid);
 
@@ -562,7 +684,7 @@
             
             // ATTACH ALL EVENT LISTENERS AFTER AUTHENTICATION
             attachAllEventListeners();
-
+            
         } else { 
             window.location.href = 'TestSeries/auth.html'; 
         }
@@ -578,6 +700,12 @@
         timeUpdateInterval = setInterval(updateTimeAndGreeting, 1000);
     }
 
+    document.getElementById('flash-close-btn').onclick = () => {
+        const flash = document.getElementById('flash-notification');
+        flash.querySelector('.transform').classList.add('translate-y-8', 'opacity-0');
+        setTimeout(() => flash.classList.add('hidden'), 300);
+    };
+    
 function updateTimeAndGreeting() {
         // --- CUSTOMIZE YOUR IMAGES HERE ---
         const morningImage = 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop';
@@ -586,6 +714,9 @@ function updateTimeAndGreeting() {
 
         const now = new Date();
         const hour = now.getHours();
+
+
+    
         
         // --- FIX: Check if the day has changed ---
    // ... inside updateTimeAndGreeting()
@@ -672,7 +803,7 @@ if (newDayString !== currentDayString) {
         navButtons.home.onclick = (e) => { e.preventDefault(); window.location.href = 'homeUPSChub.html'; };
         navButtons.dashboard.onclick = (e) => { e.preventDefault(); showView('home'); };
         navButtons.tests.onclick = (e) => { e.preventDefault(); window.location.href = 'TestSeries/Prem_testSeries.html'; };
-        navButtons.notifications.onclick = (e) => { e.preventDefault(); showView('notifications'); };
+        navButtons.notifications.onclick = (e) => { e.preventDefault(); showView('notifications');renderAllNotifications();  };
         navButtons.settings.onclick = (e) => { e.preventDefault(); showView('settings'); };
 
         // Dropdown Menu Items
