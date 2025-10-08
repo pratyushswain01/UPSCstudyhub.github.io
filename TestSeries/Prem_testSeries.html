@@ -348,6 +348,20 @@
         closeUpgradeModalBtn.addEventListener('click', hideUpgradeModal);
         upgradeBtnModal.addEventListener('click', handleUpgrade);
         closeSuccessModalBtn.addEventListener('click', () => hideSuccessAnimation(true));
+
+        // This part enables the offline page to work here too.
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register('https://pratyushswain01.github.io/UPSCstudyhub.github.io/TestSeries/sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered successfully on Premium Tests page.');
+                    })
+                    .catch((error) => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
     </script>
 </body>
 </html>
