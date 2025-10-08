@@ -812,21 +812,33 @@
     applyTheme(savedTheme);
     showView('home');
 
-    // This script registers the service worker
-      if ('serviceWorker' in navigator) {
+   onAuthStateChanged(auth, user => {
+        // NOTE THE CHANGE: We are checking if there is NO user.
+        if (!user) {
+            // If the user is NOT logged in, send them back to the homepage.
+            console.log('User is not logged in. Redirecting to homepage...');
+            window.location.href = 'https://pratyushswain01.github.io/UPSCstudyhub.github.io/TestSeries/TestSeries_UPSChub.html';
+        } else {
+            // If the user is logged in, they can stay on the page.
+            console.log('User is logged in. Welcome to the dashboard!');
+        }
+    });
+
+    // --- SCRIPT 2: Service Worker Registration Logic ---
+    // This part is the same, to make sure the offline page works here too.
+    if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker
-            // CORRECTED PATH for GitHub Pages
-            .register('sw.js') 
-            .then((registration) => {
-              // You can keep the custom console log for each page
-              console.log('Service Worker registered successfully.'); 
-            })
-            .catch((error) => {
-              console.log('Service Worker registration failed:', error);
-            });
+            navigator.serviceWorker
+                // Using the new, full URL to find the file
+                .register('https://pratyushswain01.github.io/UPSCstudyhub.github.io/TestSeries/sw.js')
+                .then((registration) => {
+                    console.log('Service Worker registered successfully on dashboard.');
+                })
+                .catch((error) => {
+                    console.error('Service Worker registration failed:', error);
+                });
         });
-      }
+    }
 </script>
 </body>
 </html>
