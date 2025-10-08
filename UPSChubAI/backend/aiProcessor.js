@@ -2,8 +2,22 @@ import { ImageAnnotatorClient } from '@google-cloud/vision';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import 'dotenv/config';
 
-// Initialize Clients using environment variables
-const visionClient = new ImageAnnotatorClient();
+// --- CORRECTED INITIALIZATION LOGIC ---
+let visionClient;
+const credentialsJsonString = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+
+if (credentialsJsonString && credentialsJsonString.trim().startsWith('{')) {
+    // This runs on Render: It parses the JSON content from the environment variable
+    const credentials = JSON.parse(credentialsJsonString);
+    visionClient = new ImageAnnotatorClient({ credentials });
+    console.log("Vision AI Client initialized via JSON content (Production Mode).");
+} else {
+    // This runs on your local computer: It uses the file path from the environment variable
+    visionClient = new ImageAnnotatorClient();
+    console.log("Vision AI Client initialized via file path (Local Dev Mode).");
+}
+// --- END OF CORRECTION ---
+
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-pro-latest" });
 
