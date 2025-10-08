@@ -265,6 +265,37 @@
             }
         });
 
+
+         (function() {
+            // 1. Paste the "Raw" URL you copied from your Gist here
+            const statusUrl = 'YOUR_GIST_RAW_URL_HERE'; 
+
+            // 2. This is your secret key to bypass maintenance mode
+            // To view the real dashboard, add "?dev=true" to the end of your URL
+            const params = new URLSearchParams(window.location.search);
+            const isDeveloper = params.get('dev') === 'true';
+
+            // 3. The checker logic
+            if (!isDeveloper) {
+                fetch(statusUrl + '?cachebust=' + new Date().getTime())
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error('Could not fetch maintenance status. The Gist URL might be incorrect.');
+                            return;
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data && data.maintenanceMode === true) {
+                            window.location.href = 'maintenance.html';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking maintenance status:', error);
+                    });
+            }
+        })();
+
         async function loadAndDisplayTests() {
             const container = document.getElementById('test-list-container');
             
@@ -366,7 +397,7 @@
         
         (function() {
         // 1. Paste the "Raw" URL you copied from your Gist here
-        const statusUrl = '<script src="https://gist.github.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4.js"></script>'; 
+        const statusUrl = '<script src="https://gist.github.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4.js">'; 
 
         // 2. This is your secret key to bypass maintenance mode
         // To view the real dashboard, add "?dev=true" to the end of your URL
