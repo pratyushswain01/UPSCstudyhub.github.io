@@ -811,6 +811,22 @@
     const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
     showView('home');
+
+    // This script registers the service worker
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker
+            // CORRECTED PATH for GitHub Pages
+            .register('sw.js') 
+            .then((registration) => {
+              // You can keep the custom console log for each page
+              console.log('Service Worker registered successfully.'); 
+            })
+            .catch((error) => {
+              console.log('Service Worker registration failed:', error);
+            });
+        });
+      }
 </script>
 </body>
 </html>
