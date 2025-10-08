@@ -839,6 +839,39 @@
                 });
         });
     }
+
+    (function() {
+        // 1. Paste the "Raw" URL you copied from your Gist here
+        const statusUrl = '<script src="https://gist.github.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4.js"></script>'; 
+
+        // 2. This is your secret key to bypass maintenance mode
+        // To view the real dashboard, add "?dev=true" to the end of your URL
+        const params = new URLSearchParams(window.location.search);
+        const isDeveloper = params.get('dev') === 'true';
+
+        // 3. The checker logic
+        if (!isDeveloper) {
+            // The '?cachebust=' part is important to prevent the browser from saving an old status
+            fetch(statusUrl + '?cachebust=' + new Date().getTime()) 
+                .then(response => {
+                    if (!response.ok) {
+                        // If the Gist URL is wrong or Gist is down, do nothing and let the page load.
+                        console.error('Could not fetch maintenance status. The Gist URL might be incorrect.');
+                        return;
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.maintenanceMode === true) {
+                        // If maintenance mode is ON, redirect the user
+                        window.location.href = 'maintenance.html';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking maintenance status:', error);
+                });
+        }
+    })();
 </script>
 </body>
 </html>
