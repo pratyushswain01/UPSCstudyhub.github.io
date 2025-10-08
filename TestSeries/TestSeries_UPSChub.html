@@ -101,25 +101,32 @@
 
     // KEY LOGIC: If a user is already logged in when they visit this page,
     // immediately send them to their dashboard.
-    onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, user => {
         if (user) {
+            // User is logged in
+            console.log('User is already logged in. Redirecting to dashboard...');
             window.location.href = 'dashboard.html';
+        } else {
+            // User is signed out
+            console.log('User is not logged in.');
         }
-// This script registers the service worker
-      if ('serviceWorker' in navigator) {
+    });
+
+
+    // --- SCRIPT 2: Service Worker Registration Logic ---
+    // This runs completely separately from the login check.
+    if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker
-            // CORRECTED PATH for GitHub Pages
-            .register('sw.js') 
-            .then((registration) => {
-              // You can keep the custom console log for each page
-              console.log('Service Worker registered successfully.'); 
-            })
-            .catch((error) => {
-              console.log('Service Worker registration failed:', error);
-            });
+            navigator.serviceWorker
+                .register('sw.js') // CORRECTED PATH for GitHub Pages
+                .then((registration) => {
+                    console.log('Service Worker registered successfully.');
+                })
+                .catch((error) => {
+                    console.log('Service Worker registration failed:', error);
+                });
         });
-      }
+    }
 </script>
 
 </body>
