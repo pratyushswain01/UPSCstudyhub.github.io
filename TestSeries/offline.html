@@ -3,71 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Connection Lost</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <title>UPSChub - You Are Offline</title>
+    
+    <!-- Google Fonts for a professional look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome for a high-quality icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
     <style>
-        /* Import a clean font like Google's Roboto */
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+        /* --- Global Styles & Variables --- */
+        :root {
+            --primary-blue: #005A9C; /* A deep, professional blue */
+            --light-gray: #f0f2f5;
+            --text-dark: #333333;
+            --text-light: #666666;
+            --white: #ffffff;
+            --border-color: #e0e0e0;
+        }
+
+        html {
+            box-sizing: border-box;
+        }
+        *, *:before, *:after {
+            box-sizing: inherit;
+        }
 
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-            color: #5f6368;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-dark);
             margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
+            min-height: 100vh;
             padding: 20px;
         }
-        .container .fas {
-            font-size: 80px;
-            color: #80868b;
+
+        /* --- Main Content Card --- */
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+            padding: 40px 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .card-icon {
+            font-size: 50px;
+            color: var(--primary-blue);
             margin-bottom: 20px;
         }
+
         h1 {
-            font-size: 24px;
-            color: #202124;
-            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 700;
+            margin: 0 0 10px;
         }
-        p {
+
+        .subtitle {
             font-size: 16px;
-            line-height: 1.5;
+            color: var(--text-light);
+            line-height: 1.6;
+            margin: 0 0 30px;
         }
-        #retry-btn {
-            margin-top: 20px;
-            padding: 10px 24px;
-            font-size: 14px;
+
+        /* --- Action Buttons --- */
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .btn {
+            display: inline-block;
+            text-decoration: none;
             font-weight: 500;
-            color: #fff;
-            background-color: #1a73e8;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 15px;
+            transition: all 0.2s ease-in-out;
+            border: 1px solid transparent;
         }
-        #retry-btn:hover {
-            background-color: #185abc;
+
+        .btn-primary {
+            background-color: var(--primary-blue);
+            color: var(--white);
+        }
+        .btn-primary:hover {
+            background-color: #004a80;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 90, 156, 0.2);
+        }
+
+        /* --- Troubleshooting Details --- */
+        .troubleshoot {
+            margin-top: 30px;
+            color: var(--text-light);
+            text-align: left;
+            font-size: 14px;
+        }
+        
+        .troubleshoot summary {
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--primary-blue);
+            list-style: none; /* Remove default arrow */
+        }
+        .troubleshoot summary::-webkit-details-marker {
+            display: none; /* For Chrome/Safari */
+        }
+        
+        .troubleshoot summary:after {
+            content: 'Show tips ▸'; /* Custom arrow */
+        }
+        
+        .troubleshoot[open] summary:after {
+            content: 'Hide tips ▾';
+        }
+
+        .troubleshoot ul {
+            padding-left: 20px;
+            margin-top: 10px;
+            line-height: 1.7;
+        }
+
+        /* --- Footer --- */
+        footer {
+            background: none; /* No background as requested */
+            padding: 30px 0 10px 0;
+            text-align: center;
+            font-size: 14px;
+            color: var(--text-light);
+        }
+
+        footer a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+        }
+        footer a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <i class="fas fa-wifi-slash"></i> 
-        <h1>Site Unreachable</h1>
-        <p>Looks like you're offline or the server is having trouble.</p>
-        <p>Please check your internet connection and try again.</p>
-        <button id="retry-btn">Retry</button>
-    </div>
+
+    <main class="card">
+        <!-- Using a compass icon implies guidance, even when lost/offline -->
+        <div class="card-icon">
+            <i class="fas fa-compass"></i>
+        </div>
+        
+        <h1>Oops! You've Gone Offline.</h1>
+        
+        <p class="subtitle">
+            Don't let a lost connection stop your preparation. Use this time to revise your notes offline. Every moment counts!
+        </p>
+        
+        <div class="actions">
+            <a href="#" id="retry-btn" class="btn btn-primary">Retry Connection</a>
+        </div>
+
+        <details class="troubleshoot">
+            <summary>Connection Troubleshooting</summary>
+            <ul>
+                <li>Check your Wi-Fi or mobile data connection.</li>
+                <li>Ensure Airplane Mode is turned off.</li>
+                <li>Try restarting your router or modem.</li>
+            </ul>
+        </details>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 UPSChub. All Rights Reserved. | <a href="/TestSeries_UPSChub.html">Homepage</a></p>
+    </footer>
 
     <script>
-        document.getElementById('retry-btn').addEventListener('click', function() {
-            // This will attempt to reload the current page.
+        document.getElementById('retry-btn').addEventListener('click', function(e) {
+            e.preventDefault(); // Prevent the link from navigating
             window.location.reload();
         });
     </script>
