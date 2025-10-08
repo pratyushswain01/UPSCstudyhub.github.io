@@ -103,27 +103,21 @@
     // immediately send them to their dashboard.
 onAuthStateChanged(auth, user => {
         if (user) {
-            // User is logged in
-            console.log('User is already logged in. Redirecting to dashboard...');
             window.location.href = 'dashboard.html';
-        } else {
-            // User is signed out
-            console.log('User is not logged in.');
         }
     });
 
-
-    // --- SCRIPT 2: Service Worker Registration Logic ---
-    // This runs completely separately from the login check.
+    // --- Service Worker Registration Logic with FULL URL ---
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker
-                .register('sw.js') // CORRECTED PATH for GitHub Pages
+                // Use the new, full URL to find the file
+                .register('https://pratyushswain01.github.io/UPSCstudyhub.github.io/TestSeries/sw.js')
                 .then((registration) => {
-                    console.log('Service Worker registered successfully.');
+                    console.log('Service Worker registered successfully with full path.');
                 })
                 .catch((error) => {
-                    console.log('Service Worker registration failed:', error);
+                    console.error('Service Worker registration failed:', error);
                 });
         });
     }
