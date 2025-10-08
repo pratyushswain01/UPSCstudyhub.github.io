@@ -237,68 +237,141 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const formElements = {
-                language: document.querySelectorAll('input[name="language"]'),
-                paper: document.getElementById('paper-select'),
-                marks: document.querySelectorAll('input[name="marks"]'),
-                evaluator: document.querySelectorAll('input[name="evaluator"]'),
-                question: document.getElementById('question-text'),
-            };
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Element Selectors ---
+        const formElements = {
+            language: document.querySelectorAll('input[name="language"]'),
+            paper: document.getElementById('paper-select'),
+            marks: document.querySelectorAll('input[name="marks"]'),
+            evaluator: document.querySelectorAll('input[name="evaluator"]'),
+            question: document.getElementById('question-text'),
+        };
+        const summaryElements = {
+            lang: document.getElementById('summary-lang'),
+            paper: document.getElementById('summary-paper'),
+            marks: document.getElementById('summary-marks'),
+            eval: document.getElementById('summary-eval'),
+            fileCount: document.getElementById('file-count'),
+        };
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const previewPanel = document.getElementById('preview-panel');
+        const emptyPreview = document.getElementById('empty-preview');
+        const evaluateBtn = document.getElementById('evaluate-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const pasteBtn = document.getElementById('paste-btn');
+        
+        let uploadedFiles = [];
+        const MAX_FILES = 25;
 
-            const summaryElements = {
-                lang: document.getElementById('summary-lang'),
-                paper: document.getElementById('summary-paper'),
-                marks: document.getElementById('summary-marks'),
-                eval: document.getElementById('summary-eval'),
-                fileCount: document.getElementById('file-count'),
-            };
+        // --- Main Functions ---
+        function updateSummary() {
+            summaryElements.lang.textContent = document.querySelector('input[name="language"]:checked')?.value || 'N/A';
+            summaryElements.marks.textContent = document.querySelector('input[name="marks"]:checked')?.value + ' Marks' || 'N/A';
+            summaryElements.eval.textContent = document.querySelector('input[name="evaluator"]:checked')?.value || 'N/A';
+            const selectedPaper = formElements.paper.options[formElements.paper.selectedIndex];
+            if (selectedPaper && selectedPaper.value) {
+                summaryElements.paper.textContent = selectedPaper.text;
+                summaryElements.paper.classList.remove('text-slate-500', 'dark:text-slate-500');
+            } else {
+                summaryElements.paper.textContent = 'Not Selected';
+                summaryElements.paper.classList.add('text-slate-500', 'dark:text-slate-500');
+            }
+            summaryElements.fileCount.textContent = uploadedFiles.length;
+        }
 
-            const dropZone = document.getElementById('drop-zone');
-            const fileInput = document.getElementById('file-input');
-            const previewPanel = document.getElementById('preview-panel');
-            const emptyPreview = document.getElementById('empty-preview');
-            const evaluateBtn = document.getElementById('evaluate-btn');
-            const resetBtn = document.getElementById('reset-btn');
-            const pasteBtn = document.getElementById('paste-btn');
+        function handleFiles(files) {
+            if (emptyPreview) emptyPreview.style.display = 'none';
+            for (const file of files) {
+                if (uploadedFiles.length >= MAX_FILES) { alert(`You can upload a maximum of ${MAX_FILES} files.`); break; }
+                if (file.size > 20 * 1024 * 1024) { alert(`File "${file.name}" is too large (max 20MB).`); continue; }
+                uploadedFiles.push(file);
+                createPreviewElement(file);
+            }
+            updateSummary();
+        }
 
-            console.log('Is the drop-zone element found?', dropZone);
-console.log('Is the file-input element found?', fileInput);
+        function createPreviewElement(file) {
+            const fileId = `file-${Date.now()}-${Math.random()}`;
+            const filePreview = document.createElement('div');
+            filePreview.className = 'file-preview-item flex items-center justify-between bg-white dark:bg-slate-700 p-2 rounded-md shadow-sm';
+            filePreview.id = fileId;
             
-            let uploadedFiles = [];
-            const MAX_FILES = 25;
+            const thumbnail = document.createElement('div');
+            thumbnail.className = 'flex items-center space-x-2 overflow-hidden';
 
-             // Make the entire drop-zone clickable, which will open the file input
-        dropZone.addEventListener('click', () => fileInput.click());
+            if (file.type.startsWith('image/')) {
+                const img = document.createElement('img');
+                img.className = 'w-8 h-8 rounded object-cover';
+                const reader = new FileReader();
+                reader.onload = (e) => { img.src = e.target.result; };
+                reader.readAsDataURL(file);
+                thumbnail.appendChild(img);
+            } else {
+                const iconContainer = document.createElement('div');
+                iconContainer.innerHTML = `<svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0011.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>`;
+                thumbnail.appendChild(iconContainer);
+            }
+            
+            const fileNameSpan = document.createElement('span');
+            fileNameSpan.className = 'text-sm truncate dark:text-gray-300';
+            fileNameSpan.textContent = file.name;
+            thumbnail.appendChild(fileNameSpan);
 
-            // --- Update Live Summary ---
-            function updateSummary() {
-                summaryElements.lang.textContent = document.querySelector('input[name="language"]:checked').value;
-                summaryElements.marks.textContent = document.querySelector('input[name="marks"]:checked').value + ' Marks';
-                summaryElements.eval.textContent = document.querySelector('input[name="evaluator"]:checked').value;
-                const selectedPaper = formElements.paper.options[formElements.paper.selectedIndex];
-                if (selectedPaper.value) {
-                    summaryElements.paper.textContent = selectedPaper.text;
-                    summaryElements.paper.classList.remove('text-slate-500', 'dark:text-slate-500');
-                } else {
-                    summaryElements.paper.textContent = 'Not Selected';
-                    summaryElements.paper.classList.add('text-slate-500', 'dark:text-slate-500');
-                }
-                summaryElements.fileCount.textContent = uploadedFiles.length;
+            const removeBtn = document.createElement('button');
+            removeBtn.dataset.fileId = fileId;
+            removeBtn.dataset.fileName = file.name;
+            removeBtn.className = 'remove-file-btn p-1 rounded-full hover:bg-slate-200 dark:hover:bg-gray-600 flex-shrink-0';
+            removeBtn.innerHTML = `<svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>`;
+            removeBtn.addEventListener('click', removeFile);
+            
+            filePreview.appendChild(thumbnail);
+            filePreview.appendChild(removeBtn);
+            if (previewPanel) previewPanel.appendChild(filePreview);
+        }
+        
+        function removeFile(e) {
+            const button = e.currentTarget;
+            const fileId = button.dataset.fileId;
+            const fileName = button.dataset.fileName;
+            document.getElementById(fileId)?.remove();
+            uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
+            if (uploadedFiles.length === 0 && emptyPreview) {
+                emptyPreview.style.display = 'block';
+            }
+            updateSummary();
+        }
+
+        function resetForm() {
+            document.getElementById('lang-en').checked = true;
+            if(formElements.paper) formElements.paper.selectedIndex = 0;
+            document.getElementById('marks-10').checked = true;
+            document.getElementById('eval-balanced').checked = true;
+            if(formElements.question) formElements.question.value = '';
+            
+            if(previewPanel) previewPanel.innerHTML = '';
+            if(previewPanel && emptyPreview) {
+                previewPanel.appendChild(emptyPreview);
+                emptyPreview.style.display = 'block';
             }
 
-            // --- Event Listeners ---
-            Object.values(formElements).forEach(elOrNodeList => {
-                const elements = elOrNodeList.length ? Array.from(elOrNodeList) : [elOrNodeList];
-                elements.forEach(el => el.addEventListener('change', updateSummary));
-            });
-
-            dropZone.addEventListener('click', () => fileInput.click());
-            dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drop-zone-over'); });
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone-over'));
-            dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drop-zone-over'); handleFiles(e.dataTransfer.files); });
-            fileInput.addEventListener('change', () => handleFiles(fileInput.files));
-            resetBtn.addEventListener('click', resetForm);
+            uploadedFiles = [];
+            if(fileInput) fileInput.value = '';
+            updateSummary();
+            console.log('Form has been reset.');
+        }
+        
+        // --- Event Listeners ---
+        // This checks if the elements exist before adding listeners, preventing errors.
+        if (dropZone) dropZone.addEventListener('click', () => fileInput.click());
+        if (dropZone) dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drop-zone-over'); });
+        if (dropZone) dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drop-zone-over'));
+        if (dropZone) dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drop-zone-over'); handleFiles(e.dataTransfer.files); });
+        
+        if (fileInput) fileInput.addEventListener('change', () => handleFiles(fileInput.files));
+        if (resetBtn) resetBtn.addEventListener('click', resetForm);
+        
+        if (pasteBtn) {
             pasteBtn.addEventListener('click', async () => {
                 try {
                     const text = await navigator.clipboard.readText();
@@ -308,154 +381,57 @@ console.log('Is the file-input element found?', fileInput);
                     alert('Failed to read clipboard. Please check browser permissions.');
                 }
             });
-
-            // --- File Handling ---
-            function handleFiles(files) {
-                emptyPreview.style.display = 'none';
-                for (const file of files) {
-                    if (uploadedFiles.length >= MAX_FILES) { alert(`You can upload a maximum of ${MAX_FILES} files.`); break; }
-                    if (file.size > 20 * 1024 * 1024) { alert(`File "${file.name}" is too large (max 20MB).`); continue; }
-                    uploadedFiles.push(file);
-                    createPreviewElement(file);
-                }
-                updateSummary();
-            }
-
-            function createPreviewElement(file) {
-                const fileId = `file-${Date.now()}-${Math.random()}`;
-                const filePreview = document.createElement('div');
-                filePreview.className = 'file-preview-item flex items-center justify-between bg-white dark:bg-slate-700 p-2 rounded-md shadow-sm';
-                filePreview.id = fileId;
-                
-                const thumbnail = document.createElement('div');
-                thumbnail.className = 'flex items-center space-x-2 overflow-hidden';
-
-                if (file.type.startsWith('image/')) {
-                    const img = document.createElement('img');
-                    img.className = 'w-8 h-8 rounded object-cover';
-                    const reader = new FileReader();
-                    reader.onload = (e) => { img.src = e.target.result; };
-                    reader.readAsDataURL(file);
-                    thumbnail.appendChild(img);
-                } else {
-                    const iconContainer = document.createElement('div');
-                    iconContainer.innerHTML = `<svg class="w-8 h-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0011.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>`;
-                    thumbnail.appendChild(iconContainer);
-                }
-                
-                const fileNameSpan = document.createElement('span');
-                fileNameSpan.className = 'text-sm truncate dark:text-gray-300';
-                fileNameSpan.textContent = file.name;
-                thumbnail.appendChild(fileNameSpan);
-
-                const removeBtn = document.createElement('button');
-                removeBtn.dataset.fileId = fileId;
-                removeBtn.dataset.fileName = file.name;
-                removeBtn.className = 'remove-file-btn p-1 rounded-full hover:bg-slate-200 dark:hover:bg-gray-600 flex-shrink-0';
-                removeBtn.innerHTML = `<svg class="w-4 h-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>`;
-                removeBtn.addEventListener('click', removeFile);
-                
-                filePreview.appendChild(thumbnail);
-                filePreview.appendChild(removeBtn);
-                previewPanel.appendChild(filePreview);
-            }
-            
-            function removeFile(e) {
-                const button = e.currentTarget;
-                const fileId = button.dataset.fileId;
-                const fileName = button.dataset.fileName;
-                document.getElementById(fileId)?.remove();
-                uploadedFiles = uploadedFiles.filter(f => f.name !== fileName);
-                if (uploadedFiles.length === 0) {
-                    emptyPreview.style.display = 'block';
-                }
-                updateSummary();
-            }
-
-            function resetForm() {
-                document.getElementById('lang-en').checked = true;
-                formElements.paper.selectedIndex = 0;
-                document.getElementById('marks-10').checked = true;
-                document.getElementById('eval-balanced').checked = true;
-                formElements.question.value = '';
-                previewPanel.innerHTML = '';
-                previewPanel.appendChild(emptyPreview);
-                emptyPreview.style.display = 'block';
-                uploadedFiles = [];
-                fileInput.value = '';
-                updateSummary();
-                console.log('Form has been reset.');
-            }
-            
-evaluateBtn.addEventListener('click', async () => {
-    // --- 1. Basic Validation ---
-    const paper = formElements.paper.value;
-    if (!paper) {
-        alert('Please select a paper type before evaluating.');
-        return;
-    }
-    if (uploadedFiles.length === 0) {
-        alert('Please upload at least one answer sheet to evaluate.');
-        return;
-    }
-
-    // --- 2. Show Loading State ---
-    evaluateBtn.disabled = true;
-    evaluateBtn.innerHTML = `
-        <svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span>Evaluating... Please Wait</span>
-    `;
-
-    // --- 3. Prepare FormData ---
-    const evaluationFormData = new FormData();
-    evaluationFormData.append('language', document.querySelector('input[name="language"]:checked').value);
-    evaluationFormData.append('paper', paper);
-    evaluationFormData.append('marks', document.querySelector('input[name="marks"]:checked').value);
-    evaluationFormData.append('evaluator', document.querySelector('input[name="evaluator"]:checked').value);
-    evaluationFormData.append('question', formElements.question.value);
-    
-    uploadedFiles.forEach(file => {
-        evaluationFormData.append('answerSheets', file);
-    });
-
-    try {
-        // --- 4. The fetch Call to Your Backend ---
-        // IMPORTANT: Replace this URL with your live Render backend URL
-       const response = await fetch('https://upschub-ai-api.onrender.com/api/evaluate', {
-            method: 'POST',
-            body: evaluationFormData,
-            // Do NOT set a 'Content-Type' header here. The browser handles it for FormData.
+        }
+        
+        Object.values(formElements).forEach(elOrNodeList => {
+            const elements = elOrNodeList.length ? Array.from(elOrNodeList) : [elOrNodeList];
+            elements.forEach(el => {
+                if (el) el.addEventListener('change', updateSummary);
+            });
         });
 
-        if (!response.ok) {
-            const errorResult = await response.json();
-            throw new Error(errorResult.error || 'The server returned an error.');
+        if (evaluateBtn) {
+            evaluateBtn.addEventListener('click', async () => {
+                const paper = formElements.paper.value;
+                if (!paper) { alert('Please select a paper type.'); return; }
+                if (uploadedFiles.length === 0) { alert('Please upload at least one answer sheet.'); return; }
+
+                evaluateBtn.disabled = true;
+                evaluateBtn.innerHTML = `<svg class="animate-spin h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span>Evaluating...</span>`;
+
+                const evaluationFormData = new FormData();
+                evaluationFormData.append('language', document.querySelector('input[name="language"]:checked').value);
+                evaluationFormData.append('paper', paper);
+                evaluationFormData.append('marks', document.querySelector('input[name="marks"]:checked').value);
+                evaluationFormData.append('evaluator', document.querySelector('input[name="evaluator"]:checked').value);
+                evaluationFormData.append('question', formElements.question.value);
+                uploadedFiles.forEach(file => evaluationFormData.append('answerSheets', file));
+
+                try {
+                    const response = await fetch('https://upschub-ai-api.onrender.com/api/evaluate', {
+                        method: 'POST',
+                        body: evaluationFormData,
+                    });
+                    if (!response.ok) {
+                        const errorResult = await response.json();
+                        throw new Error(errorResult.error || 'The server returned an error.');
+                    }
+                    const result = await response.json();
+                    console.log('--- AI Feedback Received ---', result);
+                    alert('Evaluation successful! Check console (F12) for results.');
+                } catch (error) {
+                    console.error('Error sending data to backend:', error);
+                    alert(`An error occurred: ${error.message}`);
+                } finally {
+                    evaluateBtn.disabled = false;
+                    evaluateBtn.innerHTML = `<svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span>Evaluate Answer</span>`;
+                }
+            });
         }
-
-        const result = await response.json();
         
-        // --- 5. Handle Success ---
-        // This is where you would take the 'result' and display it in a new feedback section.
-        // For now, we'll log it and show an alert.
-        console.log('--- AI Feedback Received ---', result);
-        alert('Evaluation successful! A full feedback page would display these results.');
-
-    } catch (error) {
-        // --- 6. Handle Errors ---
-        console.error('Error sending data to backend:', error);
-        alert(`An error occurred: ${error.message}`);
-    } finally {
-        // --- 7. Reset Button State ---
-        evaluateBtn.disabled = false;
-        evaluateBtn.innerHTML = `
-            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            <span>Evaluate Answer</span>
-        `;
-    }
-});
-    </script>
+        // Initial UI setup
+        updateSummary();
+    });
+</script>
 </body>
 </html>
