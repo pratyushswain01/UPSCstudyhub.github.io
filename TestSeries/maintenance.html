@@ -206,41 +206,46 @@
             }
         }
 
-        function checkLiveStatus() {
-            fetch(GIST_RAW_URL + '?cachebust=' + new Date().getTime())
-                .then(response => response.json())
-                .then(data => {
-                    if (data.maintenanceMode == false) {
-                        startCountdown();
-                    } else {
-                        dynamicStatus.textContent = "Status: Still developing... Retrying verification.";
-                        setTimeout(checkLiveStatus, 5000);
-                    }
-                })
-                .catch(error => {
-                    console.error('Status check failed:', error);
-                    dynamicStatus.textContent = "Status: Fetching trouble... Retrying connection.";
-                    setTimeout(checkLiveStatus, 5000);
-                });
-        }
+function checkLiveStatus() {
+    fetch(GIST_RAW_URL + '?cachebust=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+            // --- ADD THESE TWO LINES FOR DEBUGGING ---
+            console.log('Received data:', data);
+            console.log('Type of maintenanceMode:', typeof data.maintenanceMode);
 
-        function startCountdown() {
-            let timeLeft = COUNTDOWN_SECONDS;
-            timerEl.classList.remove('hidden');
-            document.getElementById('data-orb').style.display = 'none';
-            document.querySelector('.pipeline-svg').style.opacity = '0.5';
+            if (data.maintenanceMode === false) {
+                startCountdown();
+            } else {
+                dynamicStatus.textContent = "Status: Still developing... Retrying verification.";
+                setTimeout(checkLiveStatus, 5000);
+            }
+        })
+        .catch(error => {
+            console.error('Status check failed:', error);
+            dynamicStatus.textContent = "Status: Fetching trouble... Retrying connection.";
+            setTimeout(checkLiveStatus, 5000);
+        });
+}
 
-            const countdownInterval = setInterval(() => {
-                dynamicStatus.textContent = "Status: System is Live!";
-                timerEl.innerHTML = `Redirecting to dashboard in <strong>${timeLeft}</strong>...`;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(countdownInterval);
-                    window.location.href = TestSeries/dashboard.html;
-                }
-                timeLeft--;
-            }, 1000);
+function startCountdown() {
+    let timeLeft = COUNTDOWN_SECONDS;
+    timerEl.classList.remove('hidden');
+    document.getElementById('data-orb').style.display = 'none';
+    document.querySelector('.pipeline-svg').style.opacity = '0.5';
+
+    const countdownInterval = setInterval(() => {
+        dynamicStatus.textContent = "Status: System is Live!";
+        timerEl.innerHTML = `Redirecting to dashboard in <strong>${timeLeft}</strong>...`;
+
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            // --- I'VE FIXED THE URL HERE (ADDED QUOTES) ---
+            window.location.href = 'TestSeries/dashboard.html';
         }
+        timeLeft--;
+    }, 1000);
+}
 
         // --- START ---
         document.addEventListener('DOMContentLoaded', runSequence);
