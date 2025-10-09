@@ -28,7 +28,10 @@
 
     <!-- Simple Page Loader -->
     <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
-        <svg class="animate-spin h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        <div class="text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8_0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p id="loader-text" class="mt-2 text-slate-500">Authenticating...</p>
+        </div>
     </div>
 
     <!-- Main Content (Hidden by default, shown for logged-in users) -->
@@ -111,6 +114,7 @@
         
         const pageLoader = document.getElementById('page-loader');
         const mainContent = document.getElementById('main-content');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let allTests = [];
         let isPremiumUser = false;
         let currentTopic = '';
@@ -118,22 +122,36 @@
 
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                const userDocRef = doc(db, `users`, user.uid);
-                const docSnap = await getDoc(userDocRef);
-                if (docSnap.exists()) {
-                    isPremiumUser = docSnap.data().isPremium || false;
-                } else {
-                    await setDoc(userDocRef, { email: user.email, isPremium: false }, { merge: true });
-                    isPremiumUser = false;
-                }
-                
-                await fetchAllTests();
-                setupUI();
-                
-                // Hide loader and show main content
-                pageLoader.classList.add('hidden');
-                mainContent.classList.remove('hidden');
+                try {
+                    document.getElementById('loader-text').textContent = 'Fetching user data...';
+                    // CORRECTED: Using the original, correct path for the user document
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    const docSnap = await getDoc(userDocRef);
+                    
+                    if (docSnap.exists()) {
+                        isPremiumUser = docSnap.data().isPremium || false;
+                    } else {
+                        // This case might occur for a brand new user.
+                        await setDoc(userDocRef, { email: user.email, isPremium: false }, { merge: true });
+                        isPremiumUser = false;
+                    }
+                    
+                    document.getElementById('loader-text').textContent = 'Loading tests...';
+                    await fetchAllTests();
+                    setupUI();
+                    
+                    // Hide loader and show main content ONLY after everything succeeds
+                    pageLoader.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
 
+                } catch (error) {
+                    console.error("Authentication or data fetching failed:", error);
+                    // Handle the error: show an error message instead of a stuck loader
+                    pageLoader.innerHTML = `<div class="text-center text-red-500 p-4">
+                        <p class="font-semibold">Could not load page data.</p>
+                        <p class="text-sm mt-1">There might be a connection issue or a problem with your account. Please refresh and try again.</p>
+                    </div>`;
+                }
             } else {
                 // User is not logged in, redirect to auth page
                 window.location.href = 'auth.html';
@@ -268,7 +286,7 @@
                 "key": "rzp_test_YourKey", "amount": 9900, "currency": "INR", "name": "UPSChub",
                 "description": "UPSChub Lifetime Premium Access",
                 "handler": async function (response){
-                    const userDocRef = doc(db, `users`, user.uid);
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     await updateDoc(userDocRef, { isPremium: true });
                     window.location.reload();
                 },
