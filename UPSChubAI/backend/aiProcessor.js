@@ -5,7 +5,7 @@ import 'dotenv/config';
 
 // Gemini AI client (this part stays the same)
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+const model = genAI.getGenerativeModel({ model: "gemini-1.0-pro" });
 
 // --- NEW FUNCTION: Uses the free OCR.space API ---
 async function getTextFromImage(imageBuffer) {
