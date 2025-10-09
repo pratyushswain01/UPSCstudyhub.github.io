@@ -7,7 +7,7 @@ const { google } = require("googleapis");
 
 // --- ⚙️ SETUP & CONFIGURATION ---
 // IMPORTANT: Set your API key securely in your project's terminal by running:
-// firebase functions:config:set gemini.key="AIzaSyAeHKwuFBVTyHwLeQxIjQkl4mB_q5MmUOM"
+// firebase functions:config:set gemini key
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_KEY);
 
 // --- ✨ 1. AI SUMMARY FUNCTION ---
