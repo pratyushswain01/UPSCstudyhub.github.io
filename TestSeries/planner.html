@@ -105,15 +105,12 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-functions.js";
 
-        
         const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const functions = getFunctions(app);
         
         const pageLoader = document.getElementById('page-loader');
         const mainContent = document.getElementById('main-content');
@@ -311,51 +308,30 @@
             await getAiSummary(topicName);
         }
 
-       // ❗️REPLACE your old getAiSummary function in planner.html with this one
-async function getAiSummary(topicName) {
-    try {
-        // This creates the "phone call" to your 'generateSummary' function in the kitchen
-        const generateSummary = httpsCallable(functions, 'generateSummary');
-        const result = await generateSummary({ topic: topicName }); // Pass the topic
-        
-        const text = result.data.summaryText;
-        if (!text) throw new Error("AI response was empty.");
-        
-        let htmlText = text.replace(/## (.*)/g, '<h2>$1</h2>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/^\* (.*)/gm, '<ul><li>$1</li></ul>').replace(/<\/ul>\n<ul>/g, '').replace(/\n/g, '<br>');
-        document.getElementById('ai-summary-text').innerHTML = htmlText;
+        async function getAiSummary(topicName) {
+            const systemPrompt = `You are an expert tutor for the Indian UPSC civil services exam. Your goal is to provide a concise, well-structured summary of the key concepts related to a given topic. Focus on the most important points, facts, and articles of the constitution that are highly relevant for the exam. Use markdown for formatting, including headings, bold text, and bullet points for clarity.`;
+            const userQuery = `Please provide a summary for the topic: "${topicName}"`;
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("AI response was empty.");
+                
+                let htmlText = text.replace(/## (.*)/g, '<h2>$1</h2>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/^\* (.*)/gm, '<ul><li>$1</li></ul>').replace(/<\/ul>\n<ul>/g, '').replace(/\n/g, '<br>');
+                document.getElementById('ai-summary-text').innerHTML = htmlText;
+            } catch (error) {
+                document.getElementById('ai-summary-text').innerHTML = `<p class="text-red-500">An error occurred while fetching the summary.</p>`;
+            } finally {
+                document.getElementById('ai-loader').classList.add('hidden');
+                document.getElementById('ai-summary-content').classList.remove('hidden');
+            }
+        }
 
-    } catch (error) {
-        console.error("Error calling generateSummary function:", error);
-        document.getElementById('ai-summary-text').innerHTML = `<p class="text-red-500">An error occurred while fetching the summary.</p>`;
-    } finally {
-        document.getElementById('ai-loader').classList.add('hidden');
-        document.getElementById('ai-summary-content').classList.remove('hidden');
-    }
-}
-
-// ❗️REPLACE your old getAiPracticeQuestions function in planner.html with this one
-async function getAiPracticeQuestions(topicName) {
-    const questionsContent = document.getElementById('ai-questions-content');
-    questionsContent.classList.remove('hidden');
-    questionsContent.innerHTML = `<div class="text-center py-4"><svg class="animate-spin h-6 w-6 text-blue-600 mx-auto"></svg><p class="text-slate-500 mt-2">Generating questions...</p></div>`;
-
-    try {
-        // This creates the "phone call" to your 'generatePracticeQuestions' function
-        const generateQuestions = httpsCallable(functions, 'generatePracticeQuestions');
-        const result = await generateQuestions({ topic: topicName }); // Pass the topic
-
-        generatedQuestions = result.data.questions;
-        if (!generatedQuestions) throw new Error("AI did not return questions.");
-        
-        renderAiQuestions(generatedQuestions);
-
-    } catch (error) {
-        console.error("Error calling generatePracticeQuestions function:", error);
-        questionsContent.innerHTML = `<p class="text-red-500">Failed to generate practice questions. Please try again.</p>`;
-    }
-}
-        
-        
         async function getAiPracticeQuestions(topicName) {
             const questionsContent = document.getElementById('ai-questions-content');
             questionsContent.classList.remove('hidden');
@@ -363,8 +339,8 @@ async function getAiPracticeQuestions(topicName) {
 
             const systemPrompt = `You are an expert question creator for the Indian UPSC civil services exam. Generate 3 multiple-choice questions based on the provided topic. Ensure the questions are relevant and challenging.`;
             const userQuery = `Topic: "${topicName}"`;
-           const generateQuestions = httpsCallable(functions, 'generatePracticeQuestions'); // <--- The new one has this
-    const result = await generateQuestions({ topic: topicName });
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
@@ -453,4 +429,3 @@ async function getAiPracticeQuestions(topicName) {
     </script>
 </body>
 </html>
-
