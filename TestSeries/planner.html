@@ -363,8 +363,8 @@ async function getAiPracticeQuestions(topicName) {
 
             const systemPrompt = `You are an expert question creator for the Indian UPSC civil services exam. Generate 3 multiple-choice questions based on the provided topic. Ensure the questions are relevant and challenging.`;
             const userQuery = `Topic: "${topicName}"`;
-            const apiKey = "";
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+           const generateQuestions = httpsCallable(functions, 'generatePracticeQuestions'); // <--- The new one has this
+    const result = await generateQuestions({ topic: topicName });
             const payload = {
                 contents: [{ parts: [{ text: userQuery }] }],
                 systemInstruction: { parts: [{ text: systemPrompt }] },
