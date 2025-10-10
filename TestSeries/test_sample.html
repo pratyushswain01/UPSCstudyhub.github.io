@@ -572,6 +572,8 @@ const dom = {
 };
 
 // ### STAGE 1 & 2: PRE-EXAM LOGIC ###
+
+  // ### REVISED FUNCTION ###
 function handleLogin() {
     const email = dom.emailInput.value;
     const password = dom.passwordInput.value;
@@ -580,23 +582,23 @@ function handleLogin() {
     dom.loginBtn.textContent = 'Logging in...';
 
     firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
+       .then((userCredential) => {
             currentUser = userCredential.user; // Store the authenticated user
             console.log("Login successful for:", currentUser.email);
-            window.addEventListener('online', validateStartConditions);
-            window.addEventListener('offline', validateStartConditions);
-            validateStartConditions(); 
-            dom.loginScreen.style.display = 'none';
-            dom.instructionsScreen.style.display = 'flex';
+            
+            // NOW that the user is logged in, load the test data.
+            // This is the critical change.
+            loadTestFromURL(); 
         })
-        .catch((error) => {
+       .catch((error) => {
             dom.loginError.textContent = error.message;
-        })
-        .finally(() => {
             dom.loginBtn.disabled = false;
             dom.loginBtn.textContent = 'Login';
         });
 }
+
+
+  
 function validateStartConditions() {
     const isOffline = !navigator.onLine;
     const isAgreed = dom.agreementCheckbox.checked;
@@ -632,6 +634,7 @@ function forceSubmitOnReconnect() {
     }
 }
 
+// ### REVISED FUNCTION ###
 async function loadTestFromURL() {
     const params = new URLSearchParams(window.location.search);
     const testId = params.get('testId');
@@ -642,6 +645,11 @@ async function loadTestFromURL() {
     }
 
     try {
+        // Show a loading state on the instructions screen while fetching
+        dom.loginScreen.style.display = 'none';
+        dom.instructionsScreen.style.display = 'flex';
+        dom.instructionsTitle.textContent = 'Loading Test...';
+
         // Fetch test metadata
         const testDocRef = db.collection('quizzes').doc(testId);
         const testDoc = await testDocRef.get();
@@ -663,14 +671,18 @@ async function loadTestFromURL() {
         timeLeft = testMetadata.durationMinutes * 60;
         dom.timer.textContent = formatTime(timeLeft);
         
-        // Show login screen now that test data is ready
-        dom.loginScreen.style.display = 'flex';
+        // Prepare the instructions screen for starting the exam
+        window.addEventListener('online', validateStartConditions);
+        window.addEventListener('offline', validateStartConditions);
+        validateStartConditions();
 
     } catch (error) {
         console.error("Failed to load test:", error);
-        document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>${error.message}</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go back</a></div></div>`;
+        // This is where the permission error would appear if the rules were wrong.
+        document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>Could not load question data. Missing or insufficient permissions.</p><p style="font-size:0.8em; color:#666; margin-top:10px;">${error.message}</p><a href="#" onclick="window.location.reload()" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Try Again</a></div></div>`;
     }
 }
+
   
 // =====================================================================
 // ============ START: STREAK AND RESULT SAVING LOGIC ==================
@@ -1396,33 +1408,32 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', updateSidebarPosition);
 
     // --- Main Initializer: Determines what the page should do on load ---
-    async function initializePage() {
-        const params = new URLSearchParams(window.location.search);
-        const testId = params.get('testId');
-        const resultId = params.get('resultId');
+  // Find this function at the bottom of your script
+async function initializePage() {
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get('testId');
+    const resultId = params.get('resultId');
 
-        // CRITICAL: A testId is required for almost all operations.
-        if (!testId) {
-            document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
-            return;
-        }
-
-        // SCENARIO 1: Reviewing a specific, completed test result.
-        if (resultId) {
-            console.log("Mode: Reviewing a past result.");
-            await loadAndReviewTest(testId, resultId);
-        
-        // SCENARIO 2: Resuming a finished test (e.g., after a refresh on the result page).
-        } else if (localStorage.getItem('testTaken') === 'true') {
-            console.log("Mode: Resuming a finished test session.");
-            await resumeResultSession(); // This is the function we added before
-
-        // SCENARIO 3: Starting a brand new test.
-        } else {
-            console.log("Mode: Starting a new test.");
-            await loadTestFromURL(); // This will load data and then show the login screen.
-        }
+    if (!testId) {
+        document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
+        return;
     }
+
+    if (resultId) {
+        console.log("Mode: Reviewing a past result.");
+        await loadAndReviewTest(testId, resultId);
+    
+    } else if (localStorage.getItem('testTaken') === 'true') {
+        console.log("Mode: Resuming a finished test session.");
+        await resumeResultSession();
+
+    } else {
+        // ### THIS IS THE ONLY CHANGE IN THIS FUNCTION ###
+        // We no longer load data here. We just wait for the user to log in.
+        console.log("Mode: Starting a new test. Waiting for user login.");
+        // The login screen is visible by default, so we don't need to do anything.
+    }
+}
 
     // Run the initializer function to start the page
     initializePage();
