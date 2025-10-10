@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Series - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .gradient-text {
+            background-image: linear-gradient(to right, #1e3a8a, #3b82f6);
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .modal-content-enter { animation: scaleIn 0.3s ease-out forwards; }
+        .prose-styles h2 { font-size: 1.25rem; font-weight: 700; margin-top: 1rem; margin-bottom: 0.5rem; }
+        .prose-styles strong { font-weight: 600; }
+        .prose-styles ul { list-style-type: disc; margin-left: 1.25rem; }
+        .prose-styles li { margin-bottom: 0.25rem; }
+        .question-feedback.correct { border-left: 4px solid #22c55e; background-color: #f0fdf4; }
+        .question-feedback.incorrect { border-left: 4px solid #ef4444; background-color: #fef2f2; }
+        .feedback-container { padding: 0.75rem; border-left-width: 4px; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Simple Page Loader -->
+    <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+        <div class="text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8_0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p id="loader-text" class="mt-2 text-slate-500">Authenticating...</p>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden by default, shown for logged-in users) -->
+    <div id="main-content" class="hidden flex flex-col min-h-screen">
+        <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
+             <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <a href="#" class="flex items-center gap-3 text-2xl font-bold text-blue-600">
+                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
+                    <span>UPSChub</span>
+                </a>
+                <a href="#" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Dashboard</a>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-6 flex-grow">
+            <div class="text-center mb-10">
+                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight gradient-text">UPSC Test Series</h1>
+                 <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Your complete toolkit for exam success. Search, learn, and test your knowledge.</p>
+            </div>
+            
+            <div id="controls-container" class="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center"></div>
+            <div id="test-list-container" class="space-y-12"></div>
+        </main>
+
+        <footer class="bg-slate-800 text-slate-400 mt-16 py-8">
+            <div class="container mx-auto px-4 sm:px-6 text-center">
+                <p class="text-sm">&copy; 2024 UPSChub. All Rights Reserved.</p>
+                <p class="text-xs mt-3 max-w-2xl mx-auto">
+                    <strong class="text-slate-300">WARNING:</strong> This content is protected by copyright law. Unauthorized reproduction, distribution, or sharing of this material, in whole or in part, is strictly prohibited and may result in legal action.
+                </p>
+            </div>
+        </footer>
+    </div>
+    
+    <!-- Premium Modal -->
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div id="upgrade-modal-content" class="bg-white rounded-2xl shadow-lg w-full max-w-md modal-content-enter"></div>
+    </div>
+
+    <!-- AI Summary & Practice Questions Modal -->
+    <div id="ai-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-2xl modal-content-enter relative flex flex-col">
+            <div class="p-6 border-b border-slate-200 flex justify-between items-center flex-shrink-0">
+                <h3 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                    ✨ AI Study Tool
+                </h3>
+                <button id="close-ai-modal" class="text-slate-400 hover:text-slate-600 text-3xl leading-none">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto" id="ai-modal-body">
+                <div id="ai-loader" class="text-center py-8">
+                    <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                    <p class="text-slate-500">Generating with Gemini... Please wait.</p>
+                </div>
+                <div id="ai-summary-content" class="hidden">
+                    <h4 class="font-bold text-lg text-slate-700 mb-2">Topic Summary</h4>
+                    <div id="ai-summary-text" class="prose-styles text-slate-600"></div>
+                     <div class="mt-6 text-center">
+                        <button id="generate-questions-btn" class="px-5 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">✨ Generate Practice Questions</button>
+                    </div>
+                </div>
+                <div id="ai-questions-content" class="hidden mt-4 space-y-4"></div>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-b-2xl text-right border-t border-slate-200 flex-shrink-0">
+                 <button id="close-ai-modal-footer" class="px-4 py-2 text-sm font-semibold rounded-lg bg-slate-200 hover:bg-slate-300 transition-colors">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        const pageLoader = document.getElementById('page-loader');
+        const mainContent = document.getElementById('main-content');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let allTests = [];
+        let isPremiumUser = false;
+        let currentTopic = '';
+        let generatedQuestions = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    document.getElementById('loader-text').textContent = 'Fetching user data...';
+                    // CORRECTED: Using the original, correct path for the user document
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    const docSnap = await getDoc(userDocRef);
+                    
+                    if (docSnap.exists()) {
+                        isPremiumUser = docSnap.data().isPremium || false;
+                    } else {
+                        // This case might occur for a brand new user.
+                        await setDoc(userDocRef, { email: user.email, isPremium: false }, { merge: true });
+                        isPremiumUser = false;
+                    }
+                    
+                    document.getElementById('loader-text').textContent = 'Loading tests...';
+                    await fetchAllTests();
+                    setupUI();
+                    
+                    // Hide loader and show main content ONLY after everything succeeds
+                    pageLoader.classList.add('hidden');
+                    mainContent.classList.remove('hidden');
+
+                } catch (error) {
+                    console.error("Authentication or data fetching failed:", error);
+                    // Handle the error: show an error message instead of a stuck loader
+                    pageLoader.innerHTML = `<div class="text-center text-red-500 p-4">
+                        <p class="font-semibold">Could not load page data.</p>
+                        <p class="text-sm mt-1">There might be a connection issue or a problem with your account. Please refresh and try again.</p>
+                    </div>`;
+                }
+            } else {
+                // User is not logged in, redirect to auth page
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function fetchAllTests() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "quizzes"));
+                allTests = [];
+                querySnapshot.forEach((doc) => allTests.push({ id: doc.id, ...doc.data() }));
+            } catch (error) { console.error("Error fetching tests: ", error); }
+        }
+        
+        function setupUI() {
+            const controlsContainer = document.getElementById('controls-container');
+            controlsContainer.innerHTML = `
+                <div class="relative w-full sm:max-w-xs">
+                    <input type="text" id="search-input" placeholder="Search by subject or test name..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></div>
+                </div>
+                <div class="relative w-full sm:w-auto">
+                    <select id="sort-select" class="appearance-none w-full bg-white border border-slate-300 text-slate-700 py-2.5 pl-3 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
+                        <option value="default">Sort by: Chapter</option>
+                        <option value="name-asc">Name (A-Z)</option>
+                        <option value="name-desc">Name (Z-A)</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700"><svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg></div>
+                </div>`;
+            document.getElementById('search-input').addEventListener('input', renderTests);
+            document.getElementById('sort-select').addEventListener('change', renderTests);
+            
+            if (!isPremiumUser) {
+                const fixedUpgradeButton = `<button id="fixed-upgrade-btn" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transform-gpu transition-all flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Go Premium</button>`;
+                document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
+            }
+
+            renderTests();
+        }
+        
+        function renderTests() {
+             const container = document.getElementById('test-list-container');
+             const searchTerm = document.getElementById('search-input').value.toLowerCase();
+             const sortValue = document.getElementById('sort-select').value;
+
+             let processedTests = allTests.filter(test => test.testName.toLowerCase().includes(searchTerm) || (test.subject && test.subject.toLowerCase().includes(searchTerm)));
+             processedTests.sort((a, b) => (a.chapter || 0) - (b.chapter || 0));
+
+             if (sortValue === 'name-asc') processedTests.sort((a, b) => a.testName.localeCompare(b.testName));
+             if (sortValue === 'name-desc') processedTests.sort((a, b) => b.testName.localeCompare(a.testName));
+
+             container.innerHTML = '';
+             if (processedTests.length === 0) {
+                 container.innerHTML = `<p class="text-slate-500 text-center">No tests match your search criteria.</p>`;
+                 return;
+             }
+             
+             const testsBySubject = processedTests.reduce((acc, test) => {
+                const subject = test.subject || 'General';
+                if (!acc[subject]) acc[subject] = [];
+                acc[subject].push(test);
+                return acc;
+             }, {});
+
+             for (const subject in testsBySubject) {
+                 const subjectSection = document.createElement('div');
+                 subjectSection.innerHTML = `<h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">${subject}</h2>`;
+                 const testsGrid = document.createElement('div');
+                 testsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+                 
+                 testsBySubject[subject].forEach(test => {
+                    const testCard = document.createElement('div');
+                    testCard.className = "bg-white rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col";
+                    testCard.innerHTML = `
+                        <div class="p-6 flex-grow">
+                            <h3 class="text-xl font-bold text-slate-800 mt-2">${test.testName}</h3>
+                            <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                <span>${test.totalQuestions || 0} Questions</span>
+                                <span>${test.durationMinutes || 0} Minutes</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50/70 p-4 border-t border-slate-200/60 rounded-b-xl flex items-center justify-between gap-2">
+                            ${isPremiumUser ? `
+                                <button data-topic="${test.testName}" class="ai-summary-btn text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 p-2 rounded-md hover:bg-blue-100 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                    ✨ AI Study
+                                </button>
+                                <a href="test_sample.html?testId=${test.id}" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Test &rarr;</a>
+                            ` : `
+                                <button disabled title="Available for Premium users" class="text-sm font-semibold text-slate-400 cursor-not-allowed flex items-center gap-1.5 p-2 rounded-md">
+                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    ✨ AI Study
+                                </button>
+                                <button data-testid="${test.id}" class="unlock-btn px-4 py-2 text-sm font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors flex items-center gap-1.5">
+                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                                    Unlock
+                                </button>
+                            `}
+                        </div>`;
+                    testsGrid.appendChild(testCard);
+                 });
+                 subjectSection.appendChild(testsGrid);
+                 container.appendChild(subjectSection);
+             }
+        }
+
+        function showUpgradeModal() {
+            const modal = document.getElementById('upgrade-modal');
+            const modalContent = document.getElementById('upgrade-modal-content');
+            modalContent.innerHTML = `
+                <div class="p-6 text-center bg-gradient-to-br from-blue-100 to-indigo-200 rounded-t-2xl">
+                    <div class="w-16 h-16 mx-auto bg-blue-600/10 rounded-full flex items-center justify-center"><svg class="w-10 h-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                    <h3 class="text-2xl font-bold mt-4 text-slate-800">Go Premium!</h3>
+                    <p class="text-slate-500 mt-1">Unlock your full potential with lifetime access.</p>
+                </div>
+                <div class="p-6"><ul class="space-y-3 text-slate-700">
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Access to <span class="font-semibold">All Test Series</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>AI-Powered <span class="font-semibold">Study Tools</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Detailed <span class="font-semibold">Performance Analytics</span></span></li>
+                </ul></div>
+                <div class="p-4 bg-slate-50 rounded-b-2xl flex flex-col sm:flex-row justify-end gap-3">
+                    <button type="button" class="close-modal-btn px-4 py-2.5 text-sm font-semibold rounded-lg bg-slate-200/80 hover:bg-slate-200 transition-colors">Maybe Later</button>
+                    <button type="button" id="upgrade-btn-modal" class="px-6 py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md">Upgrade Now <span class="line-through opacity-70 ml-1">₹199</span> <span class="ml-1 font-bold">₹99</span></button>
+                </div>`;
+            modal.classList.remove('hidden');
+        }
+
+        async function handleUpgrade() {
+            const user = auth.currentUser;
+            if (!user) { console.error("No user to upgrade."); return; }
+            var options = {
+                "key": "rzp_test_YourKey", "amount": 9900, "currency": "INR", "name": "UPSChub",
+                "description": "UPSChub Lifetime Premium Access",
+                "handler": async function (response){
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    await updateDoc(userDocRef, { isPremium: true });
+                    window.location.reload();
+                },
+                "prefill": { "email": user.email }, "theme": { "color": "#2563EB" }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+
+        async function openAiTool(topicName) {
+            currentTopic = topicName;
+            const aiModal = document.getElementById('ai-modal');
+            aiModal.classList.remove('hidden');
+            document.getElementById('ai-loader').classList.remove('hidden');
+            document.getElementById('ai-summary-content').classList.add('hidden');
+            document.getElementById('ai-questions-content').classList.add('hidden');
+            document.getElementById('ai-questions-content').innerHTML = '';
+            document.getElementById('generate-questions-btn').disabled = false;
+            await getAiSummary(topicName);
+        }
+
+        async function getAiSummary(topicName) {
+            const systemPrompt = `You are an expert tutor for the Indian UPSC civil services exam. Your goal is to provide a concise, well-structured summary of the key concepts related to a given topic. Focus on the most important points, facts, and articles of the constitution that are highly relevant for the exam. Use markdown for formatting, including headings, bold text, and bullet points for clarity.`;
+            const userQuery = `Please provide a summary for the topic: "${topicName}"`;
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = { contents: [{ parts: [{ text: userQuery }] }], systemInstruction: { parts: [{ text: systemPrompt }] } };
+            
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+                const result = await response.json();
+                const text = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("AI response was empty.");
+                
+                let htmlText = text.replace(/## (.*)/g, '<h2>$1</h2>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>').replace(/^\* (.*)/gm, '<ul><li>$1</li></ul>').replace(/<\/ul>\n<ul>/g, '').replace(/\n/g, '<br>');
+                document.getElementById('ai-summary-text').innerHTML = htmlText;
+            } catch (error) {
+                document.getElementById('ai-summary-text').innerHTML = `<p class="text-red-500">An error occurred while fetching the summary.</p>`;
+            } finally {
+                document.getElementById('ai-loader').classList.add('hidden');
+                document.getElementById('ai-summary-content').classList.remove('hidden');
+            }
+        }
+
+        async function getAiPracticeQuestions(topicName) {
+            const questionsContent = document.getElementById('ai-questions-content');
+            questionsContent.classList.remove('hidden');
+            questionsContent.innerHTML = `<div class="text-center py-4"><svg class="animate-spin h-6 w-6 text-blue-600 mx-auto"></svg><p class="text-slate-500 mt-2">Generating questions...</p></div>`;
+
+            const systemPrompt = `You are an expert question creator for the Indian UPSC civil services exam. Generate 3 multiple-choice questions based on the provided topic. Ensure the questions are relevant and challenging.`;
+            const userQuery = `Topic: "${topicName}"`;
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: userQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT", properties: {
+                            questions: { type: "ARRAY", items: {
+                                type: "OBJECT", properties: {
+                                    question: { type: "STRING" },
+                                    options: { type: "OBJECT", properties: { A: {type: "STRING"}, B: {type: "STRING"}, C: {type: "STRING"}, D: {type: "STRING"}}},
+                                    answer: { type: "STRING" },
+                                    explanation: { type: "STRING" }
+                                }, required: ["question", "options", "answer", "explanation"]
+                            }}
+                        }, required: ["questions"]
+                    }
+                }
+            };
+            
+            try {
+                const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                if (!response.ok) throw new Error(`API error: ${response.statusText}`);
+                const result = await response.json();
+                const jsonText = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!jsonText) throw new Error("Empty response from AI.");
+                
+                const data = JSON.parse(jsonText);
+                generatedQuestions = data.questions;
+                renderAiQuestions(generatedQuestions);
+            } catch (error) {
+                questionsContent.innerHTML = `<p class="text-red-500">Failed to generate practice questions. Please try again.</p>`;
+            }
+        }
+
+        function renderAiQuestions(questions) {
+            const questionsContainer = document.getElementById('ai-questions-content');
+            let questionsHtml = '<h4 class="font-bold text-lg text-slate-700 mb-2 border-t pt-4 mt-4">Practice Questions</h4>';
+            questions.forEach((q, index) => {
+                questionsHtml += `
+                    <div class="text-sm p-4 border border-slate-200 rounded-lg" data-question-index="${index}" data-correct-answer="${q.answer}">
+                        <p class="font-semibold text-slate-800 mb-3">${index + 1}. ${q.question}</p>
+                        <div class="space-y-2">${Object.entries(q.options).map(([key, value]) => `
+                            <div><label class="flex items-center cursor-pointer"><input type="radio" name="q${index}" value="${key}" class="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500">${value}</label></div>`).join('')}
+                        </div>
+                        <div class="feedback-container mt-3 hidden"></div>
+                    </div>`;
+            });
+            questionsHtml += `<div class="text-center mt-4"><button id="check-answers-btn" class="px-5 py-2 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700">Check Answers</button></div>`;
+            questionsContainer.innerHTML = questionsHtml;
+        }
+        
+        function checkAiAnswers() {
+            const questionDivs = document.querySelectorAll('[data-question-index]');
+            questionDivs.forEach(div => {
+                const index = parseInt(div.dataset.questionIndex, 10);
+                const correctAnswer = div.dataset.correctAnswer;
+                const selectedAnswer = document.querySelector(`input[name="q${index}"]:checked`)?.value;
+                const feedbackContainer = div.querySelector('.feedback-container');
+                const explanation = generatedQuestions[index].explanation;
+                
+                div.classList.remove('correct', 'incorrect');
+                
+                if (selectedAnswer === correctAnswer) {
+                    div.classList.add('correct');
+                    feedbackContainer.innerHTML = `<p class="font-semibold text-green-700">Correct!</p><p class="text-xs text-slate-600 mt-1">${explanation}</p>`;
+                } else {
+                    div.classList.add('incorrect');
+                    feedbackContainer.innerHTML = `<p class="font-semibold text-red-700">Incorrect. The correct answer is ${correctAnswer}.</p><p class="text-xs text-slate-600 mt-1">${explanation}</p>`;
+                }
+                feedbackContainer.classList.remove('hidden');
+            });
+            document.getElementById('check-answers-btn').disabled = true;
+        }
+
+        document.addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.closest('.ai-summary-btn')) openAiTool(target.closest('.ai-summary-btn').dataset.topic);
+            else if (target.closest('.unlock-btn') || target.closest('#fixed-upgrade-btn')) showUpgradeModal();
+            else if (target.id === 'close-ai-modal' || target.id === 'close-ai-modal-footer') document.getElementById('ai-modal').classList.add('hidden');
+            else if (target.closest('.close-modal-btn')) document.getElementById('upgrade-modal').classList.add('hidden');
+            else if (target.id === 'generate-questions-btn') { target.disabled = true; getAiPracticeQuestions(currentTopic); }
+            else if (target.id === 'check-answers-btn') checkAiAnswers();
+            else if (target.id === 'upgrade-btn-modal') handleUpgrade();
+        });
+    </script>
+</body>
+</html>
