@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Test History - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        /* Styles for color-coded scores */
+        .score-badge-green { background-color: #ecfdf5; color: #16a34a; border: 1px solid #a7f3d0; }
+        .score-badge-yellow { background-color: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+        .score-badge-red { background-color: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <!-- Simple Page Loader -->
+    <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+        <div class="text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p class="mt-2 text-slate-500">Authenticating...</p>
+        </div>
+    </div>
+
+    <!-- Main Content (Hidden by default) -->
+    <div id="main-content" class="hidden flex flex-col min-h-screen">
+        <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <a href="TestSeries/dashboard.html" class="flex items-center gap-3 text-2xl font-bold text-blue-600">
+                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
+                    <span>UPSChub</span>
+                </a>
+                <a href="TestSeries/dashboard.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Go to Dashboard</a>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-6 flex-grow">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight">My Test History</h1>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">A detailed report of all the tests you've attempted. Track your progress and review your performance.</p>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200/80 overflow-hidden">
+                    <!-- Table Container -->
+                    <div id="history-table-container" class="overflow-x-auto">
+                        <!-- Loading State Skeleton -->
+                        <div id="table-loader">
+                            <div class="p-4 border-b border-slate-200 animate-pulse">
+                                <div class="h-6 w-1/4 bg-slate-200 rounded-md"></div>
+                            </div>
+                            <div class="p-4 space-y-4">
+                                <div class="h-8 bg-slate-200 rounded-md"></div>
+                                <div class="h-8 bg-slate-100 rounded-md"></div>
+                                <div class="h-8 bg-slate-200 rounded-md"></div>
+                                <div class="h-8 bg-slate-100 rounded-md"></div>
+                            </div>
+                        </div>
+
+                        <!-- Actual Table (hidden initially) -->
+                        <table id="history-table" class="hidden min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Test Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Subject</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Score</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Percentage</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Date Attempted</th>
+                                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Review</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="bg-white divide-y divide-slate-200">
+                                <!-- Rows will be injected here by JavaScript -->
+                            </tbody>
+                        </table>
+                        
+                        <!-- Empty State -->
+                        <div id="empty-state" class="hidden text-center p-12">
+                             <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <h3 class="mt-2 text-lg font-semibold text-slate-800">No Tests Taken Yet</h3>
+                            <p class="mt-1 text-sm text-slate-500">Your test history will appear here once you complete a test.</p>
+                            <a href="TestSeries/Prem_testSeries.html" class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-semibold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                Go to Test Series
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-slate-800 text-slate-400 mt-16 py-8">
+            <div class="container mx-auto px-4 sm:px-6 text-center">
+                <p class="text-sm">&copy; 2025 UPSChub. All Rights Reserved.</p>
+                <p class="text-xs mt-3 max-w-2xl mx-auto">
+                    <strong class="text-slate-300">WARNING:</strong> This content is protected by copyright law. Unauthorized reproduction, distribution, or sharing of this material, in whole or in part, is strictly prohibited and may result in legal action.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // IMPORTANT: Replace with your actual Firebase config
+        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+
+        const pageLoader = document.getElementById('page-loader');
+        const mainContent = document.getElementById('main-content');
+        const tableLoader = document.getElementById('table-loader');
+        const historyTable = document.getElementById('history-table');
+        const historyTableBody = document.getElementById('history-table-body');
+        const emptyState = document.getElementById('empty-state');
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                // User is signed in.
+                pageLoader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                mainContent.classList.add('fade-in');
+                await fetchTestHistory(user.uid);
+            } else {
+                // User is signed out. Redirect to login.
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function fetchTestHistory(userId) {
+            try {
+                // Path to the subcollection: artifacts/{appId}/users/{userId}/testHistory
+                const historyCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/testHistory`);
+                
+                // Query to get documents and order them by the 'timestamp' field, newest first
+                const q = query(historyCollectionRef, orderBy("timestamp", "desc"));
+                
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    // No test history found
+                    tableLoader.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                } else {
+                    // Process and display the test history
+                    renderHistoryTable(querySnapshot.docs);
+                    tableLoader.classList.add('hidden');
+                    historyTable.classList.remove('hidden');
+                    historyTable.classList.add('fade-in');
+                }
+            } catch (error) {
+                console.error("Error fetching test history:", error);
+                tableLoader.innerHTML = `<p class="p-8 text-center text-red-500">Could not load test history. Please try again later.</p>`;
+            }
+        }
+
+        function renderHistoryTable(docs) {
+            historyTableBody.innerHTML = ''; // Clear previous entries
+            docs.forEach(doc => {
+                const attempt = doc.data();
+
+                // Convert Firestore Timestamp to a readable Date
+                const date = attempt.timestamp.toDate();
+                const formattedDate = date.toLocaleString('en-IN', {
+                    day: 'numeric',
+                    month: 'short',
+                    year: 'numeric',
+                    hour: 'numeric',
+                    minute: '2-digit',
+                    hour12: true
+                });
+
+                // Determine color class for the percentage badge
+                let scoreClass = 'score-badge-red';
+                if (attempt.percentage >= 75) {
+                    scoreClass = 'score-badge-green';
+                } else if (attempt.percentage >= 50) {
+                    scoreClass = 'score-badge-yellow';
+                }
+
+                const row = `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${attempt.testName} (Set ${attempt.testSet})</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${attempt.subject}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">${attempt.score} / ${attempt.totalQuestions}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${scoreClass}">
+                                ${attempt.percentage.toFixed(2)}%
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${formattedDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="TestSeries/test_sample.html?testId=${attempt.testId}&set=${attempt.testSet}&review=true" class="text-blue-600 hover:text-blue-800">Review</a>
+                        </td>
+                    </tr>
+                `;
+                historyTableBody.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>
