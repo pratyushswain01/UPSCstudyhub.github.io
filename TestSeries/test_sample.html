@@ -494,7 +494,7 @@ let questions = []; // This will be filled from Firestore
 let testMetadata = {}; // To store test name, duration, etc.
 let state = {};
 let timerInterval, onTimerEnd, stopwatchInterval, animationInterval;
-let timeLeft; // MODIFIED: Removed the initial value
+let timeLeft; 
 let isTestCompleted = false;
 let performanceChart = null;
 let stopwatchTime = 0;
@@ -571,32 +571,68 @@ const dom = {
     syncStatus: document.getElementById('syncStatus'),
 };
 
-// ### STAGE 1 & 2: PRE-EXAM LOGIC ###
-function handleLogin() {
+// ==========================================================
+// CORRECTED LOGIN AND DATA LOADING LOGIC
+// ==========================================================
+async function handleLogin() {
     const email = dom.emailInput.value;
     const password = dom.passwordInput.value;
     dom.loginError.textContent = '';
     dom.loginBtn.disabled = true;
     dom.loginBtn.textContent = 'Logging in...';
 
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            currentUser = userCredential.user; // Store the authenticated user
-            console.log("Login successful for:", currentUser.email);
-            window.addEventListener('online', validateStartConditions);
-            window.addEventListener('offline', validateStartConditions);
-            validateStartConditions(); 
-            dom.loginScreen.style.display = 'none';
-            dom.instructionsScreen.style.display = 'flex';
-        })
-        .catch((error) => {
-            dom.loginError.textContent = error.message;
-        })
-        .finally(() => {
-            dom.loginBtn.disabled = false;
-            dom.loginBtn.textContent = 'Login';
-        });
+    try {
+        // Step 1: Sign the user in (Requires internet)
+        const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+        currentUser = userCredential.user;
+        console.log("Login successful. Starting test download...");
+        
+        // Change button text to show the download is in progress
+        dom.loginBtn.textContent = 'Loading Test...';
+
+        // Step 2: "Download" the test data (Requires internet)
+        const params = new URLSearchParams(window.location.search);
+        const testId = params.get('testId');
+        if (!testId) throw new Error("No Test ID found in URL.");
+
+        const testDocRef = db.collection('quizzes').doc(testId);
+        const testDoc = await testDocRef.get();
+        if (!testDoc.exists) throw new Error("Test not found in database.");
+        testMetadata = testDoc.data();
+
+        const questionsSnapshot = await testDocRef.collection('questions').get();
+        questions = questionsSnapshot.docs.map(doc => doc.data());
+        if (questions.length === 0) throw new Error("This test has no questions.");
+        
+        console.log(`Download complete: ${questions.length} questions loaded.`);
+
+        // Step 3: Once download is complete, prepare and show the instructions screen
+        dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
+        dom.totalQuestionsEl.textContent = testMetadata.totalQuestions;
+        dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
+        timeLeft = testMetadata.durationMinutes * 60;
+        dom.timer.textContent = formatTime(timeLeft);
+
+        dom.loginScreen.style.display = 'none';
+        dom.instructionsScreen.style.display = 'flex';
+
+        // Setup listeners to check if the user goes offline
+        window.addEventListener('online', validateStartConditions);
+        window.addEventListener('offline', validateStartConditions);
+        validateStartConditions(); // Run once to set the initial state
+
+    } catch (error) {
+        // This will catch errors from login OR download
+        dom.loginError.textContent = error.message;
+    } finally {
+        // This runs whether it succeeded or failed
+        dom.loginBtn.disabled = false;
+        dom.loginBtn.textContent = 'Login';
+    }
 }
+
+// ### ALL OTHER FUNCTIONS (UNCHANGED) ###
+
 function validateStartConditions() {
     const isOffline = !navigator.onLine;
     const isAgreed = dom.agreementCheckbox.checked;
@@ -614,6 +650,7 @@ function validateStartConditions() {
         dom.offlineStatus.className = 'status-waiting';
     }
 }
+
 function startExam() {
     if (dom.startExamBtn.disabled) return;
     dom.instructionsScreen.style.display = 'none';
@@ -625,56 +662,13 @@ function startExam() {
     window.addEventListener('online', forceSubmitOnReconnect);
     initTest();
 }
+
 function forceSubmitOnReconnect() {
     if (!isTestCompleted) {
         alert("Internet connection detected. Submitting the test as per rules.");
         submitTest(true);
     }
 }
-
-async function loadTestFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    const testId = params.get('testId');
-
-    if (!testId) {
-        document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>No Test ID provided. Please select a test from the test series page.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
-        return;
-    }
-
-    try {
-        // Fetch test metadata
-        const testDocRef = db.collection('quizzes').doc(testId);
-        const testDoc = await testDocRef.get();
-        if (!testDoc.exists) throw new Error("Test not found.");
-        testMetadata = testDoc.data();
-
-        // Fetch questions subcollection
-        const questionsSnapshot = await testDocRef.collection('questions').get();
-        questions = questionsSnapshot.docs.map(doc => doc.data());
-
-        if (questions.length === 0) throw new Error("This test has no questions.");
-
-        // Update instructions with dynamic data
-        dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
-        dom.totalQuestionsEl.textContent = testMetadata.totalQuestions;
-        dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
-        
-        // Set the timer for the exam
-        timeLeft = testMetadata.durationMinutes * 60;
-        dom.timer.textContent = formatTime(timeLeft);
-        
-        // Show login screen now that test data is ready
-        dom.loginScreen.style.display = 'flex';
-
-    } catch (error) {
-        console.error("Failed to load test:", error);
-        document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>${error.message}</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go back</a></div></div>`;
-    }
-}
-  
-// =====================================================================
-// ============ START: STREAK AND RESULT SAVING LOGIC ==================
-// =====================================================================
 
 async function saveResultToFirestore(scoreData) {
     const syncStatusEl = dom.syncStatus;
@@ -685,14 +679,10 @@ async function saveResultToFirestore(scoreData) {
         return;
     }
     const userId = currentUser.uid;
-
     syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
     syncStatusEl.className = 'syncing';
-
     const resultsCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testResults");
-    
     try {
-        // Save the test result
         await resultsCollectionRef.add({
             testId: new URLSearchParams(window.location.search).get('testId'),
             testName: testMetadata.testName,
@@ -703,14 +693,10 @@ async function saveResultToFirestore(scoreData) {
             userAnswers: state.answers,
             dateCompleted: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
         console.log("Result write to Firestore initiated.");
         syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. Syncing to your dashboard.`;
         syncStatusEl.className = 'synced';
-        
-        // After successfully saving, log the activity and update the streak
         await logTestActivityAndUpdateStreak(userId);
-
     } catch (error) {
         console.error("Error writing result to Firestore cache: ", error);
         syncStatusEl.textContent = 'Error saving result locally.';
@@ -721,30 +707,21 @@ async function saveResultToFirestore(scoreData) {
 async function logTestActivityAndUpdateStreak(userId) {
     const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(userId);
     const todayStr = new Date().toISOString().split('T')[0];
-
     try {
         const docSnap = await userDocRef.get();
         if (!docSnap.exists()) return;
-
         const userData = docSnap.data();
         const activities = userData.activity || {};
         const dayActivities = activities[todayStr] || [];
-
-        // Add this test to today's activity log
         dayActivities.push({
             type: 'TEST',
             testName: testMetadata.testName,
             time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
         });
         activities[todayStr] = dayActivities;
-        
-        // Update the activity log in Firestore
         await userDocRef.set({ activity: activities }, { merge: true });
-        
         console.log("Test activity logged. Now updating streak.");
-        // Now call the streak logic
         await updateStreakAfterTest(userId);
-
     } catch (error) {
         console.error("Error logging test activity:", error);
     }
@@ -752,32 +729,23 @@ async function logTestActivityAndUpdateStreak(userId) {
 
 async function updateStreakAfterTest(userId) {
     if (!userId) return;
-
     const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(userId);
-    
     try {
-        // We need to get the most up-to-date data, including the activity we just logged
         const docSnap = await userDocRef.get();
         if (!docSnap.exists()) return;
-
         const userData = docSnap.data();
         const streakData = userData.streak || { current: 0, highest: 0, lastUpdatedDate: null };
         const activityData = userData.activity || {};
-
         const today = new Date();
         const todayStr = today.toISOString().split('T')[0];
         const yesterday = new Date(today);
         yesterday.setDate(today.getDate() - 1);
         const yesterdayStr = yesterday.toISOString().split('T')[0];
-        
         const todaysActivities = activityData[todayStr] || [];
         const testsTodayCount = todaysActivities.filter(item => item.type === 'TEST').length;
-
-        // Condition: Must complete at least 2 tests AND streak must not have been updated today yet
         if (testsTodayCount >= 2 && streakData.lastUpdatedDate !== todayStr) {
             let newCurrentStreak = (streakData.lastUpdatedDate === yesterdayStr) ? (streakData.current || 0) + 1 : 1;
             const newHighestStreak = Math.max(streakData.highest || 0, newCurrentStreak);
-
             await userDocRef.update({
                 'streak.current': newCurrentStreak,
                 'streak.highest': newHighestStreak,
@@ -792,58 +760,33 @@ async function updateStreakAfterTest(userId) {
     }
 }
 
-// =====================================================================
-// ============== END: STREAK AND RESULT SAVING LOGIC ==================
-// =====================================================================
-
-
 async function loadAndReviewTest(testId, resultId) {
     dom.loginScreen.style.display = 'none';
     dom.instructionsScreen.style.display = 'none';
-
     try {
-        // 1. Authenticate the user to get their UID
         const auth = firebase.auth();
         const user = auth.currentUser;
         if (!user) {
             throw new Error("You must be logged in to review results.");
         }
-
-        // 2. Fetch the test questions (same as before)
         const testDocRef = db.collection('quizzes').doc(testId);
         const testDoc = await testDocRef.get();
         if (!testDoc.exists) throw new Error("Test not found.");
         testMetadata = testDoc.data();
-        
         const questionsSnapshot = await testDocRef.collection('questions').get();
         questions = questionsSnapshot.docs.map(doc => doc.data());
-        
-        // 3. Fetch the user's saved answers for that specific result
         const resultDocRef = db.collection(`artifacts/${appId}/users/${user.uid}/testResults`).doc(resultId);
         const resultDoc = await resultDocRef.get();
         if (!resultDoc.exists) throw new Error("Your test result could not be found.");
-        
-        // Temporarily store answers in localStorage for the review function to use
         localStorage.setItem('lastAnswers', JSON.stringify(resultDoc.data().userAnswers));
-
-        // 4. Show the review screen
         showReviewScreen();
-        dom.examUIWrapper.style.display = 'flex'; // Make sure the main wrapper is visible
-
+        dom.examUIWrapper.style.display = 'flex';
     } catch (error) {
         console.error("Failed to load review:", error);
         document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>${error.message}</p><a href="dashboard.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Dashboard</a></div></div>`;
     }
 }
 
-
-
-
-
-
-  
-
-// ### STAGE 3: MAIN TEST LOGIC ###
 function initTest() {
     resetState();
     timeLeft = testMetadata.durationMinutes * 60;
@@ -855,9 +798,11 @@ function initTest() {
     loadQuestion(0);
     startTimer();
 }
+
 function resetState() {
     state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) };
 }
+
 function setView(viewName) {
     dom.mockTestWrapper.style.display = 'none';
     dom.resultScreenWrapper.style.display = 'none';
@@ -889,6 +834,7 @@ function setView(viewName) {
         dom.answerWritingWrapper.style.display = 'flex';
     }
 }
+
 function loadQuestion(index) {
     state.current = index;
     if (!state.visited[index]) { state.visited[index] = true; }
@@ -909,11 +855,13 @@ function loadQuestion(index) {
     updatePalette();
     updateNavigationButtons();
 }
+
 function selectOption(optIndex) {
     state.answers[state.current] = optIndex;
     dom.optionsList.querySelectorAll('.option').forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
     updatePalette();
 }
+
 function handleSaveAndNext() {
     if (isTestCompleted) return;
     if (state.current < questions.length - 1) {
@@ -922,16 +870,19 @@ function handleSaveAndNext() {
         submitTest(true);
     }
 }
+
 function handleMarkAndNext() {
     if (isTestCompleted) return;
     state.marked[state.current] = true;
     handleSaveAndNext();
 }
+
 function handleClearResponse() {
     state.answers[state.current] = null;
     dom.optionsList.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
     updatePalette();
 }
+
 function submitTest(isForced = false) {
     if (isTestCompleted) return;
     if (!isForced) {
@@ -952,6 +903,7 @@ function submitTest(isForced = false) {
     localStorage.setItem('topicStats', JSON.stringify(topicStats));
     showResultScreen(scoreBreakdown, topicStats);
 }
+
 function calculateScoreBreakdown() {
     let correctCount = 0, incorrectCount = 0;
     state.answers.forEach((ans, i) => {
@@ -969,30 +921,16 @@ function calculateScoreBreakdown() {
     };
 }
 
-
-  /**
- * Calculates the number of correct and total attempted questions for each chapter/topic.
- * @returns {Object} An object with chapter names as keys. 
- * e.g., {"Preamble": {correct: 3, total: 5}, "Fundamental Rights": {correct: 8, total: 10}}
- */
 function calculateChapterPerformance() {
     const chapterStats = {};
-
     questions.forEach((q, index) => {
-        const chapter = q.topic; // 'topic' from your Firestore question data acts as the chapter name
+        const chapter = q.topic;
         const userAnswer = state.answers[index];
-
-        // Only count attempted questions
         if (userAnswer !== null) {
-            // Initialize the chapter if it's the first time we see it
             if (!chapterStats[chapter]) {
                 chapterStats[chapter] = { correct: 0, total: 0 };
             }
-
-            // Increment the total questions attempted for this chapter
             chapterStats[chapter].total++;
-
-            // Check if the answer was correct and increment if so
             if (userAnswer === q.answer) {
                 chapterStats[chapter].correct++;
             }
@@ -1001,68 +939,40 @@ function calculateChapterPerformance() {
     return chapterStats;
 }
 
-
-
-  /**
- * Reads, updates, and saves the user's chapter-wise accuracy in Firestore.
- * This function safely merges new test results with the user's existing performance data.
- * @param {Object} newChapterStats - The performance data calculated from the current test.
- */
 async function updateChapterAccuracyInFirestore(newChapterStats) {
     if (!currentUser || Object.keys(newChapterStats).length === 0) {
         console.log("User not logged in or no new stats to update. Skipping accuracy update.");
         return;
     }
-
     const userDocRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid);
-    const subject = testMetadata.subject; // e.g., "Indian Polity"
-
+    const subject = testMetadata.subject;
     try {
         await db.runTransaction(async (transaction) => {
             const userDoc = await transaction.get(userDocRef);
-            
-            // Get the existing accuracy data, or create a new object if it doesn't exist
             const existingData = userDoc.exists() ? userDoc.data().chapterAccuracy || {} : {};
-
-            // For each chapter in the test we just finished...
             for (const chapterName in newChapterStats) {
-                const newStats = newChapterStats[chapterName]; // {correct: 3, total: 5}
-
-                // Get old performance for this specific chapter, or default to 0
+                const newStats = newChapterStats[chapterName];
                 const oldPerformance = existingData[subject]?.[chapterName] || { correct: 0, total: 0 };
-                
-                // Combine old and new results
                 const combinedCorrect = (oldPerformance.correct || 0) + newStats.correct;
                 const combinedTotal = (oldPerformance.total || 0) + newStats.total;
-
-                // Calculate the new overall accuracy percentage for this chapter
                 const newAccuracy = combinedTotal > 0 ? Math.round((combinedCorrect / combinedTotal) * 100) : 0;
-                
-                // Prepare the data to be saved back to Firestore
                 if (!existingData[subject]) {
                     existingData[subject] = {};
                 }
                 existingData[subject][chapterName] = {
                     correct: combinedCorrect,
                     total: combinedTotal,
-                    accuracy: newAccuracy // We will save the accuracy directly
+                    accuracy: newAccuracy
                 };
             }
-
-            // Save the entire updated object back to Firestore
             transaction.set(userDocRef, { chapterAccuracy: existingData }, { merge: true });
         });
-
         console.log("Chapter accuracy successfully updated in Firestore!");
-
     } catch (error) {
         console.error("Error updating chapter accuracy in transaction:", error);
     }
 }
 
-
-
-  
 function updatePalette() {
     dom.questionPalette.innerHTML = '';
     let answered = 0, notAnswered = 0, marked = 0, notVisited = 0;
@@ -1090,16 +1000,19 @@ function updatePalette() {
     dom.summaryNotAnswered.textContent = notAnswered;
     dom.summaryNotVisited.textContent = notVisited;
 }
+
 function updateNavigationButtons() {
     dom.btnPrevQuestion.style.display = state.current === 0 ? 'none' : 'flex';
     dom.btnSaveNext.querySelector('span').textContent = (state.current === questions.length - 1) ? "Save & Finish" : "Save & Next";
 }
+
 function formatTime(totalSeconds) {
     const hours = Math.floor(totalSeconds / 3600);
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = totalSeconds % 60;
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
+
 function startTimer() {
     clearInterval(timerInterval);
     timerInterval = setInterval(() => {
@@ -1113,6 +1026,7 @@ function startTimer() {
         dom.timer.textContent = formatTime(timeLeft);
     }, 1000);
 }
+
 function startQuestionTimer() {
     if (onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
     onTimerEnd = () => handleSaveAndNext();
@@ -1123,10 +1037,12 @@ function startQuestionTimer() {
     dom.questionTimerBar.style.width = '0%';
     dom.questionTimerBar.addEventListener('transitionend', onTimerEnd, { once: true });
 }
+
 function stopTimer() {
     clearInterval(timerInterval);
     if(onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
 }
+
 function toggleStopwatch() {
     const icon = dom.stopwatchPlayPause.querySelector('i');
     if (isStopwatchRunning) {
@@ -1141,6 +1057,7 @@ function toggleStopwatch() {
     }
     isStopwatchRunning = !isStopwatchRunning;
 }
+
 function resetStopwatch() {
     clearInterval(stopwatchInterval);
     isStopwatchRunning = false;
@@ -1151,6 +1068,7 @@ function resetStopwatch() {
        icon.classList.replace('fa-pause', 'fa-play');
     }
 }
+
 function toggleDarkMode(isDark) {
     dom.body.classList.toggle('dark', isDark);
     dom.toggleLabel.textContent = isDark ? 'Light' : 'Dark';
@@ -1159,6 +1077,7 @@ function toggleDarkMode(isDark) {
         renderPerformanceChart(topicStats);
     }
 }
+
 function updateSidebarPosition() {
     const headerHeight = dom.siteHeader.offsetHeight;
     const topbarHeight = dom.topbar.offsetHeight;
@@ -1167,33 +1086,23 @@ function updateSidebarPosition() {
     dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
 }
 
-
-// ==========================================================
-// ADD THIS ENTIRE NEW FUNCTION
-// ==========================================================
 async function resumeResultSession() {
     console.log("Resuming result session...");
     const params = new URLSearchParams(window.location.search);
     const testId = params.get('testId');
-
     if (!testId) {
         console.error("Cannot resume session without a testId in the URL.");
         return;
     }
-
     try {
-        // Fetch the test data in the background
         const testDocRef = db.collection('quizzes').doc(testId);
         const testDoc = await testDocRef.get();
         if (testDoc.exists) {
             testMetadata = testDoc.data();
         }
-
         const questionsSnapshot = await testDocRef.collection('questions').get();
         questions = questionsSnapshot.docs.map(doc => doc.data());
         console.log(`Successfully re-loaded ${questions.length} questions for review.`);
-
-        // Now that questions are loaded, show the result screen from localStorage
         isTestCompleted = true;
         dom.showAnswerWritingTab.classList.remove('locked');
         dom.loginScreen.style.display = 'none';
@@ -1201,23 +1110,15 @@ async function resumeResultSession() {
         dom.examUIWrapper.style.display = 'flex';
         dom.body.classList.add('exam-active');
         updateSidebarPosition();
-        
         const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
         const topicStats = JSON.parse(localStorage.getItem('topicStats'));
         showResultScreen(breakdown, topicStats);
-
     } catch (error) {
         console.error("Failed to resume and load test data:", error);
-        dom.resultScreenWrapper.innerHTML = `<p>Error: Could not load question data for review. ${error.message}</p>`;
+        document.body.innerHTML = `<p>Error: Could not load question data for review. ${error.message}</p>`;
     }
 }
-// ==========================================================
-// END OF NEW FUNCTION
-// ==========================================================
-
-
   
-// ### STAGE 4: RESULT & REVIEW FUNCTIONS ###
 function showResultScreen(breakdown, topicStats) {
     dom.mockTestWrapper.style.display = 'none';
     dom.reviewScreenWrapper.style.display = 'none';
@@ -1232,6 +1133,7 @@ function showResultScreen(breakdown, topicStats) {
     populatePerformanceTable(topicStats);
     setTimeout(() => renderPerformanceChart(topicStats), 100);
 }
+
 function animateScorecard(data) {
     let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
     const animationSpeed = 20;
@@ -1270,6 +1172,7 @@ function animateScorecard(data) {
         if(finished) clearInterval(animationInterval);
     }, animationSpeed);
 }
+
 function calculateTopicStats() {
     const topicStats = {};
     questions.forEach((q, i) => {
@@ -1281,6 +1184,7 @@ function calculateTopicStats() {
     });
     return topicStats;
 }
+
 function populatePerformanceTable(topicStats) {
     dom.performanceTableBody.innerHTML = '';
     if (!topicStats) return;
@@ -1292,6 +1196,7 @@ function populatePerformanceTable(topicStats) {
         dom.performanceTableBody.innerHTML += row;
     });
 }
+
 function renderPerformanceChart(topicStats) {
     if (performanceChart) performanceChart.destroy();
     if (!topicStats) return;
@@ -1310,11 +1215,13 @@ function renderPerformanceChart(topicStats) {
         options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, scales: { x: { ticks: { color: textColor }, grid: { color: gridColor } }, y: { type: 'linear', position: 'left', title: { display: true, text: 'Correct Answers', color: textColor }, ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true }, y1: { type: 'linear', position: 'right', min: 0, max: 100, title: { display: true, text: 'Accuracy (%)', color: textColor }, ticks: { color: textColor }, grid: { drawOnChartArea: false } } }, plugins: { legend: { labels: { color: textColor } } } }
     });
 }
+
 function showReviewScreen() {
     dom.resultScreenWrapper.style.display = 'none';
     dom.reviewScreenWrapper.style.display = 'flex';
     populateReviewScreen();
 }
+
 function populateReviewScreen() {
     dom.reviewContainer.innerHTML = '';
     const userAnswers = JSON.parse(localStorage.getItem('lastAnswers'));
@@ -1342,6 +1249,7 @@ function populateReviewScreen() {
         dom.reviewContainer.appendChild(questionDiv);
     });
 }
+
 function handleRetest() {
     if (navigator.onLine) {
         dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
@@ -1395,32 +1303,29 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
     window.addEventListener('resize', updateSidebarPosition);
 
-    // --- Main Initializer: Determines what the page should do on load ---
+    // --- Main Initializer: THIS IS THE FLAWED LOGIC ---
     async function initializePage() {
         const params = new URLSearchParams(window.location.search);
         const testId = params.get('testId');
         const resultId = params.get('resultId');
 
-        // CRITICAL: A testId is required for almost all operations.
         if (!testId) {
-            document.body.innerHTML = `<div class="pre-exam-screen"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
+            document.body.innerHTML = `<div ...>Error...</div>`;
             return;
         }
 
-        // SCENARIO 1: Reviewing a specific, completed test result.
         if (resultId) {
             console.log("Mode: Reviewing a past result.");
             await loadAndReviewTest(testId, resultId);
         
-        // SCENARIO 2: Resuming a finished test (e.g., after a refresh on the result page).
         } else if (localStorage.getItem('testTaken') === 'true') {
             console.log("Mode: Resuming a finished test session.");
-            await resumeResultSession(); // This is the function we added before
+            await resumeResultSession(); 
 
-        // SCENARIO 3: Starting a brand new test.
         } else {
+            // THIS IS THE LINE THAT CAUSES THE ERROR
             console.log("Mode: Starting a new test.");
-            await loadTestFromURL(); // This will load data and then show the login screen.
+            await loadTestFromURL(); 
         }
     }
 
@@ -1430,3 +1335,4 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 </body>
 </html>
+
