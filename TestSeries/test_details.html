@@ -38,7 +38,6 @@
 </head>
 <body class="text-slate-800 antialiased">
 
-    <!-- Simple Page Loader -->
     <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
         <div class="text-center">
             <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
@@ -46,7 +45,6 @@
         </div>
     </div>
 
-    <!-- Main Content (Hidden by default) -->
     <div id="main-content" class="hidden flex flex-col min-h-screen">
         <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
             <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
@@ -65,7 +63,6 @@
                     <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">A detailed report of all the tests you've attempted. Track your progress and review your performance.</p>
                 </div>
 
-                <!-- Performance Analytics Section -->
                 <section id="analytics-section" class="mb-12 hidden">
                     <h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">Performance Analytics</h2>
                     <div class="bg-white rounded-xl shadow-lg border border-slate-200/80 p-6">
@@ -130,16 +127,16 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
-        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.appspot.com", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
         
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const appId = 'default-app-id';
 
         const pageLoader = document.getElementById('page-loader');
         const mainContent = document.getElementById('main-content');
@@ -175,8 +172,8 @@
                     tableLoader.classList.add('hidden');
                     emptyState.classList.remove('hidden');
                 } else {
-                    allTestData = querySnapshot.docs.map(doc => doc.data());
-                    renderHistoryTable(querySnapshot.docs);
+                    allTestData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderHistoryTable(allTestData);
                     analyticsSection.classList.remove('hidden');
                     analyticsSection.classList.add('fade-in');
                     updateCharts('day');
@@ -198,14 +195,15 @@
                 const subject = attempt.subject || 'General';
                 subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
 
+                if (!attempt.timestamp) return; // Skip if no timestamp
                 const date = attempt.timestamp.toDate();
                 let key;
 
                 if (period === 'day') {
                     key = new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().split('T')[0];
                 } else if (period === 'week') {
-                    const firstDay = new Date(date.setDate(date.getDate() - date.getDay()));
-                    key = new Date(firstDay.getFullYear(), firstDay.getMonth(), firstDay.getDate()).toISOString().split('T')[0];
+                    const firstDayOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
+                    key = new Date(firstDayOfWeek.getFullYear(), firstDayOfWeek.getMonth(), firstDayOfWeek.getDate()).toISOString().split('T')[0];
                 } else { // month
                     key = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
                 }
@@ -234,6 +232,7 @@
         
         function renderLineChart(labels, data, period) {
             document.getElementById('line-chart-loader').style.display = 'none';
+            document.getElementById('score-line-chart').style.display = 'block';
             const ctx = document.getElementById('score-line-chart').getContext('2d');
             if (lineChartInstance) lineChartInstance.destroy();
             lineChartInstance = new Chart(ctx, {
@@ -264,6 +263,7 @@
 
         function renderPieChart(labels, data) {
              document.getElementById('pie-chart-loader').style.display = 'none';
+             document.getElementById('subject-pie-chart').style.display = 'block';
             const ctx = document.getElementById('subject-pie-chart').getContext('2d');
             if (pieChartInstance) pieChartInstance.destroy();
             pieChartInstance = new Chart(ctx, {
@@ -297,10 +297,10 @@
             });
         });
 
-        function renderHistoryTable(docs) {
+        function renderHistoryTable(attempts) {
             historyTableBody.innerHTML = '';
-            docs.forEach(doc => {
-                const attempt = doc.data();
+            attempts.forEach(attempt => {
+                if (!attempt.timestamp) return; // Skip if data is malformed
                 const date = attempt.timestamp.toDate();
                 const formattedDate = date.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
 
@@ -310,7 +310,7 @@
 
                 const row = `
                     <tr class="hover:bg-slate-50 transition-colors">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${attempt.testName} (Set ${attempt.testSet})</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${attempt.testName}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${attempt.subject}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">${attempt.score} / ${attempt.totalQuestions}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">
@@ -318,7 +318,7 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${formattedDate}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="TestSeries/test_sample.html?testId=${doc.id.split('_history_')[0]}&set=${attempt.testSet}&review=true" class="text-blue-600 hover:text-blue-800">Review</a>
+                            <a href="TestSeries/test_sample.html?testId=${attempt.testId}&reviewId=${attempt.id}" class="text-blue-600 hover:text-blue-800">Review</a>
                         </td>
                     </tr>
                 `;
@@ -328,4 +328,3 @@
     </script>
 </body>
 </html>
-
