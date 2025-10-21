@@ -32,22 +32,14 @@
 
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
 
     <script type="text/babel" data-presets="react">
         // --- De-structure React hooks for ease of use ---
         const { useState, useEffect, useRef } = React;
-
-        // --- De-structure Firebase functions from the global 'firebase' object ---
-        const { initializeApp } = firebase.app;
-        const { getAuth, onAuthStateChanged, signOut } = firebase.auth;
-        const { 
-            getFirestore, doc, onSnapshot, updateDoc, getDoc, 
-            setDoc, collection, addDoc, query, where, 
-            serverTimestamp, orderBy 
-        } = firebase.firestore;
 
         // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = { 
@@ -61,9 +53,10 @@
 
         const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; // Your Admin UID
 
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
+        // --- FIXED: Initialize Firebase (v8 Syntax) ---
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
         const appId = 'default-app-id'; // As per original HTML structure
 
         // --- Main App Component ---
@@ -86,23 +79,28 @@
             const [doubtError, setDoubtError] = useState(null);
 
             useEffect(() => {
-                const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+                // FIXED: v8 onAuthStateChanged
+                const unsubscribe = auth.onAuthStateChanged((currentUser) => {
                     if (currentUser) {
                         setUser(currentUser);
                         setIsAdmin(currentUser.uid === ADMIN_UID);
                         
-                        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
-                        const unsubSnapshot = onSnapshot(userDocRef, (docSnap) => {
-                            if (docSnap.exists()) {
+                        // FIXED: v8 db.collection.doc
+                        const userDocRef = db.collection(`artifacts/${appId}/users`).doc(currentUser.uid);
+                        // FIXED: v8 doc.onSnapshot
+                        const unsubSnapshot = userDocRef.onSnapshot((docSnap) => {
+                            if (docSnap.exists) {
                                 setUserData(docSnap.data());
                             } else {
                                 const newUserProfile = {
                                     displayName: currentUser.displayName || 'UPSC Aspirant',
                                     email: currentUser.email,
-                                    createdAt: serverTimestamp(),
+                                    // FIXED: v8 serverTimestamp
+                                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                                     isPremium: false,
                                 };
-                                setDoc(userDocRef, newUserProfile);
+                                // FIXED: v8 doc.set
+                                userDocRef.set(newUserProfile);
                                 setUserData(newUserProfile);
                             }
                             setLoading(false);
@@ -119,12 +117,15 @@
             }, []);
 
             useEffect(() => {
-                // This effect now runs by default since it's the only view
                 if (!selectedChapter) return;
                 
-                const doubtsCollectionRef = collection(db, "doubts");
-                const q = query(doubtsCollectionRef, where("chapter", "==", selectedChapter), orderBy("timestamp", "desc"));
-                const unsubscribe = onSnapshot(q, (snapshot) => {
+                // FIXED: v8 db.collection
+                const doubtsCollectionRef = db.collection("doubts");
+                // FIXED: v8 query chaining
+                const q = doubtsCollectionRef.where("chapter", "==", selectedChapter).orderBy("timestamp", "desc");
+                
+                // FIXED: v8 query.onSnapshot
+                const unsubscribe = q.onSnapshot((snapshot) => {
                     setDoubts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }, (err) => {
                     console.error("Error fetching doubts:", err);
@@ -134,7 +135,8 @@
             }, [selectedChapter]);
 
 
-            const handleLogout = () => signOut(auth).catch(error => console.error("Logout Error:", error));
+            // FIXED: v8 auth.signOut
+            const handleLogout = () => auth.signOut().catch(error => console.error("Logout Error:", error));
             const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
             const handleDoubtSubmit = async (e) => {
@@ -144,14 +146,16 @@
                 }
                 setIsSubmittingDoubt(true); setDoubtError(null);
                 try {
-                    await addDoc(collection(db, "doubts"), {
+                    // FIXED: v8 db.collection.add
+                    await db.collection("doubts").add({
                         chapter: selectedChapter,
                         question: newDoubt,
                         askedBy: user.uid,
                         askedByName: userData.displayName || 'Aspirant',
                         isAnswered: false,
                         answer: "",
-                        timestamp: serverTimestamp(),
+                        // FIXED: v8 serverTimestamp
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     });
                     setNewDoubt('');
                 } catch (err) {
@@ -164,10 +168,12 @@
             const handleAnswerSubmit = async (doubtId, answerText) => {
                 if (!isAdmin || answerText.trim() === '') return;
                 try {
-                    await updateDoc(doc(db, "doubts", doubtId), {
+                    // FIXED: v8 db.collection.doc.update
+                    await db.collection("doubts").doc(doubtId).update({
                         answer: answerText,
                         isAnswered: true,
-                        answeredTimestamp: serverTimestamp()
+                        // FIXED: v8 serverTimestamp
+                        answeredTimestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } catch (err) { console.error("Error submitting answer:", err); }
             };
@@ -216,7 +222,6 @@
                         <div className="mb-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700"><h2 className="text-xl font-bold mb-4">Ask a Doubt in <span className="text-blue-600">{selectedChapter}</span></h2><form onSubmit={handleDoubtSubmit}><textarea value={newDoubt} onChange={(e) => setNewDoubt(e.target.value)} placeholder="Type your question here..." className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 mb-4" rows="4"></textarea>{doubtError && <p className="text-red-500 text-sm mb-3">{doubtError}</p>}<button type="submit" disabled={isSubmittingDoubt} className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300">{isSubmittingDoubt ? 'Submitting...' : 'Submit Your Doubt'}</button></form></div>
                         <div>
                             <h2 className="text-xl font-bold mb-4">Recent Doubts</h2>
-                            {/* --- THIS IS THE FIX --- */}
                             {doubts.length > 0 ? (doubts.map(doubt => <DoubtCard key={doubt.id} doubt={doubt} />)) : (<div className="text-center py-10 px-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700"><p className="text-gray-500 dark:text-slate-400">No doubts have been asked in this chapter yet.</p></div>)}
                         </div>
                     </div>
