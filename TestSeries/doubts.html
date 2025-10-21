@@ -23,35 +23,33 @@
     </style>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900">
-    <!-- This is where our React app will be rendered -->
     <div id="root">
         <div id="loader">Loading UPSC Hub Dashboard...</div>
     </div>
 
-    <!-- 1. React Libraries -->
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
 
-    <!-- 2. Babel to transpile JSX in the browser -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- 3. Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <!-- 4. The React Application Code -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js"></script>
+
     <script type="text/babel" data-presets="react">
-        // --- FIREBASE IMPORTS ---
-        // We are using ES Modules for Firebase, which are supported in modern browsers.
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-        import { 
+        // --- De-structure React hooks for ease of use ---
+        const { useState, useEffect, useRef } = React;
+
+        // --- FIXED: De-structure Firebase functions from the global 'firebase' object ---
+        const { initializeApp } = firebase.app;
+        const { getAuth, onAuthStateChanged, signOut } = firebase.auth;
+        const { 
             getFirestore, doc, onSnapshot, updateDoc, getDoc, 
             setDoc, collection, addDoc, query, where, 
             serverTimestamp, orderBy 
-        } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
-
-        // De-structure React hooks for ease of use
-        const { useState, useEffect, useRef } = React;
+        } = firebase.firestore;
 
         // --- FIREBASE CONFIGURATION ---
         const firebaseConfig = { 
@@ -63,7 +61,7 @@
             appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
         };
 
-        const ADMIN_UID = "REPLACE_WITH_YOUR_ADMIN_UID";
+        const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93";
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
