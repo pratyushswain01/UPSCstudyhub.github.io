@@ -226,8 +226,15 @@
                 return () => unsubscribe();
             }, []);
 
+            // ==========================================
+            // === THIS FUNCTION IS THE ONLY CHANGE ===
+            // ==========================================
             useEffect(() => {
                 if (!selectedChapter) return;
+                
+                // Clear errors and doubts when chapter changes
+                setDoubtError(null);
+                setDoubts([]); 
                 
                 const doubtsCollectionRef = db.collection("doubts");
                 const q = doubtsCollectionRef.where("chapter", "==", selectedChapter).orderBy("timestamp", "desc");
@@ -235,11 +242,17 @@
                 const unsubscribe = q.onSnapshot((snapshot) => {
                     setDoubts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }, (err) => {
+                    // --- UPDATED CODE ---
+                    // This will log the full error to your browser's console (Press F12)
                     console.error("Error fetching doubts:", err);
-                    setDoubtError("Could not fetch doubts for this chapter.");
+                    // This will show a more useful error message to the user
+                    setDoubtError(`Could not fetch doubts: ${err.message}`);
+                    // --- END OF UPDATE ---
                 });
                 return () => unsubscribe();
             }, [selectedChapter]);
+            // ==========================================
+            // ==========================================
 
             useEffect(() => {
                 if (window.innerWidth < 768) {
@@ -250,9 +263,6 @@
             const handleLogout = () => auth.signOut().catch(error => console.error("Logout Error:", error));
             const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
-            // ==========================================
-            // === THIS FUNCTION IS THE ONLY CHANGE ===
-            // ==========================================
             const handleDoubtSubmit = async (e) => {
                 e.preventDefault();
                 if (newDoubt.trim() === '' || !user) {
@@ -271,18 +281,12 @@
                     });
                     setNewDoubt('');
                 } catch (err) {
-                    // --- UPDATED CODE ---
-                    // This will log the full error to your browser's console (Press F12)
                     console.error("Error submitting doubt:", err); 
-                    // This will show a more useful error message to the user
                     setDoubtError(`Failed to submit: ${err.message}`); 
-                    // --- END OF UPDATE ---
                 } finally {
                     setIsSubmittingDoubt(false);
                 }
             };
-            // ==========================================
-            // ==========================================
 
             const handleAnswerSubmit = async (doubtId, answerText) => {
                 if (!isAdmin || answerText.trim() === '') return;
