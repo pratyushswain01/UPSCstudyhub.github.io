@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
-        /* Simple loader style */
         #loader {
             display: flex;
             align-items: center;
@@ -67,8 +66,6 @@
         const IconAnalysis = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>;
         const IconLogout = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>;
 
-
-        // --- BUG FIX: Moved DoubtCard component outside App ---
         const DoubtCard = ({ doubt, isAdmin, handleAnswerSubmit }) => {
             const [answer, setAnswer] = useState('');
             const [isAnswering, setIsAnswering] = useState(false);
@@ -108,7 +105,6 @@
             );
         };
 
-        // --- BUG FIX: Moved DoubtsView component outside App ---
         const DoubtsView = ({
             upscSubjects, selectedChapter, setSelectedChapter, doubts,
             newDoubt, setNewDoubt, handleDoubtSubmit, isSubmittingDoubt,
@@ -174,22 +170,19 @@
             </div>
         );
 
-        // --- Placeholder for other pages ---
         const PlaceholderView = ({ title }) => (
             <div className="flex items-center justify-center h-96 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
                 <h1 className="text-3xl font-bold text-slate-400 dark:text-slate-500">{title} Page (Coming Soon)</h1>
             </div>
         );
 
-
-        // --- Main App Component ---
         const App = () => {
             const [user, setUser] = useState(null);
             const [userData, setUserData] = useState({});
             const [isAdmin, setIsAdmin] = useState(false);
             const [loading, setLoading] = useState(true);
-            const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768); // Open by default on desktop
-            const [activePage, setActivePage] = useState('Doubts'); // NEW: State for active page
+            const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+            const [activePage, setActivePage] = useState('Doubts');
 
             const upscSubjects = [
                 "Indian Polity", "History - Ancient India", "History - Medieval India",
@@ -203,7 +196,6 @@
             const [doubtError, setDoubtError] = useState(null);
 
             useEffect(() => {
-                // Auth listener
                 const unsubscribe = auth.onAuthStateChanged((currentUser) => {
                     if (currentUser) {
                         setUser(currentUser);
@@ -229,15 +221,12 @@
                     } else {
                         setUser(null);
                         setLoading(false);
-                        // Optional: Redirect to login
-                        // window.location.href = 'TestSeries/auth.html';
                     }
                 });
                 return () => unsubscribe();
             }, []);
 
             useEffect(() => {
-                // Fetch doubts listener
                 if (!selectedChapter) return;
                 
                 const doubtsCollectionRef = db.collection("doubts");
@@ -253,7 +242,6 @@
             }, [selectedChapter]);
 
             useEffect(() => {
-                // Close sidebar on mobile when changing page
                 if (window.innerWidth < 768) {
                     setSidebarOpen(false);
                 }
@@ -262,6 +250,9 @@
             const handleLogout = () => auth.signOut().catch(error => console.error("Logout Error:", error));
             const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
+            // ==========================================
+            // === THIS FUNCTION IS THE ONLY CHANGE ===
+            // ==========================================
             const handleDoubtSubmit = async (e) => {
                 e.preventDefault();
                 if (newDoubt.trim() === '' || !user) {
@@ -280,11 +271,18 @@
                     });
                     setNewDoubt('');
                 } catch (err) {
-                    setDoubtError("Failed to submit your doubt.");
+                    // --- UPDATED CODE ---
+                    // This will log the full error to your browser's console (Press F12)
+                    console.error("Error submitting doubt:", err); 
+                    // This will show a more useful error message to the user
+                    setDoubtError(`Failed to submit: ${err.message}`); 
+                    // --- END OF UPDATE ---
                 } finally {
                     setIsSubmittingDoubt(false);
                 }
             };
+            // ==========================================
+            // ==========================================
 
             const handleAnswerSubmit = async (doubtId, answerText) => {
                 if (!isAdmin || answerText.trim() === '') return;
@@ -297,19 +295,16 @@
                 } catch (err) { console.error("Error submitting answer:", err); }
             };
             
-            if (loading) return null; // Root loader is already showing
+            if (loading) return null;
             if (!user) return (
                 <div className="flex items-center justify-center h-screen text-center p-8">
                     <div>
                         <h2 className="text-2xl font-bold mb-4">Please Log In</h2>
                         <p className="text-slate-600">You must be logged in to access the UPSChub dashboard.</p>
-                        {/* Add a login button here if auth.html is the intended page */}
-                        {/* <a href="TestSeries/auth.html" className="mt-6 inline-block px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">Go to Login</a> */}
                     </div>
                 </div>
             );
 
-            // --- Sidebar Link Component ---
             const NavLink = ({ title, icon, pageName }) => {
                 const isActive = activePage === pageName;
                 return (
@@ -331,7 +326,6 @@
 
             return (
                 <div className="min-h-screen text-slate-800 dark:text-slate-200">
-                    {/* --- Header --- */}
                     <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
                         <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                             <div className="flex items-center gap-2">
@@ -352,7 +346,6 @@
                         </div>
                     </header>
 
-                    {/* --- Mobile Overlay --- */}
                     {isSidebarOpen && (
                         <div 
                             className="fixed inset-0 bg-black/50 z-30 md:hidden"
@@ -361,7 +354,6 @@
                     )}
 
                     <div className="relative min-h-screen md:flex">
-                        {/* --- NEW Sidebar --- */}
                         <aside className={`fixed md:relative top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out z-40 pt-20 md:pt-6 border-r dark:border-slate-700`}>
                             <nav className="p-4 flex flex-col h-full justify-between">
                                 <ul className="space-y-2">
@@ -385,9 +377,7 @@
                             </nav>
                         </aside>
                         
-                        {/* --- Main content area --- */}
                         <main className="flex-1 transition-all duration-300 ease-in-out p-4 sm:p-6">
-                            {/* --- Conditionally render content based on activePage --- */}
                             {activePage === 'Doubts' && (
                                 <DoubtsView 
                                     upscSubjects={upscSubjects}
@@ -413,7 +403,6 @@
             );
         };
 
-        // Render the App component into the #root div
         ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
