@@ -12,70 +12,59 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .footer-nav a.active { color: #2563EB; /* blue-600 */ transform: scale(1.1); }
+        /* CSS Styles (keep your existing styles) */
+        body { font-family: 'Inter', sans-serif; opacity: 0; transition: opacity 0.5s ease-in-out; } /* Start hidden */
+        .loaded body { opacity: 1; } /* Fade in when loaded */
+        .footer-nav a.active { color: #2563EB; transform: scale(1.1); }
         .footer-nav a { transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
-        .tab-active { background-color: #3B82F6; /* blue-500 */ color: white; }
+        .tab-active { background-color: #3B82F6; color: white; }
         .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-        }
-        .confetti-piece {
-            position: absolute; width: 10px; height: 20px; border-radius: 50%;
-            opacity: 0; animation: fall 5s linear infinite;
-        }
-        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; /* blue-500 */ }
+        @keyframes fall { 0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+        .confetti-piece { position: absolute; width: 10px; height: 20px; border-radius: 50%; opacity: 0; animation: fall 5s linear infinite; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
         .toggle-checkbox { transition: transform 0.2s ease-in-out; }
-        .toggle-checkbox:checked { transform: translateX(1rem); /* Adjust based on label size */ }
+        .toggle-checkbox:checked { transform: translateX(1rem); }
         .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
-        .faq-question.open + .faq-answer { max-height: 200px; /* Adjust as needed */ }
+        .faq-question.open + .faq-answer { max-height: 200px; }
         .faq-question .icon { transition: transform 0.3s ease-in-out; }
         .faq-question.open .icon { transform: rotate(180deg); }
-        .calendar-day.has-activity { background-color: #bfdbfe; /* blue-200 */ color: #1e40af; /* blue-800 */ border-radius: 50%; font-weight: bold; }
-        .calendar-day.selected-day { background-color: #3b82f6; /* blue-500 */ color: white; border-radius: 50%; }
-
-        #welcome-banner {
-            position: relative;
-            background-size: cover;
-            background-position: center;
-            transition: background-image 0.5s ease-in-out;
-            overflow: hidden; /* Ensure overlay respects border radius */
-        }
-        #welcome-banner::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.35); /* Dark overlay */
-            border-radius: 1rem; /* Match parent's rounded-2xl */
-            z-index: 1;
-        }
-        #welcome-banner > * {
-            position: relative; /* Ensure content is above overlay */
-            z-index: 2;
-        }
-        /* Fix Chart.js tooltip color in dark mode */
+        .calendar-day.has-activity { background-color: #bfdbfe; color: #1e40af; border-radius: 50%; font-weight: bold; }
+        .calendar-day.selected-day { background-color: #3b82f6; color: white; border-radius: 50%; }
+        #welcome-banner { position: relative; background-size: cover; background-position: center; transition: background-image 0.5s ease-in-out; overflow: hidden; }
+        #welcome-banner::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.35); border-radius: 1rem; z-index: 1; }
+        #welcome-banner > * { position: relative; z-index: 2; }
         .chartjs-tooltip { background: rgba(0, 0, 0, 0.7) !important; color: white !important; }
         .chartjs-tooltip-key { background-color: #3B82F6 !important; }
     </style>
     <script>
-      // Ensure Tailwind uses the 'class' strategy for dark mode
       tailwind.config = { darkMode: 'class' }
     </script>
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
 
     <div id="flash-notification" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[100] md:left-auto md:translate-x-0 md:right-5 md:bottom-5">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border dark:border-slate-700 p-4 transform transition-all duration-300 translate-y-8 opacity-0">
-            </div>
+       <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border dark:border-slate-700 p-4 transform transition-all duration-300 translate-y-8 opacity-0">
+         <div class="flex items-start gap-3">
+             <div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-full">
+                 <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+             </div>
+             <div class="flex-1">
+                 <p id="flash-title" class="font-bold text-slate-800 dark:text-white"></p>
+                 <p id="flash-message" class="text-sm text-slate-600 dark:text-slate-300 mt-1"></p>
+                 <button id="flash-action-btn" class="hidden mt-3 text-sm font-semibold text-blue-600 hover:underline">View Now</button>
+             </div>
+             <button id="flash-close-btn" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                 <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+             </button>
+         </div>
+       </div>
     </div>
 
-    <div id="app-view" class="opacity-0 transition-opacity duration-500 ease-in-out">
+    <div id="app-view">
         <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-           <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                 <div class="flex items-center gap-2">
-                    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 md:hidden"> {/* Hide on medium+ */}
+                    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 md:hidden">
                         <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
                     <a href="TestSeries/dashboard.html" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
@@ -89,7 +78,11 @@
                             <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
                         </button>
                         <div id="streak-tooltip" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl p-3 z-20 text-sm border dark:border-slate-700">
-                           </div>
+                            <p><strong>Current Streak:</strong> <span id="current-streak">0</span> days</p>
+                            <p><strong>Highest Streak:</strong> <span id="highest-streak">0</span> days</p>
+                            <p><strong>Today's Tests:</strong> <span id="today-tests">0</span></p>
+                            <p class="text-xs text-slate-500 mt-2">Complete 2 tests to extend!</p>
+                        </div>
                     </div>
                     <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                         <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
@@ -100,67 +93,43 @@
                            <svg id="account-placeholder-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
                        </button>
                         <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20 border dark:border-slate-700">
-                           </div>
+                           <div class="px-4 py-2 border-b dark:border-slate-700"><p class="font-semibold text-sm" id="dropdown-display-name"></p><p class="text-xs text-slate-500 dark:text-slate-400 truncate" id="user-email-display"></p></div>
+                           <div class="py-1"><a href="#" id="dropdown-profile-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">My Profile</a><a href="#" id="dropdown-settings-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Settings</a><div class="p-2"><div class="p-2 flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50"><span class="text-sm font-medium">Dark Mode</span><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="dropdown-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="dropdown-theme-toggle" class="toggle-label block overflow-hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div></div></div>
+                           <div class="border-t border-slate-200 dark:border-slate-700"></div><a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
+                        </div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <div class="relative min-h-screen md:flex"> {/* Use flex for sidebar layout on md+ */}
+        <div class="relative min-h-screen md:flex">
             <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
             <aside id="sidebar" class="fixed md:relative top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out z-40 pt-20 md:pt-6 border-r dark:border-slate-700">
-                 <nav class="p-4">
-                     <ul class="space-y-2">
-                         <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> Planner</a></li>
-                         <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg> Browse</a></li>
-                         <li><a href="TestSeries/test_hub.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Test Series</a></li>
-                         <li><a href="TestSeries/doubts.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Doubts</a></li>
-                         <li><a href="TestSeries/test_details.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Analysis</a></li>
-                     </ul>
-                 </nav>
+                 <nav class="p-4"> <ul class="space-y-2"> /* Sidebar Links */ </ul> </nav>
             </aside>
 
-            <main id="main-content" class="flex-1 transition-margin duration-300 ease-in-out"> {/* Use transition-margin */}
+            <main id="main-content" class="flex-1 transition-margin duration-300 ease-in-out">
                 <div class="container mx-auto p-4 sm:p-6 pb-24">
-                   <div id="home-view">
-                       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="lg:col-span-2 space-y-6">
-                               <div id="welcome-banner" class="p-6 rounded-2xl shadow-lg text-white"> /* ... banner content ... */ </div>
-                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"> /* ... stat cards ... */ </div>
-                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border dark:border-slate-700">
-                                    <h3 class="text-lg font-bold mb-4">Performance Overview</h3>
-                                    <div> <canvas id="performanceChart"></canvas> </div>
-                                </div>
-                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border dark:border-slate-700">
-                                    <h3 class="text-lg font-bold mb-4">Recent Test Results</h3>
-                                    <div id="recent-tests-container" class="space-y-4"> /* ... recent tests load here ... */ </div>
-                                </div>
-                            </div>
-                            <div class="lg:col-span-1 space-y-6">
-                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24 border dark:border-slate-700">
-                                   <h3 id="activity-date-heading" class="text-lg font-bold mb-4 flex justify-between items-center"> /* ... */ </h3>
-                                    <div id="productivity-section" class="mb-6 hidden"> /* ... */ </div>
-                                    <div id="dashboard-activity-timeline" class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:h-full before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
-                                       </div>
-                                </div>
-                            </div>
+                    <div id="home-view">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                           <div class="lg:col-span-2 space-y-6">
+                              <div id="welcome-banner" class="p-6 rounded-2xl shadow-lg text-white bg-gradient-to-r from-blue-500 to-indigo-600"> <div class="flex justify-between items-start"><div><h1 id="welcome-heading" class="text-3xl font-bold"></h1><p class="mt-1 opacity-80"></p></div><div id="date-time-container" class="text-right flex-shrink-0 ml-4 hidden sm:block"><p id="time-display" class="text-2xl font-bold"></p><p id="date-display" class="text-sm opacity-80"></p></div></div> </div>
+                              <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4"> <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4 border dark:border-slate-700"><div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full">/* icon */</div><div><p class="text-sm text-slate-500 dark:text-slate-400">Accuracy</p><p id="accuracy-value" class="text-lg font-bold">--%</p></div></div> <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4 border dark:border-slate-700"><div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full">/* icon */</div><div><p class="text-sm text-slate-500 dark:text-slate-400">Tests Taken</p><p id="tests-taken-value" class="text-lg font-bold">--</p></div></div> <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4 border dark:border-slate-700"><div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full">/* icon */</div><div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. Score</p><p id="avg-score-value" class="text-lg font-bold">--</p></div></div> <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4 border dark:border-slate-700"><div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full">/* icon */</div><div><p class="text-sm text-slate-500 dark:text-slate-400">Best Subject</p><p id="best-subject-value" class="text-lg font-bold">--</p></div></div> </div>
+                              <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border dark:border-slate-700"> <h3 class="text-lg font-bold mb-4">Performance Overview</h3> <div><canvas id="performanceChart"></canvas></div> </div>
+                              <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border dark:border-slate-700"> <h3 class="text-lg font-bold mb-4">Recent Test Results</h3> <div id="recent-tests-container" class="space-y-4"></div> </div>
+                           </div>
+                           <div class="lg:col-span-1 space-y-6"> <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24 border dark:border-slate-700"> <h3 id="activity-date-heading" class="text-lg font-bold mb-4 flex justify-between items-center"><span></span><button id="add-task-btn">/* icon */</button></h3> <div id="productivity-section" class="mb-6 hidden"> /* ... */ </div> <div id="dashboard-activity-timeline" class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:h-full before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700"></div> </div> </div>
                         </div>
                     </div>
-
-                    <div id="notifications-view" class="hidden"> /* ... notifications content ... */ </div>
-
-                    <div id="settings-view" class="hidden"> /* ... settings content ... */ </div>
-
-                    <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-                        <p class="text-sm text-slate-500 dark:text-slate-400">© 2025 UPSChub. All Rights Reserved.</p>
-                   </div>
+                    <div id="notifications-view" class="hidden"> /* ... */ </div>
+                    <div id="settings-view" class="hidden"> /* ... */ </div>
+                    <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-slate-700"> <p class="text-sm text-slate-500 dark:text-slate-400">© 2025 UPSChub.</p> </div>
                 </div>
             </main>
         </div>
 
         <footer class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-[0_-2px_5px_-1px_rgba(0,0,0,0.1)] z-50 border-t dark:border-slate-700">
-             <nav class="container mx-auto px-4 h-16 flex justify-around items-center footer-nav">
-               </nav>
+             <nav class="container mx-auto px-4 h-16 flex justify-around items-center footer-nav"> /* Nav Links */ </nav>
         </footer>
     </div>
 
@@ -174,7 +143,7 @@
     <div id="faq-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> /* ... */ </div>
     <div id="terms-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> /* ... */ </div>
     <div id="privacy-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop"> /* ... */ </div>
-    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop"> /* ... */ </div>
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop"> <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6"><p id="alert-message" class="font-medium"></p><button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button></div> </div>
     <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center modal-backdrop"> /* ... */ </div>
     <div id="congrats-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop"> /* ... */ </div>
 
@@ -185,419 +154,367 @@
     import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc, getDoc, setDoc, collection, query, getDocs, orderBy, serverTimestamp, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    // --- FIREBASE CONFIG ---
-    const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    // --- MAIN APP INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log("DOM fully loaded and parsed.");
 
-    // --- ELEMENT SELECTORS --- (Shortened for brevity - Assume all your elements are correctly selected here)
-    const appView = document.getElementById('app-view');
-    const userEmailDisplay = document.getElementById('user-email-display');
-    // ... (include all your other element selectors here) ...
-    const dropdownDisplayName = document.getElementById('dropdown-display-name');
-    const displayNameSettings = document.getElementById('settings-display-name');
-    const userEmailDisplaySettings = document.getElementById('settings-user-email');
-    const subscriptionItem = document.getElementById('subscription-item');
-    const emailToggle = document.getElementById('email-toggle');
-    const inAppToggle = document.getElementById('in-app-toggle');
-    const welcomeHeading = document.getElementById('welcome-heading');
-    const welcomeBanner = document.getElementById('welcome-banner');
-    const timeDisplay = document.getElementById('time-display');
-    const dateDisplay = document.getElementById('date-display');
-    const accuracyValueEl = document.getElementById('accuracy-value');
-    const testsTakenValueEl = document.getElementById('tests-taken-value');
-    const avgScoreValueEl = document.getElementById('avg-score-value');
-    const bestSubjectValueEl = document.getElementById('best-subject-value');
-    const recentTestsContainer = document.getElementById('recent-tests-container');
-    const currentStreakSpan = document.getElementById('current-streak');
-    const highestStreakSpan = document.getElementById('highest-streak');
-    const todayTestsSpan = document.getElementById('today-tests');
-    const dashboardActivityTimeline = document.getElementById('dashboard-activity-timeline');
-    const productivitySection = document.getElementById('productivity-section');
-    const productivityBar = document.getElementById('productivity-bar');
-    const productivityPercentage = document.getElementById('productivity-percentage');
-    const alertModal = document.getElementById('alert-modal');
-    const alertMessage = document.getElementById('alert-message');
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-    const mainContent = document.getElementById('main-content');
-    const accountBtn = document.getElementById('account-btn');
-    const accountDropdown = document.getElementById('account-dropdown');
-    const streakBtn = document.getElementById('streak-btn');
-    const streakTooltip = document.getElementById('streak-tooltip');
-    const calendarBtn = document.getElementById('calendar-btn');
-    const calendarModal = document.getElementById('calendar-modal');
-    const closeCalendarModalBtn = document.getElementById('close-calendar-modal');
-    const profileModal = document.getElementById('edit-profile-modal');
-    const passwordModal = document.getElementById('change-password-modal');
-    const notificationPrefsModal = document.getElementById('notification-prefs-modal');
-    const deleteAccountModal = document.getElementById('delete-account-modal');
-    const contactModal = document.getElementById('contact-modal');
-    const faqModal = document.getElementById('faq-modal');
-    const termsModal = document.getElementById('terms-modal');
-    const privacyModal = document.getElementById('privacy-modal');
-    const addTaskModal = document.getElementById('add-task-modal');
-    const congratsModal = document.getElementById('congrats-modal');
-    const successAnimationModal = document.getElementById('success-animation-modal');
-    const navButtons = { home: document.getElementById('nav-home'), dashboard: document.getElementById('nav-dashboard'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
-    // ... Add other necessary selectors ...
-
-    let selectedDateStr = new Date().toISOString().split('T')[0];
-    let performanceChartInstance = null;
-    let timeUpdateInterval = null;
-    let currentDayString = new Date().toISOString().split('T')[0];
-    let todaysTasks = [];
-    let unsubscribeUserPerformance = null; // To store the listener unsubscribe function
-    let unsubscribeUserData = null; // To store the user data listener
-
-    // --- HELPER FUNCTION ---
-    function showAlert(message) { /* ... keep existing ... */ }
-    document.getElementById('alert-ok').addEventListener('click', () => alertModal.classList.add('hidden'));
-
-    // --- SIDEBAR LOGIC ---
-    function handleSidebarState() {
-        const isMobile = window.innerWidth < 768; // md breakpoint
-        if (sidebar.classList.contains('-translate-x-full')) {
-            sidebarBackdrop.classList.add('hidden');
-             if (!isMobile) { // Only adjust margin if sidebar was visible
-                 mainContent.style.marginLeft = '0';
-             }
-        } else {
-             if (isMobile) {
-                 sidebarBackdrop.classList.remove('hidden');
-                 mainContent.style.marginLeft = '0'; // No margin on mobile
-             } else {
-                 sidebarBackdrop.classList.add('hidden'); // No backdrop on desktop
-                 mainContent.style.marginLeft = '16rem'; // 64 * 4 = 256px = w-64
-             }
-        }
-     }
-     function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); handleSidebarState(); }
-     // Initial setup based on screen size
-     if (window.innerWidth >= 768) {
-         sidebar.classList.remove('-translate-x-full');
-     }
-     handleSidebarState(); // Call once to set initial margin
-     window.addEventListener('resize', handleSidebarState); // Adjust on resize
-
-
-    // --- NOTIFICATION FUNCTIONS --- (Keep your existing functions)
-    async function checkAndDisplayNotifications(user) { /* ... keep existing ... */ }
-    async function renderAllNotifications() { /* ... keep existing ... */ }
-
-    // --- AUTHENTICATION & DATA LISTENER ---
-    onAuthStateChanged(auth, user => {
-        if (user) {
-            console.log("Auth State Changed: User Logged In", user.uid);
-            appView.classList.remove('opacity-0'); // Show app view smoothly
-            appView.classList.remove('hidden'); // Ensure it's not hidden if previously logged out
-
-            checkAndDisplayNotifications(user); // Check for notifications
-
-            renderPerformanceChart(); // Initialize chart structure once
-
-            // Stop previous listeners if they exist
-            if (unsubscribeUserData) unsubscribeUserData();
-            if (unsubscribeUserPerformance) unsubscribeUserPerformance();
-
-            // Start real-time listener for user document (profile, settings, activity)
-            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
-            unsubscribeUserData = onSnapshot(userDocRef, (docSnap) => {
-                console.log("User Data Snapshot Received");
-                if (docSnap.exists()) {
-                    const userData = docSnap.data();
-                    const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
-                    const userEmail = user.email || 'No email found';
-
-                    // Update UI elements related to user profile
-                    if (dropdownDisplayName) dropdownDisplayName.textContent = displayName;
-                    if (displayNameSettings) displayNameSettings.textContent = displayName;
-                    if (userEmailDisplay) userEmailDisplay.textContent = userEmail;
-                    if (userEmailDisplaySettings) userEmailDisplaySettings.textContent = userEmail;
-                    // Update Avatar if available
-                    const accountAvatar = document.getElementById('account-avatar');
-                    const placeholderIcon = document.getElementById('account-placeholder-icon');
-                    if(user.photoURL) {
-                        if (accountAvatar) {
-                            accountAvatar.src = user.photoURL;
-                            accountAvatar.classList.remove('hidden');
-                        }
-                        if (placeholderIcon) placeholderIcon.classList.add('hidden');
-                    } else {
-                         if (accountAvatar) accountAvatar.classList.add('hidden');
-                         if (placeholderIcon) placeholderIcon.classList.remove('hidden');
-                    }
-
-
-                    updateSubscriptionUI(userData.isPremium);
-                    updateStreakUI(userData.streak, userData.activity);
-                    updateDashboardActivity(selectedDateStr); // Update schedule for selected date
-
-                    // Initialize time/greeting only once
-                    if (!timeUpdateInterval) {
-                        initializeTimeBasedUI();
-                    }
-                    // Update notification preferences
-                    if (userData.preferences) {
-                        if (emailToggle) emailToggle.checked = userData.preferences.receiveEmails ?? true;
-                        if (inAppToggle) inAppToggle.checked = userData.preferences.receiveInAppAnnouncements ?? true;
-                    }
-                } else {
-                    console.log("User document doesn't exist, creating one...");
-                    // Create user document if it doesn't exist
-                    setDoc(userDocRef, {
-                        displayName: user.displayName || 'UPSC Aspirant',
-                        email: user.email,
-                        createdAt: serverTimestamp(),
-                        isPremium: false,
-                        preferences: { receiveEmails: true, receiveInAppAnnouncements: true },
-                        streak: { current: 0, highest: 0, lastUpdatedDate: null },
-                        activity: {}
-                    }).catch(error => console.error("Error creating user document:", error));
-                }
-            }, (error) => {
-                console.error("Error listening to user document:", error);
-                showAlert("Could not load user profile data.");
-            });
-
-            // Start the real-time listener for performance data (test results)
-            unsubscribeUserPerformance = processUserPerformance(user.uid);
-
-            attachAllEventListeners(); // Attach event listeners after user is confirmed
-
-        } else {
-            console.log("Auth State Changed: User Logged Out");
-            // Stop listeners if user logs out
-            if (unsubscribeUserData) {
-                console.log("Stopping user data listener.");
-                unsubscribeUserData();
-                unsubscribeUserData = null;
-            }
-            if (unsubscribeUserPerformance) {
-                console.log("Stopping performance listener.");
-                unsubscribeUserPerformance();
-                unsubscribeUserPerformance = null;
-            }
-            // Clear interval if user logs out
-             if (timeUpdateInterval) {
-                 clearInterval(timeUpdateInterval);
-                 timeUpdateInterval = null;
-             }
-
-            // Redirect to login page
-            window.location.href = 'TestSeries/auth.html';
-        }
-    });
-
-    // --- PERFORMANCE DATA LISTENER --- (UPDATED)
-    function processUserPerformance(userId) {
-        const testResultsRef = collection(db, `artifacts/${appId}/users/${userId}/testResults`);
-        const q = query(testResultsRef, orderBy("dateCompleted", "asc"));
-
-        console.log("Setting up performance listener for user:", userId);
-
-        // Return the unsubscribe function provided by onSnapshot
-        return onSnapshot(q, (querySnapshot) => {
-            const allResults = [];
-            querySnapshot.forEach((doc) => {
-                // IMPORTANT: Include the document ID if needed for links
-                allResults.push({ id: doc.id, ...doc.data() });
-            });
-
-            console.log("Performance Snapshot Received:", allResults.length, "results");
-
-            if (!document.hidden) { // Only update UI if tab is active
-                if (allResults.length === 0) {
-                    console.log("No test results found for UI update.");
-                    updateStatCards([]);
-                    updateRecentResults([]);
-                    updatePerformanceChart([]);
-                } else {
-                    updateStatCards(allResults);
-                    updateRecentResults(allResults.slice().reverse()); // Show latest first
-                    updatePerformanceChart(allResults);
-                }
-            } else {
-                 console.log("Tab inactive, skipping UI update for performance.");
-            }
-
-        }, (error) => {
-            console.error("Error fetching test results in real-time:", error);
-            // Check specifically for the index error
-            if (error.code === 'failed-precondition') {
-                 showAlert(`Error: Missing Firestore index for test results. Please check the developer console (F12) for a link to create it.`);
-                 // You might want to log the specific error message which contains the link
-                 console.error("Index creation needed:", error.message);
-            } else {
-                 showAlert(`Error fetching performance data: ${error.message}.`);
-            }
-            // Clear UI on error
-            updateStatCards([]);
-            updateRecentResults([]);
-            updatePerformanceChart([]);
-        });
-    }
-
-
-    // --- UI Update Functions --- (Keep all your existing UI update functions)
-    function initializeTimeBasedUI() { /* ... keep existing ... */ }
-    function updateTimeAndGreeting() { /* ... keep existing ... */ }
-    function updateStreakUI(streakData, activityData) { /* ... keep existing ... */ }
-    async function updateDashboardActivity(dateStr) { /* ... keep existing ... */ }
-    function updateProductivityUI(activities, dateStr) { /* ... keep existing ... */ }
-    function showCongratsAnimation() { /* ... keep existing ... */ }
-    function renderCalendar() { /* ... keep existing ... */ }
-    function updateSubscriptionUI(isPremium) { /* ... keep existing ... */ }
-    function handleUpgrade() { /* ... keep existing ... */ }
-    function showSuccessAnimation() { /* ... keep existing ... */ }
-    function updateStatCards(results) { /* ... keep existing ... */ }
-    function updateRecentResults(results) { /* ... keep existing - Make sure the link uses result.id */
-        recentTestsContainer.innerHTML = '';
-        if (results.length === 0) {
-            recentTestsContainer.innerHTML = `<p class="text-sm text-center text-slate-500 dark:text-slate-400">Complete a test to see your results here.</p>`;
+        // --- FIREBASE CONFIG & INIT ---
+        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        let app;
+        let auth;
+        let db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            console.log("Firebase initialized successfully.");
+        } catch (error) {
+            console.error("Firebase initialization failed:", error);
+            document.body.innerHTML = '<p style="color: red; padding: 20px;">Error initializing Firebase. See console (F12).</p>';
+            document.documentElement.classList.add('loaded'); // Show error
             return;
         }
-        const recentTests = results.slice(0, 5); // Show latest 5
-        recentTests.forEach(test => {
-            // Check if dateCompleted is a Firestore Timestamp object
-            let dateCompletedStr = 'Date N/A';
-            if (test.dateCompleted && typeof test.dateCompleted.toDate === 'function') {
-                try {
-                    dateCompletedStr = test.dateCompleted.toDate().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric'});
-                } catch (e) { console.error("Error formatting date:", e); }
-            } else if (test.dateCompleted) {
-                 // Fallback if it's already a string or different format
-                 dateCompletedStr = String(test.dateCompleted);
-            }
 
-            // Ensure accuracy is formatted correctly or show N/A
-            const accuracyStr = (typeof test.accuracy === 'number') ? test.accuracy.toFixed(1) + '%' : 'N/A';
-            const scoreStr = (typeof test.score === 'number') ? test.score.toFixed(1) : 'N/A';
+        // --- ELEMENT SELECTORS --- (Ensure all IDs exist in HTML)
+        let appView, dropdownDisplayName, displayNameSettings, userEmailDisplay, userEmailDisplaySettings, subscriptionItem, emailToggle, inAppToggle, welcomeHeading, welcomeBanner, timeDisplay, dateDisplay, accuracyValueEl, testsTakenValueEl, avgScoreValueEl, bestSubjectValueEl, recentTestsContainer, currentStreakSpan, highestStreakSpan, todayTestsSpan, dashboardActivityTimeline, productivitySection, productivityBar, productivityPercentage, alertModal, alertMessage, sidebar, sidebarToggle, sidebarBackdrop, mainContent, accountBtn, accountDropdown, streakBtn, streakTooltip, calendarBtn, calendarModal, closeCalendarModalBtn, profileModal, passwordModal, notificationPrefsModal, deleteAccountModal, contactModal, faqModal, termsModal, privacyModal, addTaskModal, congratsModal, successAnimationModal, navButtons, profileForm, passwordForm, editProfileBtn, changePasswordBtn, notificationPrefsBtn, closeNotificationPrefsBtn, deleteAccountBtn, deleteAccountForm, cancelDeleteAccountBtn, contactBtn, closeContactModalBtn, faqBtn, closeFaqModalBtn, faqContainer, termsBtn, closeTermsModalBtn, privacyBtn, closePrivacyModalBtn, dropdownProfileBtn, dropdownSettingsBtn, logoutBtn, dropdownThemeToggle, logoutBtnSettings, addTaskBtn, addTaskForm, cancelAddTaskBtn, closeCongratsModalBtn, congratsConfettiContainer, closeSuccessAnimationBtn, confettiContainer, successMessageContent, alertOkBtn; // Added alertOkBtn
 
-            // Construct the analysis link using the result ID
-            const analysisLink = `TestSeries/test_details.html?resultId=${test.id}`; // Assuming test.id is the Firestore doc ID
+        try {
+             appView = document.getElementById('app-view');
+             dropdownDisplayName = document.getElementById('dropdown-display-name');
+             displayNameSettings = document.getElementById('settings-display-name');
+             userEmailDisplay = document.getElementById('user-email-display');
+             userEmailDisplaySettings = document.getElementById('settings-user-email');
+             subscriptionItem = document.getElementById('subscription-item');
+             emailToggle = document.getElementById('email-toggle');
+             inAppToggle = document.getElementById('in-app-toggle');
+             welcomeHeading = document.getElementById('welcome-heading');
+             welcomeBanner = document.getElementById('welcome-banner');
+             timeDisplay = document.getElementById('time-display');
+             dateDisplay = document.getElementById('date-display');
+             accuracyValueEl = document.getElementById('accuracy-value');
+             testsTakenValueEl = document.getElementById('tests-taken-value');
+             avgScoreValueEl = document.getElementById('avg-score-value');
+             bestSubjectValueEl = document.getElementById('best-subject-value');
+             recentTestsContainer = document.getElementById('recent-tests-container');
+             currentStreakSpan = document.getElementById('current-streak');
+             highestStreakSpan = document.getElementById('highest-streak');
+             todayTestsSpan = document.getElementById('today-tests');
+             dashboardActivityTimeline = document.getElementById('dashboard-activity-timeline');
+             productivitySection = document.getElementById('productivity-section');
+             productivityBar = document.getElementById('productivity-bar');
+             productivityPercentage = document.getElementById('productivity-percentage');
+             alertModal = document.getElementById('alert-modal');
+             alertMessage = document.getElementById('alert-message');
+             sidebar = document.getElementById('sidebar');
+             sidebarToggle = document.getElementById('sidebar-toggle');
+             sidebarBackdrop = document.getElementById('sidebar-backdrop');
+             mainContent = document.getElementById('main-content');
+             accountBtn = document.getElementById('account-btn');
+             accountDropdown = document.getElementById('account-dropdown');
+             streakBtn = document.getElementById('streak-btn');
+             streakTooltip = document.getElementById('streak-tooltip');
+             calendarBtn = document.getElementById('calendar-btn');
+             calendarModal = document.getElementById('calendar-modal');
+             closeCalendarModalBtn = document.getElementById('close-calendar-modal');
+             profileModal = document.getElementById('edit-profile-modal');
+             passwordModal = document.getElementById('change-password-modal');
+             notificationPrefsModal = document.getElementById('notification-prefs-modal');
+             deleteAccountModal = document.getElementById('delete-account-modal');
+             contactModal = document.getElementById('contact-modal');
+             faqModal = document.getElementById('faq-modal');
+             termsModal = document.getElementById('terms-modal');
+             privacyModal = document.getElementById('privacy-modal');
+             addTaskModal = document.getElementById('add-task-modal');
+             congratsModal = document.getElementById('congrats-modal');
+             successAnimationModal = document.getElementById('success-animation-modal');
+             navButtons = { home: document.getElementById('nav-home'), dashboard: document.getElementById('nav-dashboard'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
+             profileForm = document.getElementById('profile-form');
+             passwordForm = document.getElementById('password-form');
+             editProfileBtn = document.getElementById('edit-profile-btn');
+             changePasswordBtn = document.getElementById('change-password-btn');
+             notificationPrefsBtn = document.getElementById('notification-prefs-btn');
+             closeNotificationPrefsBtn = document.getElementById('close-notification-prefs');
+             deleteAccountBtn = document.getElementById('delete-account-btn');
+             deleteAccountForm = document.getElementById('delete-account-form');
+             cancelDeleteAccountBtn = document.getElementById('cancel-delete-account');
+             contactBtn = document.getElementById('contact-btn');
+             closeContactModalBtn = document.getElementById('close-contact-modal');
+             faqBtn = document.getElementById('faq-btn');
+             closeFaqModalBtn = document.getElementById('close-faq-modal');
+             faqContainer = document.getElementById('faq-container');
+             termsBtn = document.getElementById('terms-btn');
+             closeTermsModalBtn = document.getElementById('close-terms-modal');
+             privacyBtn = document.getElementById('privacy-btn');
+             closePrivacyModalBtn = document.getElementById('close-privacy-modal');
+             dropdownProfileBtn = document.getElementById('dropdown-profile-btn');
+             dropdownSettingsBtn = document.getElementById('dropdown-settings-btn');
+             logoutBtn = document.getElementById('logout-btn');
+             dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
+             logoutBtnSettings = document.getElementById('logout-btn-settings');
+             addTaskBtn = document.getElementById('add-task-btn');
+             addTaskForm = document.getElementById('add-task-form');
+             cancelAddTaskBtn = document.getElementById('cancel-add-task');
+             closeCongratsModalBtn = document.getElementById('close-congrats-modal');
+             congratsConfettiContainer = document.getElementById('congrats-confetti-container');
+             closeSuccessAnimationBtn = document.getElementById('close-success-animation');
+             confettiContainer = document.getElementById('confetti-container');
+             successMessageContent = document.getElementById('success-message-content');
+             alertOkBtn = document.getElementById('alert-ok'); // Select the OK button
 
-            const testHTML = `
-             <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                 <div>
-                     <div class="flex items-center gap-3 mb-1 flex-wrap">
-                         <span class="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-xs font-semibold px-2.5 py-0.5 rounded-full whitespace-nowrap">Completed ${dateCompletedStr}</span>
-                         <span class="text-xs font-medium text-slate-500 dark:text-slate-400">${test.subject || 'N/A'}</span>
-                     </div>
-                     <h4 class="font-bold text-slate-800 dark:text-slate-100">${test.testName || 'Unnamed Test'}</h4>
-                     <p class="text-sm text-slate-600 dark:text-slate-300">Score: ${scoreStr}, Accuracy: ${accuracyStr}</p>
-                 </div>
-                 <a href="${analysisLink}" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm whitespace-nowrap">
-                     View Analysis
-                 </a>
-             </div>`;
-            recentTestsContainer.innerHTML += testHTML;
+             // Check if any essential elements are missing
+             if (!appView || !auth || !db || !alertOkBtn /* add other crucial elements */) {
+                 throw new Error("One or more essential HTML elements or Firebase services are missing.");
+             }
+            console.log("All elements selected successfully.");
+        } catch (error) {
+            console.error("Error selecting elements:", error);
+            document.body.innerHTML = `<p style="color: red; padding: 20px;">Error finding HTML elements needed for the page. Check element IDs and console (F12). Error: ${error.message}</p>`;
+            document.documentElement.classList.add('loaded'); // Show error
+            return; // Stop if elements are missing
+        }
+
+
+        // --- GLOBAL VARIABLES ---
+        let selectedDateStr = new Date().toISOString().split('T')[0];
+        let performanceChartInstance = null;
+        let timeUpdateInterval = null;
+        let currentDayString = new Date().toISOString().split('T')[0];
+        let todaysTasks = [];
+        let unsubscribeUserPerformance = null;
+        let unsubscribeUserData = null;
+        let currentDate = new Date();
+
+        // --- HELPER FUNCTIONS ---
+        function showAlert(message) {
+             if (alertMessage) alertMessage.textContent = message;
+             if (alertModal) alertModal.classList.remove('hidden');
+        }
+        // Moved the listener attachment to attachAllEventListeners
+
+        // --- SIDEBAR LOGIC ---
+        function handleSidebarState() { /* ... keep existing ... */ }
+        function toggleSidebar() { /* ... keep existing ... */ }
+        if (window.innerWidth >= 768) { if(sidebar) sidebar.classList.remove('-translate-x-full'); }
+        handleSidebarState();
+        window.addEventListener('resize', handleSidebarState);
+
+        // --- NOTIFICATION FUNCTIONS ---
+        async function checkAndDisplayNotifications(user) { /* ... keep existing ... */ }
+        async function renderAllNotifications() { /* ... keep existing ... */ }
+
+        // --- AUTHENTICATION & DATA LISTENER ---
+        onAuthStateChanged(auth, user => {
+            // ... (Keep the exact same onAuthStateChanged logic) ...
+            if (user) {
+                console.log("Auth State Changed: User Logged In", user.uid);
+                if(appView) appView.style.opacity = '1'; // Fade in app view
+
+                checkAndDisplayNotifications(user);
+                if (!performanceChartInstance) renderPerformanceChart();
+
+                if (unsubscribeUserData) unsubscribeUserData();
+                if (unsubscribeUserPerformance) unsubscribeUserPerformance();
+
+                const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                unsubscribeUserData = onSnapshot(userDocRef, (docSnap) => {
+                    console.log("User Data Snapshot Received");
+                    // ... (rest of user data update logic) ...
+                    if (docSnap.exists()) {
+                        const userData = docSnap.data();
+                        const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
+                        const userEmail = user.email || 'No email found';
+                        // ... update UI elements ...
+                        if (dropdownDisplayName) dropdownDisplayName.textContent = displayName;
+                         if (displayNameSettings) displayNameSettings.textContent = displayName;
+                         if (userEmailDisplay) userEmailDisplay.textContent = userEmail;
+                         if (userEmailDisplaySettings) userEmailDisplaySettings.textContent = userEmail;
+                         const accountAvatar = document.getElementById('account-avatar');
+                         const placeholderIcon = document.getElementById('account-placeholder-icon');
+                         if(accountAvatar && placeholderIcon) { /* avatar logic */ }
+                         updateSubscriptionUI(userData.isPremium);
+                         updateStreakUI(userData.streak, userData.activity);
+                         updateDashboardActivity(selectedDateStr);
+                         if (!timeUpdateInterval) initializeTimeBasedUI();
+                         if (userData.preferences) { /* notification toggles */ }
+
+                    } else {
+                        console.log("User document doesn't exist, creating...");
+                        setDoc(userDocRef, { /* default data */ }).catch(error => console.error("Error creating user doc:", error));
+                    }
+                }, (error) => { /* error handling */ });
+
+                unsubscribeUserPerformance = processUserPerformance(user.uid);
+                attachAllEventListeners();
+
+            } else {
+                 console.log("Auth State Changed: User Logged Out");
+                 if (unsubscribeUserData) { unsubscribeUserData(); unsubscribeUserData = null; }
+                 if (unsubscribeUserPerformance) { unsubscribeUserPerformance(); unsubscribeUserPerformance = null; }
+                 if (timeUpdateInterval) { clearInterval(timeUpdateInterval); timeUpdateInterval = null; }
+                 window.location.href = 'TestSeries/auth.html';
+             }
         });
-     }
-    function updatePerformanceChart(results) { /* ... keep existing ... */ }
-    function renderPerformanceChart() { /* ... keep existing ... */ }
-    async function updateNotificationPreference(prefName, value) { /* ... keep existing ... */ }
-    function renderFAQs() { /* ... keep existing ... */ }
-    function handleLogout(e) { /* ... keep existing ... */ }
-    function showView(viewName) { /* ... keep existing ... */ }
-    function applyTheme(theme) { /* ... keep existing ... */ }
-    function toggleTheme() { /* ... keep existing ... */ }
 
-    // --- EVENT LISTENERS ---
-    function attachAllEventListeners() {
-         console.log("Attaching event listeners...");
-        // Sidebar
-        sidebarToggle.onclick = toggleSidebar;
-        sidebarBackdrop.onclick = toggleSidebar;
-        // Header Buttons
-        streakBtn.onmouseenter = () => streakTooltip.classList.remove('hidden');
-        streakBtn.onmouseleave = () => streakTooltip.classList.add('hidden');
-        calendarBtn.onclick = () => { renderCalendar(); calendarModal.classList.remove('hidden'); };
-        closeCalendarModalBtn.onclick = () => calendarModal.classList.add('hidden');
-        accountBtn.onclick = () => accountDropdown.classList.toggle('hidden');
-        // Close dropdown if clicked outside
-        document.onclick = (e) => {
-             // Close account dropdown
-             if (accountBtn && !accountBtn.contains(e.target) && accountDropdown && !accountDropdown.contains(e.target)) {
-                 accountDropdown.classList.add('hidden');
-             }
-             // Close streak tooltip (alternative to mouseleave)
-             if (streakBtn && !streakBtn.contains(e.target) && streakTooltip && !streakTooltip.contains(e.target)) {
-                 streakTooltip.classList.add('hidden');
-             }
-        };
-        // Flash notification close
-        document.getElementById('flash-close-btn').onclick = () => { /* ... keep existing ... */ };
+        // --- PERFORMANCE DATA LISTENER ---
+        function processUserPerformance(userId) {
+             const testResultsRef = collection(db, `artifacts/${appId}/users/${userId}/testResults`);
+             const q = query(testResultsRef, orderBy("dateCompleted", "asc"));
+             console.log("Setting up performance listener for user:", userId);
+             return onSnapshot(q, (querySnapshot) => {
+                 const allResults = [];
+                 querySnapshot.forEach((doc) => allResults.push({ id: doc.id, ...doc.data() }));
+                 console.log("Performance Snapshot Received:", allResults.length, "results");
+                 if (!document.hidden) {
+                     // ... updateStatCards, updateRecentResults, updatePerformanceChart ...
+                     if (allResults.length === 0) {
+                         updateStatCards([]); updateRecentResults([]); updatePerformanceChart([]);
+                     } else {
+                         updateStatCards(allResults); updateRecentResults(allResults.slice().reverse()); updatePerformanceChart(allResults);
+                     }
+                 } else { console.log("Tab inactive, skipping UI update."); }
+             }, (error) => {
+                 console.error("Error fetching test results:", error);
+                 if (error.code === 'failed-precondition') {
+                     showAlert(`Error: Missing Firestore index. Check console (F12) for link.`);
+                     console.error("Index creation needed:", error.message);
+                 } else { showAlert(`Error fetching performance data: ${error.message}.`); }
+                 updateStatCards([]); updateRecentResults([]); updatePerformanceChart([]);
+             });
+        }
 
-        // Footer Navigation
-        navButtons.home.onclick = (e) => { e.preventDefault(); window.location.href = 'homeUPSChub.html'; };
-        navButtons.dashboard.onclick = (e) => { e.preventDefault(); showView('home'); };
-        navButtons.tests.onclick = (e) => { e.preventDefault(); window.location.href = 'TestSeries/Prem_testSeries.html'; };
-        navButtons.notifications.onclick = (e) => { e.preventDefault(); showView('notifications'); renderAllNotifications(); };
-        navButtons.settings.onclick = (e) => { e.preventDefault(); showView('settings'); };
+        // --- UI Update & Event Listener Functions ---
+        // ... (Keep ALL your other functions: initializeTimeBasedUI, updateStatCards, updateRecentResults, renderPerformanceChart, handleLogout, showView, applyTheme, etc.) ...
+        function initializeTimeBasedUI() { /* ... */ }
+         function updateTimeAndGreeting() { /* ... */ }
+         function updateStreakUI(streakData, activityData) { /* ... */ }
+         async function updateDashboardActivity(dateStr) { /* ... */ }
+         function updateProductivityUI(activities, dateStr) { /* ... */ }
+         function showCongratsAnimation() { /* ... */ }
+         async function renderCalendar() { /* ... */ }
+         function updateSubscriptionUI(isPremium) { /* ... */ }
+         function handleUpgrade() { /* ... */ }
+         function showSuccessAnimation() { /* ... */ }
+         function updateStatCards(results) { /* ... */ }
+         function updateRecentResults(results) { /* ... */ }
+         function updatePerformanceChart(results) { /* ... */ }
+         function renderPerformanceChart() { /* ... */ }
+         async function updateNotificationPreference(prefName, value) { /* ... */ }
+         function renderFAQs() { /* ... */ }
+         function handleLogout(e) { e.preventDefault(); signOut(auth).catch(err => console.error("Logout failed:", err)); }
+         function showView(viewName) { /* ... */ }
+         function applyTheme(theme) { /* ... */ }
+         function toggleTheme() { /* ... */ }
 
-        // Account Dropdown actions
-        dropdownProfileBtn.onclick = (e) => { e.preventDefault(); showView('settings'); accountDropdown.classList.add('hidden'); profileModal.classList.remove('hidden'); };
-        dropdownSettingsBtn.onclick = (e) => { e.preventDefault(); showView('settings'); accountDropdown.classList.add('hidden'); };
-        logoutBtn.onclick = handleLogout;
-        dropdownThemeToggle.onchange = toggleTheme;
+        function attachAllEventListeners() {
+            console.log("Attaching event listeners...");
+            try {
+                // Moved from global scope
+                if (alertOkBtn) alertOkBtn.addEventListener('click', () => {
+                     if (alertModal) alertModal.classList.add('hidden');
+                }); else { console.error("alert-ok button not found during listener attachment!"); }
 
-        // Settings Page Buttons & Forms
-        document.getElementById('logout-btn-settings').onclick = handleLogout;
-        editProfileBtn.onclick = () => { profileModal.classList.remove('hidden'); document.getElementById('display-name').value = displayNameSettings.textContent };
-        document.getElementById('cancel-profile').onclick = () => profileModal.classList.add('hidden');
-        profileForm.onsubmit = async (e) => { /* ... keep existing ... */ };
-        changePasswordBtn.onclick = () => { passwordModal.classList.remove('hidden'); };
-        document.getElementById('cancel-password').onclick = () => { passwordModal.classList.add('hidden'); passwordForm.reset(); };
-        passwordForm.onsubmit = async (e) => { /* ... keep existing ... */ };
-        notificationPrefsBtn.onclick = () => notificationPrefsModal.classList.remove('hidden');
-        document.getElementById('close-notification-prefs').onclick = () => notificationPrefsModal.classList.add('hidden');
-        emailToggle.onchange = (e) => updateNotificationPreference('receiveEmails', e.target.checked);
-        inAppToggle.onchange = (e) => updateNotificationPreference('receiveInAppAnnouncements', e.target.checked);
-        deleteAccountBtn.onclick = () => deleteAccountModal.classList.remove('hidden');
-        document.getElementById('cancel-delete-account').onclick = () => { deleteAccountModal.classList.add('hidden'); deleteAccountForm.reset(); };
-        deleteAccountForm.onsubmit = async (e) => { /* ... keep existing ... */ };
-        contactBtn.onclick = () => contactModal.classList.remove('hidden');
-        document.getElementById('close-contact-modal').onclick = () => contactModal.classList.add('hidden');
-        termsBtn.onclick = () => termsModal.classList.remove('hidden');
-        document.getElementById('close-terms-modal').onclick = () => termsModal.classList.add('hidden');
-        privacyBtn.onclick = () => privacyModal.classList.remove('hidden');
-        document.getElementById('close-privacy-modal').onclick = () => privacyModal.classList.add('hidden');
-        faqBtn.onclick = () => { renderFAQs(); faqModal.classList.remove('hidden'); };
-        document.getElementById('close-faq-modal').onclick = () => faqModal.classList.add('hidden');
-        faqContainer.onclick = (e) => { /* ... keep existing ... */ };
+                // Sidebar
+                if(sidebarToggle) sidebarToggle.onclick = toggleSidebar; else console.warn("sidebar-toggle not found");
+                if(sidebarBackdrop) sidebarBackdrop.onclick = toggleSidebar; else console.warn("sidebar-backdrop not found");
+                // ... (Add checks for other elements if needed) ...
+                if(streakBtn) streakBtn.onmouseenter = () => streakTooltip?.classList.remove('hidden'); else console.warn("streak-btn not found");
+                if(streakBtn) streakBtn.onmouseleave = () => streakTooltip?.classList.add('hidden');
+                if(calendarBtn) calendarBtn.onclick = () => { renderCalendar(); calendarModal?.classList.remove('hidden'); }; else console.warn("calendar-btn not found");
+                if(closeCalendarModalBtn) closeCalendarModalBtn.onclick = () => calendarModal?.classList.add('hidden'); else console.warn("close-calendar-modal not found");
+                if(accountBtn) accountBtn.onclick = () => accountDropdown?.classList.toggle('hidden'); else console.warn("account-btn not found");
 
-        // Add Task Modal & Form
-        addTaskBtn.onclick = () => { /* ... keep existing ... */ };
-        cancelAddTaskBtn.onclick = () => { /* ... keep existing ... */ };
-        addTaskForm.onsubmit = async (e) => { /* ... keep existing ... */ };
-        // Task interaction (delete/complete) - Event delegation
-        dashboardActivityTimeline.onclick = async (e) => { /* ... keep existing ... */ };
-        dashboardActivityTimeline.onchange = async (e) => { /* ... keep existing ... */ };
+                document.onclick = (e) => { /* ... close dropdown logic ... */ };
+                if(document.getElementById('flash-close-btn')) document.getElementById('flash-close-btn').onclick = () => { /* ... flash close ... */ }; else console.warn("flash-close-btn not found");
 
-        // Calendar month navigation
-        document.getElementById('prev-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
-        document.getElementById('next-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
+                // Footer Nav (Check if buttons exist)
+                Object.keys(navButtons).forEach(key => {
+                    if (navButtons[key]) {
+                        switch(key) {
+                             case 'home': navButtons[key].onclick = (e) => { e.preventDefault(); window.location.href = 'homeUPSChub.html'; }; break;
+                             case 'dashboard': navButtons[key].onclick = (e) => { e.preventDefault(); showView('home'); }; break;
+                             case 'tests': navButtons[key].onclick = (e) => { e.preventDefault(); window.location.href = 'TestSeries/Prem_testSeries.html'; }; break;
+                             case 'notifications': navButtons[key].onclick = (e) => { e.preventDefault(); showView('notifications'); renderAllNotifications(); }; break;
+                             case 'settings': navButtons[key].onclick = (e) => { e.preventDefault(); showView('settings'); }; break;
+                        }
+                    } else {
+                         console.warn(`Nav button '${key}' not found.`);
+                    }
+                });
 
-        // Success/Congrats Modals close buttons
-        document.getElementById('close-success-animation').onclick = () => { successAnimationModal.classList.add('hidden'); confettiContainer.innerHTML = ''; };
-        document.getElementById('close-congrats-modal').onclick = () => { congratsModal.classList.add('hidden'); congratsConfettiContainer.innerHTML = ''; };
 
-        console.log("Event listeners attached.");
-    }
+                // Account Dropdown actions
+                if(dropdownProfileBtn) dropdownProfileBtn.onclick = (e) => { e.preventDefault(); showView('settings'); accountDropdown?.classList.add('hidden'); profileModal?.classList.remove('hidden'); }; else console.warn("dropdown-profile-btn not found");
+                if(dropdownSettingsBtn) dropdownSettingsBtn.onclick = (e) => { e.preventDefault(); showView('settings'); accountDropdown?.classList.add('hidden'); }; else console.warn("dropdown-settings-btn not found");
+                if(logoutBtn) logoutBtn.onclick = handleLogout; else console.warn("logout-btn not found");
+                if(dropdownThemeToggle) dropdownThemeToggle.onchange = toggleTheme; else console.warn("dropdown-theme-toggle not found");
 
-    // --- INITIALIZATION ---
-    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    applyTheme(savedTheme);
-    showView('home'); // Show home view by default
+                // Settings Page Buttons & Forms
+                 if(logoutBtnSettings) logoutBtnSettings.onclick = handleLogout; else console.warn("logout-btn-settings not found");
+                 if(editProfileBtn) editProfileBtn.onclick = () => { profileModal?.classList.remove('hidden'); const nameInput = document.getElementById('display-name'); if(nameInput && displayNameSettings) nameInput.value = displayNameSettings.textContent;}; else console.warn("edit-profile-btn not found");
+                 if(document.getElementById('cancel-profile')) document.getElementById('cancel-profile').onclick = () => profileModal?.classList.add('hidden'); else console.warn("cancel-profile not found");
+                 if(profileForm) profileForm.onsubmit = async (e) => { /* ... profile update ... */ }; else console.warn("profile-form not found");
+                 if(changePasswordBtn) changePasswordBtn.onclick = () => { passwordModal?.classList.remove('hidden'); }; else console.warn("change-password-btn not found");
+                 if(document.getElementById('cancel-password')) document.getElementById('cancel-password').onclick = () => { passwordModal?.classList.add('hidden'); passwordForm?.reset(); }; else console.warn("cancel-password not found");
+                 if(passwordForm) passwordForm.onsubmit = async (e) => { /* ... password update ... */ }; else console.warn("password-form not found");
+                 if(notificationPrefsBtn) notificationPrefsBtn.onclick = () => notificationPrefsModal?.classList.remove('hidden'); else console.warn("notification-prefs-btn not found");
+                 if(closeNotificationPrefsBtn) closeNotificationPrefsBtn.onclick = () => notificationPrefsModal?.classList.add('hidden'); else console.warn("close-notification-prefs not found");
+                 if(emailToggle) emailToggle.onchange = (e) => updateNotificationPreference('receiveEmails', e.target.checked); else console.warn("email-toggle not found");
+                 if(inAppToggle) inAppToggle.onchange = (e) => updateNotificationPreference('receiveInAppAnnouncements', e.target.checked); else console.warn("in-app-toggle not found");
+                 if(deleteAccountBtn) deleteAccountBtn.onclick = () => deleteAccountModal?.classList.remove('hidden'); else console.warn("delete-account-btn not found");
+                 if(cancelDeleteAccountBtn) cancelDeleteAccountBtn.onclick = () => { deleteAccountModal?.classList.add('hidden'); deleteAccountForm?.reset(); }; else console.warn("cancel-delete-account not found");
+                 if(deleteAccountForm) deleteAccountForm.onsubmit = async (e) => { /* ... delete account ... */ }; else console.warn("delete-account-form not found");
+                 if(contactBtn) contactBtn.onclick = () => contactModal?.classList.remove('hidden'); else console.warn("contact-btn not found");
+                 if(closeContactModalBtn) closeContactModalBtn.onclick = () => contactModal?.classList.add('hidden'); else console.warn("close-contact-modal not found");
+                 if(termsBtn) termsBtn.onclick = () => termsModal?.classList.remove('hidden'); else console.warn("terms-btn not found");
+                 if(closeTermsModalBtn) closeTermsModalBtn.onclick = () => termsModal?.classList.add('hidden'); else console.warn("close-terms-modal not found");
+                 if(privacyBtn) privacyBtn.onclick = () => privacyModal?.classList.remove('hidden'); else console.warn("privacy-btn not found");
+                 if(closePrivacyModalBtn) closePrivacyModalBtn.onclick = () => privacyModal?.classList.add('hidden'); else console.warn("close-privacy-modal not found");
+                 if(faqBtn) faqBtn.onclick = () => { renderFAQs(); faqModal?.classList.remove('hidden'); }; else console.warn("faq-btn not found");
+                 if(closeFaqModalBtn) closeFaqModalBtn.onclick = () => faqModal?.classList.add('hidden'); else console.warn("close-faq-modal not found");
+                 if(faqContainer) faqContainer.onclick = (e) => { /* ... faq toggle ... */ }; else console.warn("faq-container not found");
 
-    // --- Service Worker & Maintenance Check --- (Keep existing self-executing functions)
-    if ('serviceWorker' in navigator) { /* ... keep existing ... */ }
-    (function() { /* ... maintenance check ... */ })();
+                // Add Task Modal & Form
+                 if(addTaskBtn) addTaskBtn.onclick = () => { addTaskForm?.reset(); addTaskModal?.classList.remove('hidden'); }; else console.warn("add-task-btn not found");
+                 if(cancelAddTaskBtn) cancelAddTaskBtn.onclick = () => { addTaskModal?.classList.add('hidden'); }; else console.warn("cancel-add-task not found");
+                 if(addTaskForm) addTaskForm.onsubmit = async (e) => { /* ... add task ... */ }; else console.warn("add-task-form not found");
+                // Task interaction (delete/complete) - Event delegation
+                 if(dashboardActivityTimeline) {
+                     dashboardActivityTimeline.onclick = async (e) => { /* ... delete task ... */ };
+                     dashboardActivityTimeline.onchange = async (e) => { /* ... complete task ... */ };
+                 } else { console.warn("dashboard-activity-timeline not found"); }
 
+                // Calendar month navigation
+                if(document.getElementById('prev-month')) document.getElementById('prev-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); }; else console.warn("prev-month not found");
+                if(document.getElementById('next-month')) document.getElementById('next-month').onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); }; else console.warn("next-month not found");
+
+                // Success/Congrats Modals close buttons
+                if(closeSuccessAnimationBtn) closeSuccessAnimationBtn.onclick = () => { successAnimationModal?.classList.add('hidden'); if(confettiContainer) confettiContainer.innerHTML = ''; }; else console.warn("close-success-animation not found");
+                if(closeCongratsModalBtn) closeCongratsModalBtn.onclick = () => { congratsModal?.classList.add('hidden'); if(congratsConfettiContainer) congratsConfettiContainer.innerHTML = ''; }; else console.warn("close-congrats-modal not found");
+
+                console.log("Event listeners attached successfully.");
+            } catch (error) {
+                 console.error("Error attaching event listeners:", error);
+                 showAlert("Error setting up page interactions. Some buttons might not work.");
+            }
+        }
+
+
+        // --- INITIALIZATION ---
+        const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        applyTheme(savedTheme);
+        showView('home'); // Show home view by default
+        console.log("Initial theme applied and default view shown.");
+
+        // --- Service Worker & Maintenance Check ---
+        if ('serviceWorker' in navigator) { /* ... keep existing ... */ }
+        (function() { /* ... maintenance check ... */ })();
+
+        // Fade in the body
+        document.documentElement.classList.add('loaded');
+        console.log("App loaded, fading in.");
+
+    }); // End of DOMContentLoaded
 </script>
 </body>
 </html>
