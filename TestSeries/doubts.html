@@ -24,18 +24,16 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900">
     <div id="root">
-        <div id="loader">Loading Doubts Portal...</div>
+        <div id="loader">Loading Dashboard...</div>
     </div>
 
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-
 
     <script type="text/babel" data-presets="react">
         // --- De-structure React hooks for ease of use ---
@@ -53,11 +51,136 @@
 
         const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; // Your Admin UID
 
-        // --- FIXED: Initialize Firebase (v8 Syntax) ---
-        firebase.initializeApp(firebaseConfig);
+        // --- Initialize Firebase (v8 Syntax) ---
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
         const auth = firebase.auth();
         const db = firebase.firestore();
         const appId = 'default-app-id'; // As per original HTML structure
+
+        // --- Sidebar Icons (as stateless components) ---
+        const IconPlanner = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>;
+        const IconBrowse = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>;
+        const IconTestSeries = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>;
+        const IconDoubts = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>;
+        const IconAnalysis = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>;
+        const IconLogout = () => <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>;
+
+
+        // --- BUG FIX: Moved DoubtCard component outside App ---
+        const DoubtCard = ({ doubt, isAdmin, handleAnswerSubmit }) => {
+            const [answer, setAnswer] = useState('');
+            const [isAnswering, setIsAnswering] = useState(false);
+            const date = doubt.timestamp?.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+            
+            const onAnswerSubmit = (e) => {
+                e.preventDefault();
+                setIsAnswering(true);
+                handleAnswerSubmit(doubt.id, answer).finally(() => {
+                    setIsAnswering(false);
+                    setAnswer('');
+                });
+            };
+            
+            return (
+                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg mb-4 border dark:border-slate-700">
+                    <div className="p-6">
+                        <p className="text-gray-500 dark:text-slate-400 text-sm mb-3">Asked by {doubt.askedByName} on {date || '...'}</p>
+                        <p className="text-slate-800 dark:text-slate-200 text-lg leading-relaxed mb-4">{doubt.question}</p>
+                        {doubt.isAnswered ? (
+                            <div className="mt-4 p-4 bg-blue-50 dark:bg-slate-700/50 border-l-4 border-blue-500 rounded-r-lg">
+                                <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">Admin's Answer:</h4>
+                                <p className="text-gray-700 dark:text-slate-300 whitespace-pre-wrap">{doubt.answer}</p>
+                            </div>
+                        ) : isAdmin ? (
+                            <form onSubmit={onAnswerSubmit} className="mt-4">
+                                <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Write your answer here..." className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" />
+                                <button type="submit" disabled={isAnswering} className="mt-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300">{isAnswering ? 'Submitting...' : 'Submit Answer'}</button>
+                            </form>
+                        ) : (
+                            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/40 border-l-4 border-yellow-400 rounded-r-lg">
+                                <p className="text-yellow-800 dark:text-yellow-300 font-medium">Waiting for an answer from the admin.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        };
+
+        // --- BUG FIX: Moved DoubtsView component outside App ---
+        const DoubtsView = ({
+            upscSubjects, selectedChapter, setSelectedChapter, doubts,
+            newDoubt, setNewDoubt, handleDoubtSubmit, isSubmittingDoubt,
+            doubtError, isAdmin, handleAnswerSubmit
+        }) => (
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <aside className="lg:col-span-4 xl:col-span-3">
+                    <div className="p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700 sticky top-24">
+                        <h2 className="text-lg font-semibold mb-4 border-b dark:border-slate-600 pb-2">Subjects</h2>
+                        <ul className="space-y-1">
+                            {upscSubjects.map(chapter => (
+                                <li key={chapter}>
+                                    <button 
+                                        onClick={() => setSelectedChapter(chapter)} 
+                                        className={`w-full text-left px-4 py-2 rounded-lg transition-colors text-sm font-medium ${selectedChapter === chapter ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}
+                                    >
+                                        {chapter}
+                                    </button>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </aside>
+                <div className="lg:col-span-8 xl:col-span-9">
+                    <div className="mb-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
+                        <h2 className="text-xl font-bold mb-4">Ask a Doubt in <span className="text-blue-600">{selectedChapter}</span></h2>
+                        <form onSubmit={handleDoubtSubmit}>
+                            <textarea 
+                                value={newDoubt} 
+                                onChange={(e) => setNewDoubt(e.target.value)} 
+                                placeholder="Type your question here..." 
+                                className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 mb-4" 
+                                rows="4"
+                            ></textarea>
+                            {doubtError && <p className="text-red-500 text-sm mb-3">{doubtError}</p>}
+                            <button 
+                                type="submit" 
+                                disabled={isSubmittingDoubt} 
+                                className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300"
+                            >
+                                {isSubmittingDoubt ? 'Submitting...' : 'Submit Your Doubt'}
+                            </button>
+                        </form>
+                    </div>
+                    <div>
+                        <h2 className="text-xl font-bold mb-4">Recent Doubts</h2>
+                        {doubts.length > 0 ? (
+                            doubts.map(doubt => 
+                                <DoubtCard 
+                                    key={doubt.id} 
+                                    doubt={doubt} 
+                                    isAdmin={isAdmin}
+                                    handleAnswerSubmit={handleAnswerSubmit} 
+                                />
+                            )
+                        ) : (
+                            <div className="text-center py-10 px-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
+                                <p className="text-gray-500 dark:text-slate-400">No doubts have been asked in this chapter yet.</p>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+
+        // --- Placeholder for other pages ---
+        const PlaceholderView = ({ title }) => (
+            <div className="flex items-center justify-center h-96 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
+                <h1 className="text-3xl font-bold text-slate-400 dark:text-slate-500">{title} Page (Coming Soon)</h1>
+            </div>
+        );
+
 
         // --- Main App Component ---
         const App = () => {
@@ -65,7 +188,8 @@
             const [userData, setUserData] = useState({});
             const [isAdmin, setIsAdmin] = useState(false);
             const [loading, setLoading] = useState(true);
-            const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768);
+            const [isSidebarOpen, setSidebarOpen] = useState(window.innerWidth >= 768); // Open by default on desktop
+            const [activePage, setActivePage] = useState('Doubts'); // NEW: State for active page
 
             const upscSubjects = [
                 "Indian Polity", "History - Ancient India", "History - Medieval India",
@@ -79,15 +203,13 @@
             const [doubtError, setDoubtError] = useState(null);
 
             useEffect(() => {
-                // FIXED: v8 onAuthStateChanged
+                // Auth listener
                 const unsubscribe = auth.onAuthStateChanged((currentUser) => {
                     if (currentUser) {
                         setUser(currentUser);
                         setIsAdmin(currentUser.uid === ADMIN_UID);
                         
-                        // FIXED: v8 db.collection.doc
                         const userDocRef = db.collection(`artifacts/${appId}/users`).doc(currentUser.uid);
-                        // FIXED: v8 doc.onSnapshot
                         const unsubSnapshot = userDocRef.onSnapshot((docSnap) => {
                             if (docSnap.exists) {
                                 setUserData(docSnap.data());
@@ -95,11 +217,9 @@
                                 const newUserProfile = {
                                     displayName: currentUser.displayName || 'UPSC Aspirant',
                                     email: currentUser.email,
-                                    // FIXED: v8 serverTimestamp
                                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                                     isPremium: false,
                                 };
-                                // FIXED: v8 doc.set
                                 userDocRef.set(newUserProfile);
                                 setUserData(newUserProfile);
                             }
@@ -109,7 +229,7 @@
                     } else {
                         setUser(null);
                         setLoading(false);
-                        // Redirect to login page if not authenticated
+                        // Optional: Redirect to login
                         // window.location.href = 'TestSeries/auth.html';
                     }
                 });
@@ -117,14 +237,12 @@
             }, []);
 
             useEffect(() => {
+                // Fetch doubts listener
                 if (!selectedChapter) return;
                 
-                // FIXED: v8 db.collection
                 const doubtsCollectionRef = db.collection("doubts");
-                // FIXED: v8 query chaining
                 const q = doubtsCollectionRef.where("chapter", "==", selectedChapter).orderBy("timestamp", "desc");
                 
-                // FIXED: v8 query.onSnapshot
                 const unsubscribe = q.onSnapshot((snapshot) => {
                     setDoubts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 }, (err) => {
@@ -134,8 +252,13 @@
                 return () => unsubscribe();
             }, [selectedChapter]);
 
+            useEffect(() => {
+                // Close sidebar on mobile when changing page
+                if (window.innerWidth < 768) {
+                    setSidebarOpen(false);
+                }
+            }, [activePage]);
 
-            // FIXED: v8 auth.signOut
             const handleLogout = () => auth.signOut().catch(error => console.error("Logout Error:", error));
             const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
 
@@ -146,7 +269,6 @@
                 }
                 setIsSubmittingDoubt(true); setDoubtError(null);
                 try {
-                    // FIXED: v8 db.collection.add
                     await db.collection("doubts").add({
                         chapter: selectedChapter,
                         question: newDoubt,
@@ -154,7 +276,6 @@
                         askedByName: userData.displayName || 'Aspirant',
                         isAnswered: false,
                         answer: "",
-                        // FIXED: v8 serverTimestamp
                         timestamp: firebase.firestore.FieldValue.serverTimestamp(),
                     });
                     setNewDoubt('');
@@ -168,109 +289,124 @@
             const handleAnswerSubmit = async (doubtId, answerText) => {
                 if (!isAdmin || answerText.trim() === '') return;
                 try {
-                    // FIXED: v8 db.collection.doc.update
                     await db.collection("doubts").doc(doubtId).update({
                         answer: answerText,
                         isAnswered: true,
-                        // FIXED: v8 serverTimestamp
                         answeredTimestamp: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 } catch (err) { console.error("Error submitting answer:", err); }
             };
             
-            const DoubtCard = ({ doubt }) => {
-                const [answer, setAnswer] = useState('');
-                const [isAnswering, setIsAnswering] = useState(false);
-                const date = doubt.timestamp?.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
-                const onAnswerSubmit = (e) => {
-                    e.preventDefault();
-                    setIsAnswering(true);
-                    handleAnswerSubmit(doubt.id, answer).finally(() => {
-                        setIsAnswering(false);
-                        setAnswer('');
-                    });
-                };
-                return (
-                    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg mb-4 border dark:border-slate-700">
-                        <div className="p-6">
-                            <p className="text-gray-500 dark:text-slate-400 text-sm mb-3">Asked by {doubt.askedByName} on {date || '...'}</p>
-                            <p className="text-slate-800 dark:text-slate-200 text-lg leading-relaxed mb-4">{doubt.question}</p>
-                            {doubt.isAnswered ? (
-                                <div className="mt-4 p-4 bg-blue-50 dark:bg-slate-700/50 border-l-4 border-blue-500 rounded-r-lg">
-                                    <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">Admin's Answer:</h4>
-                                    <p className="text-gray-700 dark:text-slate-300 whitespace-pre-wrap">{doubt.answer}</p>
-                                </div>
-                            ) : isAdmin ? (
-                                <form onSubmit={onAnswerSubmit} className="mt-4">
-                                    <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Write your answer here..." className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" />
-                                    <button type="submit" disabled={isAnswering} className="mt-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300">{isAnswering ? 'Submitting...' : 'Submit Answer'}</button>
-                                </form>
-                            ) : (
-                                <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/40 border-l-4 border-yellow-400 rounded-r-lg">
-                                    <p className="text-yellow-800 dark:text-yellow-300 font-medium">Waiting for an answer from the admin.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                );
-            };
-
-            const DoubtsView = () => (
-                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                    <aside className="lg:col-span-4 xl:col-span-3"><div className="p-4 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700 sticky top-24"><h2 className="text-lg font-semibold mb-4 border-b dark:border-slate-600 pb-2">Subjects</h2><ul className="space-y-1">{upscSubjects.map(chapter => (<li key={chapter}><button onClick={() => setSelectedChapter(chapter)} className={`w-full text-left px-4 py-2 rounded-lg transition-colors text-sm font-medium ${selectedChapter === chapter ? 'bg-blue-600 text-white shadow-sm' : 'hover:bg-slate-100 dark:hover:bg-slate-700'}`}>{chapter}</button></li>))}</ul></div></aside>
-                    <div className="lg:col-span-8 xl:col-span-9">
-                        <div className="mb-8 p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700"><h2 className="text-xl font-bold mb-4">Ask a Doubt in <span className="text-blue-600">{selectedChapter}</span></h2><form onSubmit={handleDoubtSubmit}><textarea value={newDoubt} onChange={(e) => setNewDoubt(e.target.value)} placeholder="Type your question here..." className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 mb-4" rows="4"></textarea>{doubtError && <p className="text-red-500 text-sm mb-3">{doubtError}</p>}<button type="submit" disabled={isSubmittingDoubt} className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300">{isSubmittingDoubt ? 'Submitting...' : 'Submit Your Doubt'}</button></form></div>
-                        <div>
-                            <h2 className="text-xl font-bold mb-4">Recent Doubts</h2>
-                            {doubts.length > 0 ? (doubts.map(doubt => <DoubtCard key={doubt.id} doubt={doubt} />)) : (<div className="text-center py-10 px-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700"><p className="text-gray-500 dark:text-slate-400">No doubts have been asked in this chapter yet.</p></div>)}
-                        </div>
+            if (loading) return null; // Root loader is already showing
+            if (!user) return (
+                <div className="flex items-center justify-center h-screen text-center p-8">
+                    <div>
+                        <h2 className="text-2xl font-bold mb-4">Please Log In</h2>
+                        <p className="text-slate-600">You must be logged in to access the UPSChub dashboard.</p>
+                        {/* Add a login button here if auth.html is the intended page */}
+                        {/* <a href="TestSeries/auth.html" className="mt-6 inline-block px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700">Go to Login</a> */}
                     </div>
                 </div>
             );
-            
-            if (loading) return null; // Root loader is already showing
-            if (!user) return <div className="text-center p-8">Please log in to access the dashboard.</div>;
 
-            // --- Main render return, simplified ---
+            // --- Sidebar Link Component ---
+            const NavLink = ({ title, icon, pageName }) => {
+                const isActive = activePage === pageName;
+                return (
+                    <li>
+                        <button
+                            onClick={() => setActivePage(pageName)}
+                            className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-lg font-medium transition-colors ${
+                                isActive
+                                ? 'bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300'
+                                : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700'
+                            }`}
+                        >
+                            {icon}
+                            <span>{title}</span>
+                        </button>
+                    </li>
+                );
+            };
+
             return (
                 <div className="min-h-screen text-slate-800 dark:text-slate-200">
-                    <header className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+                    {/* --- Header --- */}
+                    <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
                         <div className="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
                             <div className="flex items-center gap-2">
                                 <button onClick={toggleSidebar} className="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 md:hidden">
                                     <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                                 </button>
-                                <a href="#" className="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
-                                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" className="h-8 w-8 rounded-lg"/>
-                                    <span>UPSChub Doubts</span>
+                                <a href="#" className="flex items-center gap-2 text-2xl font-bold">
+                                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" className="h-9 w-9 rounded-lg"/>
+                                    <span className="text-slate-800 dark:text-slate-200">UPSChub</span>
                                 </a>
                             </div>
                             <div className="flex items-center gap-4">
                                 {isAdmin && <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full">Admin Mode</span>}
+                                <span className="text-slate-700 dark:text-slate-300 font-medium hidden sm:block">
+                                    Welcome, {userData.displayName || 'Aspirant'}
+                                </span>
                             </div>
                         </div>
                     </header>
+
+                    {/* --- Mobile Overlay --- */}
+                    {isSidebarOpen && (
+                        <div 
+                            className="fixed inset-0 bg-black/50 z-30 md:hidden"
+                            onClick={toggleSidebar}
+                        ></div>
+                    )}
+
                     <div className="relative min-h-screen md:flex">
-                        {/* --- Sidebar now only has Logout --- */}
-                        <aside className={`fixed md:relative top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out z-40 pt-16 md:pt-4`}>
-                            <nav className="p-4">
+                        {/* --- NEW Sidebar --- */}
+                        <aside className={`fixed md:relative top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 transition-transform duration-300 ease-in-out z-40 pt-20 md:pt-6 border-r dark:border-slate-700`}>
+                            <nav className="p-4 flex flex-col h-full justify-between">
                                 <ul className="space-y-2">
+                                    <NavLink title="Planner" icon={<IconPlanner />} pageName="Planner" />
+                                    <NavLink title="Browse" icon={<IconBrowse />} pageName="Browse" />
+                                    <NavLink title="Test Series" icon={<IconTestSeries />} pageName="Test Series" />
+                                    <NavLink title="Doubts" icon={<IconDoubts />} pageName="Doubts" />
+                                    <NavLink title="Analysis" icon={<IconAnalysis />} pageName="Analysis" />
+                                </ul>
+                                <ul>
                                     <li>
-                                        <span className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300">
-                                            Doubts
-                                        </span>
-                                    </li>
-                                    <li>
-                                        <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium">
-                                            Logout
+                                        <button 
+                                            onClick={handleLogout} 
+                                            className="w-full flex items-center gap-3.5 px-4 py-3 rounded-lg text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"
+                                        >
+                                            <IconLogout />
+                                            <span>Logout</span>
                                         </button>
                                     </li>
                                 </ul>
                             </nav>
                         </aside>
-                        {/* --- Main content area always renders DoubtsView --- */}
+                        
+                        {/* --- Main content area --- */}
                         <main className="flex-1 transition-all duration-300 ease-in-out p-4 sm:p-6">
-                            <DoubtsView />
+                            {/* --- Conditionally render content based on activePage --- */}
+                            {activePage === 'Doubts' && (
+                                <DoubtsView 
+                                    upscSubjects={upscSubjects}
+                                    selectedChapter={selectedChapter}
+                                    setSelectedChapter={setSelectedChapter}
+                                    doubts={doubts}
+                                    newDoubt={newDoubt}
+                                    setNewDoubt={setNewDoubt}
+                                    handleDoubtSubmit={handleDoubtSubmit}
+                                    isSubmittingDoubt={isSubmittingDoubt}
+                                    doubtError={doubtError}
+                                    isAdmin={isAdmin}
+                                    handleAnswerSubmit={handleAnswerSubmit}
+                                />
+                            )}
+                            {activePage === 'Planner' && <PlaceholderView title="Planner" />}
+                            {activePage === 'Browse' && <PlaceholderView title="Browse" />}
+                            {activePage === 'Test Series' && <PlaceholderView title="Test Series" />}
+                            {activePage === 'Analysis' && <PlaceholderView title="Analysis" />}
                         </main>
                     </div>
                 </div>
