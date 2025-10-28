@@ -1,1 +1,531 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSChub Magazines & Daily Wrap</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Razorpay Checkout -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged, 
+            signInAnonymously, 
+            signInWithCustomToken 
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            collection, 
+            setDoc, 
+            onSnapshot,
+            serverTimestamp,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- IMPORTANT CONFIGURATION ---
+        // Canvas will provide these variables
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        // --- YOUR RAZORPAY KEY ---
+        // !!! REPLACE THIS with your actual Razorpay Key ID
+        const RAZORPAY_KEY_ID = 'YOUR_RAZORPAY_KEY_ID'; 
+        
+        // --- App State ---
+        let db, auth, userId;
+
+        // --- DOM Elements ---
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const mainContent = document.getElementById('main-content');
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        const dailyWrapList = document.getElementById('daily-wrap-list');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+
+        // --- Magazine Plan Definitions ---
+        // Prices are in 'paise' (e.g., 1000 = ₹10.00)
+        const plans = {
+            daily: { name: 'Daily Magazine', amount: 500, display: '₹5' },
+            weekly: { name: 'Weekly Magazine', amount: 2500, display: '₹25' },
+            monthly: { name: 'Monthly Magazine', amount: 10000, display: '₹100' },
+            quarterly: { name: 'Quarterly Magazine', amount: 25000, display: '₹250' },
+            yearly: { name: 'Yearly Magazine', amount: 99900, display: '₹999' }
+        };
+
+        // --- Initializer Function ---
+        function initApp() {
+            try {
+                const app = initializeApp(firebaseConfig);
+                auth = getAuth(app);
+                db = getFirestore(app);
+                setLogLevel('Debug'); // Enable Firestore logging
+
+                // Listen for Authentication state
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // User is logged in, proceed.
+                        handleAuthentication(user);
+                    } else {
+                        // User is not logged in, REDIRECT to auth1.html
+                        console.log('User not logged in. Redirecting to auth1.html...');
+                        window.location.href = 'auth1.html';
+                    }
+                });
+            } catch (error) {
+                console.error("Firebase Init Error:", error);
+                displayError("Could not connect to services. Please refresh.");
+            }
+        }
+
+        // --- Handle Authenticated User ---
+        async function handleAuthentication(user) {
+            try {
+                // Sign in with token or anonymously
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else if (!auth.currentUser) {
+                    await signInAnonymously(auth);
+                }
+                userId = auth.currentUser.uid;
+                console.log("User Authenticated:", userId);
+
+                // Attach button listeners
+                attachButtonListeners();
+
+                // Load dynamic content
+                listenToDailyContent();
+                listenToUserSubscriptions();
+
+                // Show the main page
+                loadingSpinner.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Authentication Error:", error);
+                displayError("Could not verify user. Please refresh.");
+            }
+        }
+
+        // --- Firestore: Listen for Daily Content ---
+        function listenToDailyContent() {
+            // This doc should be created in your Firestore:
+            // Path: /artifacts/{appId}/public/data/dailyContent/today
+            const contentRef = doc(db, `artifacts/${appId}/public/data/dailyContent`, 'today');
+            
+            onSnapshot(contentRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    
+                    // Populate Quote
+                    quoteText.textContent = data.quote || "The future belongs to those who believe in the beauty of their dreams.";
+                    quoteAuthor.textContent = data.author || "Eleanor Roosevelt";
+                    
+                    // Populate Daily Wrap
+                    dailyWrapList.innerHTML = ''; // Clear existing
+                    if (data.wrap && data.wrap.length > 0) {
+                        data.wrap.forEach(item => {
+                            const li = document.createElement('li');
+                            li.textContent = item;
+                            li.className = "py-2";
+                            dailyWrapList.appendChild(li);
+                        });
+                    } else {
+                        dailyWrapList.innerHTML = '<li class="py-2">No news items for today.</li>';
+                    }
+                } else {
+                    // Fallback content if doc doesn't exist
+                    console.warn("No daily content found in Firestore. Using placeholders.");
+                    quoteText.textContent = "The future belongs to those who believe in the beauty of their dreams.";
+                    quoteAuthor.textContent = "Eleanor Roosevelt";
+                    dailyWrapList.innerHTML = '<li class="py-2">Daily wrap is being updated.</li>';
+                }
+            }, (error) => {
+                console.error("Error fetching daily content:", error);
+            });
+        }
+
+        // --- Firestore: Listen for User's Subscriptions ---
+        function listenToUserSubscriptions() {
+            const subsRef = collection(db, `artifacts/${appId}/users/${userId}/subscriptions`);
+            
+            onSnapshot(subsRef, (snapshot) => {
+                const activeSubscriptions = new Map();
+                const now = new Date();
+
+                snapshot.docs.forEach(doc => {
+                    const sub = doc.data();
+                    const expiryDate = sub.expiryDate.toDate(); // Convert Firestore Timestamp
+                    
+                    if (expiryDate > now) {
+                        activeSubscriptions.set(doc.id, sub);
+                    }
+                });
+
+                // Update the UI for all pricing cards
+                updatePricingCardUI(activeSubscriptions);
+
+            }, (error) => {
+                console.error("Error fetching user subscriptions:", error);
+            });
+        }
+
+        // --- UI: Update Buy Buttons based on Subscriptions ---
+        function updatePricingCardUI(activeSubscriptions) {
+            document.querySelectorAll('[data-plan]').forEach(button => {
+                const planType = button.dataset.plan;
+                
+                if (activeSubscriptions.has(planType)) {
+                    // User is subscribed and it's active
+                    button.textContent = 'Subscribed';
+                    button.disabled = true;
+                    button.className = "w-full py-3 px-6 rounded-lg font-semibold text-center bg-green-600 text-white cursor-not-allowed";
+                } else {
+                    // User is not subscribed or it expired
+                    button.textContent = `Buy Now (${plans[planType].display})`;
+                    button.disabled = false;
+                    button.className = "w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors";
+                }
+            });
+        }
+
+        // --- Attach Click Listeners to Buy Buttons ---
+        function attachButtonListeners() {
+            document.querySelectorAll('[data-plan]').forEach(button => {
+                button.addEventListener('click', () => {
+                    const planType = button.dataset.plan;
+                    if (RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID') {
+                        showModal('Configuration Error', 'Please ask the site administrator to configure Razorpay payments.');
+                        return;
+                    }
+                    initiatePayment(planType);
+                });
+            });
+            
+            // Modal close
+            modalCloseBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        }
+
+        // --- Razorpay: Initiate Payment ---
+        function initiatePayment(planType) {
+            const plan = plans[planType];
+            const user = auth.currentUser;
+
+            const options = {
+                key: RAZORPAY_KEY_ID,
+                amount: plan.amount,
+                currency: "INR",
+                name: "UPSChub Subscription",
+                description: plan.name,
+                image: "https://placehold.co/100x100/3498DB/FFFFFF?text=U", // Placeholder logo
+                
+                // Prefill user info if available
+                prefill: {
+                    name: user.displayName || "UPSC Aspirant",
+                    email: user.email || "",
+                    contact: user.phoneNumber || ""
+                },
+                theme: {
+                    color: "#3498DB" // Blue theme
+                },
+                
+                // --- Payment Handler ---
+                // This function is called after a successful payment
+                handler: async function (response) {
+                    console.log("Payment successful:", response);
+                    await recordSubscription(planType, response.razorpay_payment_id);
+                },
+                modal: {
+                    ondismiss: function() {
+                        console.log('Checkout form was closed.');
+                    }
+                }
+            };
+
+            // --- SECURITY WARNING ---
+            // In a real-world, secure application, you would NOT create the
+            // subscription directly from the client-side 'handler'.
+            // You would:
+            // 1. Send the `response.razorpay_payment_id` to your backend (e.g., a Firebase Cloud Function).
+            // 2. Your backend would securely verify the payment with Razorpay's API.
+            // 3. ONLY after verification would the backend write the subscription to Firestore.
+            //
+            // Since this is a single-file demo, we do the (less secure) optimistic write.
+            // ---
+
+            try {
+                const rzp = new Razorpay(options);
+                rzp.open();
+                
+                rzp.on('payment.failed', function (response){
+                    console.error("Payment Failed:", response);
+                    showModal('Payment Failed', `Error: ${response.error.description}`);
+                });
+
+            } catch (error) {
+                console.error("Razorpay Error:", error);
+                showModal('Payment Error', 'Could not initialize payment. Please try again.');
+            }
+        }
+
+        // --- Firestore: Record Subscription After Payment ---
+        async function recordSubscription(planType, paymentId) {
+            try {
+                const subRef = doc(db, `artifacts/${appId}/users/${userId}/subscriptions`, planType);
+                const expiryDate = calculateExpiryDate(planType);
+
+                await setDoc(subRef, {
+                    plan: planType,
+                    planName: plans[planType].name,
+                    paymentId: paymentId,
+                    purchaseDate: serverTimestamp(),
+                    expiryDate: expiryDate
+                });
+
+                console.log(`Subscription ${planType} recorded.`);
+                showModal('Payment Successful!', `Your ${plans[planType].name} subscription is now active.`);
+            
+            } catch (error) {
+                console.error("Error recording subscription:", error);
+                showModal('Update Error', 'Your payment was successful, but we had an error updating your account. Please contact support.');
+            }
+        }
+
+        // --- Helper: Calculate Expiry Date ---
+        function calculateExpiryDate(planType) {
+            const now = new Date();
+            switch (planType) {
+                case 'daily':
+                    now.setDate(now.getDate() + 1);
+                    return now;
+                case 'weekly':
+                    now.setDate(now.getDate() + 7);
+                    return now;
+                case 'monthly':
+                    now.setMonth(now.getMonth() + 1);
+                    return now;
+                case 'quarterly':
+                    now.setMonth(now.getMonth() + 3);
+                    return now;
+                case 'yearly':
+                    now.setFullYear(now.getFullYear() + 1);
+                    return now;
+                default:
+                    return now;
+            }
+        }
+
+        // --- Helper: Show/Hide Modal ---
+        function showModal(title, message) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            modal.classList.remove('hidden');
+        }
+        
+        function displayError(message) {
+             loadingSpinner.innerHTML = `<p class="text-red-400">${message}</p>`;
+        }
+
+        // --- Start the App ---
+        initApp();
+
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Simple spinner */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid #3498db; /* Blue */
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Loading Spinner (Visible on load) -->
+    <div id="loading-spinner" class="min-h-screen flex flex-col items-center justify-center">
+        <div class="spinner"></div>
+        <p class="mt-4 text-lg">Loading UPSChub...</p>
+    </div>
+
+    <!-- Main Content (Hidden on load) -->
+    <div id="main-content" class="hidden">
+        
+        <!-- Header -->
+        <header class="bg-gray-800 shadow-md">
+            <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <a href="#" class="text-2xl font-bold text-white">
+                    <span class="text-blue-400">UPSC</span>hub
+                </a>
+                <div>
+                    <!-- Add other nav links here if needed, e.g., Home, Profile -->
+                    <a href="#" class="px-4 text-gray-300 hover:text-white">Home</a>
+                    <a href="#" class="px-4 text-gray-300 hover:text-white">Profile</a>
+                </div>
+            </nav>
+        </header>
+
+        <!-- Page Content -->
+        <main class="container mx-auto px-6 py-12">
+            
+            <h1 class="text-4xl font-bold text-center text-white mb-12">
+                Our Magazines & Daily Updates
+            </h1>
+
+            <!-- Daily Content Section -->
+            <section class="mb-16 p-8 bg-gray-800 rounded-lg shadow-xl">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Daily Wrap -->
+                    <div>
+                        <h2 class="text-3xl font-semibold text-blue-400 mb-4">Daily Wrap</h2>
+                        <ul id="daily-wrap-list" class="list-disc list-inside space-y-2 text-gray-300">
+                            <!-- JS will populate this -->
+                            <li class="py-2">Loading daily news...</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Quote of the Day -->
+                    <div class="border-t-2 md:border-t-0 md:border-l-2 border-gray-700 md:pl-8 pt-8 md:pt-0">
+                        <h2 class="text-3xl font-semibold text-blue-400 mb-4">Quote of the Day</h2>
+                        <blockquote class="text-2xl italic text-white">
+                            "<span id="quote-text">Loading...</span>"
+                        </blockquote>
+                        <p class="text-right text-lg text-gray-400 mt-4">- <span id="quote-author">...</span></p>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Pricing / Subscription Section -->
+            <section>
+                <h2 class="text-3xl font-bold text-center text-white mb-10">Choose Your Plan</h2>
+                
+                <!-- Pricing Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-6">
+                    
+                    <!-- Daily Plan -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center border-2 border-gray-700 hover:border-blue-500 transition-colors">
+                        <h3 class="text-xl font-bold text-blue-400 mb-2">Daily</h3>
+                        <p class="text-4xl font-bold text-white mb-4" id="price-daily">₹5</p>
+                        <ul class="text-gray-400 text-center mb-6 space-y-1">
+                            <li>Access for 24 hours</li>
+                            <li>Daily News Analysis</li>
+                        </ul>
+                        <button data-plan="daily" class="w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                            Buy Now (₹5)
+                        </button>
+                    </div>
+
+                    <!-- Weekly Plan -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center border-2 border-gray-700 hover:border-blue-500 transition-colors">
+                        <h3 class="text-xl font-bold text-blue-400 mb-2">Weekly</h3>
+                        <p class="text-4xl font-bold text-white mb-4" id="price-weekly">₹25</p>
+                        <ul class="text-gray-400 text-center mb-6 space-y-1">
+                            <li>Access for 7 Days</li>
+                            <li>Weekly Compendium</li>
+                        </ul>
+                        <button data-plan="weekly" class="w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                            Buy Now (₹25)
+                        </button>
+                    </div>
+                    
+                    <!-- Monthly Plan (Most Popular) -->
+                    <div class="bg-blue-800 rounded-lg shadow-2xl p-6 flex flex-col items-center border-2 border-blue-400 scale-105">
+                        <span class="text-sm font-semibold bg-yellow-400 text-gray-900 px-3 py-1 rounded-full -mt-9 mb-3">Popular</span>
+                        <h3 class="text-xl font-bold text-white mb-2">Monthly</h3>
+                        <p class="text-4xl font-bold text-white mb-4" id="price-monthly">₹100</p>
+                        <ul class="text-gray-200 text-center mb-6 space-y-1">
+                            <li>Access for 30 Days</li>
+                            <li>Full Monthly Magazine</li>
+                            <li>All Weekly Compendiums</li>
+                        </ul>
+                        <button data-plan="monthly" class="w-full py-3 px-6 rounded-lg font-semibold text-center bg-white text-blue-700 hover:bg-gray-200 transition-colors">
+                            Buy Now (₹100)
+                        </button>
+                    </div>
+
+                    <!-- Quarterly Plan -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center border-2 border-gray-700 hover:border-blue-500 transition-colors">
+                        <h3 class="text-xl font-bold text-blue-400 mb-2">Quarterly</h3>
+                        <p class="text-4xl font-bold text-white mb-4" id="price-quarterly">₹250</p>
+                        <ul class="text-gray-400 text-center mb-6 space-y-1">
+                            <li>Access for 3 Months</li>
+                            <li>3 Monthly Magazines</li>
+                            <li>+ All Features</li>
+                        </ul>
+                        <button data-plan="quarterly" class="w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                            Buy Now (₹250)
+                        </button>
+                    </div>
+
+                    <!-- Yearly Plan -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center border-2 border-gray-700 hover:border-blue-500 transition-colors">
+                        <h3 class="text-xl font-bold text-blue-400 mb-2">Yearly</h3>
+                        <p class="text-4xl font-bold text-white mb-4" id="price-yearly">₹999</p>
+                        <ul class="text-gray-400 text-center mb-6 space-y-1">
+                            <li>Best Value (1 Year)</li>
+                            <li>All Monthly Magazines</li>
+                            <li>+ All Features</li>
+                        </ul>
+                        <button data-plan="yearly" class="w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors">
+                            Buy Now (₹999)
+                        </button>
+                    </div>
+                    
+                </div>
+            </section>
+            
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-gray-800 mt-20 border-t border-gray-700">
+            <div class="container mx-auto px-6 py-6 text-center text-gray-400">
+                <p>&copy; 2025 UPSChub. All rights reserved.</p>
+                <p class="text-sm mt-1">This is a demo page. Payments are for demonstration purposes.</p>
+            </div>
+        </footer>
+
+    </div>
+    
+    <!-- Modal for Messages -->
+    <div id="modal" class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 w-full max-w-md text-center">
+            <h3 id="modal-title" class="text-2xl font-bold text-gray-900 dark:text-white mb-4"></h3>
+            <p id="modal-message" class="text-gray-600 dark:text-gray-300 mb-6"></p>
+            <button id="modal-close-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                Close
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>
 
