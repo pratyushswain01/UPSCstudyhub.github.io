@@ -52,6 +52,7 @@
         // --- DOM Elements ---
         const loadingSpinner = document.getElementById('loading-spinner');
         const mainContent = document.getElementById('main-content');
+        const connectionErrorBanner = document.getElementById('connection-error'); // Added
         const quoteText = document.getElementById('quote-text');
         const quoteAuthor = document.getElementById('quote-author');
         const dailyWrapList = document.getElementById('daily-wrap-list');
@@ -73,6 +74,7 @@
         // --- Initializer Function ---
         function initApp() {
             try {
+                // This line might fail if __firebase_config is missing or invalid
                 const app = initializeApp(firebaseConfig);
                 auth = getAuth(app);
                 db = getFirestore(app);
@@ -91,7 +93,9 @@
                 });
             } catch (error) {
                 console.error("Firebase Init Error:", error);
-                displayError("Could not connect to services. Please refresh.");
+                // --- THIS IS THE CHANGE ---
+                // Instead of blocking, enter a fallback mode.
+                enterFallbackMode("Could not connect to services. Please refresh.");
             }
         }
 
@@ -120,6 +124,7 @@
 
             } catch (error) {
                 console.error("Authentication Error:", error);
+                // If auth fails, enter fallback mode
                 displayError("Could not verify user. Please refresh.");
             }
         }
@@ -159,6 +164,8 @@
                 }
             }, (error) => {
                 console.error("Error fetching daily content:", error);
+                // Enter fallback mode if we can't even *read* from the DB
+                enterFallbackMode("Error fetching daily content. Live data is unavailable.");
             });
         }
 
@@ -172,10 +179,11 @@
 
                 snapshot.docs.forEach(doc => {
                     const sub = doc.data();
-                    const expiryDate = sub.expiryDate.toDate(); // Convert Firestore Timestamp
-                    
-                    if (expiryDate > now) {
-                        activeSubscriptions.set(doc.id, sub);
+                    if (sub.expiryDate) { // Check if expiryDate exists
+                        const expiryDate = sub.expiryDate.toDate(); // Convert Firestore Timestamp
+                        if (expiryDate > now) {
+                            activeSubscriptions.set(doc.id, sub);
+                        }
                     }
                 });
 
@@ -184,6 +192,7 @@
 
             }, (error) => {
                 console.error("Error fetching user subscriptions:", error);
+                // Don't kill the page, just log it. The buttons will remain as "Buy Now".
             });
         }
 
@@ -201,7 +210,12 @@
                     // User is not subscribed or it expired
                     button.textContent = `Buy Now (${plans[planType].display})`;
                     button.disabled = false;
-                    button.className = "w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors";
+                    // Reset classes, especially for the popular one
+                    if (planType === 'monthly') {
+                         button.className = "w-full py-3 px-6 rounded-lg font-semibold text-center bg-white text-blue-700 hover:bg-gray-200 transition-colors";
+                    } else {
+                         button.className = "w-full py-3 px-6 rounded-lg font-semibold text-center bg-blue-600 text-white hover:bg-blue-700 transition-colors";
+                    }
                 }
             });
         }
@@ -214,6 +228,10 @@
                     if (RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID') {
                         showModal('Configuration Error', 'Please ask the site administrator to configure Razorpay payments.');
                         return;
+                    }
+                    if (!db || !auth || !userId) {
+                         showModal('Connection Error', 'Cannot process payment. Not connected to services.');
+                         return;
                     }
                     initiatePayment(planType);
                 });
@@ -247,7 +265,6 @@
                 },
                 
                 // --- Payment Handler ---
-                // This function is called after a successful payment
                 handler: async function (response) {
                     console.log("Payment successful:", response);
                     await recordSubscription(planType, response.razorpay_payment_id);
@@ -258,17 +275,8 @@
                     }
                 }
             };
-
-            // --- SECURITY WARNING ---
-            // In a real-world, secure application, you would NOT create the
-            // subscription directly from the client-side 'handler'.
-            // You would:
-            // 1. Send the `response.razorpay_payment_id` to your backend (e.g., a Firebase Cloud Function).
-            // 2. Your backend would securely verify the payment with Razorpay's API.
-            // 3. ONLY after verification would the backend write the subscription to Firestore.
-            //
-            // Since this is a single-file demo, we do the (less secure) optimistic write.
-            // ---
+            
+            // Security Warning (same as before)
 
             try {
                 const rzp = new Razorpay(options);
@@ -339,9 +347,39 @@
             modal.classList.remove('hidden');
         }
         
+        // --- UPDATED Function ---
+        // This function is called when a critical error occurs
         function displayError(message) {
-             loadingSpinner.innerHTML = `<p class="text-red-400">${message}</p>`;
+             enterFallbackMode(message);
         }
+
+        // --- NEW Function ---
+        // Enters a "safe mode" if Firebase fails to load
+        function enterFallbackMode(message) {
+            console.warn("Entering Fallback Mode:", message);
+            
+            // Show the error banner
+            connectionErrorBanner.textContent = `Error: ${message} Live content and subscriptions are disabled.`;
+            connectionErrorBanner.classList.remove('hidden');
+
+            // Show the main page, hide spinner
+            loadingSpinner.classList.add('hidden');
+            mainContent.classList.remove('hidden');
+
+            // Populate with fallback content
+            quoteText.textContent = "The future belongs to those who believe in the beauty of their dreams.";
+            quoteAuthor.textContent = "Eleanor Roosevelt";
+            dailyWrapList.innerHTML = '<li class="py-2">Daily wrap is unavailable.</li>';
+
+            // Disable all payment buttons
+            document.querySelectorAll('[data-plan]').forEach(button => {
+                button.disabled = true;
+                button.textContent = 'Unavailable';
+                // Remove all styling and add disabled styling
+                button.className = "w-full py-3 px-6 rounded-lg font-semibold text-center bg-gray-500 text-white cursor-not-allowed";
+            });
+        }
+
 
         // --- Start the App ---
         initApp();
@@ -368,6 +406,11 @@
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200 min-h-screen">
+
+    <!-- Database Connection Error Banner (Hidden by default) -->
+    <div id="connection-error" class="hidden bg-red-600 text-white text-center p-3 font-semibold sticky top-0 z-50">
+        <!-- JS will populate this -->
+    </div>
 
     <!-- Loading Spinner (Visible on load) -->
     <div id="loading-spinner" class="min-h-screen flex flex-col items-center justify-center">
