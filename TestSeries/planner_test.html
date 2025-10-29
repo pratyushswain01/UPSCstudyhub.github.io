@@ -288,11 +288,23 @@
         let currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
 
         // --- Firebase Config (from environment) ---
-        const firebaseConfig = typeof __firebase_config !== 'undefined' 
-            ? JSON.parse(__firebase_config) 
-            : { apiKey: "DEFAULT_KEY", authDomain: "DEFAULT_DOMAIN", projectId: "DEFAULT_PROJECT" };
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // const firebaseConfig = typeof __firebase_config !== 'undefined' 
+        //     ? JSON.parse(__firebase_config) 
+        //     : { apiKey: "DEFAULT_KEY", authDomain: "DEFAULT_DOMAIN", projectId: "DEFAULT_PROJECT" };
+        // const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- HARDCODED Firebase Config (for GitHub Pages) ---
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", 
+            authDomain: "upscstudyhub-github.firebaseapp.com", 
+            projectId: "upscstudyhub-github", 
+            storageBucket: "upscstudyhub-github.firebasestorage.app", 
+            messagingSenderId: "451692540885", 
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
+        };
+        const appId = 'default-app-id'; // Use the same one as dashboard
+        const initialAuthToken = null; // This will not be present on GitHub Pages navigation
 
         // --- UI Elements (Moved here) ---
         function getUiElements() {
@@ -749,7 +761,7 @@
                         // Sign in (ONLY if the initial token is provided)
                         (async () => {
                             try {
-                                if (initialAuthToken) {
+                                if (initialAuthToken) { // This will be false now, which is correct
                                     await signInWithCustomToken(auth, initialAuthToken);
                                 }
                                 // If no token, we do nothing.
@@ -799,6 +811,7 @@
     </script>
 </body>
 </html>
+
 
 
 
