@@ -3,502 +3,831 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPSC Hub - Doubts</title>
+    <title>UPSC Hub - Test Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        #loader {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #4a5568;
-            background-color: #f1f5f9; /* bg-slate-100 */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9;
         }
-        body.dark #loader {
-            background-color: #0f172a; /* dark:bg-slate-900 */
-            color: #cbd5e1; /* dark:text-slate-300 */
+        /* ... existing styles ... */
+        .calendar {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+        .day {
+            @apply text-center py-2 px-1 rounded-lg transition-all duration-150 cursor-pointer;
+        }
+        .day.header {
+            @apply font-bold text-xs text-slate-500 uppercase;
+        }
+        .day.empty {
+            @apply bg-transparent;
+        }
+        .day.normal {
+            @apply text-slate-700 bg-white hover:bg-slate-50;
+        }
+        .day.has-test {
+            @apply font-bold text-blue-700 bg-blue-100 hover:bg-blue-200 ring-1 ring-blue-300;
+        }
+        .day.today {
+            @apply ring-2 ring-blue-500 font-bold;
+        }
+        .day.selected {
+            @apply bg-blue-600 text-white font-bold ring-2 ring-blue-700;
+        }
+
+        /* Admin Mode */
+        .admin-only {
+            display: none;
+        }
+        body.admin-mode .admin-only {
+            display: flex; /* Or 'block', 'grid' as needed */
+        }
+        /* Loader */
+        #loader-overlay {
+            @apply fixed inset-0 bg-white bg-opacity-75 flex flex-col items-center justify-center z-50;
+        }
+        .loader-spinner {
+            @apply w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin;
+        }
+        
+        /* Custom modal styles */
+        #message-modal-overlay {
+            @apply fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm;
+            animation: fadeIn 0.2s ease-out;
+        }
+        #message-modal .modal-content {
+            @apply bg-white p-6 rounded-2xl shadow-xl w-full max-w-sm;
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes slideDown {
+            from { opacity: 1; transform: translateY(0) scale(1); }
+            to { opacity: 0; transform: translateY(30px) scale(0.95); }
+        }
+
+        /* Progress Bar Animation */
+        .progress-bar div {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Gradient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 400px;
+            z-index: -1;
+            opacity: 0.6;
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.15) 0%, rgba(241, 245, 249, 0) 100%);
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900">
-    <div id="root">
-        <div id="loader">Loading Dashboard...</div>
+<body class="min-h-screen antialiased">
+    <div id="app" class="flex flex-col min-h-screen">
+        
+        <!-- Header -->
+        <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <!-- Logo / Title -->
+                    <div class="flex items-center space-x-3">
+                        <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg"/>
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-800">
+                            Test Planner
+                        </h1>
+                    </div>
+                    
+                    <!-- Actions -->
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <!-- Admin Mode Badge (hidden by default, shown if admin) -->
+                        <span id="admin-badge" class="hidden px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full">Admin Mode</span>
+
+                        <!-- Dashboard Button (now a link) -->
+                        <a href="./doubts.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-all duration-200 text-sm sm:text-base flex items-center space-x-2">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main id="main-content" class="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 flex-1 opacity-0 transition-opacity duration-500">
+            <!-- Auth Loading State -->
+            <div id="loader-overlay">
+                <div class="loader-spinner"></div>
+                <p class="text-lg font-medium text-slate-600 mt-4">Connecting...</p>
+            </div>
+            
+            <!-- "Please Log In" Message (Hidden by default) -->
+            <div id="login-prompt" class="hidden flex-col items-center justify-center h-full min-h-[50vh] bg-white rounded-xl shadow-lg p-8">
+                <svg class="w-16 h-16 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Please Log In</h2>
+                <p class="text-slate-600 text-center">You must be logged in to access the UPSChub dashboard.</p>
+                <p class="text-sm text-slate-500 mt-4">Your User ID (if available): <span id="userIdDisplay" class="font-medium">...</span></p>
+            </div>
+
+            <!-- App Content (Hidden by default) -->
+            <div id="app-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+                <!-- Left Column: Calendar -->
+                <div class="lg:col-span-2">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="p-5 border-b border-slate-200">
+                            <!-- Calendar Header -->
+                            <div class="flex items-center justify-between mb-4">
+                                <button id="prev-month" aria-label="Previous Month" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+                                </button>
+                                <h2 id="month-year" class="text-lg font-semibold text-slate-800"></h2>
+                                <button id="next-month" aria-label="Next Month" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                                </button>
+                            </div>
+                            <!-- Calendar Grid -->
+                            <div id="calendar-grid" class="calendar">
+                                <!-- Day headers will be injected here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column: Test Details -->
+                <div class="lg:col-span-1 space-y-6">
+                    <!-- Today's Tests -->
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        <div class="p-5 border-b border-slate-200">
+                            <h3 class="text-base font-semibold text-slate-800">Tests for:</h3>
+                            <div class="flex items-baseline justify-between">
+                                <time id="selected-date-display" class="text-2xl font-bold text-blue-600">January 1, 2024</time>
+                                <div class="flex space-x-1">
+                                    <button id="prev-day" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+                                    </button>
+                                    <button id="next-day" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="date" id="date-picker" class="absolute -left-[9999px] opacity-0" />
+                        </div>
+                        
+                        <div class="p-5 space-y-4">
+                            <!-- Progress Bar -->
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-slate-600">Completion</span>
+                                    <span id="progress-text" class="text-sm font-medium text-blue-600">0 / 0</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5 progress-bar">
+                                    <div id="progress-bar-inner" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Test List -->
+                            <ul id="test-list" class="space-y-3">
+                                <!-- Test items will be injected here -->
+                            </ul>
+
+                            <!-- Empty State -->
+                            <div id="empty-state" class="text-center py-6 hidden">
+                                <svg class="w-12 h-12 mx-auto text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" /></svg>
+                                <h4 class="mt-2 text-lg font-semibold text-slate-700">No Tests Scheduled</h4>
+                                <p class="mt-1 text-sm text-slate-500">No tests are scheduled for this day.</p>
+                                <!-- Admin-only CTA -->
+                                <button id="admin-empty-cta" class="admin-only mt-4 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 text-sm">
+                                    Add a test
+                                </button>
+                            </div>
+                            
+                            <!-- Admin: Add Test Form -->
+                            <form id="add-test-form" class="admin-only pt-4 border-t border-slate-200 space-y-3">
+                                <h4 class="text-base font-semibold text-slate-800">Add New Test</h4>
+                                <div>
+                                    <label for="new-test-name" class="block text-sm font-medium text-slate-700 mb-1">Test Name</label>
+                                    <input type="text" id="new-test-name" class="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Polity Test 1">
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center space-x-2">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+                                    <span>Add Test</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <!-- Footer -->
+        <footer class="text-center py-4 px-4 text-sm text-slate-500">
+            © <span id="footer-year">2024</span> UPSChub. All rights reserved.
+        </footer>
+    </div>
+    
+    <!-- Custom Message Modal -->
+    <div id="message-modal" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden" role="alertdialog" aria-modal="true" aria-labelledby="message-modal-title">
+        <div id="message-modal-overlay"></div>
+        <div class="modal-content text-center" role="document">
+            <div id="message-modal-icon" class="mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center bg-red-100">
+                <!-- Icon (e.g., error) -->
+                <svg class="w-6 h-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+            </div>
+            <h3 id="message-modal-title" class="text-lg font-semibold text-slate-800">Error</h3>
+            <p id="message-modal-text" class="text-sm text-slate-600 mt-2">Something went wrong.</p>
+            <button id="message-modal-close" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">
+                Close
+            </button>
+        </div>
     </div>
 
-    <!-- React and Babel -->
-    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    
-    <!-- Firebase v8 (namespaced) SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-    <!-- Main React Application code, now using Babel -->
-    <script type="text/babel" data-presets="react">
-        // De-structure React hooks
-        const { useState, useEffect } = React;
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            setPersistence,
+            sessionPersistence  // <-- CHANGED from inMemoryPersistence
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc,
+            setDoc,
+            updateDoc,
+            arrayUnion,
+            arrayRemove,
+            onSnapshot,
+            collection,
+            query,
+            getDocs,
+            Timestamp,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // --- FIREBASE CONFIGURATION (FROM CANVAS) ---
+        // --- App State ---
+        let db, auth;
+        let currentUserId = null;
+        const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; // The admin UID from your dashboard file
+        let isAdmin = false;
+        let currentDate = new Date(); // YYYY-MM-DD string
+        let currentSchedule = []; // { id, name }
+        let currentCompletion = []; // [id1, id2]
+        let calendarData = {}; // { 'YYYY-MM-DD': true }
+        let unsubscribeSchedule = () => {};
+        let unsubscribeCalendar = () => {};
+        let currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+
+        // --- Firebase Config (from environment) ---
         const firebaseConfig = typeof __firebase_config !== 'undefined' 
             ? JSON.parse(__firebase_config) 
             : { apiKey: "DEFAULT_KEY", authDomain: "DEFAULT_DOMAIN", projectId: "DEFAULT_PROJECT" };
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        
-        const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; // Your Admin UID
 
-        // --- Initialize Firebase (v8 Syntax) ---
-        let auth, db, serverTimestamp;
-        try {
-            if (!firebase.apps.length) {
-                firebase.initializeApp(firebaseConfig);
-            }
-            auth = firebase.auth();
-            db = firebase.firestore();
-            serverTimestamp = firebase.firestore.FieldValue.serverTimestamp;
-            // Note: setLogLevel is not as straightforward in v8
-        } catch (e) {
-            console.error("Error initializing Firebase:", e);
-            document.getElementById('loader').innerText = "Error initializing. Please refresh.";
+        // --- UI Elements ---
+        const $ = (selector) => document.getElementById(selector);
+        
+        const adminBadge = $("admin-badge");
+        const userIdDisplay = $("userIdDisplay");
+        const datePicker = $("date-picker");
+        const prevDayBtn = $("prev-day");
+        const nextDayBtn = $("next-day");
+        const selectedDateDisplay = $("selected-date-display");
+        const testList = $("test-list");
+        const emptyState = $("empty-state");
+        const newTestNameInput = $("new-test-name");
+        const addTestForm = $("add-test-form");
+        const progressText = $("progress-text");
+        const progressBarInner = $("progress-bar-inner");
+        const calendarGrid = $("calendar-grid");
+        const monthYearDisplay = $("month-year");
+        const prevMonthBtn = $("prev-month");
+        const nextMonthBtn = $("next-month");
+        const loaderOverlay = $("loader-overlay");
+        const loginPrompt = $("login-prompt");
+        const appContent = $("app-content");
+        const mainContent = $("main-content");
+        
+        const messageModal = $("message-modal");
+        const messageModalOverlay = $("message-modal-overlay");
+        const messageModalClose = $("message-modal-close");
+        const messageModalTitle = $("message-modal-title");
+        const messageModalText = $("message-modal-text");
+        
+        // --- Utility Functions ---
+
+        /**
+         * Formats a Date object to 'YYYY-MM-DD' string
+         */
+        function getYYYYMMDD(date) {
+            return date.toISOString().split('T')[0];
         }
 
-        // --- Modal Component (to replace alert/confirm) ---
-        const Modal = ({ show, title, message, onConfirm, onCancel, confirmText, cancelText, type }) => {
-            if (!show) return null;
+        /**
+         * Formats a Date object to a readable string e.g., "July 20, 2024"
+         */
+        function formatReadableDate(date) {
+            return date.toLocaleDateString('en-US', {
+                month: 'long',
+                day: 'numeric',
+                year: 'numeric',
+            });
+        }
+        
+        /**
+         * Formats a Date object to a month/year string e.g., "July 2024"
+         */
+        function formatMonthYear(date) {
+            return date.toLocaleDateString('en-US', {
+                month: 'long',
+                year: 'numeric',
+            });
+        }
+        
+        /**
+         * Shows a custom modal message
+         */
+        function showMessage(title, text) {
+            messageModalTitle.textContent = title;
+            messageModalText.textContent = text;
+            messageModal.classList.remove('hidden');
+            messageModalOverlay.classList.add('fadeIn');
+            messageModal.querySelector('.modal-content').classList.add('slideUp');
+        }
 
-            const confirmColor = type === 'danger' ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700';
-
-            return (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50">
-                    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
-                        <h3 className="text-lg font-medium text-gray-900 dark:text-slate-100">{title}</h3>
-                        <p className="text-sm text-gray-600 dark:text-slate-300 mt-2">{message}</p>
-                        <div className="mt-6 space-y-2">
-                            {onConfirm && (
-                                <button onClick={onConfirm} className={`w-full text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 ${confirmColor}`}>
-                                    {confirmText || 'Confirm'}
-                                </button>
-                            )}
-                            {onCancel && (
-                                <button onClick={onCancel} className="w-full bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-800 dark:text-slate-200 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">
-                                    {cancelText || 'Cancel'}
-                                </button>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // --- DoubtCard Component ---
-        const DoubtCard = ({ doubt, isAdmin, handleAnswerSubmit, handleDeleteDoubt }) => {
-            const [answer, setAnswer] = useState('');
-            const [isAnswering, setIsAnswering] = useState(false);
-            const date = doubt.timestamp?.toDate().toLocaleDateString('en-IN', { day: 'numeric', month: 'long', year: 'numeric' });
+        /**
+         * Hides the custom modal message
+         */
+        function hideMessage() {
+            messageModalOverlay.classList.remove('fadeIn');
+            messageModal.querySelector('.modal-content').classList.remove('slideUp');
             
-            const onAnswerSubmit = (e) => {
-                e.preventDefault();
-                setIsAnswering(true);
-                handleAnswerSubmit(doubt.id, answer).finally(() => {
-                    setIsAnswering(false);
-                    setAnswer('');
-                });
-            };
+            // Allow animation to finish before hiding
+            setTimeout(() => {
+                messageModal.classList.add('hidden');
+            }, 300);
+        }
+
+        // --- Core UI Logic ---
+
+        /**
+         * Renders the test list for the currently selected date
+         */
+        function renderTestList() {
+            testList.innerHTML = '';
             
-            return (
-                <div className="bg-white dark:bg-slate-800 rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-lg mb-4 border dark:border-slate-700">
-                    <div className="p-6">
-                        <div className="flex justify-between items-start">
-                            <p className="text-gray-500 dark:text-slate-400 text-sm mb-3">Asked by {doubt.askedByName} on {date || '...'}</p>
-                            {isAdmin && (
-                                <button 
-                                    onClick={() => handleDeleteDoubt(doubt.id, doubt.question)}
-                                    className="text-sm text-red-500 hover:text-red-700 font-medium"
-                                >
-                                    Delete
-                                </button>
-                            )}
+            if (currentSchedule.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                currentSchedule.forEach(test => {
+                    const isCompleted = currentCompletion.includes(test.id);
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between p-3 bg-slate-50 rounded-lg border border-slate-200';
+                    li.innerHTML = `
+                        <div class="flex items-center space-x-3">
+                            <input type="checkbox" data-id="${test.id}" class="h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500" ${isCompleted ? 'checked' : ''}>
+                            <label for="test-${test.id}" class="text-base ${isCompleted ? 'text-slate-400 line-through' : 'text-slate-700'}">${test.name}</label>
                         </div>
-                        <p className="text-slate-800 dark:text-slate-200 text-lg leading-relaxed mb-4">{doubt.question}</p>
-                        {doubt.isAnswered ? (
-                            <div className="mt-4 p-4 bg-blue-50 dark:bg-slate-700/50 border-l-4 border-blue-500 rounded-r-lg">
-                                <h4 className="font-bold text-blue-800 dark:text-blue-300 mb-2">Admin's Answer:</h4>
-                                <p className="text-gray-700 dark:text-slate-300 whitespace-pre-wrap">{doubt.answer}</p>
-                            </div>
-                        ) : isAdmin ? (
-                            <form onSubmit={onAnswerSubmit} className="mt-4">
-                                <textarea value={answer} onChange={(e) => setAnswer(e.target.value)} placeholder="Write your answer here..." className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500" rows="3" />
-                                <button type="submit" disabled={isAnswering} className="mt-2 px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300">{isAnswering ? 'Submitting...' : 'Submit Answer'}</button>
-                            </form>
-                        ) : (
-                            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/40 border-l-4 border-yellow-400 rounded-r-lg">
-                                <p className="text-yellow-800 dark:text-yellow-300 font-medium">Waiting for an answer from the admin.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        };
-
-        // --- DoubtsView Component ---
-        const DoubtsView = ({
-            upscSubjects, selectedChapter, setSelectedChapter, doubts,
-            newDoubt, setNewDoubt, handleDoubtSubmit, isSubmittingDoubt,
-            doubtError, isAdmin, handleAnswerSubmit, handleDeleteDoubt, handleClearAnswered
-        }) => (
-            <div className="flex flex-col gap-8">
-                
-                <div className="p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
-                    <h2 className="text-xl font-bold mb-4 border-b dark:border-slate-600 pb-3">Subjects</h2>
-                    <ul className="flex flex-wrap gap-2">
-                        {upscSubjects.map(chapter => (
-                            <li key={chapter}>
-                                <button 
-                                    onClick={() => setSelectedChapter(chapter)} 
-                                    className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
-                                        selectedChapter === chapter 
-                                        ? 'bg-blue-600 text-white shadow-sm' 
-                                        : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'
-                                    }`}
-                                >
-                                    {chapter}
-                                </button>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-
-                <div className="p-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
-                    <h2 className="text-xl font-bold mb-4">Ask a Doubt in <span className="text-blue-600">{selectedChapter}</span></h2>
-                    <form onSubmit={handleDoubtSubmit}>
-                        <textarea 
-                            value={newDoubt} 
-                            onChange={(e) => setNewDoubt(e.target.value)} 
-                            placeholder="Type your question here..." 
-                            className="w-full p-3 border border-gray-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 rounded-lg focus:ring-2 focus:ring-blue-500 mb-4" 
-                            rows="4"
-                        ></textarea>
-                        {doubtError && <p className="text-red-500 text-sm mb-3">{doubtError}</p>}
-                        <button 
-                            type="submit" 
-                            disabled={isSubmittingDoubt} 
-                            className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 disabled:bg-blue-300"
-                        >
-                            {isSubmittingDoubt ? 'Submitting...' : 'Submit Your Doubt'}
+                        <button data-id="${test.id}" class="admin-only text-red-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 transition-colors" aria-label="Delete test">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.58.11-2.368.11a.75.75 0 0 0 0 1.5h1.248v10.5h.01c.02 1.258 1.03 2.25 2.28 2.25h8.46c1.25 0 2.26-1.002 2.279-2.268v-10.5h1.248a.75.75 0 0 0 0-1.5c-.788 0-1.573-.033-2.368-.11V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM7.5 3.75c0-.69.56-1.25 1.25-1.25h2.5c.69 0 1.25.56 1.25 1.25v.443c-.795.077-1.58.11-2.368.11a12.2 12.2 0 0 1-2.368-.11V3.75Zm3 7.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Zm4-1.25a.75.75 0 0 0-.75.75v3.5a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75Z" clip-rule="evenodd" /></svg>
                         </button>
-                    </form>
-                </div>
-
-                <div>
-                    <div className="flex justify-between items-center mb-4">
-                        <h2 className="text-xl font-bold">Recent Doubts</h2>
-                        {isAdmin && (
-                            <button
-                                onClick={() => handleClearAnswered(selectedChapter)}
-                                className="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-red-700 transition-colors"
-                            >
-                                Clear All Answered
-                            </button>
-                        )}
-                    </div>
-                    {doubts.length > 0 ? (
-                        doubts.map(doubt => 
-                            <DoubtCard 
-                                key={doubt.id} 
-                                doubt={doubt} 
-                                isAdmin={isAdmin}
-                                handleAnswerSubmit={handleAnswerSubmit}
-                                handleDeleteDoubt={handleDeleteDoubt} 
-                            />
-                        )
-                    ) : (
-                        <div className="text-center py-10 px-6 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700">
-                            <p className="text-gray-500 dark:text-slate-400">No doubts have been asked in this chapter yet.</p>
-                        </div>
-                    )}
-                </div>
-            </div>
-        );
-
-        // --- Main App Component (v8 Firebase) ---
-        const App = () => {
-            const [user, setUser] = useState(null);
-            const [userData, setUserData] = useState({});
-            const [isAdmin, setIsAdmin] = useState(false);
-            const [loading, setLoading] = useState(true);
-
-            const upscSubjects = [
-                "Indian Polity", "History - Ancient India", "History - Medieval India",
-                "History - Modern India", "Geography", "Economics", "Environment and Ecology",
-                "Science and Technology", "Current Affairs", "CSAT",
-            ];
-            const [selectedChapter, setSelectedChapter] = useState(upscSubjects[0]);
-            const [doubts, setDoubts] = useState([]);
-            const [newDoubt, setNewDoubt] = useState('');
-            const [isSubmittingDoubt, setIsSubmittingDoubt] = useState(false);
-            const [doubtError, setDoubtError] = useState(null);
-
-            // Modal state
-            const [modal, setModal] = useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null, type: 'info' });
-
-            // --- Auth Effect (v8) ---
-            useEffect(() => {
-                if (!auth || !db) {
-                     // Firebase not initialized, probably.
-                    setLoading(false);
-                    return;
-                }
-
-                // Use in-memory persistence
-                auth.setPersistence(firebase.auth.Auth.Persistence.NONE)
-                  .then(() => {
-                    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
-                        if (currentUser) {
-                            setUser(currentUser);
-                            setIsAdmin(currentUser.uid === ADMIN_UID);
-                            
-                            const userDocRef = db.collection(`artifacts/${appId}/users`).doc(currentUser.uid);
-                            const docSnap = await userDocRef.get();
-                            
-                            if (docSnap.exists) {
-                                setUserData(docSnap.data());
-                            } else {
-                                const newUserProfile = {
-                                    displayName: currentUser.displayName || 'UPSC Aspirant',
-                                    email: currentUser.email,
-                                    createdAt: serverTimestamp(),
-                                    isPremium: false,
-                                };
-                                await userDocRef.set(newUserProfile);
-                                setUserData(newUserProfile);
-                            }
-                            setLoading(false);
-                        } else {
-                            setUser(null);
-                            setIsAdmin(false);
-                            setLoading(false);
-                        }
-                    });
-
-                    // Sign in
-                    (async () => {
-                        try {
-                            if (initialAuthToken) {
-                                await auth.signInWithCustomToken(initialAuthToken);
-                            } else {
-                                await auth.signInAnonymously();
-                            }
-                        } catch (err) {
-                            console.error("Auth Error:", err);
-                            setLoading(false);
-                        }
-                    })();
-
-                    return () => unsubscribe();
-                })
-                .catch((err) => {
-                    console.error("Set persistence error:", err);
-                    setLoading(false); // Make sure we stop loading even if persistence fails
+                    `;
+                    testList.appendChild(li);
                 });
+            }
+            updateProgressBar();
+            updateAdminUI(); // To show/hide delete buttons
+        }
 
-            }, [auth, db]); // Dependencies are still auth and db
+        /**
+         * Updates the progress bar and text
+         */
+        function updateProgressBar() {
+            const total = currentSchedule.length;
+            const completed = currentCompletion.length;
+            const percentage = total === 0 ? 0 : (completed / total) * 100;
 
-            // --- Doubts Listener Effect (v8) ---
-            useEffect(() => {
-                if (!selectedChapter || !db) return;
-                
-                setDoubtError(null);
-                setDoubts([]); 
-                
-                const doubtsCollectionRef = db.collection("doubts");
-                const q = doubtsCollectionRef.where("chapter", "==", selectedChapter).orderBy("timestamp", "desc");
-                
-                const unsubscribe = q.onSnapshot((snapshot) => {
-                    setDoubts(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-                }, (err) => {
-                    console.error("Error fetching doubts:", err);
-                    setDoubtError(`Could not fetch doubts: ${err.message}. You may need to create a Firestore index.`);
-                });
-                return () => unsubscribe();
-            }, [selectedChapter, db]);
+            progressText.textContent = `${completed} / ${total}`;
+            progressBarInner.style.width = `${percentage}%`;
+        }
 
-            // --- Firestore Actions (v8) ---
-            const handleDoubtSubmit = async (e) => {
-                e.preventDefault();
-                if (newDoubt.trim() === '' || !user) {
-                    setDoubtError("Doubt cannot be empty."); return;
-                }
-                setIsSubmittingDoubt(true); setDoubtError(null);
-                try {
-                    await db.collection("doubts").add({
-                        chapter: selectedChapter,
-                        question: newDoubt,
-                        askedBy: user.uid,
-                        askedByName: userData.displayName || 'Aspirant',
-                        isAnswered: false,
-                        answer: "",
-                        timestamp: serverTimestamp(),
-                    });
-                    setNewDoubt('');
-                } catch (err) {
-                    console.error("Error submitting doubt:", err); 
-                    setDoubtError(`Failed to submit: ${err.message}`); 
-                } finally {
-                    setIsSubmittingDoubt(false);
-                }
-            };
+        /**
+         * Renders the calendar grid for the current month
+         */
+        function renderCalendar() {
+            calendarGrid.innerHTML = '';
+            monthYearDisplay.textContent = formatMonthYear(currentMonth);
 
-            const handleAnswerSubmit = async (doubtId, answerText) => {
-                if (!isAdmin || answerText.trim() === '') return;
-                try {
-                    const docRef = db.collection("doubts").doc(doubtId);
-                    await docRef.update({
-                        answer: answerText,
-                        isAnswered: true,
-                        answeredTimestamp: serverTimestamp()
-                    });
-                } catch (err) { console.error("Error submitting answer:", err); }
-            };
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            days.forEach(day => {
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day header';
+                dayEl.textContent = day;
+                calendarGrid.appendChild(dayEl);
+            });
 
-            const handleDeleteDoubt = (doubtId, question) => {
-                if (!isAdmin) return;
-                setModal({
-                    show: true,
-                    title: 'Delete Doubt',
-                    message: `Are you sure you want to delete this doubt: "${question.substring(0, 50)}..."?`,
-                    onConfirm: async () => {
-                        try {
-                            await db.collection("doubts").doc(doubtId).delete();
-                        } catch (err) {
-                            console.error("Error deleting doubt: ", err);
-                            setDoubtError(`Failed to delete doubt: ${err.message}`);
-                        }
-                        setModal({ show: false });
-                    },
-                    onCancel: () => setModal({ show: false }),
-                    type: 'danger',
-                    confirmText: 'Yes, Delete'
-                });
-            };
+            const today = new Date();
+            const selectedDay = getYYYYMMDD(currentDate);
 
-            const handleClearAnswered = (chapter) => {
-                if (!isAdmin) return;
-                setModal({
-                    show: true,
-                    title: 'Clear Answered Doubts',
-                    message: `Are you sure you want to delete all ANSWERED doubts in ${chapter}?`,
-                    onConfirm: async () => {
-                        setModal({ show: false });
-                        try {
-                            const q = db.collection("doubts")
-                                .where("chapter", "==", chapter)
-                                .where("isAnswered", "==", true);
-                            
-                            const querySnapshot = await q.get();
-                            
-                            if (querySnapshot.empty) {
-                                console.log("No answered doubts to clear.");
-                                return;
-                            }
+            const firstDay = currentMonth.getDay();
+            const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
 
-                            const batch = db.batch();
-                            querySnapshot.forEach(doc => {
-                                batch.delete(doc.ref);
-                            });
-
-                            await batch.commit();
-                            console.log(`Successfully cleared ${querySnapshot.size} answered doubts.`);
-
-                        } catch (err) {
-                            console.error("Error clearing answered doubts: ", err);
-                            setDoubtError(`Failed to clear doubts: ${err.message}. You may need a new Firestore index.`);
-                        }
-                    },
-                    onCancel: () => setModal({ show: false }),
-                    type: 'danger',
-                    confirmText: 'Yes, Clear All'
-                });
-            };
-            
-            // Render loading state manually
-            if (loading) {
-                // We return null, so the static loader in the HTML is shown
-                // But ReactDOM.render will *replace* the loader.
-                // So let's render the loader from React as well.
-                return (
-                    <div id="loader" className="dark:bg-slate-900">
-                        Loading Dashboard...
-                    </div>
-                );
+            for (let i = 0; i < firstDay; i++) {
+                const emptyEl = document.createElement('div');
+                emptyEl.className = 'day empty';
+                calendarGrid.appendChild(emptyEl);
             }
 
-            if (!user) return (
-                <div className="flex items-center justify-center h-screen text-center p-8">
-                    <div>
-                        <h2 className="text-2xl font-bold mb-4">Please Log In</h2>
-                        <p className="text-slate-600">You must be logged in to access the UPSChub dashboard.</p>
-                    </div>
-                </div>
-            );
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i);
+                const dayString = getYYYYMMDD(dayDate);
+                
+                const dayEl = document.createElement('div');
+                dayEl.className = 'day normal';
+                dayEl.textContent = i;
+                dayEl.dataset.date = dayString;
+                
+                if (calendarData[dayString]) {
+                    dayEl.classList.add('has-test');
+                }
+                if (dayString === getYYYYMMDD(today)) {
+                    dayEl.classList.add('today');
+                }
+                if (dayString === selectedDay) {
+                    dayEl.classList.add('selected');
+                }
+                
+                dayEl.addEventListener('click', () => {
+                    changeDate(dayDate);
+                });
+                calendarGrid.appendChild(dayEl);
+            }
+        }
+        
+        /**
+         * Updates the UI based on the current Admin Mode state
+         */
+        function updateAdminUI() {
+            const adminElements = document.querySelectorAll('.admin-only');
+            const adminCta = $("admin-empty-cta");
+            
+            if (isAdmin) {
+                document.body.classList.add('admin-mode');
+                adminElements.forEach(el => el.style.display = 'flex'); // Use style.display for .admin-only
+                if (adminCta) adminCta.style.display = 'block'; // This one is a button
+                if (adminBadge) adminBadge.classList.remove('hidden'); // Show admin badge
+            } else {
+                document.body.classList.remove('admin-mode');
+                adminElements.forEach(el => el.style.display = 'none');
+                if (adminCta) adminCta.style.display = 'none';
+                if (adminBadge) adminBadge.classList.add('hidden'); // Hide admin badge
+            }
+        }
+        
+        /**
+         * Loads data for a new date (schedule and completion)
+         */
+        function changeDate(newDate) {
+            currentDate = newDate;
+            selectedDateDisplay.textContent = formatReadableDate(currentDate);
+            datePicker.value = getYYYYMMDD(currentDate);
+            
+            // Check if we need to re-render calendar
+            if (currentDate.getMonth() !== currentMonth.getMonth() || currentDate.getFullYear() !== currentMonth.getFullYear()) {
+                currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+                renderCalendar();
+                listenToCalendarData(); // Listen to new month's data
+            } else {
+                // Just update selected day in calendar
+                document.querySelectorAll('.day.selected').forEach(d => d.classList.remove('selected'));
+                document.querySelector(`.day[data-date="${getYYYYMMDD(currentDate)}"]`)?.classList.add('selected');
+            }
 
-            return (
-                <React.Fragment>
-                    <Modal {...modal} />
-                    <div className="min-h-screen text-slate-800 dark:text-slate-200">
-                        <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
-                            <div className="container mx-auto max-w-7xl px-4 sm:px-6 py-3 flex justify-between items-center">
-                                <a href="#" className="flex items-center gap-2 text-xl sm:text-2xl font-bold">
-                                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" className="h-9 w-9 rounded-lg"/>
-                                    <span className="text-slate-800 dark:text-slate-200">UPSChub Doubts</span>
-                                </a>
+            listenToSchedule();
+        }
+
+        // --- Event Handlers ---
+        
+        async function handleAddTest(e) {
+            e.preventDefault();
+            const testName = newTestNameInput.value.trim();
+            if (!testName || !isAdmin) return;
+            
+            const newTest = {
+                id: crypto.randomUUID(),
+                name: testName,
+                createdAt: Timestamp.now()
+            };
+            
+            try {
+                const dateKey = getYYYYMMDD(currentDate);
+                // Update schedule doc
+                const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
+                await setDoc(scheduleDocRef, {
+                    tests: arrayUnion(newTest)
+                }, { merge: true });
+                
+                // Update calendar index
+                const calendarDocRef = doc(db, `artifacts/${appId}/public/data/calendar`, String(currentDate.getFullYear()));
+                await setDoc(calendarDocRef, {
+                    [String(currentDate.getMonth() + 1)]: {
+                        [dateKey]: true
+                    }
+                }, { merge: true });
+                
+                newTestNameInput.value = '';
+            } catch (error) {
+                console.error("Error adding test:", error);
+                showMessage("Error", "Could not add the new test. Please try again.");
+            }
+        }
+
+        async function handleDeleteTest(e) {
+            const button = e.target.closest('button');
+            if (!button || !isAdmin) return;
+            
+            const testId = button.dataset.id;
+            const test = currentSchedule.find(t => t.id === testId);
+            
+            if (!test) return;
+            
+            try {
+                const dateKey = getYYYYMMDD(currentDate);
+                const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
+                await updateDoc(scheduleDocRef, {
+                    tests: arrayRemove(test)
+                });
+                
+                // Also remove from completion doc if it exists
+                const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
+                await updateDoc(completionDocRef, {
+                    completed: arrayRemove(testId)
+                });
+                
+                // Note: We don't remove from calendar index here.
+                // We'd need to check if tests.length === 0 after remove.
+                // For simplicity, we'll leave the marker. Can be fixed with a cloud function.
+                
+            } catch (error) {
+                console.error("Error deleting test:", error);
+                showMessage("Error", "Could not delete the test. Please try again.");
+            }
+        }
+
+        async function handleToggleTest(e) {
+            const checkbox = e.target;
+            if (checkbox.type !== 'checkbox' || !currentUserId) return;
+            
+            const testId = checkbox.dataset.id;
+            const isCompleted = checkbox.checked;
+            
+            try {
+                const dateKey = getYYYYMMDD(currentDate);
+                const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
+                
+                if (isCompleted) {
+                    await setDoc(completionDocRef, {
+                        completed: arrayUnion(testId)
+                    }, { merge: true });
+                } else {
+                    await setDoc(completionDocRef, {
+                        completed: arrayRemove(testId)
+                    }, { merge: true });
+                }
+            } catch (error) {
+                console.error("Error updating completion:", error);
+                showMessage("Error", "Could not update test status. Please try again.");
+                // Revert checkbox
+                checkbox.checked = !isCompleted;
+            }
+        }
+        
+        // --- Firebase Listeners ---
+        
+        /**
+         * Listens to the test schedule for the currently selected date
+         */
+        function listenToSchedule() {
+            // Stop listening to the old date
+            unsubscribeSchedule();
+            
+            const dateKey = getYYYYMMDD(currentDate);
+            
+            // Listen to schedule (public)
+            const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
+            unsubscribeSchedule = onSnapshot(scheduleDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    currentSchedule = docSnap.data().tests || [];
+                } else {
+                    currentSchedule = [];
+                }
+                renderTestList();
+            }, (error) => {
+                console.error("Error listening to schedule:", error);
+                showMessage("Error", "Could not load test schedule.");
+            });
+            
+            // Listen to completion (private)
+            if (currentUserId) {
+                const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
+                onSnapshot(completionDocRef, (docSnap) => {
+                    if (docSnap.exists()) {
+                        currentCompletion = docSnap.data().completed || [];
+                    } else {
+                        currentCompletion = [];
+                    }
+                    renderTestList();
+                }, (error) => {
+                    console.error("Error listening to completion:", error);
+                    // Don't show error, just assume no completion
+                    currentCompletion = [];
+                    renderTestList();
+                });
+            } else {
+                currentCompletion = [];
+                renderTestList();
+            }
+        }
+        
+        /**
+         * Listens to the calendar data for the current month
+         */
+        function listenToCalendarData() {
+            unsubscribeCalendar();
+            
+            const year = String(currentMonth.getFullYear());
+            const month = String(currentMonth.getMonth() + 1);
+            
+            const calendarDocRef = doc(db, `artifacts/${appId}/public/data/calendar`, year);
+            unsubscribeCalendar = onSnapshot(calendarDocRef, (docSnap) => {
+                if (docSnap.exists() && docSnap.data()[month]) {
+                    calendarData = { ...calendarData, ...docSnap.data()[month] };
+                }
+                renderCalendar();
+            }, (error) => {
+                console.error("Error listening to calendar:", error);
+            });
+        }
+        
+        /**
+         * Initializes the application
+         */
+        function initApp() {
+            // Set up event listeners
+            prevDayBtn.addEventListener('click', () => {
+                const newDate = new Date(currentDate.setDate(currentDate.getDate() - 1));
+                changeDate(newDate);
+            });
+            nextDayBtn.addEventListener('click', () => {
+                const newDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
+                changeDate(newDate);
+            });
+            selectedDateDisplay.addEventListener('click', () => datePicker.showPicker());
+            datePicker.addEventListener('change', (e) => {
+                const [year, month, day] = e.target.value.split('-').map(Number);
+                changeDate(new Date(year, month - 1, day));
+            });
+            
+            prevMonthBtn.addEventListener('click', () => {
+                currentMonth.setMonth(currentMonth.getMonth() - 1);
+                renderCalendar();
+                listenToCalendarData();
+            });
+            nextMonthBtn.addEventListener('click', () => {
+                currentMonth.setMonth(currentMonth.getMonth() + 1);
+                renderCalendar();
+                listenToCalendarData();
+            });
+            
+            addTestForm.addEventListener('submit', handleAddTest);
+            testList.addEventListener('click', (e) => {
+                if (e.target.type === 'checkbox') {
+                    handleToggleTest(e);
+                } else if (e.target.closest('button')) {
+                    handleDeleteTest(e);
+                }
+            });
+            
+            // Admin-only CTA button
+            $("admin-empty-cta").addEventListener('click', () => newTestNameInput.focus());
+
+            // Modal close
+            messageModalClose.addEventListener('click', hideMessage);
+            messageModalOverlay.addEventListener('click', hideMessage);
+            
+            // Set initial UI state
+            updateAdminUI();
+            
+            // Connect to Firebase
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                setLogLevel('Debug');
+                
+                // --- AUTHENTICATION ---
+                setPersistence(auth, sessionPersistence) // <-- CHANGED
+                    .then(() => {
+                        onAuthStateChanged(auth, (user) => {
+                            if (user) {
+                                currentUserId = user.uid;
+                                userIdDisplay.textContent = currentUserId;
                                 
-                                <div className="flex items-center gap-2 sm:gap-4">
-                                    <a 
-                                        href="...TestSeries/dashboard.html" 
-                                        className="px-3 py-2 sm:px-4 bg-blue-600 text-white text-xs sm:text-sm font-semibold rounded-lg shadow-md hover:bg-blue-700 transition-colors"
-                                    >
-                                        Test Planner
-                                    </a>
-                                    {isAdmin && <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full hidden sm:block">Admin Mode</span>}
-                                    <span className="text-slate-700 dark:text-slate-300 font-medium hidden md:block">
-                                        Welcome, {userData.displayName || 'Aspirant'}
-                                    </span>
-                                </div>
-                            </div>
-                        </header>
+                                // --- SECURE ADMIN CHECK ---
+                                isAdmin = user.uid === ADMIN_UID;
+                                updateAdminUI(); // Update UI based on auth state
+                                // --- END SECURE ADMIN CHECK ---
+                                
+                                // User is authenticated, now load the data
+                                changeDate(new Date()); // Load today's data
+                                listenToCalendarData(); // Load this month's calendar
+                                
+                                // Show app
+                                loaderOverlay.classList.add('hidden');
+                                loginPrompt.classList.add('hidden');
+                                appContent.classList.remove('hidden');
+                                
+                            } else {
+                                // User is signed out.
+                                currentUserId = null;
+                                userIdDisplay.textContent = "Not Logged In";
+                                isAdmin = false; // Ensure admin is false on logout
+                                updateAdminUI(); // Update UI
+                                
+                                // Show login prompt
+                                loaderOverlay.classList.add('hidden');
+                                loginPrompt.classList.remove('hidden');
+                                appContent.classList.add('hidden');
+                            }
+                        });
 
-                        <main className="container mx-auto max-w-7xl p-4 sm:p-6">
-                            <DoubtsView 
-                                upscSubjects={upscSubjects}
-                                selectedChapter={selectedChapter}
-                                setSelectedChapter={setSelectedChapter}
-                                doubts={doubts}
-                                newDoubt={newDoubt}
-                                setNewDoubt={setNewDoubt}
-                                handleDoubtSubmit={handleDoubtSubmit}
-                                isSubmittingDoubt={isSubmittingDoubt}
-                                doubtError={doubtError}
-                                isAdmin={isAdmin}
-                                handleAnswerSubmit={handleAnswerSubmit}
-                                handleDeleteDoubt={handleDeleteDoubt}
-                                handleClearAnswered={handleClearAnswered}
-                            />
-                        </main>
-                    </div>
-                </React.Fragment>
-            );
-        };
+                        // Sign in
+                        (async () => {
+                            try {
+                                if (initialAuthToken) {
+                                    await signInWithCustomToken(auth, initialAuthToken);
+                                } else {
+                                    // Try to sign in anonymously if no token
+                                    // This might fail based on rules, but allows read-only access
+                                    await signInAnonymously(auth); 
+                                }
+                            } catch (err) {
+                                console.error("Auth Error:", err);
+                                // Failed to sign in at all
+                                loaderOverlay.classList.add('hidden');
+                                loginPrompt.classList.remove('hidden');
+                                userIdDisplay.textContent = "Auth Failed";
+                            }
+                        })();
+                    })
+                    .catch((error) => {
+                        console.error("Set persistence error:", error);
+                        loaderOverlay.classList.add('hidden');
+                        loginPrompt.classList.remove('hidden');
+                        userIdDisplay.textContent = "Auth Init Failed";
+                    });
 
-        // Initial Render
-        ReactDOM.render(<App />, document.getElementById('root'));
+            } catch(e) {
+                console.error("Firebase Init Error:", e);
+                loaderOverlay.classList.add('hidden');
+                loginPrompt.classList.remove('hidden');
+                userIdDisplay.textContent = "Firebase Init Error";
+                showMessage("Fatal Error", `Could not initialize Firebase: ${e.message}`);
+            }
+            
+            // Fade in content
+            mainContent.style.opacity = 1;
+            $("footer-year").textContent = new Date().getFullYear();
+        }
+
+        // --- Start the App ---
+        document.addEventListener('DOMContentLoaded', initApp);
+
     </script>
 </body>
 </html>
