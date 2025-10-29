@@ -297,22 +297,35 @@
         });
 
         (function() {
-            const statusUrl = 'https://gist.githubusercontent.com/pratyushswain01/78ebf847efd0f8e43b6f0571c1ebaf39/raw/04422b0a5fab0fd3f7944fc93cc7f670604e36b5/appStatus.json'; 
-            const params = new URLSearchParams(window.location.search);
-            const isDeveloper = params.get('dev') === 'true';
-            if (!isDeveloper) {
-                fetch(statusUrl + '?cachebust=' + new Date().getTime())
-                    .then(response => {
-                        if (!response.ok) { console.error('Could not fetch maintenance status. The Gist URL might be incorrect.'); return; }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data && data.maintenanceMode === true) { window.location.href = './maintenance.html'; }
-                    })
-                    .catch(error => { console.error('Error checking maintenance status:', error); });
-            }
-        })();
+    // ✅ Use your new Gist URL (raw JSON)
+    const statusUrl = 'https://gist.githubusercontent.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4/raw/b025d77d5b5c72b999f7f488b5fa2d4784069703/status.json';
 
+    // Optional: allow developer bypass via ?dev=true
+    const params = new URLSearchParams(window.location.search);
+    const isDeveloper = params.get('dev') === 'true';
+
+    // Only check maintenance status if not developer
+    if (!isDeveloper) {
+        fetch(statusUrl + '?cachebust=' + new Date().getTime()) // avoids caching
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Could not fetch maintenance status. The Gist URL might be incorrect.');
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.maintenanceMode === true) {
+                    window.location.href = './maintenance.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking maintenance status:', error);
+            });
+    }
+})();
+
+        
         async function fetchAllTests() {
             try {
                 const querySnapshot = await getDocs(collection(db, "quizzes"));
