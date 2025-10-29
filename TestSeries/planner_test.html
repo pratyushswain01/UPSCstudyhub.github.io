@@ -362,6 +362,13 @@
          * Shows a custom modal message
          */
         function showMessage(title, text) {
+            // Get modal elements *inside* the function
+            const { messageModal, messageModalOverlay, messageModalTitle, messageModalText } = getUiElements();
+            if (!messageModal || !messageModalOverlay || !messageModalTitle || !messageModalText) {
+                console.error("Modal UI elements not found. Message:", title, text);
+                return; // Can't show message
+            }
+            
             messageModalTitle.textContent = title;
             messageModalText.textContent = text;
             messageModal.classList.remove('hidden');
@@ -373,9 +380,12 @@
          * Hides the custom modal message
          */
         function hideMessage() {
-            const messageModal = document.getElementById("message-modal");
-            const messageModalOverlay = document.getElementById("message-modal-overlay");
-            if (!messageModal || !messageModalOverlay) return;
+            // Get modal elements *inside* the function
+            const { messageModal, messageModalOverlay } = getUiElements();
+            if (!messageModal || !messageModalOverlay) {
+                console.error("Modal UI elements not found for hiding.");
+                return; // Can't hide
+            }
             
             messageModalOverlay.classList.remove('fadeIn');
             messageModal.querySelector('.modal-content').classList.remove('slideUp');
@@ -639,7 +649,7 @@
             const ui = getUiElements();
             
             // Check if essential elements exist
-            if (!ui.prevDayBtn || !ui.nextDayBtn || !ui.selectedDateDisplay || !ui.datePicker || !ui.addTestForm || !ui.testList || !ui.adminEmptyCta || !ui.messageModalClose || !ui.messageModalOverlay || !ui.mainContent) {
+            if (!ui.prevDayBtn || !ui.nextDayBtn || !ui.selectedDateDisplay || !ui.datePicker || !ui.addTestForm || !ui.testList || !ui.adminEmptyCta || !ui.messageModalClose || !ui.messageModalOverlay || !ui.mainContent || !ui.loaderOverlay || !ui.loginPrompt || !ui.appContent) {
                 console.error("Fatal Error: Could not find all essential UI elements.");
                 document.body.innerHTML = "Error: Page structure is broken. Please contact support.";
                 return;
@@ -789,6 +799,7 @@
     </script>
 </body>
 </html>
+
 
 
 
