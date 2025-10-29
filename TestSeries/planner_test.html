@@ -123,7 +123,7 @@
                         <span id="admin-badge" class="hidden px-3 py-1 bg-green-100 text-green-800 text-sm font-bold rounded-full">Admin Mode</span>
 
                         <!-- Dashboard Button (now a link) -->
-                        <a href="./dashboard.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-all duration-200 text-sm sm:text-base flex items-center space-x-2">
+                        <a href="./doubts.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-all duration-200 text-sm sm:text-base flex items-center space-x-2">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
                             <span>Dashboard</span>
                         </a>
@@ -132,13 +132,20 @@
             </div>
         </header>
 
+        <!-- Auth Loading State (Moved outside of main-content) -->
+        <div id="loader-overlay">
+            <div class="loader-spinner"></div>
+            <p class="text-lg font-medium text-slate-600 mt-4">Connecting...</p>
+        </div>
+        
         <!-- Main Content -->
         <main id="main-content" class="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 flex-1 opacity-0 transition-opacity duration-500">
-            <!-- Auth Loading State -->
+            <!-- Auth Loading State
             <div id="loader-overlay">
                 <div class="loader-spinner"></div>
                 <p class="text-lg font-medium text-slate-600 mt-4">Connecting...</p>
             </div>
+             -->
             
             <!-- "Please Log In" Message (Hidden by default) -->
             <div id="login-prompt" class="hidden flex-col items-center justify-center h-full min-h-[50vh] bg-white rounded-xl shadow-lg p-8">
@@ -149,31 +156,9 @@
             </div>
 
             <!-- App Content (Hidden by default) -->
-            <div id="app-content" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
-                <!-- Left Column: Calendar -->
-                <div class="lg:col-span-2">
-                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                        <div class="p-5 border-b border-slate-200">
-                            <!-- Calendar Header -->
-                            <div class="flex items-center justify-between mb-4">
-                                <button id="prev-month" aria-label="Previous Month" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
-                                </button>
-                                <h2 id="month-year" class="text-lg font-semibold text-slate-800"></h2>
-                                <button id="next-month" aria-label="Next Month" class="p-2 rounded-lg hover:bg-slate-100 text-slate-500 hover:text-slate-800 transition-colors">
-                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
-                                </button>
-                            </div>
-                            <!-- Calendar Grid -->
-                            <div id="calendar-grid" class="calendar">
-                                <!-- Day headers will be injected here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Column: Test Details -->
-                <div class="lg:col-span-1 space-y-6">
+            <div id="app-content" class="hidden">
+                <!-- MODIFIED: Removed calendar, made this section the main focus -->
+                <div class="max-w-4xl mx-auto space-y-6">
                     <!-- Today's Tests -->
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="p-5 border-b border-slate-200">
@@ -189,6 +174,7 @@
                                     </button>
                                 </div>
                             </div>
+                            <!-- This input is now used by the 'selected-date-display' click -->
                             <input type="date" id="date-picker" class="absolute -left-[9999px] opacity-0" />
                         </div>
                         
@@ -298,7 +284,7 @@
         let currentCompletion = []; // [id1, id2]
         let calendarData = {}; // { 'YYYY-MM-DD': true }
         let unsubscribeSchedule = () => {};
-        let unsubscribeCalendar = () => {};
+        let unsubscribeCalendar = () => {}; // This will no longer be used, but safe to keep
         let currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
 
         // --- Firebase Config (from environment) ---
@@ -308,9 +294,39 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // --- UI Elements ---
-        // DELETED: All const $ = ... declarations were moved inside initApp
-
+        // --- UI Elements (Moved here) ---
+        function getUiElements() {
+            const $ = (selector) => document.getElementById(selector);
+            return {
+                adminBadge: $("admin-badge"),
+                userIdDisplay: $("userIdDisplay"),
+                datePicker: $("date-picker"),
+                prevDayBtn: $("prev-day"),
+                nextDayBtn: $("next-day"),
+                selectedDateDisplay: $("selected-date-display"),
+                testList: $("test-list"),
+                emptyState: $("empty-state"),
+                newTestNameInput: $("new-test-name"),
+                addTestForm: $("add-test-form"),
+                progressText: $("progress-text"),
+                progressBarInner: $("progress-bar-inner"),
+                // REMOVED: Calendar elements
+                // calendarGrid: $("calendar-grid"),
+                // monthYearDisplay: $("month-year"),
+                // prevMonthBtn: $("prev-month"),
+                // nextMonthBtn: $("next-month"),
+                loaderOverlay: $("loader-overlay"),
+                loginPrompt: $("login-prompt"),
+                appContent: $("app-content"),
+                mainContent: $("main-content"),
+                messageModal: $("message-modal"),
+                messageModalOverlay: $("message-modal-overlay"),
+                messageModalClose: $("message-modal-close"),
+                messageModalTitle: $("message-modal-title"),
+                messageModalText: $("message-modal-text"),
+                adminEmptyCta: $("admin-empty-cta") // Added this
+            };
+        }
         
         // --- Utility Functions ---
 
@@ -357,6 +373,10 @@
          * Hides the custom modal message
          */
         function hideMessage() {
+            const messageModal = document.getElementById("message-modal");
+            const messageModalOverlay = document.getElementById("message-modal-overlay");
+            if (!messageModal || !messageModalOverlay) return;
+            
             messageModalOverlay.classList.remove('fadeIn');
             messageModal.querySelector('.modal-content').classList.remove('slideUp');
             
@@ -372,6 +392,9 @@
          * Renders the test list for the currently selected date
          */
         function renderTestList() {
+            const { testList, emptyState, adminEmptyCta } = getUiElements();
+            if (!testList || !emptyState) return;
+
             testList.innerHTML = '';
             
             if (currentSchedule.length === 0) {
@@ -402,6 +425,9 @@
          * Updates the progress bar and text
          */
         function updateProgressBar() {
+            const { progressText, progressBarInner } = getUiElements();
+            if (!progressText || !progressBarInner) return;
+            
             const total = currentSchedule.length;
             const completed = currentCompletion.length;
             const percentage = total === 0 ? 0 : (completed / total) * 100;
@@ -412,73 +438,26 @@
 
         /**
          * Renders the calendar grid for the current month
+         * REMOVED - No longer needed
          */
-        function renderCalendar() {
-            calendarGrid.innerHTML = '';
-            monthYearDisplay.textContent = formatMonthYear(currentMonth);
-
-            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            days.forEach(day => {
-                const dayEl = document.createElement('div');
-                dayEl.className = 'day header';
-                dayEl.textContent = day;
-                calendarGrid.appendChild(dayEl);
-            });
-
-            const today = new Date();
-            const selectedDay = getYYYYMMDD(currentDate);
-
-            const firstDay = currentMonth.getDay();
-            const daysInMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0).getDate();
-
-            for (let i = 0; i < firstDay; i++) {
-                const emptyEl = document.createElement('div');
-                emptyEl.className = 'day empty';
-                calendarGrid.appendChild(emptyEl);
-            }
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const dayDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), i);
-                const dayString = getYYYYMMDD(dayDate);
-                
-                const dayEl = document.createElement('div');
-                dayEl.className = 'day normal';
-                dayEl.textContent = i;
-                dayEl.dataset.date = dayString;
-                
-                if (calendarData[dayString]) {
-                    dayEl.classList.add('has-test');
-                }
-                if (dayString === getYYYYMMDD(today)) {
-                    dayEl.classList.add('today');
-                }
-                if (dayString === selectedDay) {
-                    dayEl.classList.add('selected');
-                }
-                
-                dayEl.addEventListener('click', () => {
-                    changeDate(dayDate);
-                });
-                calendarGrid.appendChild(dayEl);
-            }
-        }
+        // function renderCalendar() { ... }
         
         /**
          * Updates the UI based on the current Admin Mode state
          */
         function updateAdminUI() {
+            const { adminBadge, adminEmptyCta } = getUiElements();
             const adminElements = document.querySelectorAll('.admin-only');
-            const adminCta = $("admin-empty-cta");
             
             if (isAdmin) {
                 document.body.classList.add('admin-mode');
                 adminElements.forEach(el => el.style.display = 'flex'); // Use style.display for .admin-only
-                if (adminCta) adminCta.style.display = 'block'; // This one is a button
+                if (adminEmptyCta) adminEmptyCta.style.display = 'block'; // This one is a button
                 if (adminBadge) adminBadge.classList.remove('hidden'); // Show admin badge
             } else {
                 document.body.classList.remove('admin-mode');
                 adminElements.forEach(el => el.style.display = 'none');
-                if (adminCta) adminCta.style.display = 'none';
+                if (adminEmptyCta) adminEmptyCta.style.display = 'none';
                 if (adminBadge) adminBadge.classList.add('hidden'); // Hide admin badge
             }
         }
@@ -487,20 +466,15 @@
          * Loads data for a new date (schedule and completion)
          */
         function changeDate(newDate) {
+            const { selectedDateDisplay, datePicker } = getUiElements();
+            if (!selectedDateDisplay || !datePicker) return;
+
             currentDate = newDate;
             selectedDateDisplay.textContent = formatReadableDate(currentDate);
             datePicker.value = getYYYYMMDD(currentDate);
             
-            // Check if we need to re-render calendar
-            if (currentDate.getMonth() !== currentMonth.getMonth() || currentDate.getFullYear() !== currentMonth.getFullYear()) {
-                currentMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-                renderCalendar();
-                listenToCalendarData(); // Listen to new month's data
-            } else {
-                // Just update selected day in calendar
-                document.querySelectorAll('.day.selected').forEach(d => d.classList.remove('selected'));
-                document.querySelector(`.day[data-date="${getYYYYMMDD(currentDate)}"]`)?.classList.add('selected');
-            }
+            // REMOVED: Calendar update logic
+            // ...
 
             listenToSchedule();
         }
@@ -509,6 +483,9 @@
         
         async function handleAddTest(e) {
             e.preventDefault();
+            const { newTestNameInput } = getUiElements();
+            if (!newTestNameInput) return;
+            
             const testName = newTestNameInput.value.trim();
             if (!testName || !isAdmin) return;
             
@@ -650,86 +627,45 @@
         
         /**
          * Listens to the calendar data for the current month
+         * REMOVED - No longer needed
          */
-        function listenToCalendarData() {
-            unsubscribeCalendar();
-            
-            const year = String(currentMonth.getFullYear());
-            const month = String(currentMonth.getMonth() + 1);
-            
-            const calendarDocRef = doc(db, `artifacts/${appId}/public/data/calendar`, year);
-            unsubscribeCalendar = onSnapshot(calendarDocRef, (docSnap) => {
-                if (docSnap.exists() && docSnap.data()[month]) {
-                    calendarData = { ...calendarData, ...docSnap.data()[month] };
-                }
-                renderCalendar();
-            }, (error) => {
-                console.error("Error listening to calendar:", error);
-            });
-        }
+        // function listenToCalendarData() { ... }
         
         /**
          * Initializes the application
          */
         function initApp() {
-            // --- UI Elements (Moved here) ---
-            const $ = (selector) => document.getElementById(selector);
+            // --- Get all UI elements ---
+            const ui = getUiElements();
             
-            const adminBadge = $("admin-badge");
-            const userIdDisplay = $("userIdDisplay");
-            const datePicker = $("date-picker");
-            const prevDayBtn = $("prev-day");
-            const nextDayBtn = $("next-day");
-            const selectedDateDisplay = $("selected-date-display");
-            const testList = $("test-list");
-            const emptyState = $("empty-state");
-            const newTestNameInput = $("new-test-name");
-            const addTestForm = $("add-test-form");
-            const progressText = $("progress-text");
-            const progressBarInner = $("progress-bar-inner");
-            const calendarGrid = $("calendar-grid");
-            const monthYearDisplay = $("month-year");
-            const prevMonthBtn = $("prev-month");
-            const nextMonthBtn = $("next-month");
-            const loaderOverlay = $("loader-overlay");
-            const loginPrompt = $("login-prompt");
-            const appContent = $("app-content");
-            const mainContent = $("main-content");
-            
-            const messageModal = $("message-modal");
-            const messageModalOverlay = $("message-modal-overlay");
-            const messageModalClose = $("message-modal-close");
-            const messageModalTitle = $("message-modal-title");
-            const messageModalText = $("message-modal-text");
-            
+            // Check if essential elements exist
+            if (!ui.prevDayBtn || !ui.nextDayBtn || !ui.selectedDateDisplay || !ui.datePicker || !ui.addTestForm || !ui.testList || !ui.adminEmptyCta || !ui.messageModalClose || !ui.messageModalOverlay || !ui.mainContent) {
+                console.error("Fatal Error: Could not find all essential UI elements.");
+                document.body.innerHTML = "Error: Page structure is broken. Please contact support.";
+                return;
+            }
+
             // Set up event listeners
-            prevDayBtn.addEventListener('click', () => {
+            ui.prevDayBtn.addEventListener('click', () => {
                 const newDate = new Date(currentDate.setDate(currentDate.getDate() - 1));
                 changeDate(newDate);
             });
-            nextDayBtn.addEventListener('click', () => {
+            ui.nextDayBtn.addEventListener('click', () => {
                 const newDate = new Date(currentDate.setDate(currentDate.getDate() + 1));
                 changeDate(newDate);
             });
-            selectedDateDisplay.addEventListener('click', () => datePicker.showPicker());
-            datePicker.addEventListener('change', (e) => {
+            ui.selectedDateDisplay.addEventListener('click', () => ui.datePicker.showPicker());
+            ui.datePicker.addEventListener('change', (e) => {
                 const [year, month, day] = e.target.value.split('-').map(Number);
                 changeDate(new Date(year, month - 1, day));
             });
             
-            prevMonthBtn.addEventListener('click', () => {
-                currentMonth.setMonth(currentMonth.getMonth() - 1);
-                renderCalendar();
-                listenToCalendarData();
-            });
-            nextMonthBtn.addEventListener('click', () => {
-                currentMonth.setMonth(currentMonth.getMonth() + 1);
-                renderCalendar();
-                listenToCalendarData();
-            });
+            // REMOVED: Calendar month listeners
+            // ui.prevMonthBtn.addEventListener('click', ...);
+            // ui.nextMonthBtn.addEventListener('click', ...);
             
-            addTestForm.addEventListener('submit', handleAddTest);
-            testList.addEventListener('click', (e) => {
+            ui.addTestForm.addEventListener('submit', handleAddTest);
+            ui.testList.addEventListener('click', (e) => {
                 if (e.target.type === 'checkbox') {
                     handleToggleTest(e);
                 } else if (e.target.closest('button')) {
@@ -738,11 +674,11 @@
             });
             
             // Admin-only CTA button
-            $("admin-empty-cta").addEventListener('click', () => newTestNameInput.focus());
+            ui.adminEmptyCta.addEventListener('click', () => ui.newTestNameInput.focus());
 
             // Modal close
-            messageModalClose.addEventListener('click', hideMessage);
-            messageModalOverlay.addEventListener('click', hideMessage);
+            ui.messageModalClose.addEventListener('click', hideMessage);
+            ui.messageModalOverlay.addEventListener('click', hideMessage);
             
             // Set initial UI state
             updateAdminUI();
@@ -769,24 +705,34 @@
                                 
                                 // User is authenticated, now load the data
                                 changeDate(new Date()); // Load today's data
-                                listenToCalendarData(); // Load this month's calendar
+                                // REMOVED: listenToCalendarData();
                                 
                                 // Show app
-                                loaderOverlay.classList.add('hidden');
-                                loginPrompt.classList.add('hidden');
-                                appContent.classList.remove('hidden');
+                                ui.loaderOverlay.classList.add('hidden');
+                                ui.loginPrompt.classList.add('hidden');
+                                ui.appContent.classList.remove('hidden');
                                 
                             } else {
                                 // User is signed out.
                                 currentUserId = null;
-                                userIdDisplay.textContent = "Not Logged In";
+                                ui.userIdDisplay.textContent = "Not Logged In";
                                 isAdmin = false; // Ensure admin is false on logout
                                 updateAdminUI(); // Update UI
                                 
                                 // Show login prompt
-                                loaderOverlay.classList.add('hidden');
-                                loginPrompt.classList.remove('hidden');
-                                appContent.classList.add('hidden');
+                                ui.loaderOverlay.classList.add('hidden');
+                                ui.loginPrompt.classList.remove('hidden');
+                                ui.appContent.classList.add('hidden');
+                                
+                                // --- NEW: Redirect to auth.html ---
+                                const loginMsg = ui.loginPrompt.querySelector('p');
+                                if (loginMsg) {
+                                    loginMsg.textContent = "Redirecting to login page...";
+                                }
+                                setTimeout(() => {
+                                    // Make sure auth.html is in the correct relative path
+                                    window.location.href = "auth.html"; 
+                                }, 2500); // 2.5 second delay
                             }
                         });
 
@@ -803,30 +749,40 @@
                             } catch (err) {
                                 console.error("Auth Error:", err);
                                 // Failed to sign in at all
-                                loaderOverlay.classList.add('hidden');
-                                loginPrompt.classList.remove('hidden');
-                                userIdDisplay.textContent = "Auth Failed";
+                                ui.loaderOverlay.classList.add('hidden');
+                                ui.loginPrompt.classList.remove('hidden');
+                                ui.userIdDisplay.textContent = "Auth Failed";
+                                // --- NEW: Redirect on Auth Fail ---
+                                const loginMsg = ui.loginPrompt.querySelector('p');
+                                if (loginMsg) {
+                                    loginMsg.textContent = "Authentication failed. Redirecting to login...";
+                                }
+                                setTimeout(() => {
+                                    window.location.href = "auth.html";
+                                }, 2500);
                             }
                         })();
                     })
                     .catch((error) => {
                         console.error("Set persistence error:", error);
-                        loaderOverlay.classList.add('hidden');
-                        loginPrompt.classList.remove('hidden');
-                        userIdDisplay.textContent = "Auth Init Failed";
+                        ui.loaderOverlay.classList.add('hidden');
+                        ui.loginPrompt.classList.remove('hidden');
+                        ui.userIdDisplay.textContent = "Auth Init Failed";
                     });
 
             } catch(e) {
                 console.error("Firebase Init Error:", e);
-                loaderOverlay.classList.add('hidden');
-                loginPrompt.classList.remove('hidden');
-                userIdDisplay.textContent = "Firebase Init Error";
+                const ui = getUiElements();
+                if(ui.loaderOverlay) ui.loaderOverlay.classList.add('hidden');
+                if(ui.loginPrompt) ui.loginPrompt.classList.remove('hidden');
+                if(ui.userIdDisplay) ui.userIdDisplay.textContent = "Firebase Init Error";
                 showMessage("Fatal Error", `Could not initialize Firebase: ${e.message}`);
             }
             
             // Fade in content
-            mainContent.style.opacity = 1;
-            $("footer-year").textContent = new Date().getFullYear();
+            ui.mainContent.style.opacity = 1;
+            const footerYear = document.getElementById("footer-year");
+            if(footerYear) footerYear.textContent = new Date().getFullYear();
         }
 
         // --- Start the App ---
@@ -835,5 +791,7 @@
     </script>
 </body>
 </html>
+
+
 
 
