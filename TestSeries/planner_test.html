@@ -736,18 +736,16 @@
                             }
                         });
 
-                        // Sign in
+                        // Sign in (ONLY if the initial token is provided)
                         (async () => {
                             try {
                                 if (initialAuthToken) {
                                     await signInWithCustomToken(auth, initialAuthToken);
-                                } else {
-                                    // Try to sign in anonymously if no token
-                                    // This might fail based on rules, but allows read-only access
-                                    await signInAnonymously(auth); 
                                 }
+                                // If no token, we do nothing.
+                                // onAuthStateChanged will fire with the session user or null.
                             } catch (err) {
-                                console.error("Auth Error:", err);
+                                console.error("Auth Error (token sign-in):", err);
                                 // Failed to sign in at all
                                 ui.loaderOverlay.classList.add('hidden');
                                 ui.loginPrompt.classList.remove('hidden');
@@ -791,6 +789,7 @@
     </script>
 </body>
 </html>
+
 
 
 
