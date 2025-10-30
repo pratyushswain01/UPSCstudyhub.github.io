@@ -97,7 +97,7 @@
         body.dark .text-red-600 { color: #f87171; /* red-400 */ }
     </style>
      <script>
-        // Apply theme early to prevent flash
+     // Apply theme early to prevent flash
         const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         if (savedTheme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -234,7 +234,7 @@
             getAuth, 
             onAuthStateChanged,
             setPersistence,
-            localPersistence 
+            browserLocalPersistence 
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -586,8 +586,8 @@ const appId = 'default-app-id'; // You can change this if you need different env
                 // setLogLevel('debug'); // Uncomment for verbose firebase logs
                 console.log("Firebase initialized.");
 
-                setPersistence(auth, localPersistence)
-                    .then(() => {
+                setPersistence(auth, browserLocalPersistence) // <-- CORRECT
+              .then(() => {
                         console.log("Persistence set to local.");
                         onAuthStateChanged(auth, (user) => {
                             console.log("Auth state changed. User:", user ? user.uid : 'null');
