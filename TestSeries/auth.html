@@ -80,7 +80,15 @@
 <script type="module">
     // --- Firebase SDK Imports ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    // 1. UPDATED IMPORT: Added setPersistence and browserLocalPersistence
+    import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        signInWithEmailAndPassword, 
+        onAuthStateChanged,
+        setPersistence,
+        browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
     import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- Firebase Configuration ---
@@ -100,14 +108,41 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // --- Auth State Observer ---
-    // If a user is already logged in, or after they log in,
-    // send them to the new dashboard.html page.
-    onAuthStateChanged(auth, user => {
-        if (user) {
-            window.location.href = 'dashboard.html'; // <<< THIS IS THE UPDATED LINE
-        }
-    });
+    // --- 2. UPDATED AUTH LOGIC ---
+    // This now saves the login (persistence) and handles redirects smartly.
+    
+    // Set persistence first
+    setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+            // Now attach the "smart" auth state observer
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    // User is logged in, check where to redirect
+                    console.log("User logged in, checking for redirect...");
+
+                    // 1. Look for the "redirect=..." note in the URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+                    
+                    if (redirectUrl) {
+                        // 2. If a redirectUrl is found (e.g., "planner.html"), go there
+                        console.log("Redirecting back to:", redirectUrl);
+                        window.location.href = redirectUrl;
+                    } else {
+                        // 3. If no redirectUrl is found, go to the dashboard as usual
+                        console.log("No redirect found, going to dashboard.");
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    // No user, do nothing. The user needs to see the login/signup form.
+                    console.log("No user found, showing auth form.");
+                }
+            });
+        })
+        .catch((error) => {
+            console.error("Error setting persistence:", error);
+            displayMessage("Error initializing session. Please try again.", "red");
+        });
 
     // --- Page Elements ---
     const signinFormContainer = document.getElementById('signin-form');
@@ -172,6 +207,7 @@
         signInWithEmailAndPassword(auth, email, password)
             .then((userCredential) => {
                 // On successful login, the onAuthStateChanged observer above will trigger the redirect.
+                displayMessage('Logging in...', 'green');
             })
             .catch((error) => {
                 displayMessage('Invalid email or password.', 'red');
