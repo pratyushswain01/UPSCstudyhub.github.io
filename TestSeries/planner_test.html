@@ -96,8 +96,11 @@
         body.dark .bg-red-100 { background-color: rgba(220, 38, 38, 0.2); }
         body.dark .text-red-600 { color: #f87171; /* red-400 */ }
     </style>
-     <script>
-     // Apply theme early to prevent flash
+     </head>
+<body class="min-h-screen antialiased">
+
+    <script>
+        // Apply theme early to prevent flash
         const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
         if (savedTheme === 'dark') {
             document.documentElement.classList.add('dark');
@@ -107,8 +110,6 @@
             document.body.classList.remove('dark');
         }
     </script>
-</head>
-<body class="min-h-screen antialiased">
 
     <div id="loader-overlay">
         <div class="loader-spinner"></div>
@@ -148,9 +149,10 @@
                 <p class="text-sm text-slate-500 mt-4">Your User ID (if available): <span id="userIdDisplay" class="font-medium">...</span></p>
             </div>
 
-<div id="app-content" class="hidden">
+            <div id="app-content" class="hidden">
                 <div class="max-w-4xl mx-auto space-y-6">
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        
                         <div class="p-5 border-b border-slate-200">
                             <h3 class="text-base font-semibold text-slate-800">Tasks for:</h3>
                             <div class="flex items-baseline justify-between">
@@ -206,7 +208,7 @@
                     </div>
                 </div>
             </div>
-          
+
         </main>
         
         <footer class="text-center py-4 px-4 text-sm text-slate-500">
@@ -235,7 +237,7 @@
             getAuth, 
             onAuthStateChanged,
             setPersistence,
-            browserLocalPersistence 
+            browserLocalPersistence // THIS IS THE FIX for 'localPersistence'
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -254,14 +256,7 @@
         let db, auth;
         let currentUserId = null;
         
-        // ===================================================================
-        // === 1. IMPORTANT: SET YOUR ADMIN USER ID HERE ===
-        // To find your ID:
-        // 1. Log in to your app once with your admin account.
-        // 2. Go to the Firebase Console > Authentication > Users tab.
-        // 3. Find your user (e.g., by email) and copy the "User UID".
-        // 4. Paste it here to replace the placeholder.
-        // ===================================================================
+        // I HAVE PRE-FILLED THIS FROM YOUR SCREENSHOT.
         const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; 
         
         let isAdmin = false;
@@ -272,19 +267,18 @@
         let unsubscribeCompletion = () => {};
 
         // ===================================================================
-        // === 2. PASTE YOUR FIREBASE CONFIG HERE ===
+        // === 1. PASTE YOUR FIREBASE CONFIG HERE ===
         // Get this from your Firebase Project Settings.
         // ===================================================================
-  const firebaseConfig = { 
-    apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", 
-    authDomain: "upscstudyhub-github.firebaseapp.com", 
-    projectId: "upscstudyhub-github", 
-    storageBucket: "upscstudyhub-github.firebasestorage.app", 
-    messagingSenderId: "451692540885", 
-    appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
-};
-
-const appId = 'default-app-id'; // You can change this if you need different environments
+        const firebaseConfig = { 
+            apiKey: "AIzaSy...", 
+            authDomain: "your-project.firebaseapp.com", 
+            projectId: "your-project-id", 
+            storageBucket: "your-project.appspot.com", 
+            messagingSenderId: "123456...", 
+            appId: "1:123456...:web:..." 
+        };
+        const appId = 'default-app-id'; // You can change this if you need different environments
 
         // --- UI Elements ---
         function getUiElements() {
@@ -350,6 +344,7 @@ const appId = 'default-app-id'; // You can change this if you need different env
         // --- Core UI Logic ---
         function renderTestList() {
             const ui = getUiElements();
+             // THIS IS THE CHECK THAT IS FAILING
              if (!ui.testList || !ui.emptyState || !ui.testListLoader) {
                  console.error("renderTestList: Missing essential UI elements.");
                  return;
@@ -464,7 +459,6 @@ const appId = 'default-app-id'; // You can change this if you need different env
 
             try {
                 // IMPORTANT: Firestore arrayRemove requires the EXACT object to remove.
-                // We must fetch the document's current state to find the exact object.
                  const scheduleDoc = await getDoc(scheduleDocRef);
                  let testsArray = [];
                  if (scheduleDoc.exists()) {
@@ -487,7 +481,6 @@ const appId = 'default-app-id'; // You can change this if you need different env
                 showMessage("Error", "Could not delete the test. Please try again.");
                  button.disabled = false; // Re-enable on error
             } 
-            // The listener will update the UI, removing the item visually.
         }
 
 
@@ -502,7 +495,6 @@ const appId = 'default-app-id'; // You can change this if you need different env
             checkbox.disabled = true; // Disable during update
 
             try {
-                 // Use setDoc with merge to create the doc if it doesn't exist
                  await setDoc(completionDocRef, { 
                      completed: isCompleted ? arrayUnion(testId) : arrayRemove(testId) 
                  }, { merge: true });
@@ -528,8 +520,6 @@ const appId = 'default-app-id'; // You can change this if you need different env
             if(ui.emptyState) ui.emptyState.classList.add('hidden'); 
             if(ui.testList) ui.testList.innerHTML = ''; 
 
-            // === Listen to schedule (public) ===
-            // This path is readable by everyone
             const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
             unsubscribeSchedule = onSnapshot(scheduleDocRef, (docSnap) => {
                  console.log("Schedule snapshot received:", docSnap.exists() ? docSnap.data() : 'No data');
@@ -544,8 +534,6 @@ const appId = 'default-app-id'; // You can change this if you need different env
                  renderTestList();
             });
             
-            // === Listen to completion (private) ===
-            // This path is unique to the logged-in user
             if (currentUserId) {
                 const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
                 unsubscribeCompletion = onSnapshot(completionDocRef, (docSnap) => { 
@@ -578,23 +566,19 @@ const appId = 'default-app-id'; // You can change this if you need different env
 
              if(ui.footerYear) ui.footerYear.textContent = new Date().getFullYear();
 
-            // Connect to Firebase and set up Auth Listener
             try {
                 console.log("Initializing Firebase...");
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-                // setLogLevel('debug'); // Uncomment for verbose firebase logs
                 console.log("Firebase initialized.");
 
-                setPersistence(auth, browserLocalPersistence) // <-- CORRECT
-              .then(() => {
+                setPersistence(auth, browserLocalPersistence) // THIS IS THE FIX
+                    .then(() => {
                         console.log("Persistence set to local.");
                         onAuthStateChanged(auth, (user) => {
                             console.log("Auth state changed. User:", user ? user.uid : 'null');
-                             const currentUI = getUiElements(); // Get fresh UI elements reference
-
-                            // Use a try...finally block to ensure loader is hidden
+                             const currentUI = getUiElements(); 
                             try {
                                 if (user) {
                                     currentUserId = user.uid;
@@ -603,12 +587,10 @@ const appId = 'default-app-id'; // You can change this if you need different env
                                     console.log("User authenticated:", currentUserId, "isAdmin:", isAdmin);
                                     if(currentUI.userIdDisplay) currentUI.userIdDisplay.textContent = currentUserId; 
                                     
-                                    // Make main view visible EARLY, before attaching listeners
                                     currentUI.appView.classList.add('loaded'); 
                                     currentUI.loginPrompt.classList.add('hidden');
                                     currentUI.appContent.classList.remove('hidden'); 
 
-                                    // Now attach listeners and load initial data
                                     attachAppEventListeners(currentUI); 
                                     updateAdminUI(); 
                                     changeDate(new Date()); 
@@ -620,33 +602,25 @@ const appId = 'default-app-id'; // You can change this if you need different env
                                     isAdmin = false; 
                                     if(currentUI.userIdDisplay) currentUI.userIdDisplay.textContent = "Not Logged In";
                                     
-                                    // Make login prompt visible
-                                     currentUI.appView.classList.add('loaded'); // Make sure the container is visible
+                                     currentUI.appView.classList.add('loaded'); 
                                     currentUI.appContent.classList.add('hidden');
                                     currentUI.loginPrompt.classList.remove('hidden');
                                     
                                     if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
                                     
-                                    // ===================================================================
-                                    // === 3. THIS PAGE REQUIRES AN AUTH PAGE ===
-                                    // It will redirect to 'auth.html' if you are not logged in.
-                                    // You MUST create an 'auth.html' page to handle login.
-                                    // ===================================================================
                                     setTimeout(() => {
                                          console.log("Redirecting to auth.html...");
-                                         window.location.href = "auth.html"; // Make sure this file exists!
+                                         window.location.href = "auth.html"; 
                                     }, 1500); 
                                 }
                             } catch (authError) {
                                  console.error("Error during auth state processing:", authError);
                                  showMessage("Error", "An error occurred while loading your session.");
-                                 // Show login prompt as a fallback
                                  currentUI.appView.classList.add('loaded'); 
                                  currentUI.appContent.classList.add('hidden');
                                  currentUI.loginPrompt.classList.remove('hidden');
                                  if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Error loading session. Please try logging in again.";
                             } finally {
-                                // Ensure loader is hidden regardless of outcome
                                 if (currentUI.loaderOverlay) {
                                      currentUI.loaderOverlay.classList.add('hidden');
                                      console.log("Loader overlay hidden.");
@@ -657,19 +631,17 @@ const appId = 'default-app-id'; // You can change this if you need different env
                         });
                     })
                     .catch((error) => {
-                         // --- ERROR SETTING PERSISTENCE ---
                          console.error("Set persistence error:", error);
-                         const errorUI = getUiElements(); // Get fresh elements for error display
+                         const errorUI = getUiElements(); 
                          if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
                          if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
                          if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Auth Init Failed";
                          if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not initialize login session.";
-                         if(errorUI.appView) errorUI.appView.classList.add('loaded'); // Show the error state
+                         if(errorUI.appView) errorUI.appView.classList.add('loaded'); 
                          showMessage("Auth Error", `Could not initialize authentication: ${error.message}. Please refresh.`);
                     });
 
             } catch(e) {
-                 // --- ERROR INITIALIZING FIREBASE ---
                  console.error("Firebase Init Error:", e);
                  const errorUI = getUiElements(); 
                  if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
@@ -690,37 +662,32 @@ const appId = 'default-app-id'; // You can change this if you need different env
                   return;
              }
 
-            // Simple assignment (overwrites previous if any)
             ui.prevDayBtn.onclick = () => { changeDate(new Date(currentDate.setDate(currentDate.getDate() - 1))); };
             ui.nextDayBtn.onclick = () => { changeDate(new Date(currentDate.setDate(currentDate.getDate() + 1))); };
-            ui.selectedDateDisplay.onclick = () => ui.datePicker.showPicker(); // Modern way to open date picker
+            ui.selectedDateDisplay.onclick = () => ui.datePicker.showPicker(); 
             ui.datePicker.onchange = (e) => { 
-                // Ensure date is parsed correctly in local timezone
                  const [year, month, day] = e.target.value.split('-').map(Number); 
-                 // Use UTC functions to avoid timezone shifts when setting date parts
-                 const newDate = new Date(); // Start with today's date/time
-                 newDate.setFullYear(year, month - 1, day); // Set year, month, day
-                 newDate.setHours(0, 0, 0, 0); // Set time to midnight local
+                 const newDate = new Date(); 
+                 newDate.setFullYear(year, month - 1, day); 
+                 newDate.setHours(0, 0, 0, 0); 
                  changeDate(newDate); 
             };
             ui.addTestForm.onsubmit = handleAddTest;
             ui.testList.onclick = (e) => { 
                 if (e.target.type === 'checkbox') { handleToggleTest(e); } 
                 else if (e.target.closest('button.admin-only')) { handleDeleteTest(e); }
-                // Allow clicking label to toggle checkbox
                  else if (e.target.tagName === 'LABEL') {
                      const checkboxId = e.target.getAttribute('for');
                      const checkbox = checkboxId ? document.getElementById(checkboxId) : null;
                      if (checkbox && checkbox.type === 'checkbox') {
                          checkbox.checked = !checkbox.checked;
-                         // Manually trigger the handler
                          handleToggleTest({ target: checkbox }); 
                      }
                  }
             };
             ui.adminEmptyCta.onclick = () => ui.newTestNameInput && ui.newTestNameInput.focus();
             ui.messageModalClose.onclick = hideMessage;
-            ui.messageModalOverlay.onclick = hideMessage; // Close on overlay click too
+            ui.messageModalOverlay.onclick = hideMessage; 
              console.log("App event listeners attached.");
          }
 
