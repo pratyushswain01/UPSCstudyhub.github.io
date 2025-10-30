@@ -256,7 +256,7 @@
         let db, auth;
         let currentUserId = null;
         
-        // I HAVE PRE-FILLED THIS FROM YOUR SCREENSHOT.
+        // This is your Admin User ID from your previous code
         const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; 
         
         let isAdmin = false;
@@ -266,17 +266,14 @@
         let unsubscribeSchedule = () => {};
         let unsubscribeCompletion = () => {};
 
-        // ===================================================================
-        // === 1. IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ===
-        // Get this from your Firebase Project Settings.
-        // ===================================================================
-        const firebaseConfig = { 
-            apiKey: "AIzaSy...", 
-            authDomain: "your-project.firebaseapp.com", 
-            projectId: "your-project-id", 
-            storageBucket: "your-project.appspot.com", 
-            messagingSenderId: "123456...", 
-            appId: "1:123456...:web:..." 
+        // This is your Firebase Config from your auth.html file
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c"
         };
         const appId = 'default-app-id'; 
 
@@ -570,11 +567,16 @@
                 setPersistence(auth, browserLocalPersistence) // Correct persistence
                     .then(() => {
                         console.log("Persistence set to local.");
+                        
+                        // ======================================================
+                        // === THIS IS THE "PATIENT" onAuthStateChanged FIX ===
+                        // ======================================================
                         onAuthStateChanged(auth, (user) => {
                             console.log("Auth state changed. User:", user ? user.uid : 'null');
                              const currentUI = getUiElements(); 
                             try {
                                 if (user) {
+                                    // === USER IS LOGGED IN ===
                                     currentUserId = user.uid;
                                     isAdmin = user.uid === ADMIN_UID;
                                     
@@ -591,14 +593,13 @@
                                     console.log("App content setup complete.");
                                     
                                 } else {
-                                    // ======================================================
-                                    // === "PATIENT" LOGIN & "SMART" REDIRECT LOGIC ===
-                                    // ======================================================
+                                    // === USER IS NOT LOGGED IN (OR WE ARE CHECKING) ===
                                     console.log("User not authenticated. Verifying...");
                                     currentUserId = null;
                                     isAdmin = false; 
                                     if(currentUI.userIdDisplay) currentUI.userIdDisplay.textContent = "Not Logged In";
                                     
+                                    // Show the "verifying" message
                                     currentUI.appView.classList.add('loaded');
                                     currentUI.appContent.classList.add('hidden');
                                     currentUI.loginPrompt.classList.remove('hidden');
@@ -608,21 +609,17 @@
                                     setTimeout(() => {
                                         // After 1.5 seconds, check auth.currentUser
                                         if (!auth.currentUser) {
-                                            // User is *really* logged out. Redirect to auth.html.
+                                            // If it's STILL null, the user is *really* logged out. Now we redirect.
                                             console.log("User confirmed logged out. Redirecting to auth.html...");
                                             if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
                                             
-                                            // THIS IS THE KEY CHANGE:
-                                            // Tell auth.html to come back to *this* page after login.
-                                            window.location.href = "auth.html?redirect=planner_test.html";
+                                            // Make sure this matches your file name
+                                            window.location.href = "auth.html?redirect=testplanner.html";
                                         } else {
-                                            // False alarm! The 'if (user)' block already ran.
+                                            // False alarm! The 'if (user)' block already ran or will run.
                                             console.log("False alarm, user is logged in. Staying on page.");
                                         }
                                     }, 1500); // Wait 1.5 seconds to be sure
-                                    // ======================================================
-                                    // === END OF FIX ===
-                                    // ======================================================
                                 }
                             } catch (authError) {
                                  console.error("Error during auth state processing:", authError);
@@ -632,6 +629,7 @@
                                  currentUI.loginPrompt.classList.remove('hidden');
                                  if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Error loading session. Please try logging in again.";
                             } finally {
+                                // This hides the initial "Connecting..." spinner
                                 if (currentUI.loaderOverlay) {
                                      currentUI.loaderOverlay.classList.add('hidden');
                                      console.log("Loader overlay hidden.");
@@ -639,7 +637,8 @@
                                      console.warn("Loader overlay not found in finally block.");
                                 }
                             }
-                        });
+                        }); // === END OF onAuthStateChanged ===
+                    
                     })
                     .catch((error) => {
                          console.error("Set persistence error:", error);
