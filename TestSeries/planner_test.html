@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPSC Hub - Test Planner</title>
+    <title>UPSC Hub - Planner</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,7 +95,6 @@
         body.dark #message-modal .modal-content { background-color: #1e293b; /* slate-800 */ }
         body.dark .bg-red-100 { background-color: rgba(220, 38, 38, 0.2); }
         body.dark .text-red-600 { color: #f87171; /* red-400 */ }
-
     </style>
      <script>
         // Apply theme early to prevent flash
@@ -111,20 +110,16 @@
 </head>
 <body class="min-h-screen antialiased">
 
-    <!-- Auth Loading State -->
     <div id="loader-overlay">
         <div class="loader-spinner"></div>
         <p class="text-lg font-medium text-slate-600 dark:text-slate-400 mt-4">Connecting...</p>
     </div>
     
-    <!-- Main App Container (Initially hidden) -->
     <div id="app-view" class="flex flex-col min-h-screen"> 
         
-        <!-- Header -->
         <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-10">
             <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="flex justify-between items-center h-16">
-                    <!-- Logo / Title -->
                     <div class="flex items-center space-x-3">
                         <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg"/>
                         <h1 class="text-xl sm:text-2xl font-bold text-slate-800">
@@ -132,13 +127,9 @@
                         </h1>
                     </div>
                     
-                    <!-- Actions -->
                     <div class="flex items-center space-x-3 sm:space-x-4">
-                        <!-- Admin Mode Badge (hidden by default, shown if admin) -->
                         <span id="admin-badge" class="hidden px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-sm font-bold rounded-full">Admin Mode</span>
 
-                        <!-- Dashboard Button (now a link) -->
-                        <!-- CORRECTED PATH: Assumes dashboard.html is in the same folder -->
                         <a href="./dashboard.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-all duration-200 text-sm sm:text-base flex items-center space-x-2">
                             <svg class="w-4 h-4 sm:w-5 sm:h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
                             <span>Dashboard</span>
@@ -148,24 +139,20 @@
             </div>
         </header>
 
-        <!-- Main Content -->
         <main id="main-content" class="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 flex-1">
             
-            <!-- "Please Log In" Message (Hidden by default) -->
             <div id="login-prompt" class="hidden flex flex-col items-center justify-center h-full min-h-[50vh] bg-white rounded-xl shadow-lg p-8">
                 <svg class="w-16 h-16 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
                 <h2 class="text-2xl font-bold text-slate-800 mb-2">Please Log In</h2>
-                <p class="text-slate-600 text-center" id="login-message">You must be logged in to access the UPSChub dashboard.</p>
+                <p class="text-slate-600 text-center" id="login-message">You must be logged in to access this page.</p>
                 <p class="text-sm text-slate-500 mt-4">Your User ID (if available): <span id="userIdDisplay" class="font-medium">...</span></p>
             </div>
 
-            <!-- App Content (Hidden by default) -->
             <div id="app-content" class="hidden">
                 <div class="max-w-4xl mx-auto space-y-6">
-                    <!-- Today's Tests -->
                     <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                         <div class="p-5 border-b border-slate-200">
-                            <h3 class="text-base font-semibold text-slate-800">Tests for:</h3>
+                            <h3 class="text-base font-semibold text-slate-800">Tasks for:</h3>
                             <div class="flex items-baseline justify-between">
                                 <time id="selected-date-display" class="text-2xl font-bold text-blue-600 cursor-pointer">January 1, 2024</time>
                                 <div class="flex space-x-1">
@@ -177,12 +164,10 @@
                                     </button>
                                 </div>
                             </div>
-                            <!-- This input is now used by the 'selected-date-display' click -->
                             <input type="date" id="date-picker" class="absolute -left-[9999px] opacity-0" />
                         </div>
                         
                         <div class="p-5 space-y-4">
-                            <!-- Progress Bar -->
                             <div>
                                 <div class="flex justify-between mb-1">
                                     <span class="text-sm font-medium text-slate-600">Completion</span>
@@ -193,34 +178,28 @@
                                 </div>
                             </div>
                             
-                            <!-- Test List -->
                             <ul id="test-list" class="space-y-3">
-                                <!-- Test items will be injected here -->
-                                <!-- Loading indicator inside list -->
-                                <li id="test-list-loader" class="text-center py-4 text-slate-500">Loading tests...</li>
+                                <li id="test-list-loader" class="text-center py-4 text-slate-500">Loading tasks...</li>
                             </ul>
 
-                            <!-- Empty State -->
                             <div id="empty-state" class="text-center py-6 hidden">
                                 <svg class="w-12 h-12 mx-auto text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" /></svg>
-                                <h4 class="mt-2 text-lg font-semibold text-slate-700">No Tests Scheduled</h4>
-                                <p class="mt-1 text-sm text-slate-500">No tests are scheduled for this day.</p>
-                                <!-- Admin-only CTA -->
+                                <h4 class="mt-2 text-lg font-semibold text-slate-700">No Tasks Scheduled</h4>
+                                <p class="mt-1 text-sm text-slate-500">No tasks are scheduled for this day.</p>
                                 <button id="admin-empty-cta" class="admin-only mt-4 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 text-sm">
-                                    Add a test
+                                    Add a task
                                 </button>
                             </div>
                             
-                            <!-- Admin: Add Test Form -->
                             <form id="add-test-form" class="admin-only pt-4 border-t border-slate-200 space-y-3">
-                                <h4 class="text-base font-semibold text-slate-800">Add New Test</h4>
+                                <h4 class="text-base font-semibold text-slate-800">Add New Task</h4>
                                 <div>
-                                    <label for="new-test-name" class="block text-sm font-medium text-slate-700 mb-1">Test Name</label>
+                                    <label for="new-test-name" class="block text-sm font-medium text-slate-700 mb-1">Task Name</label>
                                     <input type="text" id="new-test-name" class="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Polity Test 1">
                                 </div>
                                 <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center space-x-2">
                                     <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
-                                    <span>Add Test</span>
+                                    <span>Add Task</span>
                                 </button>
                             </form>
                         </div>
@@ -229,18 +208,15 @@
             </div>
         </main>
         
-        <!-- Footer -->
         <footer class="text-center py-4 px-4 text-sm text-slate-500">
             © <span id="footer-year">2024</span> UPSChub. All rights reserved.
         </footer>
     </div>
     
-    <!-- Custom Message Modal -->
     <div id="message-modal" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden" role="alertdialog" aria-modal="true" aria-labelledby="message-modal-title">
         <div id="message-modal-overlay" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm opacity-0 transition-opacity duration-200"></div>
         <div class="modal-content text-center" role="document">
             <div id="message-modal-icon" class="mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center bg-red-100">
-                <!-- Icon (e.g., error) -->
                 <svg class="w-6 h-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
             </div>
             <h3 id="message-modal-title" class="text-lg font-semibold text-slate-800">Error</h3>
@@ -252,7 +228,6 @@
     </div>
 
 
-    <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { 
@@ -277,7 +252,17 @@
         // --- App State ---
         let db, auth;
         let currentUserId = null;
+        
+        // ===================================================================
+        // === 1. IMPORTANT: SET YOUR ADMIN USER ID HERE ===
+        // To find your ID:
+        // 1. Log in to your app once with your admin account.
+        // 2. Go to the Firebase Console > Authentication > Users tab.
+        // 3. Find your user (e.g., by email) and copy the "User UID".
+        // 4. Paste it here to replace the placeholder.
+        // ===================================================================
         const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; 
+        
         let isAdmin = false;
         let currentDate = new Date(); 
         let currentSchedule = []; 
@@ -285,15 +270,20 @@
         let unsubscribeSchedule = () => {};
         let unsubscribeCompletion = () => {};
 
-        const firebaseConfig = { 
-            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", 
-            authDomain: "upscstudyhub-github.firebaseapp.com", 
-            projectId: "upscstudyhub-github", 
-            storageBucket: "upscstudyhub-github.firebasestorage.app", 
-            messagingSenderId: "451692540885", 
-            appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
-        };
-        const appId = 'default-app-id'; 
+        // ===================================================================
+        // === 2. PASTE YOUR FIREBASE CONFIG HERE ===
+        // Get this from your Firebase Project Settings.
+        // ===================================================================
+  const firebaseConfig = { 
+    apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", 
+    authDomain: "upscstudyhub-github.firebaseapp.com", 
+    projectId: "upscstudyhub-github", 
+    storageBucket: "upscstudyhub-github.firebasestorage.app", 
+    messagingSenderId: "451692540885", 
+    appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
+};
+
+const appId = 'default-app-id'; // You can change this if you need different environments
 
         // --- UI Elements ---
         function getUiElements() {
@@ -468,29 +458,27 @@
             
             const dateKey = getYYYYMMDD(currentDate);
             const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
-            const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
-
+            
              button.disabled = true;
 
             try {
                 // IMPORTANT: Firestore arrayRemove requires the EXACT object to remove.
-                // Fetch the current document state within a transaction if strict consistency is needed,
-                // but for this simple case, using the object from `currentSchedule` might work if it hasn't changed.
-                // A safer approach involves transactions or fetching the object again. Let's try direct remove first.
+                // We must fetch the document's current state to find the exact object.
                  const scheduleDoc = await getDoc(scheduleDocRef);
                  let testsArray = [];
                  if (scheduleDoc.exists()) {
-                     testsArray = scheduleDoc.data().tests || [];
+                      testsArray = scheduleDoc.data().tests || [];
                  }
                  const testToRemove = testsArray.find(t => t.id === testId); // Find exact object in current db state
                  
                  if (testToRemove) {
-                     await updateDoc(scheduleDocRef, { tests: arrayRemove(testToRemove) });
+                      await updateDoc(scheduleDocRef, { tests: arrayRemove(testToRemove) });
                  } else {
-                     console.warn("Test object not found in DB for removal, might have been deleted already.");
+                      console.warn("Test object not found in DB for removal, might have been deleted already.");
                  }
 
-                // Update user's completion
+                // Also remove it from the admin's personal completion list for today
+                const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
                 await updateDoc(completionDocRef, { completed: arrayRemove(testId) });
                 
             } catch (error) {
@@ -517,7 +505,7 @@
                  await setDoc(completionDocRef, { 
                      completed: isCompleted ? arrayUnion(testId) : arrayRemove(testId) 
                  }, { merge: true });
-                
+                 
             } catch (error) {
                 console.error("Error updating completion:", error);
                 showMessage("Error", "Could not update test status. Please try again.");
@@ -539,33 +527,35 @@
             if(ui.emptyState) ui.emptyState.classList.add('hidden'); 
             if(ui.testList) ui.testList.innerHTML = ''; 
 
-            // Listen to schedule (public)
+            // === Listen to schedule (public) ===
+            // This path is readable by everyone
             const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
             unsubscribeSchedule = onSnapshot(scheduleDocRef, (docSnap) => {
                  console.log("Schedule snapshot received:", docSnap.exists() ? docSnap.data() : 'No data');
-                currentSchedule = docSnap.exists() ? (docSnap.data().tests || []) : [];
-                currentSchedule.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
-                renderTestList(); 
+                 currentSchedule = docSnap.exists() ? (docSnap.data().tests || []) : [];
+                 currentSchedule.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+                 renderTestList(); 
             }, (error) => {
-                console.error("Error listening to schedule:", error);
-                showMessage("Error", "Could not load test schedule.");
-                currentSchedule = []; 
-                if(ui.testListLoader) ui.testListLoader.classList.add('hidden'); 
-                renderTestList();
+                 console.error("Error listening to schedule:", error);
+                 showMessage("Error", "Could not load test schedule.");
+                 currentSchedule = []; 
+                 if(ui.testListLoader) ui.testListLoader.classList.add('hidden'); 
+                 renderTestList();
             });
             
-            // Listen to completion (private)
+            // === Listen to completion (private) ===
+            // This path is unique to the logged-in user
             if (currentUserId) {
                 const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
                 unsubscribeCompletion = onSnapshot(completionDocRef, (docSnap) => { 
                      console.log("Completion snapshot received:", docSnap.exists() ? docSnap.data() : 'No data');
-                    currentCompletion = docSnap.exists() ? (docSnap.data().completed || []) : [];
-                    renderTestList(); 
+                     currentCompletion = docSnap.exists() ? (docSnap.data().completed || []) : [];
+                     renderTestList(); 
                 }, (error) => {
-                    console.error("Error listening to completion:", error);
-                    showMessage("Error", "Could not load your test completion status.");
-                    currentCompletion = []; 
-                    renderTestList(); 
+                     console.error("Error listening to completion:", error);
+                     showMessage("Error", "Could not load your test completion status.");
+                     currentCompletion = []; 
+                     renderTestList(); 
                 });
             } else {
                  console.warn("No user ID available for completion listener.");
@@ -593,7 +583,7 @@
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
-                setLogLevel('Debug');
+                // setLogLevel('debug'); // Uncomment for verbose firebase logs
                 console.log("Firebase initialized.");
 
                 setPersistence(auth, localPersistence)
@@ -636,9 +626,14 @@
                                     
                                     if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
                                     
+                                    // ===================================================================
+                                    // === 3. THIS PAGE REQUIRES AN AUTH PAGE ===
+                                    // It will redirect to 'auth.html' if you are not logged in.
+                                    // You MUST create an 'auth.html' page to handle login.
+                                    // ===================================================================
                                     setTimeout(() => {
-                                        console.log("Redirecting to auth.html...");
-                                        window.location.href = "auth.html"; 
+                                         console.log("Redirecting to auth.html...");
+                                         window.location.href = "auth.html"; // Make sure this file exists!
                                     }, 1500); 
                                 }
                             } catch (authError) {
@@ -662,37 +657,37 @@
                     })
                     .catch((error) => {
                          // --- ERROR SETTING PERSISTENCE ---
-                        console.error("Set persistence error:", error);
-                        const errorUI = getUiElements(); // Get fresh elements for error display
-                        if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
-                        if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
-                        if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Auth Init Failed";
-                        if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not initialize login session.";
-                        if(errorUI.appView) errorUI.appView.classList.add('loaded'); // Show the error state
-                        showMessage("Auth Error", `Could not initialize authentication: ${error.message}. Please refresh.`);
+                         console.error("Set persistence error:", error);
+                         const errorUI = getUiElements(); // Get fresh elements for error display
+                         if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
+                         if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
+                         if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Auth Init Failed";
+                         if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not initialize login session.";
+                         if(errorUI.appView) errorUI.appView.classList.add('loaded'); // Show the error state
+                         showMessage("Auth Error", `Could not initialize authentication: ${error.message}. Please refresh.`);
                     });
 
             } catch(e) {
                  // --- ERROR INITIALIZING FIREBASE ---
-                console.error("Firebase Init Error:", e);
-                const errorUI = getUiElements(); 
-                if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
-                if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
-                 if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Firebase Init Error";
-                 if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not connect to services.";
-                if(errorUI.appView) errorUI.appView.classList.add('loaded'); 
-                showMessage("Fatal Error", `Could not initialize Firebase: ${e.message}. Please refresh the page.`);
+                 console.error("Firebase Init Error:", e);
+                 const errorUI = getUiElements(); 
+                 if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
+                 if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
+                  if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Firebase Init Error";
+                  if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not connect to services.";
+                 if(errorUI.appView) errorUI.appView.classList.add('loaded'); 
+                 showMessage("Fatal Error", `Could not initialize Firebase: ${e.message}. Please refresh the page.`);
             }
         }
 
         // --- Attach Event Listeners ---
          function attachAppEventListeners(ui) {
-            console.log("Attaching app event listeners...");
-             if (!ui.prevDayBtn || !ui.nextDayBtn || !ui.selectedDateDisplay || !ui.datePicker || !ui.addTestForm || !ui.testList || !ui.adminEmptyCta || !ui.messageModalClose || !ui.messageModalOverlay) {
-                console.error("Cannot attach listeners: One or more UI elements missing.");
-                showMessage("UI Error", "Some page elements could not be found. Functionality may be limited.");
-                return;
-            }
+             console.log("Attaching app event listeners...");
+              if (!ui.prevDayBtn || !ui.nextDayBtn || !ui.selectedDateDisplay || !ui.datePicker || !ui.addTestForm || !ui.testList || !ui.adminEmptyCta || !ui.messageModalClose || !ui.messageModalOverlay) {
+                  console.error("Cannot attach listeners: One or more UI elements missing.");
+                  showMessage("UI Error", "Some page elements could not be found. Functionality may be limited.");
+                  return;
+             }
 
             // Simple assignment (overwrites previous if any)
             ui.prevDayBtn.onclick = () => { changeDate(new Date(currentDate.setDate(currentDate.getDate() - 1))); };
@@ -726,7 +721,7 @@
             ui.messageModalClose.onclick = hideMessage;
             ui.messageModalOverlay.onclick = hideMessage; // Close on overlay click too
              console.log("App event listeners attached.");
-        }
+         }
 
 
         // --- Start the App ---
@@ -735,4 +730,3 @@
     </script>
 </body>
 </html>
-
