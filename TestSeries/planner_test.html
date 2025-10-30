@@ -237,7 +237,7 @@
             getAuth, 
             onAuthStateChanged,
             setPersistence,
-            browserLocalPersistence // THIS IS THE FIX for 'localPersistence'
+            browserLocalPersistence // FIX 1: This is the correct name
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -267,7 +267,7 @@
         let unsubscribeCompletion = () => {};
 
         // ===================================================================
-        // === 1. PASTE YOUR FIREBASE CONFIG HERE ===
+        // === 1. IMPORTANT: PASTE YOUR FIREBASE CONFIG HERE ===
         // Get this from your Firebase Project Settings.
         // ===================================================================
         const firebaseConfig = { 
@@ -278,16 +278,16 @@
             messagingSenderId: "123456...", 
             appId: "1:123456...:web:..." 
         };
-        const appId = 'default-app-id'; // You can change this if you need different environments
+        const appId = 'default-app-id'; 
 
         // --- UI Elements ---
         function getUiElements() {
             const $ = (selector) => document.getElementById(selector);
             return {
-                appView: $("app-view"), // Main container for the app
+                appView: $("app-view"),
                 loaderOverlay: $("loader-overlay"),
                 loginPrompt: $("login-prompt"),
-                loginMessage: $("login-message"), // Specific message element
+                loginMessage: $("login-message"),
                 appContent: $("app-content"),
                 adminBadge: $("admin-badge"),
                 userIdDisplay: $("userIdDisplay"),
@@ -296,13 +296,13 @@
                 nextDayBtn: $("next-day"),
                 selectedDateDisplay: $("selected-date-display"),
                 testList: $("test-list"),
-                testListLoader: $("test-list-loader"), // Loader within the list
+                testListLoader: $("test-list-loader"),
                 emptyState: $("empty-state"),
                 newTestNameInput: $("new-test-name"),
                 addTestForm: $("add-test-form"),
                 progressText: $("progress-text"),
                 progressBarInner: $("progress-bar-inner"),
-                mainContent: $("main-content"), // Used for opacity fade-in
+                mainContent: $("main-content"),
                 messageModal: $("message-modal"),
                 messageModalOverlay: $("message-modal-overlay"),
                 messageModalClose: $("message-modal-close"),
@@ -323,7 +323,6 @@
             ui.messageModalTitle.textContent = title;
             ui.messageModalText.textContent = text;
             ui.messageModal.classList.remove('hidden');
-            // Use requestAnimationFrame for smoother transition start
             requestAnimationFrame(() => {
                 ui.messageModalOverlay.classList.add('fadeIn');
                 ui.messageModal.querySelector('.modal-content').classList.add('slideUp');
@@ -335,23 +334,22 @@
             if (!ui.messageModal || !ui.messageModalOverlay) return; 
             ui.messageModalOverlay.classList.remove('fadeIn');
             ui.messageModal.querySelector('.modal-content').classList.remove('slideUp');
-            // Wait for animation to finish before hiding
             setTimeout(() => {
                  if (ui.messageModal) ui.messageModal.classList.add('hidden');
-            }, 300); // Match animation duration
+            }, 300); 
         }
 
         // --- Core UI Logic ---
         function renderTestList() {
             const ui = getUiElements();
-             // THIS IS THE CHECK THAT IS FAILING
+             // THIS CHECK IS NOW VALID BECAUSE THE HTML IS CORRECT
              if (!ui.testList || !ui.emptyState || !ui.testListLoader) {
                  console.error("renderTestList: Missing essential UI elements.");
                  return;
              }
 
-            ui.testListLoader.classList.add('hidden'); // Hide loader once rendering starts
-            ui.testList.innerHTML = ''; // Clear previous items
+            ui.testListLoader.classList.add('hidden');
+            ui.testList.innerHTML = ''; 
             
             if (currentSchedule.length === 0) {
                 ui.emptyState.classList.remove('hidden');
@@ -362,9 +360,9 @@
                     const li = document.createElement('li');
                     li.className = 'flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-700';
                     li.innerHTML = `
-                        <div class="flex items-center space-x-3 flex-1 min-w-0"> {/* Flex-1 and min-w-0 for wrapping */}
+                        <div class="flex items-center space-x-3 flex-1 min-w-0">
                             <input type="checkbox" data-id="${test.id}" id="test-${test.id}" class="h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 flex-shrink-0 cursor-pointer" ${isCompleted ? 'checked' : ''}>
-                            <label for="test-${test.id}" class="text-base ${isCompleted ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'} break-words cursor-pointer">${test.name}</label> {/* Added cursor-pointer */}
+                            <label for="test-${test.id}" class="text-base ${isCompleted ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'} break-words cursor-pointer">${test.name}</label>
                         </div>
                         <button data-id="${test.id}" class="admin-only text-red-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0 ml-2" aria-label="Delete test">
                             <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.58.11-2.368.11a.75.75 0 0 0 0 1.5h1.248v10.5h.01c.02 1.258 1.03 2.25 2.28 2.25h8.46c1.25 0 2.26-1.002 2.279-2.268v-10.5h1.248a.75.75 0 0 0 0-1.5c-.788 0-1.573-.033-2.368-.11V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM7.5 3.75c0-.69.56-1.25 1.25-1.25h2.5c.69 0 1.25.56 1.25 1.25v.443c-.795.077-1.58.11-2.368.11a12.2 12.2 0 0 1-2.368-.11V3.75Zm3 7.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Zm4-1.25a.75.75 0 0 0-.75.75v3.5a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75Z" clip-rule="evenodd" /></svg>
@@ -382,14 +380,14 @@
             if (!ui.progressText || !ui.progressBarInner) return;
             const total = currentSchedule.length;
             const completed = currentCompletion.length;
-            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100); // Round percentage
+            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
             ui.progressText.textContent = `${completed} / ${total}`;
             ui.progressBarInner.style.width = `${percentage}%`;
         }
         
         function updateAdminUI() {
             const ui = getUiElements();
-            if (!ui.adminBadge || !ui.adminEmptyCta || !ui.addTestForm) return; // Add checks
+            if (!ui.adminBadge || !ui.adminEmptyCta || !ui.addTestForm) return; 
             
             if (isAdmin) {
                 document.body.classList.add('admin-mode');
@@ -398,11 +396,10 @@
                 document.body.classList.remove('admin-mode');
                  ui.adminBadge.classList.add('hidden'); 
             }
-             // Ensure correct elements are shown/hidden based on admin status AND data
             const adminOnlyElements = document.querySelectorAll('#test-list .admin-only');
             adminOnlyElements.forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
             ui.adminEmptyCta.style.display = (isAdmin && currentSchedule.length === 0) ? 'block' : 'none';
-            ui.addTestForm.style.display = isAdmin ? 'block' : 'none'; // Use block for form
+            ui.addTestForm.style.display = isAdmin ? 'block' : 'none';
         }
         
         function changeDate(newDate) {
@@ -441,8 +438,8 @@
         }
 
         async function handleDeleteTest(e) {
-            const button = e.target.closest('button.admin-only'); // Ensure it's the admin button
-            if (!button || !isAdmin || !currentUserId) return; // Added userId check
+            const button = e.target.closest('button.admin-only');
+            if (!button || !isAdmin || !currentUserId) return; 
             
             const testId = button.dataset.id;
             const test = currentSchedule.find(t => t.id === testId);
@@ -458,28 +455,26 @@
              button.disabled = true;
 
             try {
-                // IMPORTANT: Firestore arrayRemove requires the EXACT object to remove.
                  const scheduleDoc = await getDoc(scheduleDocRef);
                  let testsArray = [];
                  if (scheduleDoc.exists()) {
                       testsArray = scheduleDoc.data().tests || [];
                  }
-                 const testToRemove = testsArray.find(t => t.id === testId); // Find exact object in current db state
+                 const testToRemove = testsArray.find(t => t.id === testId); 
                  
                  if (testToRemove) {
                       await updateDoc(scheduleDocRef, { tests: arrayRemove(testToRemove) });
                  } else {
-                      console.warn("Test object not found in DB for removal, might have been deleted already.");
+                      console.warn("Test object not found in DB for removal.");
                  }
 
-                // Also remove it from the admin's personal completion list for today
                 const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
                 await updateDoc(completionDocRef, { completed: arrayRemove(testId) });
                 
             } catch (error) {
                 console.error("Error deleting test:", error);
                 showMessage("Error", "Could not delete the test. Please try again.");
-                 button.disabled = false; // Re-enable on error
+                 button.disabled = false;
             } 
         }
 
@@ -492,7 +487,7 @@
             const dateKey = getYYYYMMDD(currentDate);
             const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
 
-            checkbox.disabled = true; // Disable during update
+            checkbox.disabled = true;
 
             try {
                  await setDoc(completionDocRef, { 
@@ -502,9 +497,9 @@
             } catch (error) {
                 console.error("Error updating completion:", error);
                 showMessage("Error", "Could not update test status. Please try again.");
-                checkbox.checked = !isCompleted; // Revert checkbox on error
+                checkbox.checked = !isCompleted;
             } finally {
-                checkbox.disabled = false; // Re-enable checkbox
+                checkbox.disabled = false;
             }
         }
         
@@ -573,7 +568,7 @@
                 auth = getAuth(app);
                 console.log("Firebase initialized.");
 
-                setPersistence(auth, browserLocalPersistence) // THIS IS THE FIX
+                setPersistence(auth, browserLocalPersistence) // FIX 1
                     .then(() => {
                         console.log("Persistence set to local.");
                         onAuthStateChanged(auth, (user) => {
@@ -597,21 +592,36 @@
                                     console.log("App content setup complete.");
                                     
                                 } else {
-                                    console.log("User not authenticated. Preparing redirect...");
+                                    // ======================================================
+                                    // === FIX 2: "PATIENT" LOGIN CHECK LOGIC ===
+                                    // ======================================================
+                                    console.log("User not authenticated. Verifying...");
                                     currentUserId = null;
                                     isAdmin = false; 
                                     if(currentUI.userIdDisplay) currentUI.userIdDisplay.textContent = "Not Logged In";
                                     
-                                     currentUI.appView.classList.add('loaded'); 
+                                    currentUI.appView.classList.add('loaded');
                                     currentUI.appContent.classList.add('hidden');
                                     currentUI.loginPrompt.classList.remove('hidden');
-                                    
-                                    if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
-                                    
+                                    if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Verifying login status...";
+
+                                    // SET A TIMER TO DOUBLE-CHECK
                                     setTimeout(() => {
-                                         console.log("Redirecting to auth.html...");
-                                         window.location.href = "auth.html"; 
-                                    }, 1500); 
+                                        // After 1.5 seconds, check auth.currentUser
+                                        // This value will be correct *after* the initial check
+                                        if (!auth.currentUser) {
+                                            // If it's STILL null, the user is *really* logged out. Now we redirect.
+                                            console.log("User confirmed logged out. Redirecting to auth.html...");
+                                            if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
+                                            window.location.href = "auth.html";
+                                        } else {
+                                            // False alarm! The 'if (user)' block already ran or will run.
+                                            console.log("False alarm, user is logged in. Staying on page.");
+                                        }
+                                    }, 1500); // Wait 1.5 seconds to be sure
+                                    // ======================================================
+                                    // === END OF FIX 2 ===
+                                    // ======================================================
                                 }
                             } catch (authError) {
                                  console.error("Error during auth state processing:", authError);
