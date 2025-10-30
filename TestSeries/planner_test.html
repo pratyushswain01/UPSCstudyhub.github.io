@@ -237,7 +237,7 @@
             getAuth, 
             onAuthStateChanged,
             setPersistence,
-            browserLocalPersistence // FIX 1: This is the correct name
+            browserLocalPersistence // This is the correct name
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
             getFirestore, 
@@ -342,7 +342,6 @@
         // --- Core UI Logic ---
         function renderTestList() {
             const ui = getUiElements();
-             // THIS CHECK IS NOW VALID BECAUSE THE HTML IS CORRECT
              if (!ui.testList || !ui.emptyState || !ui.testListLoader) {
                  console.error("renderTestList: Missing essential UI elements.");
                  return;
@@ -568,7 +567,7 @@
                 auth = getAuth(app);
                 console.log("Firebase initialized.");
 
-                setPersistence(auth, browserLocalPersistence) // FIX 1
+                setPersistence(auth, browserLocalPersistence) // Correct persistence
                     .then(() => {
                         console.log("Persistence set to local.");
                         onAuthStateChanged(auth, (user) => {
@@ -593,7 +592,7 @@
                                     
                                 } else {
                                     // ======================================================
-                                    // === FIX 2: "PATIENT" LOGIN CHECK LOGIC ===
+                                    // === "PATIENT" LOGIN & "SMART" REDIRECT LOGIC ===
                                     // ======================================================
                                     console.log("User not authenticated. Verifying...");
                                     currentUserId = null;
@@ -608,19 +607,21 @@
                                     // SET A TIMER TO DOUBLE-CHECK
                                     setTimeout(() => {
                                         // After 1.5 seconds, check auth.currentUser
-                                        // This value will be correct *after* the initial check
                                         if (!auth.currentUser) {
-                                            // If it's STILL null, the user is *really* logged out. Now we redirect.
+                                            // User is *really* logged out. Redirect to auth.html.
                                             console.log("User confirmed logged out. Redirecting to auth.html...");
                                             if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
-                                            window.location.href = "auth.html";
+                                            
+                                            // THIS IS THE KEY CHANGE:
+                                            // Tell auth.html to come back to *this* page after login.
+                                            window.location.href = "auth.html?redirect=planner.html";
                                         } else {
-                                            // False alarm! The 'if (user)' block already ran or will run.
+                                            // False alarm! The 'if (user)' block already ran.
                                             console.log("False alarm, user is logged in. Staying on page.");
                                         }
                                     }, 1500); // Wait 1.5 seconds to be sure
                                     // ======================================================
-                                    // === END OF FIX 2 ===
+                                    // === END OF FIX ===
                                     // ======================================================
                                 }
                             } catch (authError) {
