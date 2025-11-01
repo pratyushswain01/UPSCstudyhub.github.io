@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Series - UPSChub</title>
+    <!-- Changed title to reflect the new page -->
+    <title>Weekly Tests - UPSChub</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -34,7 +35,7 @@
         </div>
     </div>
 
-    <!-- Main Content (Hidden by default, shown for logged-in users) -->
+    <!-- Main Content -->
     <div id="main-content" class="hidden flex flex-col min-h-screen">
         <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
              <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
@@ -48,20 +49,19 @@
 
         <main class="container mx-auto p-4 sm:p-6 flex-grow">
             <div class="text-center mb-10">
-                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight gradient-text">UPSC Test Series</h1>
-                 <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Your complete toolkit for exam success. Search, learn, and test your knowledge.</p>
+                 <!-- Changed title -->
+                 <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight gradient-text">UPSC Weekly Mixed Tests</h1>
+                 <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Your complete toolkit for weekly revision. Search, learn, and test your knowledge.</p>
             </div>
             
-            <div id="controls-container" class="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center"></div>
-
             <!-- 
-                *** NEW SECTION 1: Placeholder for Weekly Tests ***
-                I have added this new div. The JavaScript will fill it.
+                This is the ONLY container. It will be filled with Weekly Tests.
+                I have removed the search bar and the 'test-list-container'.
             -->
-            <div id="weekly-test-container" class="mb-12"></div>
+            <div id="weekly-test-container" class="mb-12">
+                <!-- JavaScript will fill this -->
+            </div>
 
-            <!-- This is your existing container for all other tests -->
-            <div id="test-list-container" class="space-y-12"></div>
         </main>
 
         <footer class="bg-slate-800 text-slate-400 mt-16 py-8">
@@ -123,7 +123,7 @@
         const pageLoader = document.getElementById('page-loader');
         const mainContent = document.getElementById('main-content');
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        let allTests = [];
+        // We no longer need allTests variable
         let isPremiumUser = false;
         let currentTopic = '';
         let generatedQuestions = [];
@@ -133,59 +133,52 @@
                 try {
                     document.getElementById('loader-text').textContent = 'Fetching user data...';
                     
-                    // This is your WORKING user path from the "daily test" file.
-                    // This is the CORRECT path.
+                    // This is your WORKING user path.
                     const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const docSnap = await getDoc(userDocRef);
                     
                     if (docSnap.exists()) {
                         isPremiumUser = docSnap.data().isPremium || false;
                     } else {
-                        // This case might occur for a brand new user.
                         await setDoc(userDocRef, { email: user.email, isPremium: false }, { merge: true });
                         isPremiumUser = false;
                     }
                     
-                    document.getElementById('loader-text').textContent = 'Loading tests...';
+                    document.getElementById('loader-text').textContent = 'Loading weekly tests...';
                     
-                    // *** NEW SECTION 2: Load both types of tests ***
-                    await fetchAndRenderWeeklyTests(); // Load weekly tests first
-                    await fetchAllTests(); // Load all other tests
+                    // *** ONLY load weekly tests ***
+                    await fetchAndRenderWeeklyTests();
                     
-                    setupUI(); // Setup search and render the *other* tests
+                    // *** NO LONGER NEEDED: fetchAllTests() and setupUI() ***
                     
-                    // Hide loader and show main content ONLY after everything succeeds
+                    // Show premium button if not premium
+                    if (!isPremiumUser) {
+                        const fixedUpgradeButton = `<button id="fixed-upgrade-btn" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transform-gpu transition-all flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Go Premium</button>`;
+                        document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
+                    }
+
+                    // Hide loader and show main content
                     pageLoader.classList.add('hidden');
                     mainContent.classList.remove('hidden');
 
                 } catch (error) {
                     console.error("Authentication or data fetching failed:", error);
-                    // Handle the error: show an error message instead of a stuck loader
                     pageLoader.innerHTML = `<div class="text-center text-red-500 p-4">
                         <p class="font-semibold">Could not load page data.</p>
                         <p class="text-sm mt-1">There might be a connection issue or a problem with your account. Please refresh and try again.</p>
                     </div>`;
                 }
             } else {
-                // User is not logged in, redirect to auth page
                 window.location.href = 'auth.html';
             }
         });
 
-        async function fetchAllTests() {
-            // This function now just fetches data, it doesn't render
-            const querySnapshot = await getDocs(collection(db, "quizzes"));
-            allTests = [];
-            querySnapshot.forEach((doc) => allTests.push({ id: doc.id, ...doc.data() }));
-        }
-        
-        // *** NEW SECTION 3: Function to fetch and render Weekly Tests ***
+        // *** This is the ONLY function that renders tests now ***
         async function fetchAndRenderWeeklyTests() {
             const container = document.getElementById('weekly-test-container');
             if (!container) return;
 
             let weeklyTests = [];
-            // This will not error, it will just show "Could not load" if it fails
             try {
                 const querySnapshot = await getDocs(collection(db, "weeklyTests"));
                 querySnapshot.forEach((doc) => weeklyTests.push({ id: doc.id, ...doc.data() }));
@@ -196,21 +189,18 @@
             }
 
             if (weeklyTests.length === 0) {
-                container.innerHTML = ''; // Don't show anything if no tests are found
+                container.innerHTML = `<p class="text-slate-500 text-center">No weekly tests are available right now. Please check back later.</p>`;
                 return;
             }
 
             // Build the HTML for the weekly test section
-            let sectionHtml = `<h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">Weekly Mixed Tests</h2>
-                               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+            let sectionHtml = `<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`; // No title, just the grid
 
             weeklyTests.forEach(test => {
-                // This card HTML is copied from your 'renderTests' function to match perfectly
                 const testCardHtml = `
                     <div class="bg-white rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col">
                         <div class="p-6 flex-grow">
                             <h3 class="text-xl font-bold text-slate-800 mt-2">${test.title}</h3>
-                            <!-- This is your manual topic description -->
                             <p class="text-sm text-slate-600 mt-2"><strong>Topics:</strong> ${test.topicsDescription || 'Mixed Subjects'}</p>
                             
                             <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
@@ -220,12 +210,10 @@
                         </div>
                         <div class="bg-slate-50/70 p-4 border-t border-slate-200/60 rounded-b-xl flex items-center justify-between gap-2">
                             ${isPremiumUser ? `
-                                <!-- AI button summarizes the topics -->
                                 <button data-topic="Provide a summary of these topics: ${test.topicsDescription}" class="ai-summary-btn text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 p-2 rounded-md hover:bg-blue-100 transition-colors">
                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
                                     ✨ AI Study
                                 </button>
-                                <!-- This uses the 'testId' field from your database. If it's missing, it uses the document ID -->
                                 <a href="test_sample.html?testId=${test.testId || test.id}" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Test &rarr;</a>
                             ` : `
                                 <button disabled title="Available for Premium users" class="text-sm font-semibold text-slate-400 cursor-not-allowed flex items-center gap-1.5 p-2 rounded-md">
@@ -247,97 +235,7 @@
             container.innerHTML = sectionHtml; // Add the entire new section to the page
         }
 
-        function setupUI() {
-            const controlsContainer = document.getElementById('controls-container');
-            controlsContainer.innerHTML = `
-                <div class="relative w-full sm:max-w-xs">
-                    <input type="text" id="search-input" placeholder="Search by subject or test name..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></div>
-                </div>
-                <div class="relative w-full sm:w-auto">
-                    <select id="sort-select" class="appearance-none w-full bg-white border border-slate-300 text-slate-700 py-2.5 pl-3 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
-                        <option value="default">Sort by: Chapter</option>
-                        <option value="name-asc">Name (A-Z)</option>
-                        <option value="name-desc">Name (Z-A)</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700"><svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg></div>
-                </div>`;
-            document.getElementById('search-input').addEventListener('input', renderTests);
-            document.getElementById('sort-select').addEventListener('change', renderTests);
-            
-            if (!isPremiumUser) {
-                const fixedUpgradeButton = `<button id="fixed-upgrade-btn" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transform-gpu transition-all flex items-center justify-center gap-2"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>Go Premium</button>`;
-                document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
-            }
-
-            renderTests(); // This renders the *regular* tests
-        }
-        
-        function renderTests() {
-             const container = document.getElementById('test-list-container');
-             const searchTerm = document.getElementById('search-input').value.toLowerCase();
-             const sortValue = document.getElementById('sort-select').value;
-
-             let processedTests = allTests.filter(test => test.testName.toLowerCase().includes(searchTerm) || (test.subject && test.subject.toLowerCase().includes(searchTerm)));
-             processedTests.sort((a, b) => (a.chapter || 0) - (b.chapter || 0));
-
-             if (sortValue === 'name-asc') processedTests.sort((a, b) => a.testName.localeCompare(b.testName));
-             if (sortValue === 'name-desc') processedTests.sort((a, b) => b.testName.localeCompare(a.testName));
-
-             container.innerHTML = ''; // Clear only the regular test container
-             if (processedTests.length === 0) {
-                 container.innerHTML = `<p class="text-slate-500 text-center">No tests match your search criteria.</p>`;
-                 return;
-             }
-             
-             const testsBySubject = processedTests.reduce((acc, test) => {
-                 const subject = test.subject || 'General';
-                 if (!acc[subject]) acc[subject] = [];
-                 acc[subject].push(test);
-                 return acc;
-             }, {});
-
-             for (const subject in testsBySubject) {
-                 const subjectSection = document.createElement('div');
-                 subjectSection.innerHTML = `<h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">${subject}</h2>`;
-                 const testsGrid = document.createElement('div');
-                 testsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-                 
-                 testsBySubject[subject].forEach(test => {
-                     const testCard = document.createElement('div');
-                     testCard.className = "bg-white rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col";
-                     testCard.innerHTML = `
-                         <div class="p-6 flex-grow">
-                             <h3 class="text-xl font-bold text-slate-800 mt-2">${test.testName}</h3>
-                             <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
-                                 <span>${test.totalQuestions || 0} Questions</span>
-                                 <span>${test.durationMinutes || 0} Minutes</span>
-                             </div>
-                         </div>
-                         <div class="bg-slate-50/70 p-4 border-t border-slate-200/60 rounded-b-xl flex items-center justify-between gap-2">
-                             ${isPremiumUser ? `
-                                 <button data-topic="${test.testName}" class="ai-summary-btn text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 p-2 rounded-md hover:bg-blue-100 transition-colors">
-                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                                     ✨ AI Study
-                                 </button>
-                                 <a href="test_sample.html?testId=${test.id}" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Test &rarr;</a>
-                             ` : `
-                                 <button disabled title="Available for Premium users" class="text-sm font-semibold text-slate-400 cursor-not-allowed flex items-center gap-1.5 p-2 rounded-md">
-                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                     ✨ AI Study
-                                 </button>
-                                 <button data-testid="${test.id}" class="unlock-btn px-4 py-2 text-sm font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors flex items-center gap-1.5">
-                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
-                                     Unlock
-                                 </button>
-                             `}
-                         </div>`;
-                     testsGrid.appendChild(testCard);
-                 });
-                 subjectSection.appendChild(testsGrid);
-                 container.appendChild(subjectSection);
-             }
-        }
+        // *** NO LONGER NEEDED: setupUI() and renderTests() ***
 
         function showUpgradeModal() {
             const modal = document.getElementById('upgrade-modal');
@@ -511,4 +409,3 @@
     </script>
 </body>
 </html>
-
