@@ -38,12 +38,12 @@
     <div id="main-content" class="hidden flex flex-col min-h-screen">
         <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
              <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-                 <a href="#" class="flex items-center gap-3 text-2xl font-bold text-blue-600">
-                     <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
-                     <span>UPSChub</span>
-                 </a>
-                 <a href="#" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Dashboard</a>
-             </div>
+                <a href="#" class="flex items-center gap-3 text-2xl font-bold text-blue-600">
+                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
+                    <span>UPSChub</span>
+                </a>
+                <a href="#" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Dashboard</a>
+            </div>
         </header>
 
         <main class="container mx-auto p-4 sm:p-6 flex-grow">
@@ -55,10 +55,12 @@
             <div id="controls-container" class="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center"></div>
 
             <!-- 
-                *** MODIFICATION 1: Added this placeholder for your new weekly tests ***
+                *** NEW SECTION 1: Placeholder for Weekly Tests ***
+                I have added this new div. The JavaScript will fill it.
             -->
             <div id="weekly-test-container" class="mb-12"></div>
 
+            <!-- This is your existing container for all other tests -->
             <div id="test-list-container" class="space-y-12"></div>
         </main>
 
@@ -120,7 +122,7 @@
         
         const pageLoader = document.getElementById('page-loader');
         const mainContent = document.getElementById('main-content');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // This line is no longer critical for users, but we'll leave it
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         let allTests = [];
         let isPremiumUser = false;
         let currentTopic = '';
@@ -131,10 +133,9 @@
                 try {
                     document.getElementById('loader-text').textContent = 'Fetching user data...';
                     
-                    // *** MODIFICATION: Simplified the user document path ***
-                    // This is a simpler, more standard path that avoids the 'appId' issue
-                    const userDocRef = doc(db, 'users', user.uid);
-                    
+                    // This is your WORKING user path from the "daily test" file.
+                    // This is the CORRECT path.
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const docSnap = await getDoc(userDocRef);
                     
                     if (docSnap.exists()) {
@@ -146,12 +147,12 @@
                     }
                     
                     document.getElementById('loader-text').textContent = 'Loading tests...';
-                    await fetchAllTests(); // Fetches all regular tests
                     
-                    // *** MODIFICATION 2: Call the new function to load weekly tests ***
-                    await fetchAndRenderWeeklyTests(); // Fetches and renders the new section
+                    // *** NEW SECTION 2: Load both types of tests ***
+                    await fetchAndRenderWeeklyTests(); // Load weekly tests first
+                    await fetchAllTests(); // Load all other tests
                     
-                    setupUI(); // Sets up search/sort and renders regular tests
+                    setupUI(); // Setup search and render the *other* tests
                     
                     // Hide loader and show main content ONLY after everything succeeds
                     pageLoader.classList.add('hidden');
@@ -172,13 +173,80 @@
         });
 
         async function fetchAllTests() {
-            try {
-                const querySnapshot = await getDocs(collection(db, "quizzes"));
-                allTests = [];
-                querySnapshot.forEach((doc) => allTests.push({ id: doc.id, ...doc.data() }));
-            } catch (error) { console.error("Error fetching tests: ", error); }
+            // This function now just fetches data, it doesn't render
+            const querySnapshot = await getDocs(collection(db, "quizzes"));
+            allTests = [];
+            querySnapshot.forEach((doc) => allTests.push({ id: doc.id, ...doc.data() }));
         }
         
+        // *** NEW SECTION 3: Function to fetch and render Weekly Tests ***
+        async function fetchAndRenderWeeklyTests() {
+            const container = document.getElementById('weekly-test-container');
+            if (!container) return;
+
+            let weeklyTests = [];
+            // This will not error, it will just show "Could not load" if it fails
+            try {
+                const querySnapshot = await getDocs(collection(db, "weeklyTests"));
+                querySnapshot.forEach((doc) => weeklyTests.push({ id: doc.id, ...doc.data() }));
+            } catch (error) {
+                console.error("Error fetching weekly tests: ", error);
+                container.innerHTML = `<p class="text-red-500 text-center">Could not load weekly tests. Check rules.</p>`;
+                return;
+            }
+
+            if (weeklyTests.length === 0) {
+                container.innerHTML = ''; // Don't show anything if no tests are found
+                return;
+            }
+
+            // Build the HTML for the weekly test section
+            let sectionHtml = `<h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">Weekly Mixed Tests</h2>
+                               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
+
+            weeklyTests.forEach(test => {
+                // This card HTML is copied from your 'renderTests' function to match perfectly
+                const testCardHtml = `
+                    <div class="bg-white rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col">
+                        <div class="p-6 flex-grow">
+                            <h3 class="text-xl font-bold text-slate-800 mt-2">${test.title}</h3>
+                            <!-- This is your manual topic description -->
+                            <p class="text-sm text-slate-600 mt-2"><strong>Topics:</strong> ${test.topicsDescription || 'Mixed Subjects'}</p>
+                            
+                            <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                <span>${test.totalQuestions || 0} Questions</span>
+                                <span>${test.durationMinutes || 0} Minutes</span>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50/70 p-4 border-t border-slate-200/60 rounded-b-xl flex items-center justify-between gap-2">
+                            ${isPremiumUser ? `
+                                <!-- AI button summarizes the topics -->
+                                <button data-topic="Provide a summary of these topics: ${test.topicsDescription}" class="ai-summary-btn text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 p-2 rounded-md hover:bg-blue-100 transition-colors">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                    ✨ AI Study
+                                </button>
+                                <!-- This uses the 'testId' field from your database. If it's missing, it uses the document ID -->
+                                <a href="test_sample.html?testId=${test.testId || test.id}" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Test &rarr;</a>
+                            ` : `
+                                <button disabled title="Available for Premium users" class="text-sm font-semibold text-slate-400 cursor-not-allowed flex items-center gap-1.5 p-2 rounded-md">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
+                                    ✨ AI Study
+                                </button>
+                                <button data-testid="${test.id}" class="unlock-btn px-4 py-2 text-sm font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors flex items-center gap-1.5">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
+                                    Unlock
+                                </button>
+                            `}
+                        </div>
+                    </div>`;
+                
+                sectionHtml += testCardHtml;
+            });
+
+            sectionHtml += `</div>`; // Close the grid
+            container.innerHTML = sectionHtml; // Add the entire new section to the page
+        }
+
         function setupUI() {
             const controlsContainer = document.getElementById('controls-container');
             controlsContainer.innerHTML = `
@@ -202,7 +270,7 @@
                 document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
             }
 
-            renderTests();
+            renderTests(); // This renders the *regular* tests
         }
         
         function renderTests() {
@@ -216,7 +284,7 @@
              if (sortValue === 'name-asc') processedTests.sort((a, b) => a.testName.localeCompare(b.testName));
              if (sortValue === 'name-desc') processedTests.sort((a, b) => b.testName.localeCompare(a.testName));
 
-             container.innerHTML = '';
+             container.innerHTML = ''; // Clear only the regular test container
              if (processedTests.length === 0) {
                  container.innerHTML = `<p class="text-slate-500 text-center">No tests match your search criteria.</p>`;
                  return;
@@ -271,79 +339,6 @@
              }
         }
 
-        <!-- 
-            *** MODIFICATION 3: Added this entire new function for your weekly tests ***
-        -->
-        async function fetchAndRenderWeeklyTests() {
-            const container = document.getElementById('weekly-test-container');
-            if (!container) return; // Exit if container doesn't exist
-
-            let weeklyTests = [];
-            try {
-                // This fetches from the NEW collection you created
-                const querySnapshot = await getDocs(collection(db, "weeklyTests"));
-                querySnapshot.forEach((doc) => weeklyTests.push({ id: doc.id, ...doc.data() }));
-                
-                // Optional: You could sort these by a 'releaseDate' field if you add one
-                
-            } catch (error) {
-                console.error("Error fetching weekly tests: ", error);
-                container.innerHTML = `<p class="text-red-500 text-center">Could not load weekly tests.</p>`;
-                return;
-            }
-
-            // If no weekly tests are found, just show nothing.
-            if (weeklyTests.length === 0) {
-                container.innerHTML = '';
-                return;
-            }
-
-            // Build the HTML for the weekly test section
-            let sectionHtml = `<h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">Weekly Mixed Tests</h2>
-                               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
-
-            weeklyTests.forEach(test => {
-                // This card HTML is copied from your 'renderTests' function to match perfectly
-                const testCardHtml = `
-                    <div class="bg-white rounded-xl shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col">
-                        <div class="p-6 flex-grow">
-                            <h3 class="text-xl font-bold text-slate-800 mt-2">${test.title}</h3>
-                            <!-- This is your new "manual topic" field -->
-                            <p class="text-sm text-slate-600 mt-2"><strong>Topics:</strong> ${test.topicsDescription || 'Mixed Subjects'}</p>
-                            
-                            <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
-                                <span>${test.totalQuestions || 0} Questions</span>
-                                <span>${test.durationMinutes || 0} Minutes</span>
-                            </div>
-                        </div>
-                        <div class="bg-slate-50/70 p-4 border-t border-slate-200/60 rounded-b-xl flex items-center justify-between gap-2">
-                            ${isPremiumUser ? `
-                                <!-- The AI button now summarizes the new topicsDescription field -->
-                                <button data-topic="Provide a summary of these topics: ${test.topicsDescription}" class="ai-summary-btn text-sm font-semibold text-blue-600 hover:text-blue-800 flex items-center gap-1.5 p-2 rounded-md hover:bg-blue-100 transition-colors">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
-                                    ✨ AI Study
-                                </button>
-                                <a href="test_sample.html?testId=${test.testId || test.id}" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Test &rarr;</a>
-                            ` : `
-                                <button disabled title="Available for Premium users" class="text-sm font-semibold text-slate-400 cursor-not-allowed flex items-center gap-1.5 p-2 rounded-md">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg>
-                                    ✨ AI Study
-                                </button>
-                                <button data-testid="${test.id}" class="unlock-btn px-4 py-2 text-sm font-semibold rounded-lg bg-slate-200 text-slate-700 hover:bg-slate-300 transition-colors flex items-center gap-1.5">
-                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
-                                    Unlock
-                                </button>
-                            `}
-                        </div>
-                    </div>`;
-                
-                sectionHtml += testCardHtml;
-            });
-
-            sectionHtml += `</div>`; // Close the grid
-            container.innerHTML = sectionHtml; // Add the entire new section to the page
-        }
-
         function showUpgradeModal() {
             const modal = document.getElementById('upgrade-modal');
             const modalContent = document.getElementById('upgrade-modal-content');
@@ -372,8 +367,8 @@
                 "key": "rzp_test_YourKey", "amount": 9900, "currency": "INR", "name": "UPSChub",
                 "description": "UPSChub Lifetime Premium Access",
                 "handler": async function (response){
-                    // *** MODIFICATION: Simplified the user document path ***
-                    const userDocRef = doc(db, 'users', user.uid);
+                    // This is your WORKING user path
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     await updateDoc(userDocRef, { isPremium: true });
                     window.location.reload();
                 },
