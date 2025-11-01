@@ -120,7 +120,7 @@
         
         const pageLoader = document.getElementById('page-loader');
         const mainContent = document.getElementById('main-content');
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id'; // This line is no longer critical for users, but we'll leave it
         let allTests = [];
         let isPremiumUser = false;
         let currentTopic = '';
@@ -130,8 +130,11 @@
             if (user) {
                 try {
                     document.getElementById('loader-text').textContent = 'Fetching user data...';
-                    // CORRECTED: Using the original, correct path for the user document
-                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    
+                    // *** MODIFICATION: Simplified the user document path ***
+                    // This is a simpler, more standard path that avoids the 'appId' issue
+                    const userDocRef = doc(db, 'users', user.uid);
+                    
                     const docSnap = await getDoc(userDocRef);
                     
                     if (docSnap.exists()) {
@@ -369,7 +372,8 @@
                 "key": "rzp_test_YourKey", "amount": 9900, "currency": "INR", "name": "UPSChub",
                 "description": "UPSChub Lifetime Premium Access",
                 "handler": async function (response){
-                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    // *** MODIFICATION: Simplified the user document path ***
+                    const userDocRef = doc(db, 'users', user.uid);
                     await updateDoc(userDocRef, { isPremium: true });
                     window.location.reload();
                 },
@@ -512,3 +516,4 @@
     </script>
 </body>
 </html>
+
