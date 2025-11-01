@@ -2,22 +2,276 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-<!-- ... existing code ... -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UPSChub - Exam Portal</title>
+    <link rel="icon" type="image/jpg" href="images/LOGO.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; }
-<!-- ... existing code ... -->
-        .dark .contact-admin-text a { color: #8ab4f8; }
-         @media (max-width: 768px) {
-/* ... existing code ... */
-            .sidebar-open .question-area { padding-right: 20px; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f0f5; color: #333; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
+        .dark { background: #1e1e2f; color: #eee; }
+        body.exam-active::after {
+            content: "UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A";
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; font-size: 8vw; font-weight: 700; color: rgba(0, 0, 0, 0.05); text-align: center; line-height: 2; transform-origin: center; transform: rotate(-30deg); z-index: 9999; pointer-events: none; white-space: pre-wrap; overflow: hidden;
         }
-        @media (max-width: 480px) {
-/* ... existing code ... */
-            .btn-action span { display: none; }
+       .dark.exam-active::after { color: rgba(255, 255, 255, 0.04); }
+       .site-header { position: relative; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 10px 15px; }
+       .site-logo { max-height: 40px; }
+       .site-copyright { font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; white-space: nowrap; transition: color 0.3s ease; }
+        body.light-mode.site-copyright { color: rgba(0, 0, 0, 0.6); }
+        body.dark-mode.site-copyright { color: rgba(255, 255, 255, 0.7); }
+        @media (max-width: 600px) {
+         .site-header { flex-direction: column; align-items: center; text-align: center; }
+         .site-copyright { margin-top: 5px; position: static; }
         }
-
-        /* --- NEW STYLES FOR CHAPTER SELECTION --- */
+      .pre-exam-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%; /* <-- CHANGE THIS */
+        padding: 20px;
+        z-index: 5000;
+        position: relative;
+        background: #f0f0f5;
+        overflow-y: auto;    /* <-- ADD THIS */
+      }
+       .dark.pre-exam-screen { background: #1e1e2f; }
+       .login-card,.instructions-container { background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; text-align: center; }
+       .dark.login-card,.dark.instructions-container { background: #2a2a3a; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+        #loginScreen.login-card { max-width: 450px; } /* This is wrong, should be .login-card */
+       .login-card { max-width: 450px; } /* Corrected selector */
+       .login-card h2 { margin-bottom: 25px; color: #3f51b5; font-size: 1.8em; }
+       .dark.login-card h2 { color: #8ab4f8; }
+       .input-group { margin-bottom: 20px; text-align: left; }
+       .input-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+       .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; }
+       .dark.input-group input { background: #1e1e2f; border-color: #555; color: #eee; }
+       .btn-primary { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #3f51b5; color: white; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+       .btn-primary:hover:not(:disabled) { opacity: 0.9; }
+        #loginError { color: #f44336; height: 1.2em; margin-top: 15px; font-weight: 500; }
+        #instructionsScreen { display: none; }
+        #instructionsScreen.instructions-container { max-width: 800px; text-align: left; height: 90vh; display: flex; flex-direction: column; }
+       .instructions-container { max-width: 800px; text-align: left; } /* Added for consistency */
+       #instructionsScreen h2 { color: #3f51b5; border-bottom: 2px solid #3f51b5; padding-bottom: 5px; margin-bottom: 15px; margin-top: 25px; }
+       #instructionsScreen h2:first-of-type { margin-top: 0; }
+        .dark #instructionsScreen h2 { color: #8ab4f8; border-bottom-color: #8ab4f8; }
+        .instructions-content {flex-grow: 1;overflow-y: auto;padding-right: 15px;min-height: 0; /* <-- ADD THIS LINE */}
+       .instructions-content ul { list-style: none; padding-left: 0; line-height: 1.8; }
+       .instructions-content li { display: flex; align-items: flex-start; margin-bottom: 12px; }
+       .instructions-content li i { color: #3f51b5; margin-right: 15px; font-size: 1.2em; margin-top: 5px; min-width: 20px; text-align: center; }
+       .dark.instructions-content li i { color: #8ab4f8; }
+       .instructions-content strong { color: #c62828; }
+       .dark.instructions-content strong { color: #ef9a9a; }
+       .instructions-footer { padding-top: 20px; border-top: 1px solid #eee; }
+       .dark.instructions-footer { border-top-color: #444; }
+        #offlineStatus { font-weight: 600; text-align: center; padding: 10px; border-radius: 6px; margin-bottom: 15px; }
+       .status-waiting { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+       .status-ready { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+       .agreement-group { display: flex; align-items: center; margin-bottom: 15px; }
+        #agreementCheckbox { width: 18px; height: 18px; margin-right: 10px; cursor: pointer; }
+        #agreementCheckbox + label { font-size: 0.9em; cursor: pointer; }
+       .btn-start-exam:disabled { background: #9fa8da; cursor: not-allowed; }
+       .dark.btn-start-exam:disabled { background: #2c3a7a; }
+        #startError { color: #d32f2f; text-align: center; height: 1.2em; font-weight: 500; }
+        #examUIWrapper { display: none; flex-direction: column; height: 100%; position: relative; }
+       .site-header { background: #ffffff; padding: 10px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 101; position: relative; }
+       .site-logo { height: 40px; width: auto; }
+       .site-branding.site-title { font-size: 1.4em; font-weight: 700; color: #3f51b5; line-height: 1.1; }
+       .site-branding.site-tagline { font-size: 0.8em; color: #666; margin: 0; }
+       .topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; background: #3f51b5; color: white; gap: 10px; z-index: 100; position: relative; }
+       .topbar-left-group,.topbar-right-group { display: flex; align-items: center; gap: 15px; }
+       .navigation-tabs { display: flex; gap: 5px; background: rgba(0,0,0,0.15); border-radius: 6px; padding: 3px; position: absolute; left: 50%; transform: translateX(-50%); }
+       .nav-tab { background: transparent; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s; font-size: 0.85em; }
+       .nav-tab:hover:not(.locked) { background: rgba(255,255,255,0.2); }
+       .nav-tab.active { background: white; color: #3f51b5; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+       .nav-tab.locked { cursor: not-allowed; opacity: 0.6; position: relative; pointer-events: none; }
+       .nav-tab.locked::after { content: '\f023'; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-left: 8px; font-size: 0.9em; }
+       .timer { font-size: 0.95em; font-weight: bold; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; }
+        #stopwatchWrapper { display: none; align-items: center; gap: 10px; }
+        #stopwatchDisplay { font-size: 0.95em; font-weight: bold; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; }
+       .stopwatch-controls button { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; cursor: pointer; font-size: 0.8em; padding: 5px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; margin-left: 5px; }
+       .stopwatch-controls button:hover { background-color: rgba(255,255,255,0.2); }
+       .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
+       .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+       .toggle-switch input { opacity: 0; width: 0; height: 0; }
+       .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition:.4s; border-radius: 34px; }
+       .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition:.4s; border-radius: 50%; }
+        input:checked +.toggle-slider { background-color: #4caf50; }
+        input:checked +.toggle-slider:before { transform: translateX(24px); }
+       .toggle-label { font-size: 0.9em; white-space: nowrap; }
+       .topbar #btnSubmitTest { background: #f44336; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85em; padding: 8px 15px; }
+       .topbar #btnSubmitTest:hover { opacity: 0.85; }
+       .main-content { flex: 1; display: flex; overflow: hidden; position: relative; z-index: 5; }
+       .question-area { width: 100%; padding: 20px; overflow-y: auto; padding-bottom: 100px; transition: padding-right 0.3s ease, filter 0.3s ease; position: relative; z-index: 5; }
+       .sidebar-open .question-area { filter: blur(4px); pointer-events: none; }
+       .question-header { font-size: 1.2em; margin-bottom: 15px; font-weight: 600; }
+       .question-timer-bar-container { width: 100%; height: 8px; background-color: #e0e0e0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+       .question-timer-bar { height: 100%; width: 100%; background-color: #3f51b5; border-radius: 4px; }
+       .dark.question-timer-bar-container { background-color: #3d3d4a; }
+       .dark.question-timer-bar { background-color: #8ab4f8; }
+       .question-content { margin-bottom: 20px; line-height: 1.6; font-size: 1em; }
+       .options-list { list-style: none; display: grid; grid-template-columns: 1fr; gap: 10px; padding: 0; }
+       .option { padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: white; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-size: 0.95em; position: relative; }
+       .option:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+       .option.selected { background: #4caf50; color: white; border-color: #4caf50; box-shadow: 0 2px 5px rgba(76,175,80,0.3); }
+       .option-radio { margin-right: 12px; min-width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; display: inline-block; position: relative; }
+       .option.selected .option-radio { border-color: white; background: white; box-shadow: inset 0 0 0 4px #4caf50; }
+       .sidebar { position: fixed; top: 111px; right: -300px; width: 300px; height: calc(100% - 111px); background: #f8f9fa; border-left: 1px solid #ccc; display: flex; flex-direction: column; transition: right 0.3s ease-in-out; z-index: 200; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+       .sidebar-open .sidebar { right: 0; }
+       .sidebar-content { padding: 15px; overflow-y: auto; flex-grow: 1;}
+       .palette-title { font-weight: 600; margin-bottom: 10px; color: #3f51b5; font-size: 1.1em; text-align: center; }
+       .question-palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 8px; margin-bottom: 20px; }
+       .question-number { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid transparent; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 13px; margin: 0 auto; }
+       .question-number:hover { transform: scale(1.1); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+       .answered { background: #4caf50; color: white; border: 1px solid #388e3c;}
+       .not-answered { background: #f44336; color: white; border: 1px solid #d32f2f;}
+       .marked { background: #ff9800; color: white; border: 1px solid #f57c00;}
+       .marked-answered { background: linear-gradient(135deg, #4caf50 50%, #ff9800 50%); color: white; border: 1px solid #f57c00; }
+       .not-visited { background: #e9ecef; color: #333; border: 1px solid #ddd;}
+       .current { border: 2px solid #3f51b5; transform: scale(1.1); }
+       .palette-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; padding: 12px; background: #e0e0e0; border-radius: 6px; font-size: 0.8em; }
+       .summary-item { display: flex; align-items: center; gap: 8px; color: #333; }
+       .summary-item span { font-weight: 700; background-color: #fff; border-radius: 50%; min-width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+       .legend { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;}
+       .legend-title { font-weight: 600; margin-bottom: 12px; color: #3f51b5; font-size: 1em; }
+       .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em; padding: 6px 8px; border-radius: 4px; }
+       .legend-color { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; flex-shrink: 0; }
+       .legend-answered { background: #4caf50; }
+       .legend-not-answered { background: #f44336; }
+       .legend-marked { background: #ff9800; }
+       .legend-marked-answered { background: linear-gradient(135deg, #4caf50 50%, #ff9800 50%); }
+       .legend-not-visited { background: #e9ecef; border: 1px solid #ccc; }
+       .sidebar-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; cursor: pointer; font-size: 0.9em; padding: 5px; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+       .sidebar-toggle:hover { background-color: rgba(255,255,255,0.2); }
+       .sidebar-open .sidebar-toggle { transform: rotate(180deg); }
+       .fixed-action-area { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #ccc; padding: 10px 15px; z-index: 100; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); }
+       .action-buttons { display: flex; justify-content: center; align-items: center; gap: 8px; }
+       .btn-action { padding: 8px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85em; flex-grow: 1; flex-basis: 0; }
+       .btn-action:hover { opacity: 0.85; }
+        #btnPrevQuestion { background: #6c757d; color: white; }
+        #btnSaveNext { background: #4caf50; color: white; }
+        #btnMarkReview { background: #ff9800; color: white; }
+        #btnClearResponse { background: #f44336; color: white; }
+       .submit-button.btn-action { background: #3f51b5; color: white; padding: 10px 25px; flex-grow: 0; }
+        #resultScreenWrapper { display: none; text-align: center; padding: 20px; flex-direction: column; align-items: center; justify-content: flex-start; flex: 1; overflow-y: auto; position: relative;}
+        #resultScreenWrapper h2 { font-size: 2.5em; color: #3f51b5; margin-bottom: 5px; }
+        #resultScreenWrapper p { font-size: 1.2em; margin-bottom: 20px; }
+       .scorecard-details { width: 100%; max-width: 500px; margin: 25px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+       .scorecard-table { width: 100%; border-collapse: collapse; font-size: 1.1em; }
+       .scorecard-table td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; }
+       .scorecard-table tr:last-child td { border-bottom: none; }
+       .scorecard-table td:first-child { text-align: left; font-weight: 500; color: #555; }
+       .scorecard-table td:last-child { text-align: right; font-weight: 700; }
+       .scorecard-table .correct-val { color: #4caf50; }
+       .scorecard-table .incorrect-val { color: #f44336; }
+       .scorecard-table .unattempted-val { color: #ff9800; }
+       .scorecard-table .total-row td { font-size: 1.2em; border-top: 2px solid #e0e0e0; padding-top: 15px; margin-top: 5px; }
+       .scorecard-table .total-val { color: #3f51b5; }
+       .dark .scorecard-details { background: #2a2a3a; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+       .dark .scorecard-table td { border-bottom-color: #3a3a4a; }
+       .dark .scorecard-table td:first-child { color: #ccc; }
+       .dark .scorecard-table .correct-val { color: #81c784; }
+       .dark .scorecard-table .incorrect-val { color: #ef9a9a; }
+       .dark .scorecard-table .unattempted-val { color: #ffd54f; }
+       .dark .scorecard-table .total-row td { border-top-color: #555; }
+       .dark .scorecard-table .total-val { color: #8ab4f8; }
+       .result-buttons { display: flex; gap: 15px; margin-top: 30px; margin-bottom: 30px; }
+        #syncStatus { margin-top: 10px; font-weight: 500; font-size: 0.95em; padding: 8px 12px; border-radius: 6px; }
+        #syncStatus.syncing { color: #1565c0; background-color: #e3f2fd; }
+        #syncStatus.synced { color: #2e7d32; background-color: #e8f5e9; }
+        #syncStatus.error { color: #c62828; background-color: #ffebee; }
+       .performance-analysis-container { width: 100%; max-width: 800px; margin: 30px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+       .chart-container { width: 100%; max-width: 800px; margin: 30px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+       .performance-analysis-container h3 { text-align: center; margin-bottom: 20px; font-size: 1.5em; color: #3f51b5; }
+       .table-wrapper { overflow-x: auto; }
+       .performance-table { width: 100%; border-collapse: collapse; }
+       .performance-table th,.performance-table td { padding: 14px 10px; text-align: center; border-bottom: 1px solid #e0e0e0; font-size: 0.95em; white-space: nowrap; }
+       .performance-table th { background-color: #f8f9fa; font-weight: 600; color: #444; }
+       .performance-table td:first-child { text-align: left; font-weight: 500; width: 40%; white-space: normal; }
+       .accuracy-bar-container { background-color: #e9ecef; border-radius: 10px; position: relative; height: 22px; overflow: hidden; min-width: 100px; }
+       .accuracy-bar { height: 100%; border-radius: 10px; transition: width 0.8s ease-in-out; }
+       .accuracy-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 600; font-size: 0.9em; color: #333; text-shadow: 0 0 2px rgba(255,255,255,0.7); }
+        #performanceChart { width: 100%!important; height: 350px!important; }
+        #reviewScreenWrapper { display: none; width: 100%; flex-direction: column; position: relative;}
+       .review-header { padding: 15px 20px; background: #fff; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        #reviewContainer { padding: 20px; overflow-y: auto; flex-grow: 1; background-color: #f0f0f5; }
+       .review-question { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+       .review-option-list { list-style: none; padding: 0; margin-top: 15px; }
+       .review-option { padding: 10px 15px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #e0e0e0; display: flex; align-items: center; gap: 12px; }
+       .review-option i { min-width: 1.2em; text-align: center; }
+       .review-option.review-correct { background-color: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; font-weight: 500; }
+       .review-option.review-incorrect { background-color: #ffebee; border-color: #ef9a9a; color: #b71c1c; }
+       .review-status { margin-top: 15px; padding: 8px 12px; border-radius: 6px; font-weight: 500; text-align: center; border: 1px solid transparent; }
+       .review-status.correct { background-color: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+       .review-status.incorrect { background-color: #ffebee; border-color: #ef9a9a; color: #c62828; }
+       .review-status.unanswered { background-color: #fff3e0; border-color: #ffcc80; color: #e65100; }
+       .review-explanation { margin-top: 20px; padding: 15px; background: #eef2ff; border-left: 4px solid #3f51b5; border-radius: 4px; font-size: 0.9em; line-height: 1.6; }
+       .review-explanation strong { color: #3f51b5; }
+       .password-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;}
+       .modal-content { background-color: #fefefe; padding: 25px 35px; border: 1px solid #888; width: 90%; max-width: 420px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+       .close-modal { position: absolute; top: 10px; right: 20px; font-size: 1.8em; color: #aaa; cursor: pointer; transition: color 0.2s; }
+       .close-modal:hover { color: #333; }
+        #passwordRetestInput { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+        #passwordError { color: #f44336; font-size: 0.9em; height: 1.2em; margin-bottom: 10px;}
+       .contact-admin-text { margin-top: 20px; font-size: 0.9em; color: #666; }
+       .contact-admin-text a { color: #3f51b5; text-decoration: none; font-weight: 500; }
+       .contact-admin-text a:hover { text-decoration: underline; }
+        #answerWritingWrapper { display: none; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 20px; position: relative; overflow-y: auto; }
+        #answerWritingWrapper h2 { color: #3f51b5; font-size: 1.8em; margin-bottom: 10px; }
+        #answerWritingWrapper h3 { color: #4a4a4a; font-size: 1.4em; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+        #answerWritingWrapper p { color: #555; font-size: 1.1em; line-height: 1.6; }
+        #answerWritingWrapper ul, #answerWritingWrapper ol { max-width: 800px; width: 100%; margin: 20px auto; text-align: left; padding-left: 20px; }
+        #answerWritingWrapper li { margin-bottom: 15px; line-height: 1.6; font-size: 1em; }
+        #answerWritingWrapper strong { color: #3f51b5; }
+       .dark .site-header { background: #2a2a3a; border-bottom-color: #3a3a4a; }
+       .dark .site-branding.site-title { color: #8ab4f8; }
+       .dark .site-branding.site-tagline { color: #aaa; }
+       .dark .option { background: #2c2c3c; border-color: #444; color: #eee; }
+       .dark .option:hover { background: #3d3d4a; }
+       .dark .option.selected { background: #1b5e20; color: #c8e6c9; border-color: #81c784; }
+       .dark .option.selected .option-radio { border-color: #c8e6c9; background: #c8e6c9; box-shadow: inset 0 0 0 4px #1b5e20; }
+       .dark .option-radio { border-color: #555; }
+       .dark .fixed-action-area { background: #1e1e2f; border-top-color: #444;}
+       .dark .sidebar { background: #2a2a3a; border-left: 1px solid #444;}
+       .dark .not-visited { background: #3d3d4a; color: #eee; border: 1px solid #555; }
+       .dark .palette-summary { background: #1e1e2f; border: 1px solid #444;}
+       .dark .summary-item { color: #ccc; }
+       .dark .summary-item span { background-color: #3d3d4a; color: #eee; }
+       .dark .legend,.dark .fixed-action-area { border-top-color: #444; }
+       .dark .legend-item { background: rgba(255,255,255,0.05); }
+       .dark .palette-title,.dark .legend-title { color: #8ab4f8; }
+       .dark #resultScreenWrapper h2,.dark .performance-analysis-container h3,.dark .review-title,.dark #answerWritingWrapper h2,.dark #answerWritingWrapper h3 { color: #8ab4f8; }
+       .dark #answerWritingWrapper p { color: #aaa; }
+       .dark #answerWritingWrapper li strong { color: #8ab4f8; }
+       .dark .performance-analysis-container,.dark .chart-container { background: #2a2a3a; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+       .dark .performance-table th { background-color: #1e1e2f; color: #ccc; }
+       .dark .performance-table td { border-bottom: 1px solid #444; }
+       .dark .accuracy-bar-container { background-color: #3d3d4a; }
+       .dark .accuracy-text { color: #fff; text-shadow: none; }
+       .dark .review-header { background: #2a2a3a; border-color: #444; }
+       .dark #reviewContainer { background-color: #1e1e2f; }
+       .dark .review-question { background: #2c2c3c; border-color: #444; }
+       .dark .review-option { border-color: #555; }
+       .dark .review-option.review-correct { background-color: #1a311b; border-color: #81c784; color: #c8e6c9; }
+       .dark .review-option.review-incorrect { background-color: #3e1c1f; border-color: #ef9a9a; color: #ffcdd2; }
+       .dark .review-status.correct { background-color: #1a311b; border-color: #4caf50; color: #c8e6c9; }
+       .dark .review-status.incorrect { background-color: #3e1c1f; border-color: #f44336; color: #ffcdd2; }
+       .dark .review-status.unanswered { background-color: #4a2c0f; border-color: #ff9800; color: #ffe0b2; }
+       .dark .review-explanation { background: #262a42; border-left-color: #8ab4f8; color: #ccc; }
+       .dark .review-explanation strong { color: #8ab4f8; }
+       .dark .modal-content { background: #2c2c3c; border-color: #555; }
+       .dark .close-modal:hover { color: #fff; }
+       .dark .contact-admin-text { color: #aaa; }
+       .dark .contact-admin-text a { color: #8ab4f8; }
+        
+        /* --- NEW STYLES FOR CHAPTER SELECTION (MERGED) --- */
         #chapterSelectionWrapper {
             display: none; /* Hidden by default */
             padding: 20px;
@@ -78,98 +332,227 @@
         }
         /* --- END OF NEW STYLES --- */
 
+        @media (max-width: 768px) {
+         .site-header { flex-direction: column; text-align: center; gap: 5px; }
+         .topbar { flex-wrap: wrap; justify-content: center; }
+         .navigation-tabs { position: static; transform: none; order: 3; width: 100%; justify-content: center; margin-top: 10px; }
+         .sidebar-open .question-area { padding-right: 20px; }
+        }
+        @media (max-width: 480px) {
+         .btn-action span { display: none; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loginScreen" class="pre-exam-screen" style="display: flex;">
-<!-- ... existing code ... -->
+        <div class="login-card">
+            <h2>Exam Portal Login</h2>
+            <div class="input-group">
+                <label for="emailInput">Email Address</label>
+                <input type="email" id="emailInput" placeholder="Enter your email" autocomplete="email">
+            </div>
+            <div class="input-group">
+                <label for="passwordInput">Password</label>
+                <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password">
+            </div>
+            <button id="loginBtn" class="btn-primary">Login</button>
+            <p id="loginError"></p>
+        </div>
     </div>
 
     <div id="instructionsScreen" class="pre-exam-screen">
         <div class="instructions-container">
-<!-- ... existing code ... -->
+            <div class="instructions-content">
+                <h2 id="instructions-title">General Instructions:</h2>
+                <ul>
+                    <li><i class="fas fa-list-ol"></i><div>Total Questions: <strong id="totalQuestionsEl">--</strong>.</div></li>
+                    <li><i class="fas fa-clock"></i><div id="durationEl">Total Duration: <strong>-- Minutes</strong>.</div></li>
+                    <li><i class="fas fa-stopwatch-20"></i><div>Each question has a <strong>15-second timer</strong>. The test will automatically move to the next question when this timer ends.</div></li>
+                    <li><i class="fas fa-calculator"></i><div>Marking Scheme: <strong>+1</strong> for a correct answer, <strong>-1</strong> for an incorrect answer, and <strong>0</strong> for an unattempted question.</div></li>
+                </ul>
+                <h2>Security & Environment:</h2>
+                <ul>
+                    <li><i class="fas fa-plane-departure"></i><div>You must take this exam in an offline environment. Please <strong>Enable Aeroplane/Flight Mode</strong> before starting.</div></li>
+                    <li><i class="fas fa-wifi-slash"></i><div>If an internet connection is detected after starting, your test will be <strong>auto-submitted</strong>. This action is final.</div></li>
+                    <li><i class="fas fa-window-close"></i><div>Do not close or refresh the browser window, as this will end your test.</div></li>
+                </ul>
+                <h2>Navigation Instructions:</h2>
+                <ul>
+                    <li><i class="fas fa-check" style="color:#4caf50;"></i><div>Click <strong>Save & Next</strong> to save your answer and move to the next question.</div></li>
+                    <li><i class="fas fa-flag" style="color:#ff9800;"></i><div>Click <strong>Mark</strong> to mark a question for review.</div></li>
+                    <li><i class="fas fa-square" style="color:#f44336;"></i><div>A <strong>Red</strong> number in the palette means you have visited but not answered the question.</div></li>
+                </ul>
+            </div>
+            <div class="instructions-footer">
+                <div id="offlineStatus" class="status-waiting"><i class="fas fa-wifi"></i> Please enable Aeroplane Mode.</div>
+                <div class="agreement-group">
+                    <input type="checkbox" id="agreementCheckbox">
+                    <label for="agreementCheckbox">I have read all the instructions and I am ready to begin.</label>
+                </div>
+                <button id="startExamBtn" class="btn-primary btn-start-exam" disabled>Start Exam</button>
+                <div id="startError"></div>
+            </div>
         </div>
     </div>
 
-    <!-- *** NEW: Chapter Selection Screen *** -->
     <div id="chapterSelectionWrapper">
-        <!-- This will be filled by JavaScript -->
-    </div>
-    <!-- *** END: Chapter Selection Screen *** -->
-
-
+        </div>
     <div id="examUIWrapper">
         <header class="site-header" id="siteHeader">
-<!-- ... existing code ... -->
-            <div class="site-copyright">Copyright © 2025 Pratyush Swain</div>
+            <img src="../images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
+            <div class="site-branding">
+                <div class="site-title">UPSChub</div>
+                <p class="site-tagline">Civil Services Exam Preparation</p>
+            </div>
+             <div class="site-copyright">Copyright © 2025 Pratyush Swain</div>
         </header>
         <header class="topbar" id="topbar">
-<!-- ... existing code ... -->
+            <div class="topbar-left-group">
+                <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Palette"><i class="fas fa-chevron-left"></i></button>
+                <div class="timer" id="timer">02:30:00</div>
+                <div id="stopwatchWrapper">
+                    <span id="stopwatchDisplay">00:00:00</span>
+                    <div class="stopwatch-controls">
+                        <button id="stopwatchPlayPause" title="Play/Pause"><i class="fas fa-play"></i></button>
+                        <button id="stopwatchReset" title="Reset"><i class="fas fa-rotate-left"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="navigation-tabs">
+                <button id="showMockTestTab" class="nav-tab active">Mock Test</button>
+                <button id="showAnswerWritingTab" class="nav-tab locked">Answer Writing</button>
+            </div>
             <div class="topbar-right-group">
                 <div class="dark-mode-toggle">
-<!-- ... existing code ... -->
+                    <span class="toggle-label" id="toggleLabel">Dark</span>
+                    <label class="toggle-switch"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
+                </div>
                 <button id="btnSubmitTest" style="display: none;"><i class="fas fa-paper-plane"></i> Submit</button>
             </div>
         </header>
-        <div class="main-content">
-            <div id="mockTestWrapper" style="display: flex; width: 100%;">
+        <div class="main-content" id="main-content"> <div id="mockTestWrapper" style="display: flex; width: 100%;">
                 <section class="question-area">
                     <h2 class="question-header" id="questionNumber"></h2>
-<!-- ... existing code ... -->
+                    <div class="question-timer-bar-container"><div id="questionTimerBar" class="question-timer-bar"></div></div>
+                    <div class="question-content" id="questionText"></div>
+                    <ul class="options-list" id="optionsList"></ul>
                 </section>
                 <aside class="sidebar" id="sidebar">
                     <div class="sidebar-content">
-<!-- ... existing code ... -->
+                        <div class="palette-title">Question Palette</div>
+                        <div class="question-palette" id="questionPalette"></div>
+                        <div class="palette-summary">
+                            <div class="summary-item"><span id="summaryAnswered">0</span> Answered</div>
+                            <div class="summary-item"><span id="summaryNotAnswered">0</span> Not Answered</div>
+                            <div class="summary-item"><span id="summaryMarked">0</span> Marked Review</div>
+                            <div class="summary-item"><span id="summaryNotVisited">0</span> Not Visited</div>
+                        </div>
+                        <div class="legend">
+                            <div class="legend-title">Legend</div>
+                            <div class="legend-item"><div class="legend-color answered"></div><span>Answered</span></div>
+                            <div class="legend-item"><div class="legend-color not-answered"></div><span>Not Answered</span></div>
+                            <div class="legend-item"><div class="legend-color marked"></div><span>Marked</span></div>
+                            <div class="legend-item"><div class="legend-color marked-answered"></div><span>Marked & Answered</span></div>
+                            <div class="legend-item"><div class="legend-color not-visited"></div><span>Not Visited</span></div>
+                        </div>
                     </div>
                 </aside>
             </div>
             <div id="resultScreenWrapper">
                 <h2>Test Completed!</h2>
-<!-- ... existing code ... -->
+                <p>Here is your score summary:</p>
+                
+                <div id="syncStatus"></div>
+
                 <div class="scorecard-details">
                     <table class="scorecard-table">
-<!-- ... existing code ... -->
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-check-circle" style="color: #4caf50; margin-right: 8px;"></i>Correct Answers</td>
+                                <td class="correct-val"><span id="correctCount">0</span> (<span id="correctMarks">0</span> Marks)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-times-circle" style="color: #f44336; margin-right: 8px;"></i>Incorrect Answers</td>
+                                <td class="incorrect-val"><span id="incorrectCount">0</span> (<span id="incorrectMarks">0</span> Marks)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-minus-circle" style="color: #ff9800; margin-right: 8px;"></i>Unattempted</td>
+                                <td class="unattempted-val"><span id="unattemptedCount">0</span></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Final Score</strong></td>
+                                <td class="total-val"><strong><span id="finalScoreAnimated">0</span> / <span id="totalPossibleScore">0</span></strong></td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
-                <!-- *** MODIFIED: This div is now a placeholder *** -->
+
                 <div class="result-buttons" id="resultButtonsContainer">
-                    <!-- Buttons will be added here by JavaScript -->
-                </div>
+                    </div>
+
                 <div class="performance-analysis-container">
-<!-- ... existing code ... -->
+                    <h3>Topic-wise Performance</h3>
+                    <div class="table-wrapper"><table class="performance-table"><thead><tr><th>Topic</th><th>Correct</th><th>Attempted</th><th>Accuracy</th></tr></thead><tbody id="performanceTableBody"></tbody></table></div>
+                </div>
+                <div class="chart-container"><canvas id="performanceChart"></canvas></div>
             </div>
             <div id="reviewScreenWrapper">
                 <div class="review-header"><h2 class="review-title">Review Your Answers</h2><button id="backToResultsBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Score</button></div>
-<!-- ... existing code ... -->
+                <div id="reviewContainer"></div>
             </div>
             <div id="answerWritingWrapper">
                 <h2>Answer Writing Practice</h2>
-<!-- ... existing code ... -->
+                <div class="answer-writing-questions">
+                    <h3>✍️ Practice Questions</h3>
+                    <p><em>📢 Today, no answer writing practice questions are available. The section will be updated soon. Stay tuned!</em></p>
+                </div>
             </div>
         </div>
         <div class="fixed-action-area" id="mcqFooter">
-<!-- ... existing code ... -->
+            <div class="action-buttons">
+                <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i><span>Previous</span></button>
+                <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i><span>Clear</span></button>
+                <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i><span>Mark</span></button>
+                <button class="btn-action" id="btnSaveNext"><i class="fas fa-check"></i><span>Save & Next</span></button>
+            </div>
         </div>
     </div>
     <div id="passwordModal" class="password-modal">
-<!-- ... existing code ... -->
+        <div class="modal-content">
+            <span id="closeModal" class="close-modal">×</span>
+            <h3>Enter Password to Retest</h3>
+            <input type="password" id="passwordRetestInput" placeholder="Enter password...">
+            <div id="passwordError"></div>
+            <button id="verifyPasswordButton" class="submit-button btn-action">Verify</button>
+            <p class="contact-admin-text">Don't have a password? <a id="whatsappLink" href="#" target="_blank">Contact Admin</a></p>
+        </div>
     </div>
 
 <script>
 // ### CONFIGURATION ###
-// ... existing code ...
+const RETEST_PASSWORD = "UPSChub";
 const PER_QUESTION_TIME = 15;
 
 // =====================================================================
 // ============ START: FIREBASE CONFIGURATION ==========================
-// ... existing code ...
+// =====================================================================
+const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.appspot.com", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
 const appId = 'default-app-id';
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 
 try {
-// ... existing code ...
+    db.enablePersistence()
+   .then(() => console.log("Firebase offline persistence enabled."))
+   .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            console.warn("Persistence failed: multiple tabs open?");
+        } else if (err.code == 'unimplemented') {
+            console.warn("Persistence is not available in this browser.");
+        }
+    });
+} catch (e) {
     console.error("Error enabling persistence:", e);
 }
 // =====================================================================
@@ -180,67 +563,127 @@ try {
 let questions = [];
 let testMetadata = {};
 let state = {};
-// ... existing code ...
+let timerInterval, onTimerEnd, stopwatchInterval, animationInterval;
+let timeLeft;
+let isTestCompleted = false;
+let performanceChart = null;
 let stopwatchTime = 0;
 let isStopwatchRunning = false;
 let currentUser = null;
 
-// --- NEW GLOBAL STATE ---
-let isWeeklyTest = false;       // Is this a weekly test container?
-let weeklySubTests = [];      // Array of sub-tests
+// --- NEW GLOBAL STATE (MERGED) ---
+let isWeeklyTest = false;        // Is this a weekly test container?
+let weeklySubTests = [];       // Array of sub-tests
 let completedSubTests = new Set(); // Tracks completed sub-tests
-let currentSubQuizId = null;  // The ID of the sub-test currently being taken
-let weeklyTestTitle = '';     // Title of the main weekly test
+let currentSubQuizId = null;   // The ID of the sub-test currently being taken
+let weeklyTestTitle = '';      // Title of the main weekly test
 // --- END NEW GLOBAL STATE ---
-  
+    
 const dom = {
     body: document.body,
-// ... existing code ...
     loginScreen: document.getElementById('loginScreen'),
     loginBtn: document.getElementById('loginBtn'),
-// ... existing code ...
+    emailInput: document.getElementById('emailInput'),
+    passwordInput: document.getElementById('passwordInput'),
     loginError: document.getElementById('loginError'),
     instructionsScreen: document.getElementById('instructionsScreen'),
-// ... existing code ...
+    startExamBtn: document.getElementById('startExamBtn'),
+    offlineStatus: document.getElementById('offlineStatus'),
+    agreementCheckbox: document.getElementById('agreementCheckbox'),
     startError: document.getElementById('startError'),
     totalQuestionsEl: document.getElementById('totalQuestionsEl'),
-// ... existing code ...
+    durationEl: document.getElementById('durationEl'),
     instructionsTitle: document.getElementById('instructions-title'),
     examUIWrapper: document.getElementById('examUIWrapper'),
     siteHeader: document.getElementById('siteHeader'),
-// ... existing code ...
     topbar: document.getElementById('topbar'),
+    mainContent: document.getElementById('main-content'), // Added
     sidebar: document.getElementById('sidebar'),
     mockTestWrapper: document.getElementById('mockTestWrapper'),
-// ... existing code ...
     mcqFooter: document.getElementById('mcqFooter'),
-    questionArea: document.querySelector('.question-area'), // Added this selector
+    questionArea: document.querySelector('.question-area'), // Added
     questionText: document.getElementById('questionText'),
     questionNumber: document.getElementById('questionNumber'),
-// ... existing code ...
+    questionTimerBar: document.getElementById('questionTimerBar'),
+    optionsList: document.getElementById('optionsList'),
+    questionPalette: document.getElementById('questionPalette'),
+    btnSubmitTest: document.getElementById('btnSubmitTest'),
+    btnPrevQuestion: document.getElementById('btnPrevQuestion'),
+    btnSaveNext: document.getElementById('btnSaveNext'),
+    btnMarkReview: document.getElementById('btnMarkReview'),
+    btnClearResponse: document.getElementById('btnClearResponse'),
+    timer: document.getElementById('timer'),
+    darkModeToggle: document.getElementById('darkModeToggle'),
+    toggleLabel: document.getElementById('toggleLabel'),
+    sidebarToggle: document.getElementById('btnToggleSidebar'),
+    summaryAnswered: document.getElementById('summaryAnswered'),
+    summaryNotAnswered: document.getElementById('summaryNotAnswered'),
+    summaryMarked: document.getElementById('summaryMarked'),
     summaryNotVisited: document.getElementById('summaryNotVisited'),
     resultScreenWrapper: document.getElementById('resultScreenWrapper'),
-    resultButtonsContainer: document.getElementById('resultButtonsContainer'), // Added this
+    resultButtonsContainer: document.getElementById('resultButtonsContainer'), // (MERGED)
     reviewScreenWrapper: document.getElementById('reviewScreenWrapper'),
     performanceTableBody: document.getElementById('performanceTableBody'),
-// ... existing code ...
     reviewContainer: document.getElementById('reviewContainer'),
-    // Removed retestButton, reviewAnswersButton (will be handled by event delegation)
+    // retestButton & reviewAnswersButton removed (now dynamic)
     backToResultsBtn: document.getElementById('backToResultsBtn'),
     passwordModal: document.getElementById('passwordModal'),
-// ... existing code ...
+    closeModal: document.getElementById('closeModal'),
+    verifyPasswordButton: document.getElementById('verifyPasswordButton'),
+    passwordRetestInput: document.getElementById('passwordRetestInput'),
+    passwordError: document.getElementById('passwordError'),
+    whatsappLink: document.getElementById('whatsappLink'),
+    showMockTestTab: document.getElementById('showMockTestTab'),
+    showAnswerWritingTab: document.getElementById('showAnswerWritingTab'),
+    answerWritingWrapper: document.getElementById('answerWritingWrapper'),
+    stopwatchWrapper: document.getElementById('stopwatchWrapper'),
+    stopwatchDisplay: document.getElementById('stopwatchDisplay'),
+    stopwatchPlayPause: document.getElementById('stopwatchPlayPause'),
+    stopwatchReset: document.getElementById('stopwatchReset'),
+    correctCount: document.getElementById('correctCount'),
+    correctMarks: document.getElementById('correctMarks'),
+    incorrectCount: document.getElementById('incorrectCount'),
+    incorrectMarks: document.getElementById('incorrectMarks'),
+    unattemptedCount: document.getElementById('unattemptedCount'),
+    finalScoreAnimated: document.getElementById('finalScoreAnimated'),
+    totalPossibleScore: document.getElementById('totalPossibleScore'),
     syncStatus: document.getElementById('syncStatus'),
-    chapterSelectionWrapper: document.getElementById('chapterSelectionWrapper'), // Added this
+    chapterSelectionWrapper: document.getElementById('chapterSelectionWrapper'), // (MERGED)
 };
 
 // ### STAGE 1 & 2: PRE-EXAM LOGIC ###
 
 function handleLogin() {
-// ... existing code ...
+    const email = dom.emailInput.value;
+    const password = dom.passwordInput.value;
+    dom.loginError.textContent = '';
+    dom.loginBtn.disabled = true;
+    dom.loginBtn.textContent = 'Logging in...';
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+   .catch((error) => {
+        dom.loginError.textContent = error.message;
+        dom.loginBtn.disabled = false;
+        dom.loginBtn.textContent = 'Login';
+    });
 }
-  
+    
 function validateStartConditions() {
-// ... existing code ...
+    const isOffline = !navigator.onLine;
+    const isAgreed = dom.agreementCheckbox.checked;
+    dom.startExamBtn.disabled = !(isOffline && isAgreed);
+    let errorMsg = '';
+    if (!isOffline && !isAgreed) errorMsg = 'Please agree to terms and enable Aeroplane Mode.';
+    else if (!isOffline) errorMsg = 'Please enable Aeroplane Mode to continue.';
+    else if (!isAgreed) errorMsg = 'Please agree to the instructions to start.';
+    dom.startError.textContent = errorMsg;
+    if (isOffline) {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-check-circle"></i> You are offline. Ready to begin.';
+        dom.offlineStatus.className = 'status-ready';
+    } else {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
+        dom.offlineStatus.className = 'status-waiting';
+    }
 }
 
 function startExam() {
@@ -256,16 +699,18 @@ function startExam() {
 }
 
 function forceSubmitOnReconnect() {
-// ... existing code ...
+    if (!isTestCompleted) {
+        alert("Internet connection detected. Submitting the test as per rules.");
+        submitTest(true);
+    }
 }
 
-
-// *** MODIFIED: This function now checks if it's a Weekly Test or Single Test ***
+// *** MODIFIED: This function now checks if it's a Weekly Test or Single Test (MERGED) ***
 async function loadTestFromURL(testId) {
     dom.loginScreen.style.display = 'none';
     dom.instructionsScreen.style.display = 'none';
     dom.examUIWrapper.style.display = 'none';
-    dom.instructionsTitle.textContent = 'Loading Test...';
+    dom.chapterSelectionWrapper.style.display = 'none'; // Hide chapter screen initially
 
     try {
         // 1. Check if it's a WEEKLY TEST
@@ -278,18 +723,10 @@ async function loadTestFromURL(testId) {
             weeklyTestTitle = weeklyTestDoc.data().title;
             weeklySubTests = weeklyTestDoc.data().subTests;
             
-            // Show the chapter screen immediately (no main instructions)
-            showChapterSelectionScreen();
+            // TODO: Load user's history to see which tests are completed
+            // This is a complex query, for now, we'll rely on the current session's `completedSubTests` Set
             
-            // Show premium button if not premium (logic moved here)
-            // Note: You need to fetch isPremiumUser from auth state, assuming it's done in onAuthStateChanged
-            // For this to work, make sure isPremiumUser is set before this runs.
-            /*
-            if (!isPremiumUser) {
-                const fixedUpgradeButton = `<button id="fixed-upgrade-btn" ...>Go Premium</button>`;
-                document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
-            }
-            */
+            showChapterSelectionScreen();
             
         } else {
             // 2. It's a NORMAL SINGLE TEST (original logic)
@@ -303,7 +740,7 @@ async function loadTestFromURL(testId) {
     }
 }
 
-// *** NEW: This is the original logic moved into its own function ***
+// *** NEW: This is the original logic moved into its own function (MERGED) ***
 async function loadSingleTest(testId) {
     dom.instructionsScreen.style.display = 'flex';
     dom.instructionsTitle.textContent = 'Loading Test Details...';
@@ -318,7 +755,7 @@ async function loadSingleTest(testId) {
     if (questions.length === 0) throw new Error("This test has no questions.");
 
     dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
-    dom.totalQuestionsEl.textContent = testMetadata.totalQuestions;
+    dom.totalQuestionsEl.textContent = testMetadata.totalQuestions || questions.length;
     dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
     
     timeLeft = testMetadata.durationMinutes * 60;
@@ -329,11 +766,12 @@ async function loadSingleTest(testId) {
     validateStartConditions();
 }
 
-// *** NEW: Shows the 5 chapter buttons ***
+// *** NEW: Shows the chapter buttons (MERGED) ***
 function showChapterSelectionScreen() {
     const chapterWrapper = dom.chapterSelectionWrapper;
     
-    let html = `<h2 class="text-3xl font-bold dark:text-white mb-8 text-center">${weeklyTestTitle}</h2>`;
+    // Use a relevant title
+    let html = `<h2 style="font-size: 1.8em; color: #3f51b5; margin-bottom: 25px; text-align: center;">${weeklyTestTitle || 'Test Sections'}</h2>`;
     html += `<div class="chapter-grid">`;
 
     weeklySubTests.forEach(subTest => {
@@ -358,7 +796,7 @@ function showChapterSelectionScreen() {
     dom.examUIWrapper.style.display = 'none';
 }
 
-// *** NEW: Called when a chapter button is clicked ***
+// *** NEW: Called when a chapter button is clicked (MERGED) ***
 async function startSubTest(subQuizId, subQuizName) {
     currentSubQuizId = subQuizId; // Set the global for saving results
     
@@ -397,197 +835,332 @@ async function startSubTest(subQuizId, subQuizName) {
     }
 }
 
+// *** NEW: Better error handler (MERGED) ***
 function handleLoadError(error) {
      document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>Could not load question data. Missing or insufficient permissions.</p><p style="font-size:0.8em; color:#666; margin-top:10px;">${error.message}</p><a href="#" onclick="window.location.reload()" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Try Again</a></div></div>`;
 }
 
 // =====================================================================
-// ============ START: RESULT SAVING LOGIC (UPDATED) ===================
-// ... existing code ...
+// ============ START: RESULT SAVING LOGIC (MERGED) ===================
+// =====================================================================
+
 async function saveResultToFirestore(scoreData) {
     const syncStatusEl = dom.syncStatus;
-// ... existing code ...
+    if (!currentUser) {
+        console.error("User not logged in. Cannot save result.");
+        syncStatusEl.textContent = 'Error: User not logged in.';
+        syncStatusEl.className = 'error';
+        return;
+    }
     const userId = currentUser.uid;
 
     syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
-// ... existing code ...
+    syncStatusEl.className = 'syncing';
+
     const historyCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testHistory");
     
     // *** MODIFIED: Use the sub-quiz ID if it's a weekly test ***
     const testId = new URLSearchParams(window.location.search).get('testId');
+    // Use the specific sub-quiz ID if available, otherwise fall back to the main test ID (for single tests)
     const docId = `${currentSubQuizId || testId}_history_${Date.now()}`;
 
-    // *** MODIFIED: Use the sub-test's metadata ***
+    // *** MODIFIED: Calculate percentage here ***
     const percentage = scoreData.totalQuestions > 0 ? (scoreData.correctCount / scoreData.totalQuestions) * 100 : 0;
 
     try {
         await historyCollectionRef.doc(docId).set({
-            testId: currentSubQuizId || testId, // Save the actual quiz ID
-            testName: testMetadata.testName,     // This will be the sub-test's name
+            testId: currentSubQuizId || testId, // Save the actual quiz ID that was taken
+            testName: testMetadata.testName,     // This will be the sub-test's name if applicable
             subject: testMetadata.subject,
             testSet: testMetadata.testSet || 'A',
-// ... existing code ...
+            score: scoreData.totalScore,
+            correctAnswers: scoreData.correctCount,
+            totalQuestions: scoreData.totalQuestions,
             percentage: percentage,
             userAnswers: state.answers,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp() 
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         
         console.log("Result saved to 'testHistory' collection.");
-// ... existing code ...
+        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. View on your dashboard.`;
+        syncStatusEl.className = 'synced';
+
     } catch (error) {
         console.error("Error writing result to Firestore: ", error);
-// ... existing code ...
+        syncStatusEl.textContent = 'Error saving result.';
+        syncStatusEl.className = 'error';
     }
 }
-
-// ### All other JavaScript functions remain the same... ###
-// ... existing code ...
+// =====================================================================
+// ============ END: RESULT SAVING LOGIC (MERGED) =====================
 // =====================================================================
 
 // ### STAGE 3: MAIN TEST LOGIC ###
 function initTest() {
     resetState();
-// ... existing code ...
+    // timeLeft is already set by loadSingleTest or startSubTest
+    isTestCompleted = false;
+    dom.showAnswerWritingTab.classList.add('locked');
     if (state.visited.length > 0) state.visited[0] = true;
     resetStopwatch();
     setView('mockTest');
-// ... existing code ...
+    loadQuestion(0);
     startTimer();
 }
 function resetState() {
-// ... existing code ...
+    state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) };
 }
 function setView(viewName) {
     dom.mockTestWrapper.style.display = 'none';
-// ... existing code ...
+    dom.resultScreenWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
     dom.answerWritingWrapper.style.display = 'none';
     dom.mcqFooter.style.display = 'none';
     dom.sidebar.style.display = 'none';
-// ... existing code ...
+    dom.timer.style.display = 'none';
+    dom.stopwatchWrapper.style.display = 'none';
+    dom.mainContent.style.display = 'none'; // Hide main content by default
+
     dom.showMockTestTab.classList.remove('active');
     dom.showAnswerWritingTab.classList.remove('active');
     clearInterval(animationInterval);
-    
-    // *** MODIFIED: Handle weekly test chapter view ***
+
     if (viewName === 'mockTest') {
         dom.showMockTestTab.classList.add('active');
         if (isTestCompleted) {
-            // Show result screen (this is fine)
+            // Show result screen
             const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
             const topicStats = JSON.parse(localStorage.getItem('topicStats'));
             showResultScreen(breakdown, topicStats);
-        } else if (isWeeklyTest && !currentSubQuizId) {
-            // Show chapter selection screen if it's a weekly test and no sub-test is active
-            showChapterSelectionScreen();
-            dom.examUIWrapper.style.display = 'block'; // Show the wrapper, but not the test parts
-            dom.main-content.style.display = 'none'; // Hide the main content (question area, etc.)
+            dom.mainContent.style.display = 'flex'; // Results are inside mainContent
         } else {
-            // Show normal test UI
+            // This is the active test view
             dom.timer.style.display = 'block';
             dom.mockTestWrapper.style.display = 'flex';
-            dom.main-content.style.display = 'flex'; // Show main content
             dom.mcqFooter.style.display = 'block';
             dom.sidebar.style.display = 'flex';
+            dom.mainContent.style.display = 'flex';
         }
     } else if (viewName === 'answerWriting') {
-// ... existing code ...
+        if (dom.showAnswerWritingTab.classList.contains('locked')) {
+            setView('mockTest'); // Revert to mockTest view if locked
+            return;
+        }
+        dom.showAnswerWritingTab.classList.add('active');
+        dom.stopwatchWrapper.style.display = 'flex';
+        dom.answerWritingWrapper.style.display = 'flex';
+        dom.mainContent.style.display = 'flex';
     }
 }
 function loadQuestion(index) {
     state.current = index;
-// ... existing code ...
+    if (!state.visited[index]) { state.visited[index] = true; }
     startQuestionTimer();
     const q = questions[index];
-// ... existing code ...
+    dom.questionNumber.textContent = `Question ${index + 1}`;
+    dom.questionText.textContent = q.text;
+    dom.optionsList.innerHTML = '';
+    q.options.forEach((opt, i) => {
+        const li = document.createElement('li');
+        li.className = 'option';
+        if (state.answers[index] === i) li.classList.add('selected');
+        li.innerHTML = `<span class="option-radio"></span><span class="option-text">${opt}</span>`;
+        li.onclick = () => selectOption(i);
+        dom.optionsList.appendChild(li);
+    });
     dom.btnSubmitTest.style.display = (state.current === questions.length - 1) ? 'flex' : 'none';
     updatePalette();
     updateNavigationButtons();
 }
-// ... existing code ...
+function selectOption(optIndex) {
+    state.answers[state.current] = optIndex;
+    dom.optionsList.querySelectorAll('.option').forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
+    updatePalette();
+}
 function handleSaveAndNext() {
     if (isTestCompleted) return;
-// ... existing code ...
     if (state.current < questions.length - 1) {
         loadQuestion(state.current + 1);
     } else {
-        submitTest(true); // This will trigger submit for the sub-test
+        // This is the last question, so submit
+        submitTest(false); // Ask for confirmation
     }
 }
 function handleMarkAndNext() {
-// ... existing code ...
+    if (isTestCompleted) return;
+    state.marked[state.current] = !state.marked[state.current];
+    updatePalette();
 }
 function handleClearResponse() {
-// ... existing code ...
+    state.answers[state.current] = null;
+    dom.optionsList.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+    updatePalette();
 }
 function submitTest(isForced = false) {
     if (isTestCompleted) return;
-// ... existing code ...
+    if (!isForced) {
+        if (!confirm('Are you sure you want to submit the test?')) return;
     }
     stopTimer();
     isTestCompleted = true; // This marks the SUB-TEST as completed
     window.removeEventListener('online', forceSubmitOnReconnect);
     
-    // *** NEW: If it's a weekly test, mark the sub-test as completed ***
+    // *** NEW: If it's a weekly test, mark the sub-test as completed (MERGED) ***
     if (isWeeklyTest) {
         completedSubTests.add(currentSubQuizId);
+        localStorage.setItem('currentSubQuizId', currentSubQuizId); // Save for resume
     }
     
-    // This part is for the Answer Writing tab, it's fine
-    dom.showAnswerWritingTab.classList.remove('locked'); 
+    dom.showAnswerWritingTab.classList.remove('locked');
     
     const scoreBreakdown = calculateScoreBreakdown();
-// ... existing code ...
+    const topicStats = calculateTopicStats();
+    saveResultToFirestore(scoreBreakdown);
+    localStorage.setItem('testTaken', 'true');
+    localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
+    localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
     localStorage.setItem('topicStats', JSON.stringify(topicStats));
     showResultScreen(scoreBreakdown, topicStats);
 }
 function calculateScoreBreakdown() {
-// ... existing code ...
+    let correctCount = 0, incorrectCount = 0;
+    state.answers.forEach((ans, i) => {
+        if (ans !== null) {
+            if (ans === questions[i].answer) correctCount++;
+            else incorrectCount++;
+        }
+    });
+    const unattemptedCount = questions.length - correctCount - incorrectCount;
+    const totalScore = correctCount - incorrectCount;
+    return {
+        correctCount, incorrectCount, unattemptedCount,
+        totalScore, totalQuestions: questions.length,
+        correctMarks: correctCount * 1, incorrectMarks: incorrectCount * -1,
+    };
 }
 function updatePalette() {
-// ... existing code ...
+    dom.questionPalette.innerHTML = '';
+    let answered = 0, notAnswered = 0, marked = 0, notVisited = 0;
+    questions.forEach((_, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'question-number';
+        const isAnswered = state.answers[i] !== null;
+        const isMarked = state.marked[i];
+        if(isAnswered && isMarked) btn.classList.add('marked-answered');
+        else if(isAnswered) btn.classList.add('answered');
+        else if(isMarked) btn.classList.add('marked');
+        else if(state.visited[i]) btn.classList.add('not-answered');
+        else btn.classList.add('not-visited');
+        if (i === state.current) btn.classList.add('current');
+        
+        if (isAnswered) answered++;
+        if (isMarked) marked++;
+        if (!state.visited[i]) notVisited++;
+        
+        btn.textContent = i + 1;
+        btn.onclick = () => { if (!isTestCompleted) loadQuestion(i); };
+        dom.questionPalette.appendChild(btn);
+    });
+    notAnswered = state.visited.filter(v => v).length - answered;
+    dom.summaryAnswered.textContent = answered;
+    dom.summaryMarked.textContent = marked;
+    dom.summaryNotAnswered.textContent = notAnswered;
+    dom.summaryNotVisited.textContent = notVisited;
 }
 function updateNavigationButtons() {
-// ... existing code ...
+    dom.btnPrevQuestion.disabled = state.current === 0;
+    dom.btnSaveNext.querySelector('span').textContent = (state.current === questions.length - 1) ? "Save & Finish" : "Save & Next";
 }
 function formatTime(totalSeconds) {
-// ... existing code ...
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 function startTimer() {
-// ... existing code ...
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Time's up! The test will be submitted automatically.");
+            submitTest(true);
+            return;
+        }
+        timeLeft--;
+        dom.timer.textContent = formatTime(timeLeft);
+    }, 1000);
 }
 function startQuestionTimer() {
-// ... existing code ...
+    if (onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+    onTimerEnd = () => handleSaveAndNext();
+    dom.questionTimerBar.style.transition = 'none';
+    dom.questionTimerBar.style.width = '100%';
+    void dom.questionTimerBar.offsetWidth;
+    dom.questionTimerBar.style.transition = `width ${PER_QUESTION_TIME}s linear`;
+    dom.questionTimerBar.style.width = '0%';
+    dom.questionTimerBar.addEventListener('transitionend', onTimerEnd, { once: true });
 }
 function stopTimer() {
-// ... existing code ...
+    clearInterval(timerInterval);
+    if(onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+    // Also clear the question timer bar's transition
+    dom.questionTimerBar.style.transition = 'none';
 }
 function toggleStopwatch() {
-// ... existing code ...
+    const icon = dom.stopwatchPlayPause.querySelector('i');
+    if (isStopwatchRunning) {
+        clearInterval(stopwatchInterval);
+        icon.classList.replace('fa-pause', 'fa-play');
+    } else {
+        stopwatchInterval = setInterval(() => {
+            stopwatchTime++;
+            dom.stopwatchDisplay.textContent = formatTime(stopwatchTime);
+        }, 1000);
+        icon.classList.replace('fa-play', 'fa-pause');
+    }
+    isStopwatchRunning = !isStopwatchRunning;
 }
 function resetStopwatch() {
-// ... existing code ...
+    clearInterval(stopwatchInterval);
+    isStopwatchRunning = false;
+    stopwatchTime = 0;
+    dom.stopwatchDisplay.textContent = formatTime(0);
+    const icon = dom.stopwatchPlayPause.querySelector('i');
+    if(icon) {
+       icon.classList.replace('fa-pause', 'fa-play');
+    }
 }
 function toggleDarkMode(isDark) {
-// ... existing code ...
+    dom.body.classList.toggle('dark', isDark);
+    dom.toggleLabel.textContent = isDark ? 'Light' : 'Dark';
+    if (isTestCompleted && performanceChart) {
+        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        renderPerformanceChart(topicStats);
+    }
 }
 function updateSidebarPosition() {
-// ... existing code ...
+    const headerHeight = dom.siteHeader.offsetHeight;
+    const topbarHeight = dom.topbar.offsetHeight;
+    const totalHeaderHeight = headerHeight + topbarHeight;
+    dom.sidebar.style.top = `${totalHeaderHeight}px`;
+    dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
 }
 
-// *** MODIFIED: This function now dynamically adds buttons ***
+// *** MODIFIED: This function now dynamically adds buttons (MERGED) ***
 function showResultScreen(breakdown, topicStats) {
     dom.mockTestWrapper.style.display = 'none';
     dom.reviewScreenWrapper.style.display = 'none';
-// ... existing code ...
+    dom.mcqFooter.style.display = 'none';
     dom.sidebar.style.display = 'none';
     dom.btnSubmitTest.style.display = 'none';
     dom.resultScreenWrapper.style.display = 'flex';
+    
     if (breakdown) {
-// ... existing code ...
+         dom.totalPossibleScore.textContent = breakdown.totalQuestions;
          animateScorecard(breakdown);
     }
     
-    // --- Add result buttons dynamically ---
+    // --- Add result buttons dynamically (MERGED) ---
     const resultButtons = dom.resultButtonsContainer;
     resultButtons.innerHTML = ''; // Clear old buttons
 
@@ -604,34 +1177,168 @@ function showResultScreen(breakdown, topicStats) {
     populatePerformanceTable(topicStats);
     setTimeout(() => renderPerformanceChart(topicStats), 100);
 }
-
 function animateScorecard(data) {
-// ... existing code ...
+    let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
+    const animationSpeed = 20;
+    const duration = 1200;
+    const steps = duration / animationSpeed;
+    const stepValues = {};
+    for (const key in current) {
+        stepValues[key] = (data[key] - current[key]) / steps;
+    }
+    clearInterval(animationInterval);
+    animationInterval = setInterval(() => {
+        let finished = true;
+        for (const key in current) {
+            if (Math.abs(current[key] - data[key]) > Math.abs(stepValues[key])) {
+                current[key] += stepValues[key];
+                finished = false;
+            } else {
+                current[key] = data[key];
+            }
+        }
+        dom.correctCount.textContent = Math.round(current.correctCount);
+        dom.correctMarks.textContent = `${Math.round(current.correctMarks) > 0 ? '+' : ''}${Math.round(current.correctMarks)}`;
+        dom.incorrectCount.textContent = Math.round(current.incorrectCount);
+        dom.incorrectMarks.textContent = Math.round(current.incorrectMarks);
+        dom.unattemptedCount.textContent = Math.round(current.unattemptedCount);
+        dom.finalScoreAnimated.textContent = Math.round(current.totalScore);
+        if(finished) clearInterval(animationInterval);
+    }, animationSpeed);
 }
 function calculateTopicStats() {
-// ... existing code ...
+    const topicStats = {};
+    const localAnswers = state.answers.length > 0 ? state.answers : JSON.parse(localStorage.getItem('lastAnswers'));
+    if (!localAnswers || !questions || questions.length === 0) return {};
+    
+    questions.forEach((q, i) => {
+        if (!q) return; // Safety check
+        const topic = q.topic || 'Uncategorized'; // Default topic
+        if (!topicStats[topic]) { topicStats[topic] = { correct: 0, attempted: 0 }; }
+        if (localAnswers[i] !== null) {
+            topicStats[topic].attempted++;
+            if (localAnswers[i] === q.answer) { topicStats[topic].correct++; }
+        }
+    });
+    return topicStats;
 }
 function populatePerformanceTable(topicStats) {
-// ... existing code ...
+    dom.performanceTableBody.innerHTML = '';
+    if (!topicStats) return;
+    Object.keys(topicStats).sort().forEach(topicName => {
+        const stats = topicStats[topicName];
+        const accuracy = stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
+        const barColor = accuracy > 75 ? '#4caf50' : accuracy >= 40 ? '#ff9800' : '#f44336';
+        const row = `<tr><td>${topicName}</td><td>${stats.correct}</td><td>${stats.attempted}</td><td><div class="accuracy-bar-container"><div class="accuracy-bar" style="width: ${accuracy}%; background-color: ${barColor};"></div><span class="accuracy-text">${accuracy}%</span></div></td></tr>`;
+        dom.performanceTableBody.innerHTML += row;
+    });
 }
 function renderPerformanceChart(topicStats) {
-// ... existing code ...
+    if (performanceChart) performanceChart.destroy();
+    if (!topicStats) return;
+    const isDark = dom.body.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : '#666';
+    const labels = Object.keys(topicStats).sort();
+    const correctData = labels.map(label => topicStats[label].correct);
+    const attemptedData = labels.map(label => topicStats[label].attempted);
+    
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    performanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Correct',
+                    data: correctData,
+                    backgroundColor: isDark ? 'rgba(75, 192, 192, 0.5)' : 'rgba(75, 192, 192, 0.8)',
+                    borderColor: isDark ? 'rgb(75, 192, 192)' : 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Attempted',
+                    data: attemptedData,
+                    backgroundColor: isDark ? 'rgba(255, 159, 64, 0.5)' : 'rgba(255, 159, 64, 0.8)',
+                    borderColor: isDark ? 'rgb(255, 159, 64)' : 'rgb(255, 159, 64)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                y: { type: 'linear', position: 'left', title: { display: true, text: 'Number of Questions', color: textColor }, ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true },
+            },
+            plugins: { legend: { labels: { color: textColor } } }
+        }
+    });
 }
 function showReviewScreen() {
     dom.resultScreenWrapper.style.display = 'none';
-// ... existing code ...
+    dom.reviewScreenWrapper.style.display = 'flex';
+    populateReviewScreen();
 }
 function populateReviewScreen() {
-// ... existing code ...
+    dom.reviewContainer.innerHTML = '';
+    const userAnswers = JSON.parse(localStorage.getItem('lastAnswers'));
+    if (!userAnswers || !questions || questions.length === 0) {
+        dom.reviewContainer.innerHTML = '<p>Could not load review data. Please try again.</p>';
+        return;
+    }
+    questions.forEach((q, index) => {
+        const userAnswer = userAnswers[index];
+        const correctAnswer = q.answer;
+        const isCorrect = userAnswer === correctAnswer;
+        let optionsHTML = '';
+        q.options.forEach((opt, optIndex) => {
+            let classes = 'review-option';
+            let icon = '<i class="far fa-circle"></i>';
+            if (optIndex === correctAnswer) { classes += ' review-correct'; icon = '<i class="fas fa-check-circle"></i>'; }
+            if (optIndex === userAnswer && !isCorrect) { classes += ' review-incorrect'; icon = '<i class="fas fa-times-circle"></i>'; }
+            optionsHTML += `<li class="${classes}">${icon}<span>${opt}</span></li>`;
+        });
+        let statusHTML = '';
+        if (userAnswer === null) { statusHTML = '<div class="review-status unanswered">Status: Unanswered</div>'; } 
+        else if (isCorrect) { statusHTML = '<div class="review-status correct">Status: Correct</div>'; } 
+        else { statusHTML = '<div class="review-status incorrect">Status: Incorrect</div>'; }
+        const explanationHTML = q.explanation ? `<div class="review-explanation"><strong>Explanation:</strong> ${q.explanation}</div>` : '';
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'review-question';
+        questionDiv.innerHTML = `<h4>Q${index + 1}: ${q.text}</h4><ul class="review-option-list">${optionsHTML}</ul>${statusHTML}${explanationHTML}`;
+        dom.reviewContainer.appendChild(questionDiv);
+    });
 }
 function handleRetest() {
-// ... existing code ...
+    if (navigator.onLine) {
+        dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
+        return;
+    }
+    if (dom.passwordRetestInput.value === RETEST_PASSWORD) {
+        // Clear only session-specific data
+        localStorage.removeItem('testTaken');
+        localStorage.removeItem('lastAnswers');
+        localStorage.removeItem('scoreBreakdown');
+        localStorage.removeItem('topicStats');
+        localStorage.removeItem('currentSubQuizId');
+        location.reload(); 
+    } else {
+        dom.passwordError.textContent = 'Incorrect password.';
+    }
 }
 
-// *** MODIFIED: Use event delegation for dynamic buttons ***
+// *** MODIFIED: Use event delegation for dynamic buttons (MERGED) ***
 document.addEventListener('DOMContentLoaded', () => {
     const storedTheme = localStorage.getItem('theme');
-// ... existing code ...
+    if (storedTheme === 'dark') {
+        dom.darkModeToggle.checked = true;
+        toggleDarkMode(true);
+    }
+    const phone = "918658567727";
+    const message = "I need the password for the mock test.";
     dom.whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
     
     // --- Main Listeners ---
@@ -645,23 +1352,33 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.btnSubmitTest.addEventListener('click', () => submitTest(false));
     dom.sidebarToggle.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
     dom.darkModeToggle.addEventListener('change', (e) => {
-// ... existing code ...
+        toggleDarkMode(e.target.checked);
         localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
     });
     
-    // --- Event Delegation for Dynamic/Modal Buttons ---
+    // --- Event Delegation for Dynamic/Modal Buttons (MERGED) ---
     document.addEventListener('click', (e) => {
-        if (e.target.id === 'retestButton') {
+        const target = e.target;
+        if (target.id === 'retestButton' || target.closest('#retestButton')) {
             dom.passwordModal.style.display = 'flex';
         }
-        if (e.target.id === 'reviewAnswersButton') {
+        if (target.id === 'reviewAnswersButton' || target.closest('#reviewAnswersButton')) {
             showReviewScreen();
         }
-        if (e.target.id === 'backToChaptersBtn') {
+        if (target.id === 'backToChaptersBtn' || target.closest('#backToChaptersBtn')) {
+            // Reset state to go back to chapter selection
             isTestCompleted = false;
             currentSubQuizId = null;
             state = {};
             questions = [];
+            
+            // Clear test-specific local storage
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('lastAnswers');
+            localStorage.removeItem('scoreBreakdown');
+            localStorage.removeItem('topicStats');
+            localStorage.removeItem('currentSubQuizId');
+
             dom.resultScreenWrapper.style.display = 'none';
             dom.examUIWrapper.style.display = 'none'; // Hide exam UI
             showChapterSelectionScreen(); // Show chapters
@@ -685,56 +1402,75 @@ document.addEventListener('DOMContentLoaded', () => {
         currentUser = user;
         const params = new URLSearchParams(window.location.search);
         const testId = params.get('testId');
-        const resultId = params.get('resultId');
+        const resultId = params.get('resultId'); // For reviewing specific results, not implemented yet
 
         if (!testId) {
-// ... existing code ...
+            document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
             return;
         }
 
         if (user) {
             console.log("Auth state changed: User is signed in.", user.uid);
             if (localStorage.getItem('testTaken') === 'true') {
-// ... existing code ...
                 await resumeResultSession();
             } else {
-                // *** THIS IS THE MAIN STARTING POINT ***
+                // *** THIS IS THE MAIN STARTING POINT (MERGED) ***
                 await loadTestFromURL(testId);
             }
         } else {
-// ... existing code ...
+            console.log("Auth state changed: User is signed out.");
+            dom.loginScreen.style.display = 'flex';
+            dom.instructionsScreen.style.display = 'none';
+            dom.chapterSelectionWrapper.style.display = 'none';
+            dom.examUIWrapper.style.display = 'none';
         }
     });
 });
+
+// *** MODIFIED: This function now handles resuming weekly tests (MERGED) ***
 async function resumeResultSession() {
-// ... existing code ...
+    isTestCompleted = true;
+    dom.showAnswerWritingTab.classList.remove('locked');
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'flex'; // Show the wrapper (for header)
+    dom.body.classList.add('exam-active');
     updateSidebarPosition();
     
-    // *** MODIFIED: Check if we are resuming a weekly test ***
     const params = new URLSearchParams(window.location.search);
-    const testId = params.get('testId');
+    const testId = params.get('testId'); // This is the WeeklyTest ID
+    let testIdToReview = testId; // Default to main ID
+
+    // *** MODIFIED: Check if we are resuming a weekly test ***
     const weeklyTestRef = db.collection('weeklyTests').doc(testId);
     const weeklyTestDoc = await weeklyTestRef.get();
 
     if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
-        // It's a weekly test. We should show the chapter screen.
-        // But the user just finished a sub-test, so show the results.
-        isWeeklyTest = true; // Set this flag
-        weeklySubTests = weeklyTestDoc.data().subTests; // Load sub-tests
-        currentSubQuizId = localStorage.getItem('currentSubQuizId'); // We need to save this
+        // It's a weekly test.
+        isWeeklyTest = true; 
+        weeklyTestTitle = weeklyTestDoc.data().title;
+        weeklySubTests = weeklyTestDoc.data().subTests; 
+        currentSubQuizId = localStorage.getItem('currentSubQuizId'); // Get the ID of the test that was just completed
         
-        // This logic is tricky. For now, just show results.
-        // The "Back to Chapters" button will handle returning.
+        if (currentSubQuizId) {
+            completedSubTests.add(currentSubQuizId); // Mark it as completed in the current session
+            testIdToReview = currentSubQuizId; // This is the ID we need to fetch questions for
+        }
     }
     
     const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
-// ... existing code ...
+    const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+    // Show results *inside* the main-content area
+    setView('mockTest'); 
     showResultScreen(breakdown, topicStats);
 
-    const testDocRef = db.collection('quizzes').doc(currentSubQuizId || testId); // Use sub-quiz ID
+    // Load question data for the review screen
     try {
+        const testDocRef = db.collection('quizzes').doc(testIdToReview); 
+        const testDoc = await testDocRef.get();
+        testMetadata = testDoc.data(); // Load metadata for the sub-test
         const questionsSnapshot = await testDocRef.collection('questions').get();
-// ... existing code ...
+        questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
     } catch (error) {
         console.error("Failed to load question data for review:", error);
     }
