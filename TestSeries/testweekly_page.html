@@ -35,18 +35,17 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        min-height: 100%; /* <-- CHANGE THIS */
+        min-height: 100%;
         padding: 20px;
         z-index: 5000;
         position: relative;
         background: #f0f0f5;
-        overflow-y: auto;    /* <-- ADD THIS */
+        overflow-y: auto;
       }
        .dark.pre-exam-screen { background: #1e1e2f; }
        .login-card,.instructions-container { background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; text-align: center; }
        .dark.login-card,.dark.instructions-container { background: #2a2a3a; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-        #loginScreen.login-card { max-width: 450px; } /* This is wrong, should be .login-card */
-       .login-card { max-width: 450px; } /* Corrected selector */
+       .login-card { max-width: 450px; }
        .login-card h2 { margin-bottom: 25px; color: #3f51b5; font-size: 1.8em; }
        .dark.login-card h2 { color: #8ab4f8; }
        .input-group { margin-bottom: 20px; text-align: left; }
@@ -57,12 +56,11 @@
        .btn-primary:hover:not(:disabled) { opacity: 0.9; }
         #loginError { color: #f44336; height: 1.2em; margin-top: 15px; font-weight: 500; }
         #instructionsScreen { display: none; }
-        #instructionsScreen.instructions-container { max-width: 800px; text-align: left; height: 90vh; display: flex; flex-direction: column; }
-       .instructions-container { max-width: 800px; text-align: left; } /* Added for consistency */
+        .instructions-container { max-width: 800px; text-align: left; }
        #instructionsScreen h2 { color: #3f51b5; border-bottom: 2px solid #3f51b5; padding-bottom: 5px; margin-bottom: 15px; margin-top: 25px; }
        #instructionsScreen h2:first-of-type { margin-top: 0; }
         .dark #instructionsScreen h2 { color: #8ab4f8; border-bottom-color: #8ab4f8; }
-        .instructions-content {flex-grow: 1;overflow-y: auto;padding-right: 15px;min-height: 0; /* <-- ADD THIS LINE */}
+        .instructions-content {flex-grow: 1;overflow-y: auto;padding-right: 15px;min-height: 0;}
        .instructions-content ul { list-style: none; padding-left: 0; line-height: 1.8; }
        .instructions-content li { display: flex; align-items: flex-start; margin-bottom: 12px; }
        .instructions-content li i { color: #3f51b5; margin-right: 15px; font-size: 1.2em; margin-top: 5px; min-width: 20px; text-align: center; }
@@ -398,6 +396,7 @@
 
     <div id="chapterSelectionWrapper">
         </div>
+
     <div id="examUIWrapper">
         <header class="site-header" id="siteHeader">
             <img src="../images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
@@ -431,7 +430,10 @@
                 <button id="btnSubmitTest" style="display: none;"><i class="fas fa-paper-plane"></i> Submit</button>
             </div>
         </header>
-        <div class="main-content" id="main-content"> <div id="mockTestWrapper" style="display: flex; width: 100%;">
+        
+        <div class="main-content" id="main-content"> 
+            
+            <div id="mockTestWrapper" style="display: flex; width: 100%;">
                 <section class="question-area">
                     <h2 class="question-header" id="questionNumber"></h2>
                     <div class="question-timer-bar-container"><div id="questionTimerBar" class="question-timer-bar"></div></div>
@@ -459,11 +461,9 @@
                     </div>
                 </aside>
             </div>
+            
             <div id="resultScreenWrapper">
-                <h2>Test Completed!</h2>
-                <p>Here is your score summary:</p>
-                
-                <div id="syncStatus"></div>
+                <h2 id="resultScreenTitle">Test Completed!</h2> <p id="resultScreenSubtitle">Here is your score summary:</p> <div id="syncStatus"></div>
 
                 <div class="scorecard-details">
                     <table class="scorecard-table">
@@ -497,10 +497,12 @@
                 </div>
                 <div class="chart-container"><canvas id="performanceChart"></canvas></div>
             </div>
+            
             <div id="reviewScreenWrapper">
                 <div class="review-header"><h2 class="review-title">Review Your Answers</h2><button id="backToResultsBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Score</button></div>
                 <div id="reviewContainer"></div>
             </div>
+            
             <div id="answerWritingWrapper">
                 <h2>Answer Writing Practice</h2>
                 <div class="answer-writing-questions">
@@ -509,6 +511,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="fixed-action-area" id="mcqFooter">
             <div class="action-buttons">
                 <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i><span>Previous</span></button>
@@ -518,6 +521,7 @@
             </div>
         </div>
     </div>
+    
     <div id="passwordModal" class="password-modal">
         <div class="modal-content">
             <span id="closeModal" class="close-modal">×</span>
@@ -577,7 +581,20 @@ let weeklySubTests = [];       // Array of sub-tests
 let completedSubTests = new Set(); // Tracks completed sub-tests
 let currentSubQuizId = null;   // The ID of the sub-test currently being taken
 let weeklyTestTitle = '';      // Title of the main weekly test
-// --- END NEW GLOBAL STATE ---
+
+// --- NEW: To store weekly test progress in Firestore ---
+let weeklyTestAttemptRef = null;
+let weeklyProgress = {
+    completedSubTests: [],
+    subTestResults: [],
+    totalScore: 0,
+    totalCorrect: 0,
+    totalIncorrect: 0,
+    totalQuestions: 0,
+    status: 'in-progress'
+};
+let mainTestId = null; // To store the main test ID (e.g., 'week_001')
+// --- END NEW ---
     
 const dom = {
     body: document.body,
@@ -597,11 +614,11 @@ const dom = {
     examUIWrapper: document.getElementById('examUIWrapper'),
     siteHeader: document.getElementById('siteHeader'),
     topbar: document.getElementById('topbar'),
-    mainContent: document.getElementById('main-content'), // Added
+    mainContent: document.getElementById('main-content'),
     sidebar: document.getElementById('sidebar'),
     mockTestWrapper: document.getElementById('mockTestWrapper'),
     mcqFooter: document.getElementById('mcqFooter'),
-    questionArea: document.querySelector('.question-area'), // Added
+    questionArea: document.querySelector('.question-area'),
     questionText: document.getElementById('questionText'),
     questionNumber: document.getElementById('questionNumber'),
     questionTimerBar: document.getElementById('questionTimerBar'),
@@ -621,11 +638,12 @@ const dom = {
     summaryMarked: document.getElementById('summaryMarked'),
     summaryNotVisited: document.getElementById('summaryNotVisited'),
     resultScreenWrapper: document.getElementById('resultScreenWrapper'),
-    resultButtonsContainer: document.getElementById('resultButtonsContainer'), // (MERGED)
+    resultScreenTitle: document.getElementById('resultScreenTitle'), // Added
+    resultScreenSubtitle: document.getElementById('resultScreenSubtitle'), // Added
+    resultButtonsContainer: document.getElementById('resultButtonsContainer'),
     reviewScreenWrapper: document.getElementById('reviewScreenWrapper'),
     performanceTableBody: document.getElementById('performanceTableBody'),
     reviewContainer: document.getElementById('reviewContainer'),
-    // retestButton & reviewAnswersButton removed (now dynamic)
     backToResultsBtn: document.getElementById('backToResultsBtn'),
     passwordModal: document.getElementById('passwordModal'),
     closeModal: document.getElementById('closeModal'),
@@ -648,7 +666,7 @@ const dom = {
     finalScoreAnimated: document.getElementById('finalScoreAnimated'),
     totalPossibleScore: document.getElementById('totalPossibleScore'),
     syncStatus: document.getElementById('syncStatus'),
-    chapterSelectionWrapper: document.getElementById('chapterSelectionWrapper'), // (MERGED)
+    chapterSelectionWrapper: document.getElementById('chapterSelectionWrapper'),
 };
 
 // ### STAGE 1 & 2: PRE-EXAM LOGIC ###
@@ -706,14 +724,13 @@ function forceSubmitOnReconnect() {
 }
 
 // *** MODIFIED: This function now checks if it's a Weekly Test or Single Test (MERGED) ***
-async function loadTestFromURL(testId) {
+async function loadTestFromURL(testId, user) { // <-- Added user
     dom.loginScreen.style.display = 'none';
     dom.instructionsScreen.style.display = 'none';
     dom.examUIWrapper.style.display = 'none';
-    dom.chapterSelectionWrapper.style.display = 'none'; // Hide chapter screen initially
+    dom.chapterSelectionWrapper.style.display = 'none';
 
     try {
-        // 1. Check if it's a WEEKLY TEST
         const weeklyTestRef = db.collection('weeklyTests').doc(testId);
         const weeklyTestDoc = await weeklyTestRef.get();
 
@@ -723,13 +740,35 @@ async function loadTestFromURL(testId) {
             weeklyTestTitle = weeklyTestDoc.data().title;
             weeklySubTests = weeklyTestDoc.data().subTests;
             
-            // TODO: Load user's history to see which tests are completed
-            // This is a complex query, for now, we'll rely on the current session's `completedSubTests` Set
-            
-            showChapterSelectionScreen();
+            // --- NEW: Load user progress ---
+            if (user) {
+                weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(user.uid).collection("weeklyTestAttempts").doc(testId);
+                const attemptDoc = await weeklyTestAttemptRef.get();
+                
+                if (attemptDoc.exists) {
+                    weeklyProgress = attemptDoc.data();
+                    completedSubTests = new Set(weeklyProgress.completedSubTests || []);
+                    console.log("Loaded progress:", weeklyProgress);
+                } else {
+                    console.log("No progress found, starting fresh.");
+                    // Reset progress object for a fresh start
+                    weeklyProgress = { completedSubTests: [], subTestResults: [], totalScore: 0, totalCorrect: 0, totalIncorrect: 0, totalQuestions: 0, status: 'in-progress' };
+                    completedSubTests = new Set();
+                }
+            }
+            // --- END NEW ---
+
+            // Check if test is already fully completed
+            if (completedSubTests.size === weeklySubTests.length && weeklyProgress.status === 'completed') {
+                console.log("Test is already completed. Showing final results.");
+                showWeeklyTestFinalResult(weeklyProgress);
+            } else {
+                console.log("Showing chapter selection.");
+                showChapterSelectionScreen();
+            }
             
         } else {
-            // 2. It's a NORMAL SINGLE TEST (original logic)
+            // It's a NORMAL SINGLE TEST
             console.log("Loading as Single Test");
             isWeeklyTest = false;
             await loadSingleTest(testId);
@@ -740,7 +779,7 @@ async function loadTestFromURL(testId) {
     }
 }
 
-// *** NEW: This is the original logic moved into its own function (MERGED) ***
+// *** This is the original logic moved into its own function ***
 async function loadSingleTest(testId) {
     dom.instructionsScreen.style.display = 'flex';
     dom.instructionsTitle.textContent = 'Loading Test Details...';
@@ -766,11 +805,10 @@ async function loadSingleTest(testId) {
     validateStartConditions();
 }
 
-// *** NEW: Shows the chapter buttons (MERGED) ***
+// *** This shows the chapter buttons ***
 function showChapterSelectionScreen() {
     const chapterWrapper = dom.chapterSelectionWrapper;
     
-    // Use a relevant title
     let html = `<h2 style="font-size: 1.8em; color: #3f51b5; margin-bottom: 25px; text-align: center;">${weeklyTestTitle || 'Test Sections'}</h2>`;
     html += `<div class="chapter-grid">`;
 
@@ -796,7 +834,7 @@ function showChapterSelectionScreen() {
     dom.examUIWrapper.style.display = 'none';
 }
 
-// *** NEW: Called when a chapter button is clicked (MERGED) ***
+// *** Called when a chapter button is clicked ***
 async function startSubTest(subQuizId, subQuizName) {
     currentSubQuizId = subQuizId; // Set the global for saving results
     
@@ -806,7 +844,6 @@ async function startSubTest(subQuizId, subQuizName) {
     dom.instructionsTitle.textContent = `Loading ${subQuizName}...`;
 
     try {
-        // Load this sub-test's data
         const testDocRef = db.collection('quizzes').doc(subQuizId);
         const testDoc = await testDocRef.get();
         if (!testDoc.exists) throw new Error(`Test not found: ${subQuizId}`);
@@ -824,7 +861,6 @@ async function startSubTest(subQuizId, subQuizName) {
         timeLeft = testMetadata.durationMinutes * 60;
         dom.timer.textContent = formatTime(timeLeft);
         
-        // Add offline listeners
         window.addEventListener('online', validateStartConditions);
         window.addEventListener('offline', validateStartConditions);
         validateStartConditions();
@@ -835,7 +871,7 @@ async function startSubTest(subQuizId, subQuizName) {
     }
 }
 
-// *** NEW: Better error handler (MERGED) ***
+// *** Better error handler ***
 function handleLoadError(error) {
      document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>Could not load question data. Missing or insufficient permissions.</p><p style="font-size:0.8em; color:#666; margin-top:10px;">${error.message}</p><a href="#" onclick="window.location.reload()" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Try Again</a></div></div>`;
 }
@@ -844,6 +880,7 @@ function handleLoadError(error) {
 // ============ START: RESULT SAVING LOGIC (MERGED) ===================
 // =====================================================================
 
+// This function is for SINGLE tests only now
 async function saveResultToFirestore(scoreData) {
     const syncStatusEl = dom.syncStatus;
     if (!currentUser) {
@@ -859,18 +896,14 @@ async function saveResultToFirestore(scoreData) {
 
     const historyCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testHistory");
     
-    // *** MODIFIED: Use the sub-quiz ID if it's a weekly test ***
     const testId = new URLSearchParams(window.location.search).get('testId');
-    // Use the specific sub-quiz ID if available, otherwise fall back to the main test ID (for single tests)
-    const docId = `${currentSubQuizId || testId}_history_${Date.now()}`;
-
-    // *** MODIFIED: Calculate percentage here ***
+    const docId = `${testId}_history_${Date.now()}`;
     const percentage = scoreData.totalQuestions > 0 ? (scoreData.correctCount / scoreData.totalQuestions) * 100 : 0;
 
     try {
         await historyCollectionRef.doc(docId).set({
-            testId: currentSubQuizId || testId, // Save the actual quiz ID that was taken
-            testName: testMetadata.testName,     // This will be the sub-test's name if applicable
+            testId: testId,
+            testName: testMetadata.testName,
             subject: testMetadata.subject,
             testSet: testMetadata.testSet || 'A',
             score: scoreData.totalScore,
@@ -898,7 +931,6 @@ async function saveResultToFirestore(scoreData) {
 // ### STAGE 3: MAIN TEST LOGIC ###
 function initTest() {
     resetState();
-    // timeLeft is already set by loadSingleTest or startSubTest
     isTestCompleted = false;
     dom.showAnswerWritingTab.classList.add('locked');
     if (state.visited.length > 0) state.visited[0] = true;
@@ -919,7 +951,7 @@ function setView(viewName) {
     dom.sidebar.style.display = 'none';
     dom.timer.style.display = 'none';
     dom.stopwatchWrapper.style.display = 'none';
-    dom.mainContent.style.display = 'none'; // Hide main content by default
+    dom.mainContent.style.display = 'none'; 
 
     dom.showMockTestTab.classList.remove('active');
     dom.showAnswerWritingTab.classList.remove('active');
@@ -927,23 +959,23 @@ function setView(viewName) {
 
     if (viewName === 'mockTest') {
         dom.showMockTestTab.classList.add('active');
+        dom.mainContent.style.display = 'flex'; // Show main content area
+        
         if (isTestCompleted) {
             // Show result screen
             const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
             const topicStats = JSON.parse(localStorage.getItem('topicStats'));
-            showResultScreen(breakdown, topicStats);
-            dom.mainContent.style.display = 'flex'; // Results are inside mainContent
+            showResultScreen(breakdown, topicStats); // This populates the result screen
         } else {
             // This is the active test view
             dom.timer.style.display = 'block';
             dom.mockTestWrapper.style.display = 'flex';
             dom.mcqFooter.style.display = 'block';
             dom.sidebar.style.display = 'flex';
-            dom.mainContent.style.display = 'flex';
         }
     } else if (viewName === 'answerWriting') {
         if (dom.showAnswerWritingTab.classList.contains('locked')) {
-            setView('mockTest'); // Revert to mockTest view if locked
+            setView('mockTest'); // Revert
             return;
         }
         dom.showAnswerWritingTab.classList.add('active');
@@ -982,8 +1014,7 @@ function handleSaveAndNext() {
     if (state.current < questions.length - 1) {
         loadQuestion(state.current + 1);
     } else {
-        // This is the last question, so submit
-        submitTest(false); // Ask for confirmation
+        submitTest(false); 
     }
 }
 function handleMarkAndNext() {
@@ -996,32 +1027,44 @@ function handleClearResponse() {
     dom.optionsList.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
     updatePalette();
 }
+
+// *** MODIFIED: This function now routes based on test type ***
 function submitTest(isForced = false) {
     if (isTestCompleted) return;
     if (!isForced) {
-        if (!confirm('Are you sure you want to submit the test?')) return;
+        let confirmMsg = isWeeklyTest ? "Are you sure you want to submit this section?" : "Are you sure you want to submit the test?";
+        if (!confirm(confirmMsg)) return;
     }
     stopTimer();
-    isTestCompleted = true; // This marks the SUB-TEST as completed
+    isTestCompleted = true; 
     window.removeEventListener('online', forceSubmitOnReconnect);
-    
-    // *** NEW: If it's a weekly test, mark the sub-test as completed (MERGED) ***
-    if (isWeeklyTest) {
-        completedSubTests.add(currentSubQuizId);
-        localStorage.setItem('currentSubQuizId', currentSubQuizId); // Save for resume
-    }
-    
     dom.showAnswerWritingTab.classList.remove('locked');
     
     const scoreBreakdown = calculateScoreBreakdown();
     const topicStats = calculateTopicStats();
-    saveResultToFirestore(scoreBreakdown);
-    localStorage.setItem('testTaken', 'true');
+    
+    // Save to localStorage, this is used by review screen and resume session
+    localStorage.setItem('testTaken', 'true'); 
     localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
     localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
     localStorage.setItem('topicStats', JSON.stringify(topicStats));
-    showResultScreen(scoreBreakdown, topicStats);
+
+    if (isWeeklyTest) {
+        completedSubTests.add(currentSubQuizId);
+        localStorage.setItem('currentSubQuizId', currentSubQuizId); // For resume
+        
+        // --- NEW LOGIC ---
+        // Don't show results, just save progress and go back to chapters
+        saveWeeklyTestProgress(scoreBreakdown);
+        // --- END NEW LOGIC ---
+        
+    } else {
+        // This is for single tests, logic is unchanged
+        saveResultToFirestore(scoreBreakdown);
+        showResultScreen(scoreBreakdown, topicStats);
+    }
 }
+
 function calculateScoreBreakdown() {
     let correctCount = 0, incorrectCount = 0;
     state.answers.forEach((ans, i) => {
@@ -1103,7 +1146,6 @@ function startQuestionTimer() {
 function stopTimer() {
     clearInterval(timerInterval);
     if(onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
-    // Also clear the question timer bar's transition
     dom.questionTimerBar.style.transition = 'none';
 }
 function toggleStopwatch() {
@@ -1146,7 +1188,7 @@ function updateSidebarPosition() {
     dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
 }
 
-// *** MODIFIED: This function now dynamically adds buttons (MERGED) ***
+// *** This function is for SINGLE tests (or sub-test resume) ***
 function showResultScreen(breakdown, topicStats) {
     dom.mockTestWrapper.style.display = 'none';
     dom.reviewScreenWrapper.style.display = 'none';
@@ -1155,28 +1197,152 @@ function showResultScreen(breakdown, topicStats) {
     dom.btnSubmitTest.style.display = 'none';
     dom.resultScreenWrapper.style.display = 'flex';
     
+    // Reset titles to default (for single test)
+    dom.resultScreenTitle.textContent = "Test Completed!";
+    dom.resultScreenSubtitle.textContent = "Here is your score summary:";
+
     if (breakdown) {
          dom.totalPossibleScore.textContent = breakdown.totalQuestions;
          animateScorecard(breakdown);
     }
     
-    // --- Add result buttons dynamically (MERGED) ---
+    // --- Add result buttons dynamically ---
     const resultButtons = dom.resultButtonsContainer;
-    resultButtons.innerHTML = ''; // Clear old buttons
+    resultButtons.innerHTML = ''; 
 
-    // If it's a weekly test, add "Back to Sections"
     if (isWeeklyTest) {
+        // This is a sub-test resume, show "Back to Sections"
         resultButtons.innerHTML += `<button id="backToChaptersBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Sections</button>`;
     }
     
-    // Add the standard buttons
     resultButtons.innerHTML += `<button id="retestButton" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest</button>`;
     resultButtons.innerHTML += `<button id="reviewAnswersButton" class="submit-button btn-action"><i class="fas fa-search"></i> Review Answers</button>`;
-    // --- End of button logic ---
     
     populatePerformanceTable(topicStats);
     setTimeout(() => renderPerformanceChart(topicStats), 100);
 }
+
+// *** ADDED NEW FUNCTION ***
+async function saveWeeklyTestProgress(scoreBreakdown) {
+    console.log("Saving weekly test progress...");
+    if (!weeklyTestAttemptRef) {
+        console.error("Cannot save progress: weeklyTestAttemptRef is not set.");
+        return;
+    }
+
+    // Update the local progress object
+    weeklyProgress.completedSubTests = Array.from(completedSubTests);
+    
+    // Avoid duplicate results
+    const existingResultIndex = weeklyProgress.subTestResults.findIndex(r => r.quizId === currentSubQuizId);
+    if (existingResultIndex > -1) {
+        // This case shouldn't happen with disabled buttons, but as a safeguard
+        console.warn("Result for this sub-test already exists. Overwriting.");
+        // We need to subtract the old score before adding the new one
+        const oldResult = weeklyProgress.subTestResults[existingResultIndex];
+        weeklyProgress.totalScore -= oldResult.totalScore;
+        weeklyProgress.totalCorrect -= oldResult.correctCount;
+        weeklyProgress.totalIncorrect -= oldResult.incorrectCount;
+        weeklyProgress.totalQuestions -= oldResult.totalQuestions;
+        weeklyProgress.subTestResults[existingResultIndex] = { 
+            quizId: currentSubQuizId, 
+            testName: testMetadata.testName, 
+            ...scoreBreakdown 
+        };
+    } else {
+        weeklyProgress.subTestResults.push({ 
+            quizId: currentSubQuizId, 
+            testName: testMetadata.testName, 
+            ...scoreBreakdown 
+        });
+    }
+
+    // Recalculate totals from scratch to ensure accuracy
+    weeklyProgress.totalScore = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.totalScore, 0);
+    weeklyProgress.totalCorrect = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.correctCount, 0);
+    weeklyProgress.totalIncorrect = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.incorrectCount, 0);
+    weeklyProgress.totalQuestions = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.totalQuestions, 0);
+
+    try {
+        // Check if all tests are now done
+        if (completedSubTests.size === weeklySubTests.length) {
+            console.log("All sub-tests completed!");
+            weeklyProgress.status = 'completed';
+            await weeklyTestAttemptRef.set(weeklyProgress); // Save final progress
+            showWeeklyTestFinalResult(weeklyProgress); // Show final results
+        } else {
+            // Not finished yet, just save progress and go back to chapters
+            await weeklyTestAttemptRef.set(weeklyProgress, { merge: true }); // Save in-progress
+            
+            // Go back to chapter screen
+            isTestCompleted = false;
+            currentSubQuizId = null;
+            state = {};
+            questions = [];
+            localStorage.removeItem('testTaken'); // Clear sub-test resume flag
+            localStorage.removeItem('currentSubQuizId');
+            
+            dom.resultScreenWrapper.style.display = 'none';
+            dom.examUIWrapper.style.display = 'none';
+            showChapterSelectionScreen(); // Show chapters with updated "Completed" status
+        }
+    } catch (error) {
+        console.error("Failed to save weekly progress: ", error);
+        alert("Error saving your progress. Please check your connection and try again.");
+    }
+}
+
+// *** ADDED NEW FUNCTION ***
+function showWeeklyTestFinalResult(finalProgress) {
+    console.log("Showing final weekly test results:", finalProgress);
+    dom.mockTestWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.btnSubmitTest.style.display = 'none';
+    dom.chapterSelectionWrapper.style.display = 'none'; // Hide chapters
+    dom.examUIWrapper.style.display = 'flex'; // Show wrapper for header
+    dom.mainContent.style.display = 'flex';
+    dom.resultScreenWrapper.style.display = 'flex';
+
+    // Update titles for the final results page
+    dom.resultScreenTitle.textContent = `${weeklyTestTitle} Completed!`;
+    dom.resultScreenSubtitle.textContent = "Here is your final consolidated score:";
+
+    const finalScoreBreakdown = {
+      correctCount: finalProgress.totalCorrect,
+      incorrectCount: finalProgress.totalIncorrect,
+      unattemptedCount: finalProgress.totalQuestions - (finalProgress.totalCorrect + finalProgress.totalIncorrect),
+      totalScore: finalProgress.totalScore,
+      totalQuestions: finalProgress.totalQuestions,
+      correctMarks: finalProgress.totalCorrect * 1,
+      incorrectMarks: finalProgress.totalIncorrect * -1,
+    };
+
+    // TODO: Aggregate topic stats from finalProgress.subTestResults
+    const allTopicStats = {};
+    // This is complex, as you need to load ALL questions for ALL sub-tests
+    // For now, we'll leave the table empty.
+    const topicStats = {}; 
+
+    dom.totalPossibleScore.textContent = finalScoreBreakdown.totalQuestions;
+    animateScorecard(finalScoreBreakdown);
+
+    // Logic for result buttons
+    const resultButtons = dom.resultButtonsContainer;
+    resultButtons.innerHTML = ''; // Clear old buttons
+    // Add a retest button that clears the weeklyTestAttempts document
+    resultButtons.innerHTML += `<button id="retestWeeklyTestBtn" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest Full Test</button>`;
+    // This review button is complex - it would need to show all sections
+    // resultButtons.innerHTML += `<button id="reviewWeeklyTestBtn" class="submit-button btn-action"><i class="fas fa-search"></i> Review All Answers</button>`;
+
+    populatePerformanceTable(topicStats); 
+    renderPerformanceChart(topicStats);
+
+    dom.syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Weekly Test Completed!`;
+    dom.syncStatus.className = 'synced';
+}
+
 function animateScorecard(data) {
     let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
     const animationSpeed = 20;
@@ -1184,6 +1350,7 @@ function animateScorecard(data) {
     const steps = duration / animationSpeed;
     const stepValues = {};
     for (const key in current) {
+        if(data[key] === undefined) data[key] = 0; // Prevent NaN
         stepValues[key] = (data[key] - current[key]) / steps;
     }
     clearInterval(animationInterval);
@@ -1212,8 +1379,8 @@ function calculateTopicStats() {
     if (!localAnswers || !questions || questions.length === 0) return {};
     
     questions.forEach((q, i) => {
-        if (!q) return; // Safety check
-        const topic = q.topic || 'Uncategorized'; // Default topic
+        if (!q) return; 
+        const topic = q.topic || 'Uncategorized';
         if (!topicStats[topic]) { topicStats[topic] = { correct: 0, attempted: 0 }; }
         if (localAnswers[i] !== null) {
             topicStats[topic].attempted++;
@@ -1224,7 +1391,10 @@ function calculateTopicStats() {
 }
 function populatePerformanceTable(topicStats) {
     dom.performanceTableBody.innerHTML = '';
-    if (!topicStats) return;
+    if (!topicStats || Object.keys(topicStats).length === 0) {
+        dom.performanceTableBody.innerHTML = '<tr><td colspan="4">Topic analysis not available for this test.</td></tr>';
+        return;
+    };
     Object.keys(topicStats).sort().forEach(topicName => {
         const stats = topicStats[topicName];
         const accuracy = stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
@@ -1235,7 +1405,7 @@ function populatePerformanceTable(topicStats) {
 }
 function renderPerformanceChart(topicStats) {
     if (performanceChart) performanceChart.destroy();
-    if (!topicStats) return;
+    if (!topicStats || Object.keys(topicStats).length === 0) return;
     const isDark = dom.body.classList.contains('dark');
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
     const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : '#666';
@@ -1312,6 +1482,7 @@ function populateReviewScreen() {
         dom.reviewContainer.appendChild(questionDiv);
     });
 }
+
 function handleRetest() {
     if (navigator.onLine) {
         dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
@@ -1359,20 +1530,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Delegation for Dynamic/Modal Buttons (MERGED) ---
     document.addEventListener('click', (e) => {
         const target = e.target;
+        
+        // Retest button (for single tests)
         if (target.id === 'retestButton' || target.closest('#retestButton')) {
             dom.passwordModal.style.display = 'flex';
         }
+        
+        // Review Answers button (for single tests)
         if (target.id === 'reviewAnswersButton' || target.closest('#reviewAnswersButton')) {
             showReviewScreen();
         }
+        
+        // Back to Chapters button (from sub-test result/review)
         if (target.id === 'backToChaptersBtn' || target.closest('#backToChaptersBtn')) {
-            // Reset state to go back to chapter selection
             isTestCompleted = false;
             currentSubQuizId = null;
             state = {};
             questions = [];
             
-            // Clear test-specific local storage
             localStorage.removeItem('testTaken');
             localStorage.removeItem('lastAnswers');
             localStorage.removeItem('scoreBreakdown');
@@ -1380,8 +1555,25 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.removeItem('currentSubQuizId');
 
             dom.resultScreenWrapper.style.display = 'none';
-            dom.examUIWrapper.style.display = 'none'; // Hide exam UI
-            showChapterSelectionScreen(); // Show chapters
+            dom.examUIWrapper.style.display = 'none'; 
+            showChapterSelectionScreen(); 
+        }
+        
+        // Retest Full Weekly Test button (from final result)
+        if (target.id === 'retestWeeklyTestBtn' || target.closest('#retestWeeklyTestBtn')) {
+             if (confirm("Are you sure you want to retest this entire weekly test? All your progress will be deleted.")) {
+                if (weeklyTestAttemptRef) {
+                    weeklyTestAttemptRef.delete().then(() => {
+                        console.log("Weekly test progress deleted.");
+                        location.reload();
+                    }).catch(err => {
+                        console.error("Error deleting progress: ", err);
+                        alert("Could not delete progress. Check connection.");
+                    });
+                } else {
+                    location.reload();
+                }
+             }
         }
     });
 
@@ -1398,24 +1590,27 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
     window.addEventListener('resize', updateSidebarPosition);
 
+    // --- MODIFIED: Main Auth Handler ---
     firebase.auth().onAuthStateChanged(async (user) => {
         currentUser = user;
         const params = new URLSearchParams(window.location.search);
-        const testId = params.get('testId');
-        const resultId = params.get('resultId'); // For reviewing specific results, not implemented yet
-
-        if (!testId) {
+        mainTestId = params.get('testId'); // Get the main test ID
+        
+        if (!mainTestId) {
             document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
             return;
         }
 
         if (user) {
             console.log("Auth state changed: User is signed in.", user.uid);
+            
+            // Check if user is resuming a sub-test from a refresh
             if (localStorage.getItem('testTaken') === 'true') {
                 await resumeResultSession();
             } else {
-                // *** THIS IS THE MAIN STARTING POINT (MERGED) ***
-                await loadTestFromURL(testId);
+                // This is a fresh load.
+                // loadTestFromURL will check for weekly test status and progress
+                await loadTestFromURL(mainTestId, user);
             }
         } else {
             console.log("Auth state changed: User is signed out.");
@@ -1429,48 +1624,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // *** MODIFIED: This function now handles resuming weekly tests (MERGED) ***
 async function resumeResultSession() {
+    console.log("Resuming result session...");
     isTestCompleted = true;
     dom.showAnswerWritingTab.classList.remove('locked');
     dom.loginScreen.style.display = 'none';
     dom.instructionsScreen.style.display = 'none';
-    dom.examUIWrapper.style.display = 'flex'; // Show the wrapper (for header)
+    dom.examUIWrapper.style.display = 'flex'; 
     dom.body.classList.add('exam-active');
     updateSidebarPosition();
     
     const params = new URLSearchParams(window.location.search);
-    const testId = params.get('testId'); // This is the WeeklyTest ID
-    let testIdToReview = testId; // Default to main ID
+    const testId = params.get('testId'); // This is the WeeklyTest ID or Single Test ID
+    let testIdToReview = testId; 
 
     // *** MODIFIED: Check if we are resuming a weekly test ***
     const weeklyTestRef = db.collection('weeklyTests').doc(testId);
     const weeklyTestDoc = await weeklyTestRef.get();
 
     if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
-        // It's a weekly test.
+        console.log("Resuming a weekly test sub-test");
         isWeeklyTest = true; 
         weeklyTestTitle = weeklyTestDoc.data().title;
         weeklySubTests = weeklyTestDoc.data().subTests; 
-        currentSubQuizId = localStorage.getItem('currentSubQuizId'); // Get the ID of the test that was just completed
+        currentSubQuizId = localStorage.getItem('currentSubQuizId'); 
         
         if (currentSubQuizId) {
-            completedSubTests.add(currentSubQuizId); // Mark it as completed in the current session
-            testIdToReview = currentSubQuizId; // This is the ID we need to fetch questions for
+            completedSubTests.add(currentSubQuizId); 
+            testIdToReview = currentSubQuizId; 
+            
+            // Need to set the progress ref for the "Back to Chapters" button
+            weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
+        } else {
+             console.error("Resuming weekly test but no currentSubQuizId found in localStorage.");
+             // This shouldn't happen, but good to handle
         }
+    } else {
+        console.log("Resuming a single test");
+        isWeeklyTest = false;
     }
     
     const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
     const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+    
     // Show results *inside* the main-content area
     setView('mockTest'); 
-    showResultScreen(breakdown, topicStats);
+    showResultScreen(breakdown, topicStats); // This function now correctly handles 'isWeeklyTest' flag
 
     // Load question data for the review screen
     try {
         const testDocRef = db.collection('quizzes').doc(testIdToReview); 
         const testDoc = await testDocRef.get();
-        testMetadata = testDoc.data(); // Load metadata for the sub-test
-        const questionsSnapshot = await testDocRef.collection('questions').get();
-        questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+        if(testDoc.exists) {
+            testMetadata = testDoc.data(); 
+            const questionsSnapshot = await testDocRef.collection('questions').get();
+            questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+            console.log(`Loaded ${questions.length} questions for review.`);
+        } else {
+            console.error("Could not find test document for review:", testIdToReview);
+        }
     } catch (error) {
         console.error("Failed to load question data for review:", error);
     }
