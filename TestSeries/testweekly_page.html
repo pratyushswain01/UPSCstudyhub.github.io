@@ -268,7 +268,7 @@
        .dark .modal-content { background: #2c2c3c; border-color: #555; }
        .dark .close-modal:hover { color: #fff; }
        .dark .contact-admin-text { color: #aaa; }
-       .dark .contact-admin-text a { color: #8ab4f8; }
+       .dark .contact-admin-text a { color: #8ab4F8; }
         
         /* --- NEW STYLES FOR CHAPTER SELECTION (MERGED) --- */
         #chapterSelectionWrapper {
@@ -1019,7 +1019,7 @@ async function saveResultToFirestore(scoreData) {
             correctAnswers: scoreData.correctCount,
             totalQuestions: scoreData.totalQuestions,
             percentage: percentage,
-            userAnswers: state.answers,
+            userAnswers: state.answers, // *** FIX: Save answers for single tests too ***
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
         console.log("Result saved to 'testHistory' collection.");
@@ -1032,19 +1032,27 @@ async function saveResultToFirestore(scoreData) {
     }
 }
 
-async function saveWeeklyTestProgress(scoreBreakdown) {
+async function saveWeeklyTestProgress(scoreBreakdown, userAnswers) { // *** FIX: Pass userAnswers ***
     console.log("Saving weekly test progress...");
 
     // 1. Update the global progress object
     completedSubTests.add(currentSubQuizId);
     weeklyProgress.completedSubTests = Array.from(completedSubTests);
     
+    // *** FIX: Create result data with userAnswers ***
+    const resultData = { 
+        quizId: currentSubQuizId, 
+        testName: testMetadata.testName, 
+        userAnswers: userAnswers, // Save the answers
+        ...scoreBreakdown 
+    };
+    
     const existingResultIndex = weeklyProgress.subTestResults.findIndex(r => r.quizId === currentSubQuizId);
     if (existingResultIndex > -1) {
         console.warn("Result for this sub-test already exists. Overwriting.");
-        weeklyProgress.subTestResults[existingResultIndex] = { quizId: currentSubQuizId, testName: testMetadata.testName, ...scoreBreakdown };
+        weeklyProgress.subTestResults[existingResultIndex] = resultData;
     } else {
-        weeklyProgress.subTestResults.push({ quizId: currentSubQuizId, testName: testMetadata.testName, ...scoreBreakdown });
+        weeklyProgress.subTestResults.push(resultData);
     }
 
     // 2. Recalculate totals
@@ -1229,7 +1237,7 @@ async function submitTest(isForced = false) {
     const topicStats = calculateTopicStats();
     
     localStorage.setItem('testTaken', 'true'); 
-    localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
+    localStorage.setItem('lastAnswers', JSON.stringify(state.answers)); // *** FIX: Save answers for review ***
     localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
     localStorage.setItem('topicStats', JSON.stringify(topicStats));
 
@@ -1245,11 +1253,11 @@ async function submitTest(isForced = false) {
         dom.submittingSuccess.style.display = 'none';
         dom.submittingMessage.textContent = "Saving your progress...";
 
-        // The save function now handles showing the next screen
-        await saveWeeklyTestProgress(scoreBreakdown); 
+        // *** FIX: Pass state.answers to the save function ***
+        await saveWeeklyTestProgress(scoreBreakdown, state.answers); 
         
     } else {
-        // This is for single tests, logic is unchanged
+        // This is for single tests
         saveResultToFirestore(scoreBreakdown);
         showResultScreen(scoreBreakdown, topicStats);
     }
@@ -1369,7 +1377,6 @@ async function toggleDarkMode(isDark) {
     if (isTestCompleted && performanceChart) {
         let topicStats;
         if (isWeeklyTest) {
-            // *** FIX: Get stats from global weeklyProgress object ***
             topicStats = await calculateAggregatedTopicStats(weeklyProgress);
         } else {
             topicStats = JSON.parse(localStorage.getItem('topicStats'));
@@ -1444,7 +1451,6 @@ async function showWeeklyTestFinalResult(finalProgress) {
     // --- NEW: Aggregate topic stats ---
     let topicStats = {};
     try {
-        // *** FIX: Pass the finalProgress object ***
         topicStats = await calculateAggregatedTopicStats(finalProgress);
         localStorage.setItem('topicStats', JSON.stringify(topicStats)); // Save for dark mode toggle
     } catch (error) {
@@ -1532,7 +1538,6 @@ function calculateTopicStats() {
 // *** NEW FUNCTION: Aggregates stats for the FINAL weekly result ***
 async function calculateAggregatedTopicStats(finalProgress) {
     const allTopicStats = {};
-    // *** FIX: Use the passed finalProgress object ***
     if (!finalProgress || !finalProgress.subTestResults) return {};
 
     for (const subtest of finalProgress.subTestResults) {
