@@ -755,36 +755,27 @@ function handleLogin() {
 }
     
 function validateStartConditions() {
-    // MODIFIED: This check is now only for single tests
+    // *** MODIFIED: This check now applies to ALL tests ***
     const isOffline = !navigator.onLine;
     const isAgreed = dom.agreementCheckbox.checked;
 
-    if (!isWeeklyTest) {
-        // Original logic for single tests
-        dom.startExamBtn.disabled = !(isOffline && isAgreed);
-        let errorMsg = '';
-        if (!isOffline && !isAgreed) errorMsg = 'Please agree to terms and enable Aeroplane Mode.';
-        else if (!isOffline) errorMsg = 'Please enable Aeroplane Mode to continue.';
-        else if (!isAgreed) errorMsg = 'Please agree to the instructions to start.';
-        dom.startError.textContent = errorMsg;
-        if (isOffline) {
-            dom.offlineStatus.innerHTML = '<i class="fas fa-check-circle"></i> You are offline. Ready to begin.';
-            dom.offlineStatus.className = 'status-ready';
-        } else {
-            dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
-            dom.offlineStatus.className = 'status-waiting';
-        }
+    dom.startExamBtn.disabled = !(isOffline && isAgreed);
+    let errorMsg = '';
+    if (!isOffline && !isAgreed) errorMsg = 'Please agree to terms and enable Aeroplane Mode.';
+    else if (!isOffline) errorMsg = 'Please enable Aeroplane Mode to continue.';
+    else if (!isAgreed) errorMsg = 'Please agree to the instructions to start.';
+    dom.startError.textContent = errorMsg;
+    
+    if (isOffline) {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-check-circle"></i> You are offline. Ready to begin.';
+        dom.offlineStatus.className = 'status-ready';
     } else {
-        // NEW logic for weekly tests: Internet is NOT required to start a sub-test
-        dom.startExamBtn.disabled = !isAgreed;
-         if (!isAgreed) {
-             dom.startError.textContent = 'Please agree to the instructions to start.';
-         } else {
-             dom.startError.textContent = '';
-         }
-         // We don't show the offline status message for weekly sub-tests
-         dom.offlineStatus.style.display = 'none';
+        dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
+        dom.offlineStatus.className = 'status-waiting';
     }
+
+    // This is for weekly tests, show the offline status message
+    dom.offlineStatus.style.display = 'block';
 }
 
 function startExam() {
@@ -794,29 +785,22 @@ function startExam() {
     dom.body.classList.add('exam-active');
     updateSidebarPosition();
     
-    // Only add forced submit listener for single tests
-    if (!isWeeklyTest) {
-        window.removeEventListener('online', validateStartConditions);
-        window.removeEventListener('offline', validateStartConditions);
-        window.addEventListener('online', forceSubmitOnReconnect);
-    } else {
-        // For weekly tests, we don't care if they go online/offline
-        window.removeEventListener('online', validateStartConditions);
-        window.removeEventListener('offline', validateStartConditions);
-    }
+    // *** MODIFIED: This listener applies to ALL tests ***
+    window.removeEventListener('online', validateStartConditions);
+    window.removeEventListener('offline', validateStartConditions);
+    window.addEventListener('online', forceSubmitOnReconnect);
     
     initTest();
 }
 
 function forceSubmitOnReconnect() {
-    // This logic only applies to single tests now
-    if (!isTestCompleted && !isWeeklyTest) {
+    // *** MODIFIED: This applies to ALL active tests ***
+    if (!isTestCompleted) {
         alert("Internet connection detected. Submitting the test as per rules.");
         submitTest(true);
     }
 }
 
-// *** MODIFIED: This function now handles loading from localStorage and Firestore ***
 async function loadTestFromURL(testId, user) {
     dom.loginScreen.style.display = 'none';
     dom.instructionsScreen.style.display = 'none';
@@ -836,42 +820,37 @@ async function loadTestFromURL(testId, user) {
             weeklySubTests = weeklyTestDoc.data().subTests;
             
             if (user) {
-                // Set up the keys for this user and test
                 weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
                 weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(user.uid).collection("weeklyTestAttempts").doc(mainTestId);
                 
-                // 1. Check for a completed test on Firestore
                 const attemptDoc = await weeklyTestAttemptRef.get();
                 if (attemptDoc.exists && attemptDoc.data().status === 'completed') {
                     console.log("Loaded COMPLETED progress from Firestore.");
                     weeklyProgress = attemptDoc.data();
                     completedSubTests = new Set(weeklyProgress.completedSubTests || []);
-                    showWeeklyTestFinalResult(weeklyProgress); // Show final results
+                    showWeeklyTestFinalResult(weeklyProgress);
                     return;
                 }
 
-                // 2. If not completed on Firestore, check localStorage for in-progress data
                 const localProgress = localStorage.getItem(weeklyProgressKey);
                 if (localProgress) {
                     console.log("Loaded IN-PROGRESS from localStorage.");
                     weeklyProgress = JSON.parse(localProgress);
                 } else if (attemptDoc.exists) {
                     console.log("Loaded IN-PROGRESS from Firestore (no local data).");
-                    weeklyProgress = attemptDoc.data(); // Load partially-synced data
-                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress)); // Sync to local
+                    weeklyProgress = attemptDoc.data();
+                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
                 } else {
                     console.log("No progress found anywhere, starting fresh.");
                     weeklyProgress = { completedSubTests: [], subTestResults: [], totalScore: 0, totalCorrect: 0, totalIncorrect: 0, totalQuestions: 0, status: 'in-progress' };
                     completedSubTests = new Set();
-                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress)); // Save fresh state
+                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
                 }
 
-                // 3. Populate completed set and show chapters
                 completedSubTests = new Set(weeklyProgress.completedSubTests || []);
                 showChapterSelectionScreen();
 
             } else {
-                 // User not logged in, just show chapter screen (no progress)
                  completedSubTests = new Set();
                  showChapterSelectionScreen();
             }
@@ -890,7 +869,7 @@ async function loadTestFromURL(testId, user) {
 async function loadSingleTest(testId) {
     dom.instructionsScreen.style.display = 'flex';
     dom.instructionsTitle.textContent = 'Loading Test Details...';
-    dom.offlineStatus.style.display = 'block'; // Ensure offline status is visible
+    dom.offlineStatus.style.display = 'block';
 
     const testDocRef = db.collection('quizzes').doc(testId);
     const testDoc = await testDocRef.get();
@@ -919,7 +898,6 @@ function showChapterSelectionScreen() {
     let html = `<h2 style="font-size: 1.8em; color: #3f51b5; margin-bottom: 25px; text-align: center;">${weeklyTestTitle || 'Test Sections'}</h2>`;
     html += `<div class="chapter-grid">`;
     
-    // Read from the global set, which is loaded from localStorage
     weeklySubTests.forEach(subTest => {
         const isCompleted = completedSubTests.has(subTest.quizId);
         html += `
@@ -948,7 +926,7 @@ async function startSubTest(subQuizId, subQuizName) {
     dom.chapterSelectionWrapper.style.display = 'none';
     dom.instructionsScreen.style.display = 'flex';
     dom.instructionsTitle.textContent = `Loading ${subQuizName}...`;
-    dom.offlineStatus.style.display = 'none'; // Hide offline status for sub-tests
+    dom.offlineStatus.style.display = 'block'; // *** RE-ENABLE offline status check ***
 
     try {
         const testDocRef = db.collection('quizzes').doc(subQuizId);
@@ -967,10 +945,10 @@ async function startSubTest(subQuizId, subQuizName) {
         timeLeft = testMetadata.durationMinutes * 60;
         dom.timer.textContent = formatTime(timeLeft);
         
-        // We don't need the online/offline check here, just the agreement
-        window.removeEventListener('online', validateStartConditions);
-        window.removeEventListener('offline', validateStartConditions);
-        validateStartConditions(); // Just to check the agreement box
+        // *** RE-ADD online/offline listeners ***
+        window.addEventListener('online', validateStartConditions);
+        window.addEventListener('offline', validateStartConditions);
+        validateStartConditions(); // Check agreement and offline status
 
     } catch (error) {
         console.error("Failed to load sub-test:", error);
@@ -986,9 +964,7 @@ function handleLoadError(error) {
 // ============ START: RESULT SAVING LOGIC =============================
 // =====================================================================
 
-// This function is for SINGLE tests only
 async function saveResultToFirestore(scoreData) {
-    // ... (This function is unchanged from your provided code, as it's for single tests)
     const syncStatusEl = dom.syncStatus;
     if (!currentUser) {
         console.error("User not logged in. Cannot save result.");
@@ -1026,13 +1002,12 @@ async function saveResultToFirestore(scoreData) {
     }
 }
 
-// *** MODIFIED: This function saves to LOCALSTORAGE first, then *tries* to save to Firestore ***
 async function saveWeeklyTestProgress(scoreBreakdown) {
     console.log("Saving weekly test progress...");
 
     // 1. Update the global progress object
-    completedSubTests.add(currentSubQuizId); // Add to the Set
-    weeklyProgress.completedSubTests = Array.from(completedSubTests); // Update the array
+    completedSubTests.add(currentSubQuizId);
+    weeklyProgress.completedSubTests = Array.from(completedSubTests);
     
     const existingResultIndex = weeklyProgress.subTestResults.findIndex(r => r.quizId === currentSubQuizId);
     if (existingResultIndex > -1) {
@@ -1057,16 +1032,15 @@ async function saveWeeklyTestProgress(scoreBreakdown) {
         dom.submittingTitle.textContent = "Error!";
         dom.submittingSpinner.style.display = 'none';
         dom.submittingMessage.textContent = "Could not save progress locally. Storage may be full.";
-        return; // Stop here if local save fails
+        return;
     }
 
     // 4. Check if all tests are now done
     if (completedSubTests.size === weeklySubTests.length) {
         console.log("All sub-tests completed!");
         weeklyProgress.status = 'completed';
-        localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress)); // Save final status
+        localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
         
-        // Show success and redirect to final results
         dom.submittingTitle.textContent = "Weekly Test Complete!";
         dom.submittingTestName.textContent = weeklyTestTitle;
         dom.submittingSpinner.style.display = 'none';
@@ -1079,7 +1053,7 @@ async function saveWeeklyTestProgress(scoreBreakdown) {
         }, 2500);
 
     } else {
-        // Not finished yet, show success and go back to chapters
+        // Not finished yet
         dom.submittingTitle.textContent = "Section Submitted!";
         dom.submittingSpinner.style.display = 'none';
         dom.submittingSuccess.style.display = 'block';
@@ -1090,17 +1064,15 @@ async function saveWeeklyTestProgress(scoreBreakdown) {
             currentSubQuizId = null;
             state = {};
             questions = [];
-            localStorage.removeItem('testTaken'); // Clear sub-test resume flag
+            localStorage.removeItem('testTaken');
             localStorage.removeItem('currentSubQuizId');
             
             dom.submittingScreen.style.display = 'none';
-            showChapterSelectionScreen(); // Show chapters with updated "Completed" status
+            showChapterSelectionScreen();
         }, 2500);
     }
     
     // 5. (In Background) Try to sync to Firestore
-    // We don't wait for this. This is "fire and forget".
-    // If the user is offline, it will be queued by Firestore persistence and sync when they go online.
     if (weeklyTestAttemptRef) {
         weeklyTestAttemptRef.set(weeklyProgress, { merge: true })
             .then(() => console.log("Progress successfully synced to Firestore in background."))
@@ -1743,7 +1715,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             console.log("Auth state changed: User is signed in.", user.uid);
             
-            if (localStorage.getItem('testTaken') === 'true' && !isWeeklyTest) { // Only resume single tests this way
+            // This key must be set before checking localStorage
+            weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
+            
+            // Modified logic: Check for 'testTaken' (sub-test resume)
+            // *AND* that it's not a weekly test that has been fully completed
+            const localProgress = JSON.parse(localStorage.getItem(weeklyProgressKey));
+            const isWeeklyCompleted = localProgress && localProgress.status === 'completed';
+
+            if (localStorage.getItem('testTaken') === 'true' && !isWeeklyCompleted) {
                 await resumeResultSession();
             } else {
                 await loadTestFromURL(mainTestId, user);
@@ -1772,7 +1752,6 @@ async function resumeResultSession() {
     const testId = params.get('testId');
     let testIdToReview = testId; 
 
-    // This key must be set before checking Firestore/localStorage
     if (currentUser) {
         weeklyProgressKey = `weeklyProgress_${testId}_${currentUser.uid}`;
     }
@@ -1793,7 +1772,6 @@ async function resumeResultSession() {
             testIdToReview = currentSubQuizId; 
             
             weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
-            // Load progress from localStorage
             const localProgress = localStorage.getItem(weeklyProgressKey);
             if (localProgress) {
                 weeklyProgress = JSON.parse(localProgress);
