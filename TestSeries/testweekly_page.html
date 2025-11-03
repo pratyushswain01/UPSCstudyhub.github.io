@@ -1369,7 +1369,8 @@ async function toggleDarkMode(isDark) {
     if (isTestCompleted && performanceChart) {
         let topicStats;
         if (isWeeklyTest) {
-            topicStats = await calculateAggregatedTopicStats();
+            // *** FIX: Get stats from global weeklyProgress object ***
+            topicStats = await calculateAggregatedTopicStats(weeklyProgress);
         } else {
             topicStats = JSON.parse(localStorage.getItem('topicStats'));
         }
@@ -1443,7 +1444,8 @@ async function showWeeklyTestFinalResult(finalProgress) {
     // --- NEW: Aggregate topic stats ---
     let topicStats = {};
     try {
-        topicStats = await calculateAggregatedTopicStats();
+        // *** FIX: Pass the finalProgress object ***
+        topicStats = await calculateAggregatedTopicStats(finalProgress);
         localStorage.setItem('topicStats', JSON.stringify(topicStats)); // Save for dark mode toggle
     } catch (error) {
         console.error("Failed to aggregate topic stats:", error);
@@ -1528,11 +1530,12 @@ function calculateTopicStats() {
 }
 
 // *** NEW FUNCTION: Aggregates stats for the FINAL weekly result ***
-async function calculateAggregatedTopicStats() {
+async function calculateAggregatedTopicStats(finalProgress) {
     const allTopicStats = {};
-    if (!weeklyProgress || !weeklyProgress.subTestResults) return {};
+    // *** FIX: Use the passed finalProgress object ***
+    if (!finalProgress || !finalProgress.subTestResults) return {};
 
-    for (const subtest of weeklyProgress.subTestResults) {
+    for (const subtest of finalProgress.subTestResults) {
         const userAnswers = subtest.userAnswers;
         
         // Fetch the questions for this subtest
@@ -1548,6 +1551,7 @@ async function calculateAggregatedTopicStats() {
             const subtestQuestions = questionsSnapshot.docs.map(doc => doc.data());
             
             subtestQuestions.forEach((q, i) => {
+                if (!q) return; // Safety check
                 const topic = q.topic || 'Uncategorized';
                 if (!allTopicStats[topic]) {
                     allTopicStats[topic] = { correct: 0, attempted: 0 };
@@ -1664,6 +1668,7 @@ async function populateWeeklyReviewScreen() {
     dom.resultScreenWrapper.style.display = 'none';
     dom.reviewScreenWrapper.style.display = 'flex';
     
+    // *** FIX: Use the global weeklyProgress object ***
     if (!weeklyProgress || !weeklyProgress.subTestResults) {
         dom.reviewContainer.innerHTML = '<p>Could not load review data.</p>';
         return;
@@ -1672,13 +1677,11 @@ async function populateWeeklyReviewScreen() {
     for (const subtest of weeklyProgress.subTestResults) {
         const userAnswers = subtest.userAnswers;
         
-        // Create a title for this section
         const sectionTitle = document.createElement('h2');
         sectionTitle.textContent = `Review: ${subtest.testName}`;
         sectionTitle.style = "font-size: 1.5em; color: #3f51b5; margin-bottom: 15px; border-bottom: 2px solid #3f51b5; padding-bottom: 5px;";
         dom.reviewContainer.appendChild(sectionTitle);
 
-        // Fetch the questions for this subtest
         let testDocRef = db.collection('weeklyTestsdocs').doc(subtest.quizId);
         let testDoc = await testDocRef.get();
         if (!testDoc.exists) {
@@ -1690,8 +1693,8 @@ async function populateWeeklyReviewScreen() {
             const questionsSnapshot = await testDocRef.collection('questions').get();
             const subtestQuestions = questionsSnapshot.docs.map(doc => doc.data());
             
-            // Re-use the populateReviewScreen logic for each question
             subtestQuestions.forEach((q, index) => {
+                if (!q || !q.options) return; // Safety check
                 const userAnswer = userAnswers[index];
                 const correctAnswer = q.answer;
                 const isCorrect = userAnswer === correctAnswer;
@@ -1841,6 +1844,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (target.id === 'retestWeeklyTestBtn' || target.closest('#retestWeeklyTestBtn')) {
              if (confirm("Are you sure you want to retest this entire weekly test? All your progress will be deleted.")) {
+                // *** MODIFIED: Must be online to delete Firestore doc ***
                 if (weeklyTestAttemptRef && navigator.onLine) {
                     weeklyTestAttemptRef.delete().then(() => {
                         console.log("Weekly test progress deleted from Firestore.");
@@ -1853,6 +1857,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (!navigator.onLine) {
                     alert("Please connect to the internet to clear your test progress from your account.");
                 } else {
+                     // No Firestore ref, just clear local
                      localStorage.removeItem(weeklyProgressKey);
                      location.reload();
                 }
@@ -1863,6 +1868,7 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.backToResultsBtn.addEventListener('click', () => {
         // *** MODIFIED: Go to chapter or final result based on context ***
         if (isWeeklyTest) {
+            // *** FIX: Call ASYNC function ***
             showWeeklyTestFinalResult(weeklyProgress);
         } else {
             const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
