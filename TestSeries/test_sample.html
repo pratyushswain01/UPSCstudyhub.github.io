@@ -27,25 +27,26 @@
         body.light-mode.site-copyright { color: rgba(0, 0, 0, 0.6); }
         body.dark-mode.site-copyright { color: rgba(255, 255, 255, 0.7); }
         @media (max-width: 600px) {
-          .site-header { flex-direction: column; align-items: center; text-align: center; }
-          .site-copyright { margin-top: 5px; position: static; }
+         .site-header { flex-direction: column; align-items: center; text-align: center; }
+         .site-copyright { margin-top: 5px; position: static; }
         }
       .pre-exam-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100%; /* <-- CHANGE THIS */
-    padding: 20px;
-    z-index: 5000;
-    position: relative;
-    background: #f0f0f5;
-    overflow-y: auto;   /* <-- ADD THIS */
-}
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%;
+        padding: 20px;
+        z-index: 5000;
+        position: relative;
+        background: #f0f0f5;
+        overflow-y: auto;
+      }
        .dark.pre-exam-screen { background: #1e1e2f; }
-       .login-card,.instructions-container { background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; text-align: center; }
-       .dark.login-card,.dark.instructions-container { background: #2a2a3a; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
-        #loginScreen.login-card { max-width: 450px; }
+       .login-card,.instructions-container,.submitting-card { background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; text-align: center; }
+       .dark.login-card,.dark.instructions-container,.dark.submitting-card { background: #2a2a3a; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+       .login-card { max-width: 450px; }
+       .submitting-card { max-width: 500px; }
        .login-card h2 { margin-bottom: 25px; color: #3f51b5; font-size: 1.8em; }
        .dark.login-card h2 { color: #8ab4f8; }
        .input-group { margin-bottom: 20px; text-align: left; }
@@ -56,11 +57,11 @@
        .btn-primary:hover:not(:disabled) { opacity: 0.9; }
         #loginError { color: #f44336; height: 1.2em; margin-top: 15px; font-weight: 500; }
         #instructionsScreen { display: none; }
-        #instructionsScreen.instructions-container { max-width: 800px; text-align: left; height: 90vh; display: flex; flex-direction: column; }
-        #instructionsScreen h2 { color: #3f51b5; border-bottom: 2px solid #3f51b5; padding-bottom: 5px; margin-bottom: 15px; margin-top: 25px; }
-        #instructionsScreen h2:first-of-type { margin-top: 0; }
+        .instructions-container { max-width: 800px; text-align: left; }
+       #instructionsScreen h2 { color: #3f51b5; border-bottom: 2px solid #3f51b5; padding-bottom: 5px; margin-bottom: 15px; margin-top: 25px; }
+       #instructionsScreen h2:first-of-type { margin-top: 0; }
         .dark #instructionsScreen h2 { color: #8ab4f8; border-bottom-color: #8ab4f8; }
-        .instructions-content {flex-grow: 1;overflow-y: auto;padding-right: 15px;min-height: 0; /* <-- ADD THIS LINE */}
+        .instructions-content {flex-grow: 1;overflow-y: auto;padding-right: 15px;min-height: 0;}
        .instructions-content ul { list-style: none; padding-left: 0; line-height: 1.8; }
        .instructions-content li { display: flex; align-items: flex-start; margin-bottom: 12px; }
        .instructions-content li i { color: #3f51b5; margin-right: 15px; font-size: 1.2em; margin-top: 5px; min-width: 20px; text-align: center; }
@@ -268,14 +269,119 @@
        .dark .close-modal:hover { color: #fff; }
        .dark .contact-admin-text { color: #aaa; }
        .dark .contact-admin-text a { color: #8ab4f8; }
+        
+        /* --- NEW STYLES FOR CHAPTER SELECTION (MERGED) --- */
+        #chapterSelectionWrapper {
+            display: none; /* Hidden by default */
+            padding: 20px;
+            max-width: 1000px;
+            margin: 20px auto;
+        }
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .chapter-button {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px 25px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
+        }
+        .chapter-button:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+        .chapter-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f9f9f9;
+        }
+        .chapter-button h3 {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #3f51b5;
+        }
+        .chapter-button .status-completed {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #4caf50;
+            margin-top: 10px;
+        }
+        .dark .chapter-button {
+            background: #2a2a3a;
+            border-color: #444;
+        }
+        .dark .chapter-button h3 {
+            color: #8ab4f8;
+        }
+        .dark .chapter-button:disabled {
+            background-color: #242434;
+        }
+        .dark .chapter-button .status-completed {
+            color: #81c784;
+        }
+
+        /* --- NEW: Submitting Screen Styles --- */
+        #submittingScreen {
+            display: none; /* Hidden by default */
+        }
+        #submittingScreen h2 {
+            font-size: 1.8em;
+            color: #3f51b5;
+            margin-bottom: 15px;
+        }
+        .dark #submittingScreen h2 {
+            color: #8ab4f8;
+        }
+        #submittingScreen p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .dark #submittingScreen p {
+            color: #aaa;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f0f0f5;
+            border-top: 5px solid #3f51b5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto; /* Center the spinner */
+        }
+        .dark .spinner {
+            border-color: #1e1e2f;
+            border-top-color: #8ab4f8;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success-icon {
+            font-size: 50px;
+            color: #4caf50;
+            display: none; /* Hidden by default */
+        }
+        /* --- END: Submitting Screen Styles --- */
+
         @media (max-width: 768px) {
-          .site-header { flex-direction: column; text-align: center; gap: 5px; }
-          .topbar { flex-wrap: wrap; justify-content: center; }
-          .navigation-tabs { position: static; transform: none; order: 3; width: 100%; justify-content: center; margin-top: 10px; }
-          .sidebar-open .question-area { padding-right: 20px; }
+         .site-header { flex-direction: column; text-align: center; gap: 5px; }
+         .topbar { flex-wrap: wrap; justify-content: center; }
+         .navigation-tabs { position: static; transform: none; order: 3; width: 100%; justify-content: center; margin-top: 10px; }
+         .sidebar-open .question-area { padding-right: 20px; }
         }
         @media (max-width: 480px) {
-          .btn-action span { display: none; }
+         .btn-action span { display: none; }
         }
     </style>
 </head>
@@ -332,6 +438,24 @@
         </div>
     </div>
 
+    <!-- This is the container for the chapter selection screen -->
+    <div id="chapterSelectionWrapper">
+        <!-- Chapters will be loaded here by JavaScript -->
+    </div>
+
+    <!-- *** NEW: Submitting Screen *** -->
+    <div id="submittingScreen" class="pre-exam-screen">
+        <div class="submitting-card">
+            <h2 id="submittingTitle">Submitting Test...</h2>
+            <p id="submittingTestName">Polity Ch. 23 : Parliament</p>
+            <div id="submittingSpinner" class="spinner"></div>
+            <i id="submittingSuccess" class="fas fa-check-circle success-icon"></i>
+            <p id="submittingMessage" style="margin-top: 20px; font-weight: 500;"></p>
+        </div>
+    </div>
+    <!-- *** END: Submitting Screen *** -->
+
+    <!-- This is the main wrapper for the test UI and results -->
     <div id="examUIWrapper">
         <header class="site-header" id="siteHeader">
             <img src="../images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
@@ -365,7 +489,10 @@
                 <button id="btnSubmitTest" style="display: none;"><i class="fas fa-paper-plane"></i> Submit</button>
             </div>
         </header>
-        <div class="main-content">
+        
+        <!-- This main-content div holds the test, results, review, etc. -->
+        <div class="main-content" id="main-content"> 
+            
             <div id="mockTestWrapper" style="display: flex; width: 100%;">
                 <section class="question-area">
                     <h2 class="question-header" id="questionNumber"></h2>
@@ -394,9 +521,10 @@
                     </div>
                 </aside>
             </div>
+            
             <div id="resultScreenWrapper">
-                <h2>Test Completed!</h2>
-                <p>Here is your score summary:</p>
+                <h2 id="resultScreenTitle">Test Completed!</h2>
+                <p id="resultScreenSubtitle">Here is your score summary:</p>
                 
                 <div id="syncStatus"></div>
 
@@ -422,20 +550,23 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="result-buttons">
-                    <button id="retestButton" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest</button>
-                    <button id="reviewAnswersButton" class="submit-button btn-action"><i class="fas fa-search"></i> Review Answers</button>
+
+                <div class="result-buttons" id="resultButtonsContainer">
+                    <!-- Buttons are dynamically added here -->
                 </div>
+
                 <div class="performance-analysis-container">
                     <h3>Topic-wise Performance</h3>
                     <div class="table-wrapper"><table class="performance-table"><thead><tr><th>Topic</th><th>Correct</th><th>Attempted</th><th>Accuracy</th></tr></thead><tbody id="performanceTableBody"></tbody></table></div>
                 </div>
                 <div class="chart-container"><canvas id="performanceChart"></canvas></div>
             </div>
+            
             <div id="reviewScreenWrapper">
                 <div class="review-header"><h2 class="review-title">Review Your Answers</h2><button id="backToResultsBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Score</button></div>
                 <div id="reviewContainer"></div>
             </div>
+            
             <div id="answerWritingWrapper">
                 <h2>Answer Writing Practice</h2>
                 <div class="answer-writing-questions">
@@ -444,6 +575,7 @@
                 </div>
             </div>
         </div>
+        
         <div class="fixed-action-area" id="mcqFooter">
             <div class="action-buttons">
                 <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i><span>Previous</span></button>
@@ -453,6 +585,7 @@
             </div>
         </div>
     </div>
+    
     <div id="passwordModal" class="password-modal">
         <div class="modal-content">
             <span id="closeModal" class="close-modal">×</span>
@@ -505,7 +638,26 @@ let performanceChart = null;
 let stopwatchTime = 0;
 let isStopwatchRunning = false;
 let currentUser = null;
-  
+
+let isWeeklyTest = false;
+let weeklySubTests = [];
+let completedSubTests = new Set();
+let currentSubQuizId = null;
+let weeklyTestTitle = '';
+
+let weeklyTestAttemptRef = null;
+let weeklyProgressKey = null; // Key for localStorage
+let weeklyProgress = {
+    completedSubTests: [],
+    subTestResults: [],
+    totalScore: 0,
+    totalCorrect: 0,
+    totalIncorrect: 0,
+    totalQuestions: 0,
+    status: 'in-progress'
+};
+let mainTestId = null;
+    
 const dom = {
     body: document.body,
     loginScreen: document.getElementById('loginScreen'),
@@ -524,9 +676,11 @@ const dom = {
     examUIWrapper: document.getElementById('examUIWrapper'),
     siteHeader: document.getElementById('siteHeader'),
     topbar: document.getElementById('topbar'),
+    mainContent: document.getElementById('main-content'),
     sidebar: document.getElementById('sidebar'),
     mockTestWrapper: document.getElementById('mockTestWrapper'),
     mcqFooter: document.getElementById('mcqFooter'),
+    questionArea: document.querySelector('.question-area'),
     questionText: document.getElementById('questionText'),
     questionNumber: document.getElementById('questionNumber'),
     questionTimerBar: document.getElementById('questionTimerBar'),
@@ -546,11 +700,12 @@ const dom = {
     summaryMarked: document.getElementById('summaryMarked'),
     summaryNotVisited: document.getElementById('summaryNotVisited'),
     resultScreenWrapper: document.getElementById('resultScreenWrapper'),
+    resultScreenTitle: document.getElementById('resultScreenTitle'),
+    resultScreenSubtitle: document.getElementById('resultScreenSubtitle'),
+    resultButtonsContainer: document.getElementById('resultButtonsContainer'),
     reviewScreenWrapper: document.getElementById('reviewScreenWrapper'),
     performanceTableBody: document.getElementById('performanceTableBody'),
     reviewContainer: document.getElementById('reviewContainer'),
-    retestButton: document.getElementById('retestButton'),
-    reviewAnswersButton: document.getElementById('reviewAnswersButton'),
     backToResultsBtn: document.getElementById('backToResultsBtn'),
     passwordModal: document.getElementById('passwordModal'),
     closeModal: document.getElementById('closeModal'),
@@ -573,6 +728,13 @@ const dom = {
     finalScoreAnimated: document.getElementById('finalScoreAnimated'),
     totalPossibleScore: document.getElementById('totalPossibleScore'),
     syncStatus: document.getElementById('syncStatus'),
+    chapterSelectionWrapper: document.getElementById('chapterSelectionWrapper'),
+    submittingScreen: document.getElementById('submittingScreen'),
+    submittingTitle: document.getElementById('submittingTitle'),
+    submittingTestName: document.getElementById('submittingTestName'),
+    submittingSpinner: document.getElementById('submittingSpinner'),
+    submittingSuccess: document.getElementById('submittingSuccess'),
+    submittingMessage: document.getElementById('submittingMessage'),
 };
 
 // ### STAGE 1 & 2: PRE-EXAM LOGIC ###
@@ -591,16 +753,19 @@ function handleLogin() {
         dom.loginBtn.textContent = 'Login';
     });
 }
-  
+    
+// *** MODIFIED: Restored offline check for ALL tests ***
 function validateStartConditions() {
     const isOffline = !navigator.onLine;
     const isAgreed = dom.agreementCheckbox.checked;
+
     dom.startExamBtn.disabled = !(isOffline && isAgreed);
     let errorMsg = '';
     if (!isOffline && !isAgreed) errorMsg = 'Please agree to terms and enable Aeroplane Mode.';
     else if (!isOffline) errorMsg = 'Please enable Aeroplane Mode to continue.';
     else if (!isAgreed) errorMsg = 'Please agree to the instructions to start.';
     dom.startError.textContent = errorMsg;
+    
     if (isOffline) {
         dom.offlineStatus.innerHTML = '<i class="fas fa-check-circle"></i> You are offline. Ready to begin.';
         dom.offlineStatus.className = 'status-ready';
@@ -608,6 +773,9 @@ function validateStartConditions() {
         dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
         dom.offlineStatus.className = 'status-waiting';
     }
+    
+    // Ensure the offline status message is always visible on the instructions screen
+    dom.offlineStatus.style.display = 'block';
 }
 
 function startExam() {
@@ -616,45 +784,193 @@ function startExam() {
     dom.examUIWrapper.style.display = 'flex';
     dom.body.classList.add('exam-active');
     updateSidebarPosition();
+    
+    // *** MODIFIED: Add online listener for ALL tests ***
     window.removeEventListener('online', validateStartConditions);
     window.removeEventListener('offline', validateStartConditions);
     window.addEventListener('online', forceSubmitOnReconnect);
+    
     initTest();
 }
 
 function forceSubmitOnReconnect() {
+    // *** MODIFIED: This applies to ALL active tests ***
     if (!isTestCompleted) {
         alert("Internet connection detected. Submitting the test as per rules.");
         submitTest(true);
     }
 }
 
-async function loadTestFromURL() {
-    const params = new URLSearchParams(window.location.search);
-    const testId = params.get('testId');
-
-    if (!testId) {
-        document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>No Test ID provided in the URL.</p></div></div>`;
-        return;
-    }
+// *** MODIFIED: This function now handles loading from localStorage and Firestore ***
+async function loadTestFromURL(testId, user) {
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'none';
+    dom.chapterSelectionWrapper.style.display = 'none';
+    dom.submittingScreen.style.display = 'none'; 
 
     try {
-        dom.loginScreen.style.display = 'none';
-        dom.instructionsScreen.style.display = 'flex';
-        dom.instructionsTitle.textContent = 'Loading Test...';
+        // *** FIX: Changed to 'weeklyTests' ***
+        const weeklyTestRef = db.collection('weeklyTests').doc(testId);
+        const weeklyTestDoc = await weeklyTestRef.get();
 
-        const testDocRef = db.collection('quizzes').doc(testId);
-        const testDoc = await testDocRef.get();
-        if (!testDoc.exists) throw new Error("Test not found.");
+        if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
+            console.log("Loading as Weekly Test Container");
+            isWeeklyTest = true;
+            mainTestId = testId;
+            weeklyTestTitle = weeklyTestDoc.data().title;
+            weeklySubTests = weeklyTestDoc.data().subTests;
+            
+            if (user) {
+                weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
+                weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(user.uid).collection("weeklyTestAttempts").doc(mainTestId);
+                
+                const attemptDoc = await weeklyTestAttemptRef.get();
+                if (attemptDoc.exists && (attemptDoc.data().status === 'completed' || attemptDoc.data().status === 'completed-synced')) {
+                    console.log("Loaded COMPLETED progress from Firestore.");
+                    weeklyProgress = attemptDoc.data();
+                    if(weeklyProgress.status === 'completed') {
+                        weeklyProgress.status = 'completed-synced';
+                        weeklyTestAttemptRef.set(weeklyProgress, {merge: true}).catch(e => console.warn("Sync on load failed", e));
+                    }
+                    completedSubTests = new Set(weeklyProgress.completedSubTests || []);
+                    // *** FIX: Call the ASYNC version ***
+                    await showWeeklyTestFinalResult(weeklyProgress); 
+                    return;
+                }
+
+                const localProgress = localStorage.getItem(weeklyProgressKey);
+                if (localProgress) {
+                    console.log("Loaded IN-PROGRESS from localStorage.");
+                    weeklyProgress = JSON.parse(localProgress);
+                } else if (attemptDoc.exists) {
+                    console.log("Loaded IN-PROGRESS from Firestore (no local data).");
+                    weeklyProgress = attemptDoc.data();
+                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+                } else {
+                    console.log("No progress found anywhere, starting fresh.");
+                    weeklyProgress = { completedSubTests: [], subTestResults: [], totalScore: 0, totalCorrect: 0, totalIncorrect: 0, totalQuestions: 0, status: 'in-progress' };
+                    completedSubTests = new Set();
+                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+                }
+
+                completedSubTests = new Set(weeklyProgress.completedSubTests || []);
+                showChapterSelectionScreen();
+
+            } else {
+                 completedSubTests = new Set();
+                 showChapterSelectionScreen();
+            }
+            
+        } else {
+            console.log("Loading as Single Test");
+            isWeeklyTest = false;
+            await loadSingleTest(testId);
+        }
+    } catch (error) {
+        console.error("Failed to load test:", error);
+        handleLoadError(error);
+    }
+}
+
+// *** MODIFIED: This function now checks 'weeklyTestsdocs' first, then 'quizzes' ***
+async function loadSingleTest(testId) {
+    dom.instructionsScreen.style.display = 'flex';
+    dom.instructionsTitle.textContent = 'Loading Test Details...';
+    dom.offlineStatus.style.display = 'block';
+
+    let testDocRef = db.collection('weeklyTestsdocs').doc(testId);
+    let testDoc = await testDocRef.get();
+    let questionsSnapshot;
+
+    if (!testDoc.exists) {
+        console.warn(`Test not found in 'weeklyTestsdocs'. Trying 'quizzes'...`);
+        testDocRef = db.collection('quizzes').doc(testId);
+        testDoc = await testDocRef.get();
+        if (!testDoc.exists) {
+            throw new Error("Test not found in 'weeklyTestsdocs' or 'quizzes'.");
+        }
+    }
+    
+    console.log(`Loading test from: ${testDocRef.path}`);
+    testMetadata = testDoc.data();
+
+    questionsSnapshot = await testDocRef.collection('questions').get();
+    questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (questions.length === 0) throw new Error("This test has no questions.");
+
+    dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
+    dom.totalQuestionsEl.textContent = testMetadata.totalQuestions || questions.length;
+    dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
+    
+    timeLeft = testMetadata.durationMinutes * 60;
+    dom.timer.textContent = formatTime(timeLeft);
+    
+    window.addEventListener('online', validateStartConditions);
+    window.addEventListener('offline', validateStartConditions);
+    validateStartConditions();
+}
+
+function showChapterSelectionScreen() {
+    const chapterWrapper = dom.chapterSelectionWrapper;
+    
+    let html = `<h2 style="font-size: 1.8em; color: #3f51b5; margin-bottom: 25px; text-align: center;">${weeklyTestTitle || 'Test Sections'}</h2>`;
+    html += `<div class="chapter-grid">`;
+    
+    weeklySubTests.forEach(subTest => {
+        const isCompleted = completedSubTests.has(subTest.quizId);
+        html += `
+            <button ${isCompleted ? 'disabled' : ''} onclick="startSubTest('${subTest.quizId}', '${subTest.name}')" class="chapter-button">
+                <div>
+                    <h3>${subTest.name}</h3>
+                </div>
+                ${isCompleted ? '<span class="status-completed"><i class="fas fa-check-circle"></i> Completed</span>' : ''}
+            </button>
+        `;
+    });
+
+    html += `</div>`;
+    chapterWrapper.innerHTML = html;
+    
+    chapterWrapper.style.display = 'block';
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'none';
+    dom.submittingScreen.style.display = 'none';
+}
+
+// *** MODIFIED: This function now checks 'weeklyTestsdocs' first, then 'quizzes' ***
+async function startSubTest(subQuizId, subQuizName) {
+    currentSubQuizId = subQuizId;
+    
+    dom.chapterSelectionWrapper.style.display = 'none';
+    dom.instructionsScreen.style.display = 'flex';
+    dom.instructionsTitle.textContent = `Loading ${subQuizName}...`;
+    dom.offlineStatus.style.display = 'block'; 
+
+    try {
+        let testDocRef = db.collection('weeklyTestsdocs').doc(subQuizId);
+        let testDoc = await testDocRef.get();
+        let questionsSnapshot;
+
+        if (!testDoc.exists) {
+            console.warn(`Test not found in 'weeklyTestsdocs'. Trying 'quizzes'...`);
+            testDocRef = db.collection('quizzes').doc(subQuizId);
+            testDoc = await testDocRef.get();
+            if (!testDoc.exists) {
+                throw new Error(`Test not found: ${subQuizId}`);
+            }
+        }
+
+        console.log(`Loading sub-test from: ${testDocRef.path}`);
         testMetadata = testDoc.data();
 
-        const questionsSnapshot = await testDocRef.collection('questions').get();
+        questionsSnapshot = await testDocRef.collection('questions').get();
         questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
         if (questions.length === 0) throw new Error("This test has no questions.");
 
-        dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
-        dom.totalQuestionsEl.textContent = testMetadata.totalQuestions;
+        dom.instructionsTitle.textContent = `${subQuizName} - Instructions`;
+        dom.totalQuestionsEl.textContent = testMetadata.totalQuestions || questions.length;
         dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
         
         timeLeft = testMetadata.durationMinutes * 60;
@@ -662,16 +978,20 @@ async function loadTestFromURL() {
         
         window.addEventListener('online', validateStartConditions);
         window.addEventListener('offline', validateStartConditions);
-        validateStartConditions();
+        validateStartConditions(); 
 
     } catch (error) {
-        console.error("Failed to load test:", error);
-        document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>Could not load question data. Missing or insufficient permissions.</p><p style="font-size:0.8em; color:#666; margin-top:10px;">${error.message}</p><a href="#" onclick="window.location.reload()" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Try Again</a></div></div>`;
+        console.error("Failed to load sub-test:", error);
+        handleLoadError(error);
     }
 }
 
+function handleLoadError(error) {
+     document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>Could not load question data. Missing or insufficient permissions.</p><p style="font-size:0.8em; color:#666; margin-top:10px;">${error.message}</p><a href="#" onclick="window.location.reload()" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Try Again</a></div></div>`;
+}
+
 // =====================================================================
-// ============ START: RESULT SAVING LOGIC (UPDATED) ===================
+// ============ START: RESULT SAVING LOGIC =============================
 // =====================================================================
 
 async function saveResultToFirestore(scoreData) {
@@ -683,43 +1003,28 @@ async function saveResultToFirestore(scoreData) {
         return;
     }
     const userId = currentUser.uid;
-
     syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
     syncStatusEl.className = 'syncing';
-
-    // *** UPDATED: Changed collection name to "testHistory" to match the history page ***
     const historyCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testHistory");
-    
-    // *** UPDATED: Create a custom document ID to make reviewing easier ***
     const testId = new URLSearchParams(window.location.search).get('testId');
-    const testSet = testMetadata.testSet || 'A'; // Assuming a test set, defaulting to 'A'
     const docId = `${testId}_history_${Date.now()}`;
-
-    // *** UPDATED: Calculate percentage here ***
     const percentage = scoreData.totalQuestions > 0 ? (scoreData.correctCount / scoreData.totalQuestions) * 100 : 0;
-
     try {
-        // *** UPDATED: Use .doc(docId).set() with the new data structure ***
         await historyCollectionRef.doc(docId).set({
             testId: testId,
             testName: testMetadata.testName,
             subject: testMetadata.subject,
-            testSet: testSet,
+            testSet: testMetadata.testSet || 'A',
             score: scoreData.totalScore,
             correctAnswers: scoreData.correctCount,
             totalQuestions: scoreData.totalQuestions,
             percentage: percentage,
             userAnswers: state.answers,
-            timestamp: firebase.firestore.FieldValue.serverTimestamp() // Changed from dateCompleted
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        
         console.log("Result saved to 'testHistory' collection.");
         syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. View on your dashboard.`;
         syncStatusEl.className = 'synced';
-        
-        // This function is hypothetical as it's not in the original code, but would be called here.
-        // await logTestActivityAndUpdateStreak(userId);
-
     } catch (error) {
         console.error("Error writing result to Firestore: ", error);
         syncStatusEl.textContent = 'Error saving result.';
@@ -727,16 +1032,94 @@ async function saveResultToFirestore(scoreData) {
     }
 }
 
-// ### All other JavaScript functions remain the same... ###
-// (The rest of the script is omitted for brevity but should be the same as the previous correct version)
+async function saveWeeklyTestProgress(scoreBreakdown) {
+    console.log("Saving weekly test progress...");
+
+    // 1. Update the global progress object
+    completedSubTests.add(currentSubQuizId);
+    weeklyProgress.completedSubTests = Array.from(completedSubTests);
+    
+    const existingResultIndex = weeklyProgress.subTestResults.findIndex(r => r.quizId === currentSubQuizId);
+    if (existingResultIndex > -1) {
+        console.warn("Result for this sub-test already exists. Overwriting.");
+        weeklyProgress.subTestResults[existingResultIndex] = { quizId: currentSubQuizId, testName: testMetadata.testName, ...scoreBreakdown };
+    } else {
+        weeklyProgress.subTestResults.push({ quizId: currentSubQuizId, testName: testMetadata.testName, ...scoreBreakdown });
+    }
+
+    // 2. Recalculate totals
+    weeklyProgress.totalScore = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.totalScore, 0);
+    weeklyProgress.totalCorrect = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.correctCount, 0);
+    weeklyProgress.totalIncorrect = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.incorrectCount, 0);
+    weeklyProgress.totalQuestions = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.totalQuestions, 0);
+
+    // 3. Save to localStorage (This is the critical OFFLINE save)
+    try {
+        localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+        console.log("Progress saved to localStorage.");
+    } catch (e) {
+        console.error("Failed to save to localStorage!", e);
+        dom.submittingTitle.textContent = "Error!";
+        dom.submittingSpinner.style.display = 'none';
+        dom.submittingMessage.textContent = "Could not save progress locally. Storage may be full.";
+        return;
+    }
+
+    // 4. Check if all tests are now done
+    if (completedSubTests.size === weeklySubTests.length) {
+        console.log("All sub-tests completed!");
+        weeklyProgress.status = 'completed';
+        localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+        
+        dom.submittingTitle.textContent = "Weekly Test Complete!";
+        dom.submittingTestName.textContent = weeklyTestTitle;
+        dom.submittingSpinner.style.display = 'none';
+        dom.submittingSuccess.style.display = 'block';
+        dom.submittingMessage.textContent = "Calculating your final score...";
+
+        setTimeout(async () => {
+            dom.submittingScreen.style.display = 'none';
+            // *** FIX: Call ASYNC function ***
+            await showWeeklyTestFinalResult(weeklyProgress);
+        }, 2500);
+
+    } else {
+        // Not finished yet
+        dom.submittingTitle.textContent = "Section Submitted!";
+        dom.submittingSpinner.style.display = 'none';
+        dom.submittingSuccess.style.display = 'block';
+        dom.submittingMessage.textContent = "Returning to sections...";
+        
+        setTimeout(() => {
+            isTestCompleted = false;
+            currentSubQuizId = null;
+            state = {};
+            questions = [];
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('currentSubQuizId');
+            
+            dom.submittingScreen.style.display = 'none';
+            showChapterSelectionScreen();
+        }, 2500);
+    }
+    
+    // 5. (In Background) Try to sync to Firestore
+    if (weeklyTestAttemptRef && navigator.onLine) {
+        weeklyTestAttemptRef.set(weeklyProgress, { merge: true })
+            .then(() => console.log("Progress successfully synced to Firestore in background."))
+            .catch(err => console.warn("Failed to sync progress to Firestore in background:", err.message));
+    } else {
+        console.log("User is offline. Progress saved locally. Will sync when 'Save & Finish' is clicked.");
+    }
+}
 // =====================================================================
-// ============ END: RESULT SAVING LOGIC (UPDATED) =====================
+// ============ END: RESULT SAVING LOGIC ===============================
 // =====================================================================
+
 
 // ### STAGE 3: MAIN TEST LOGIC ###
 function initTest() {
     resetState();
-    timeLeft = testMetadata.durationMinutes * 60;
     isTestCompleted = false;
     dom.showAnswerWritingTab.classList.add('locked');
     if (state.visited.length > 0) state.visited[0] = true;
@@ -757,26 +1140,35 @@ function setView(viewName) {
     dom.sidebar.style.display = 'none';
     dom.timer.style.display = 'none';
     dom.stopwatchWrapper.style.display = 'none';
+    dom.mainContent.style.display = 'none'; 
+
     dom.showMockTestTab.classList.remove('active');
     dom.showAnswerWritingTab.classList.remove('active');
     clearInterval(animationInterval);
+
     if (viewName === 'mockTest') {
         dom.showMockTestTab.classList.add('active');
-        dom.timer.style.display = 'block';
+        dom.mainContent.style.display = 'flex';
+        
         if (isTestCompleted) {
             const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
             const topicStats = JSON.parse(localStorage.getItem('topicStats'));
             showResultScreen(breakdown, topicStats);
         } else {
+            dom.timer.style.display = 'block';
             dom.mockTestWrapper.style.display = 'flex';
             dom.mcqFooter.style.display = 'block';
             dom.sidebar.style.display = 'flex';
         }
     } else if (viewName === 'answerWriting') {
-        if (dom.showAnswerWritingTab.classList.contains('locked')) return;
+        if (dom.showAnswerWritingTab.classList.contains('locked')) {
+            setView('mockTest');
+            return;
+        }
         dom.showAnswerWritingTab.classList.add('active');
         dom.stopwatchWrapper.style.display = 'flex';
         dom.answerWritingWrapper.style.display = 'flex';
+        dom.mainContent.style.display = 'flex';
     }
 }
 function loadQuestion(index) {
@@ -809,7 +1201,7 @@ function handleSaveAndNext() {
     if (state.current < questions.length - 1) {
         loadQuestion(state.current + 1);
     } else {
-        submitTest(true);
+        submitTest(false); 
     }
 }
 function handleMarkAndNext() {
@@ -822,27 +1214,52 @@ function handleClearResponse() {
     dom.optionsList.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
     updatePalette();
 }
-function submitTest(isForced = false) {
+
+async function submitTest(isForced = false) {
     if (isTestCompleted) return;
     if (!isForced) {
-        if (!confirm('Are you sure you want to submit the test?')) return;
+        let confirmMsg = isWeeklyTest ? "Are you sure you want to submit this section?" : "Are you sure you want to submit the test?";
+        if (!confirm(confirmMsg)) return;
     }
     stopTimer();
-    isTestCompleted = true;
+    isTestCompleted = true; 
     window.removeEventListener('online', forceSubmitOnReconnect);
     dom.showAnswerWritingTab.classList.remove('locked');
+    
     const scoreBreakdown = calculateScoreBreakdown();
     const topicStats = calculateTopicStats();
-    saveResultToFirestore(scoreBreakdown); // This now saves the correct data
-    localStorage.setItem('testTaken', 'true');
+    
+    localStorage.setItem('testTaken', 'true'); 
     localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
     localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
     localStorage.setItem('topicStats', JSON.stringify(topicStats));
-    showResultScreen(scoreBreakdown, topicStats);
+
+    if (isWeeklyTest) {
+        completedSubTests.add(currentSubQuizId);
+        localStorage.setItem('currentSubQuizId', currentSubQuizId);
+        
+        dom.examUIWrapper.style.display = 'none';
+        dom.submittingScreen.style.display = 'flex';
+        dom.submittingTitle.textContent = "Submitting Section...";
+        dom.submittingTestName.textContent = testMetadata.testName;
+        dom.submittingSpinner.style.display = 'block';
+        dom.submittingSuccess.style.display = 'none';
+        dom.submittingMessage.textContent = "Saving your progress...";
+
+        // The save function now handles showing the next screen
+        await saveWeeklyTestProgress(scoreBreakdown); 
+        
+    } else {
+        // This is for single tests, logic is unchanged
+        saveResultToFirestore(scoreBreakdown);
+        showResultScreen(scoreBreakdown, topicStats);
+    }
 }
+
 function calculateScoreBreakdown() {
     let correctCount = 0, incorrectCount = 0;
     state.answers.forEach((ans, i) => {
+        if (!questions[i]) return; 
         if (ans !== null) {
             if (ans === questions[i].answer) correctCount++;
             else incorrectCount++;
@@ -921,6 +1338,7 @@ function startQuestionTimer() {
 function stopTimer() {
     clearInterval(timerInterval);
     if(onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+    dom.questionTimerBar.style.transition = 'none';
 }
 function toggleStopwatch() {
     const icon = dom.stopwatchPlayPause.querySelector('i');
@@ -950,7 +1368,8 @@ function toggleDarkMode(isDark) {
     dom.body.classList.toggle('dark', isDark);
     dom.toggleLabel.textContent = isDark ? 'Light' : 'Dark';
     if (isTestCompleted && performanceChart) {
-        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        // *** FIX: Re-pass the correct data ***
+        const topicStats = JSON.parse(localStorage.getItem('topicStats')) || calculateAggregatedTopicStats();
         renderPerformanceChart(topicStats);
     }
 }
@@ -961,6 +1380,7 @@ function updateSidebarPosition() {
     dom.sidebar.style.top = `${totalHeaderHeight}px`;
     dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
 }
+
 function showResultScreen(breakdown, topicStats) {
     dom.mockTestWrapper.style.display = 'none';
     dom.reviewScreenWrapper.style.display = 'none';
@@ -968,13 +1388,91 @@ function showResultScreen(breakdown, topicStats) {
     dom.sidebar.style.display = 'none';
     dom.btnSubmitTest.style.display = 'none';
     dom.resultScreenWrapper.style.display = 'flex';
+    
+    dom.resultScreenTitle.textContent = "Test Completed!";
+    dom.resultScreenSubtitle.textContent = "Here is your score summary:";
+
     if (breakdown) {
          dom.totalPossibleScore.textContent = breakdown.totalQuestions;
          animateScorecard(breakdown);
     }
+    
+    const resultButtons = dom.resultButtonsContainer;
+    resultButtons.innerHTML = ''; 
+
+    if (isWeeklyTest) {
+        resultButtons.innerHTML += `<button id="backToChaptersBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Sections</button>`;
+    }
+    
+    resultButtons.innerHTML += `<button id="retestButton" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest</button>`;
+    resultButtons.innerHTML += `<button id="reviewAnswersButton" class="submit-button btn-action"><i class="fas fa-search"></i> Review Answers</button>`;
+    
     populatePerformanceTable(topicStats);
     setTimeout(() => renderPerformanceChart(topicStats), 100);
 }
+
+// *** MODIFIED: This function is now ASYNC and fetches question data ***
+async function showWeeklyTestFinalResult(finalProgress) {
+    console.log("Showing final weekly test results:", finalProgress);
+    dom.mockTestWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.btnSubmitTest.style.display = 'none';
+    dom.chapterSelectionWrapper.style.display = 'none';
+    dom.examUIWrapper.style.display = 'flex';
+    dom.mainContent.style.display = 'flex';
+    dom.resultScreenWrapper.style.display = 'flex';
+
+    dom.resultScreenTitle.textContent = `${weeklyTestTitle} Completed!`;
+    dom.resultScreenSubtitle.textContent = "Here is your final consolidated score:";
+
+    const finalScoreBreakdown = {
+      correctCount: finalProgress.totalCorrect,
+      incorrectCount: finalProgress.totalIncorrect,
+      unattemptedCount: finalProgress.totalQuestions - (finalProgress.totalCorrect + finalProgress.totalIncorrect),
+      totalScore: finalProgress.totalScore,
+      totalQuestions: finalProgress.totalQuestions,
+      correctMarks: finalProgress.totalCorrect * 1,
+      incorrectMarks: finalProgress.totalIncorrect * -1,
+    };
+
+    // --- NEW: Aggregate topic stats ---
+    let topicStats = {};
+    try {
+        topicStats = await calculateAggregatedTopicStats();
+        localStorage.setItem('topicStats', JSON.stringify(topicStats)); // Save for dark mode toggle
+    } catch (error) {
+        console.error("Failed to aggregate topic stats:", error);
+    }
+    // --- END NEW ---
+
+    dom.totalPossibleScore.textContent = finalScoreBreakdown.totalQuestions;
+    animateScorecard(finalScoreBreakdown);
+
+    const resultButtons = dom.resultButtonsContainer;
+    resultButtons.innerHTML = '';
+    
+    const retestButtonHtml = `<button id="retestWeeklyTestBtn" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest Full Test</button>`;
+    const saveButtonHtml = `<button id="saveAndFinishBtn" class="submit-button btn-action"><i class="fas fa-save"></i> Save & Finish Test</button>`;
+
+    if (finalProgress.status === 'completed-synced') {
+        dom.syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Your final results are saved.`;
+        dom.syncStatus.className = 'synced';
+        resultButtons.innerHTML += retestButtonHtml;
+    } else {
+        dom.syncStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Your final results are saved locally. Connect to the internet and click 'Save' to sync to your account.`;
+        dom.syncStatus.className = 'error'; 
+        resultButtons.innerHTML += saveButtonHtml;
+        resultButtons.innerHTML += retestButtonHtml;
+        const retestBtn = document.getElementById('retestWeeklyTestBtn');
+        if(retestBtn) retestBtn.style.display = 'none';
+    }
+
+    populatePerformanceTable(topicStats); 
+    renderPerformanceChart(topicStats);
+}
+
 function animateScorecard(data) {
     let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
     const animationSpeed = 20;
@@ -982,6 +1480,7 @@ function animateScorecard(data) {
     const steps = duration / animationSpeed;
     const stepValues = {};
     for (const key in current) {
+        if(data[key] === undefined) data[key] = 0;
         stepValues[key] = (data[key] - current[key]) / steps;
     }
     clearInterval(animationInterval);
@@ -1006,21 +1505,64 @@ function animateScorecard(data) {
 }
 function calculateTopicStats() {
     const topicStats = {};
-    const localAnswers = state.answers || JSON.parse(localStorage.getItem('lastAnswers'));
-    if (!localAnswers) return {};
+    const localAnswers = state.answers.length > 0 ? state.answers : JSON.parse(localStorage.getItem('lastAnswers'));
+    if (!localAnswers || !questions || questions.length === 0) return {};
     
     questions.forEach((q, i) => {
-        if (!topicStats[q.topic]) { topicStats[q.topic] = { correct: 0, attempted: 0 }; }
+        if (!q) return; 
+        const topic = q.topic || 'Uncategorized';
+        if (!topicStats[topic]) { topicStats[topic] = { correct: 0, attempted: 0 }; }
         if (localAnswers[i] !== null) {
-            topicStats[q.topic].attempted++;
-            if (localAnswers[i] === q.answer) { topicStats[q.topic].correct++; }
+            topicStats[topic].attempted++;
+            if (localAnswers[i] === q.answer) { topicStats[topic].correct++; }
         }
     });
     return topicStats;
 }
+
+// *** NEW FUNCTION: Aggregates stats for the FINAL weekly result ***
+async function calculateAggregatedTopicStats() {
+    const allTopicStats = {};
+    if (!weeklyProgress || !weeklyProgress.subTestResults) return {};
+
+    for (const subtest of weeklyProgress.subTestResults) {
+        const userAnswers = subtest.userAnswers;
+        
+        // Fetch the questions for this subtest
+        let testDocRef = db.collection('weeklyTestsdocs').doc(subtest.quizId);
+        let testDoc = await testDocRef.get();
+        if (!testDoc.exists) {
+            testDocRef = db.collection('quizzes').doc(subtest.quizId);
+            testDoc = await testDocRef.get();
+        }
+        
+        if (testDoc.exists) {
+            const questionsSnapshot = await testDocRef.collection('questions').get();
+            const subtestQuestions = questionsSnapshot.docs.map(doc => doc.data());
+            
+            subtestQuestions.forEach((q, i) => {
+                const topic = q.topic || 'Uncategorized';
+                if (!allTopicStats[topic]) {
+                    allTopicStats[topic] = { correct: 0, attempted: 0 };
+                }
+                if (userAnswers[i] !== null) {
+                    allTopicStats[topic].attempted++;
+                    if (userAnswers[i] === q.answer) {
+                        allTopicStats[topic].correct++;
+                    }
+                }
+            });
+        }
+    }
+    return allTopicStats;
+}
+
 function populatePerformanceTable(topicStats) {
     dom.performanceTableBody.innerHTML = '';
-    if (!topicStats) return;
+    if (!topicStats || Object.keys(topicStats).length === 0) {
+        dom.performanceTableBody.innerHTML = '<tr><td colspan="4">Topic analysis not available for this test.</td></tr>';
+        return;
+    };
     Object.keys(topicStats).sort().forEach(topicName => {
         const stats = topicStats[topicName];
         const accuracy = stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
@@ -1031,7 +1573,7 @@ function populatePerformanceTable(topicStats) {
 }
 function renderPerformanceChart(topicStats) {
     if (performanceChart) performanceChart.destroy();
-    if (!topicStats) return;
+    if (!topicStats || Object.keys(topicStats).length === 0) return;
     const isDark = dom.body.classList.contains('dark');
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
     const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : '#666';
@@ -1108,18 +1650,31 @@ function populateReviewScreen() {
         dom.reviewContainer.appendChild(questionDiv);
     });
 }
+
+// *** MODIFIED: Restore offline check for retest ***
 function handleRetest() {
     if (navigator.onLine) {
         dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
         return;
     }
     if (dom.passwordRetestInput.value === RETEST_PASSWORD) {
-        localStorage.clear();
+        localStorage.removeItem('testTaken');
+        localStorage.removeItem('lastAnswers');
+        localStorage.removeItem('scoreBreakdown');
+        localStorage.removeItem('topicStats');
+        localStorage.removeItem('currentSubQuizId');
+        
+        // Clear weekly progress ONLY if it's a single test
+        if (!isWeeklyTest && weeklyProgressKey) {
+             localStorage.removeItem(weeklyProgressKey);
+        }
+        
         location.reload(); 
     } else {
         dom.passwordError.textContent = 'Incorrect password.';
     }
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     const storedTheme = localStorage.getItem('theme');
     if (storedTheme === 'dark') {
@@ -1129,6 +1684,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const phone = "918658567727";
     const message = "I need the password for the mock test.";
     dom.whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    
     dom.loginBtn.addEventListener('click', handleLogin);
     dom.startExamBtn.addEventListener('click', startExam);
     dom.agreementCheckbox.addEventListener('change', validateStartConditions);
@@ -1142,8 +1698,96 @@ document.addEventListener('DOMContentLoaded', () => {
         toggleDarkMode(e.target.checked);
         localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
     });
-    dom.retestButton.addEventListener('click', () => { dom.passwordModal.style.display = 'flex'; });
-    dom.reviewAnswersButton.addEventListener('click', showReviewScreen);
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        
+        if (target.id === 'retestButton' || target.closest('#retestButton')) {
+            dom.passwordModal.style.display = 'flex';
+        }
+        
+        if (target.id === 'reviewAnswersButton' || target.closest('#reviewAnswersButton')) {
+            showReviewScreen();
+        }
+        
+        if (target.id === 'backToChaptersBtn' || target.closest('#backToChaptersBtn')) {
+            isTestCompleted = false;
+            currentSubQuizId = null;
+            state = {};
+            questions = [];
+            
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('lastAnswers');
+            localStorage.removeItem('scoreBreakdown');
+            localStorage.removeItem('topicStats');
+            localStorage.removeItem('currentSubQuizId');
+
+            dom.resultScreenWrapper.style.display = 'none';
+            dom.examUIWrapper.style.display = 'none'; 
+            showChapterSelectionScreen(); 
+        }
+        
+        if (target.id === 'saveAndFinishBtn' || target.closest('#saveAndFinishBtn')) {
+            if (!navigator.onLine) {
+                alert("Please connect to the internet to save your final results.");
+                return;
+            }
+            if (!weeklyTestAttemptRef) {
+                if (currentUser && mainTestId) {
+                    weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
+                } else {
+                    alert("Error: Cannot find test progress reference. Please refresh.");
+                    return;
+                }
+            }
+            
+            target.disabled = true;
+            target.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving...`;
+            
+            weeklyProgress.status = 'completed-synced'; 
+            
+            weeklyTestAttemptRef.set(weeklyProgress)
+                .then(() => {
+                    console.log("Weekly test progress SAVED to Firestore.");
+                    dom.syncStatus.textContent = "Your results are saved to your account.";
+                    dom.syncStatus.className = 'synced';
+                    target.textContent = "Saved!";
+                    localStorage.removeItem(weeklyProgressKey); 
+                    target.style.display = 'none';
+                    
+                    const retestBtn = document.getElementById('retestWeeklyTestBtn');
+                    if(retestBtn) retestBtn.style.display = 'flex';
+                })
+                .catch(err => {
+                    console.error("Error saving final progress: ", err);
+                    alert("Error saving progress. Please try again.");
+                    target.disabled = false;
+                    target.innerHTML = `<i class="fas fa-save"></i> Save & Finish Test`;
+                    weeklyProgress.status = 'completed'; // Revert status
+                });
+        }
+        
+        if (target.id === 'retestWeeklyTestBtn' || target.closest('#retestWeeklyTestBtn')) {
+             if (confirm("Are you sure you want to retest this entire weekly test? All your progress will be deleted.")) {
+                if (weeklyTestAttemptRef && navigator.onLine) {
+                    weeklyTestAttemptRef.delete().then(() => {
+                        console.log("Weekly test progress deleted from Firestore.");
+                        localStorage.removeItem(weeklyProgressKey);
+                        location.reload();
+                    }).catch(err => {
+                        console.error("Error deleting progress: ", err);
+                        alert("Could not delete progress. Check connection.");
+                    });
+                } else if (!navigator.onLine) {
+                    alert("Please connect to the internet to clear your test progress from your account.");
+                } else {
+                     localStorage.removeItem(weeklyProgressKey);
+                     location.reload();
+                }
+             }
+        }
+    });
+
     dom.backToResultsBtn.addEventListener('click', () => {
         const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
         const topicStats = JSON.parse(localStorage.getItem('topicStats'));
@@ -1160,46 +1804,109 @@ document.addEventListener('DOMContentLoaded', () => {
     firebase.auth().onAuthStateChanged(async (user) => {
         currentUser = user;
         const params = new URLSearchParams(window.location.search);
-        const testId = params.get('testId');
-        const resultId = params.get('resultId'); // For reviewing specific results, not implemented yet
-
-        if (!testId) {
+        mainTestId = params.get('testId');
+        
+        if (!mainTestId) {
             document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
             return;
         }
 
         if (user) {
             console.log("Auth state changed: User is signed in.", user.uid);
-            if (localStorage.getItem('testTaken') === 'true') {
+            
+            weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
+            
+            const localProgress = JSON.parse(localStorage.getItem(weeklyProgressKey));
+            const isWeeklyCompleted = localProgress && (localProgress.status === 'completed' || localProgress.status === 'completed-synced');
+
+            if (localStorage.getItem('testTaken') === 'true' && !isWeeklyCompleted) {
                 await resumeResultSession();
             } else {
-                await loadTestFromURL();
+                await loadTestFromURL(mainTestId, user);
             }
         } else {
             console.log("Auth state changed: User is signed out.");
-            // Display login screen by default
+            dom.loginScreen.style.display = 'flex';
+            dom.instructionsScreen.style.display = 'none';
+            dom.chapterSelectionWrapper.style.display = 'none';
+            dom.examUIWrapper.style.display = 'none';
         }
     });
 });
+
 async function resumeResultSession() {
+    console.log("Resuming result session...");
     isTestCompleted = true;
     dom.showAnswerWritingTab.classList.remove('locked');
     dom.loginScreen.style.display = 'none';
     dom.instructionsScreen.style.display = 'none';
-    dom.examUIWrapper.style.display = 'flex';
+    dom.examUIWrapper.style.display = 'flex'; 
     dom.body.classList.add('exam-active');
     updateSidebarPosition();
     
-    const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
-    const topicStats = JSON.parse(localStorage.getItem('topicStats'));
-    showResultScreen(breakdown, topicStats);
-
     const params = new URLSearchParams(window.location.search);
     const testId = params.get('testId');
+    let testIdToReview = testId; 
+
+    if (currentUser) {
+        weeklyProgressKey = `weeklyProgress_${testId}_${currentUser.uid}`;
+    }
+
+    // *** FIX: Check 'weeklyTests' ***
+    const weeklyTestRef = db.collection('weeklyTests').doc(testId); 
+    const weeklyTestDoc = await weeklyTestRef.get();
+
+    if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
+        console.log("Resuming a weekly test sub-test");
+        isWeeklyTest = true; 
+        mainTestId = testId;
+        weeklyTestTitle = weeklyTestDoc.data().title;
+        weeklySubTests = weeklyTestDoc.data().subTests; 
+        currentSubQuizId = localStorage.getItem('currentSubQuizId'); 
+        
+        if (currentSubQuizId) {
+            completedSubTests.add(currentSubQuizId); 
+            testIdToReview = currentSubQuizId; 
+            
+            weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
+            const localProgress = localStorage.getItem(weeklyProgressKey);
+            if (localProgress) {
+                weeklyProgress = JSON.parse(localProgress);
+            }
+        } else {
+             console.error("Resuming weekly test but no currentSubQuizId found in localStorage.");
+        }
+    } else {
+        console.log("Resuming a single test");
+        isWeeklyTest = false;
+    }
+    
+    const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+    const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+    
+    setView('mockTest'); 
+    showResultScreen(breakdown, topicStats);
+
     try {
-        const testDocRef = db.collection('quizzes').doc(testId);
-        const questionsSnapshot = await testDocRef.collection('questions').get();
-        questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+        // *** FIX: Check 'weeklyTestsdocs' first, then 'quizzes' ***
+        let testDocRef = db.collection('weeklyTestsdocs').doc(testIdToReview); 
+        let testDoc = await testDocRef.get();
+        let questionsSnapshot;
+        
+        if (!testDoc.exists) {
+            console.warn("Test not in 'weeklyTestsdocs', checking 'quizzes'");
+            testDocRef = db.collection('quizzes').doc(testIdToReview);
+            testDoc = await testDocRef.get();
+        }
+
+        if(testDoc.exists) {
+            testMetadata = testDoc.data(); 
+            questionsSnapshot = await testDocRef.collection('questions').get();
+            questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+            console.log(`Loaded ${questions.length} questions for review from ${testDocRef.path}.`);
+        } else {
+            console.error("Could not find test document for review:", testIdToReview);
+        }
     } catch (error) {
         console.error("Failed to load question data for review:", error);
     }
@@ -1207,3 +1914,4 @@ async function resumeResultSession() {
 </script>
 </body>
 </html>
+
