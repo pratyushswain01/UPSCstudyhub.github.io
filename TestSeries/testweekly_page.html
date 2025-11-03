@@ -809,7 +809,8 @@ async function loadTestFromURL(testId, user) {
     dom.submittingScreen.style.display = 'none'; 
 
     try {
-        const weeklyTestRef = db.collection('weeklyTestsdocs').doc(testId);
+        // *** FIX: Changed to 'weeklyTests' (as per your screenshot) ***
+        const weeklyTestRef = db.collection('weeklyTests').doc(testId);
         const weeklyTestDoc = await weeklyTestRef.get();
 
         if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
@@ -824,9 +825,15 @@ async function loadTestFromURL(testId, user) {
                 weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(user.uid).collection("weeklyTestAttempts").doc(mainTestId);
                 
                 const attemptDoc = await weeklyTestAttemptRef.get();
-                if (attemptDoc.exists && attemptDoc.data().status === 'completed') {
+                if (attemptDoc.exists && (attemptDoc.data().status === 'completed' || attemptDoc.data().status === 'completed-synced')) {
                     console.log("Loaded COMPLETED progress from Firestore.");
                     weeklyProgress = attemptDoc.data();
+                    if(weeklyProgress.status === 'completed') {
+                         // This means it was saved locally but not synced, mark as synced now
+                        weeklyProgress.status = 'completed-synced';
+                        // Fire-and-forget sync
+                        weeklyTestAttemptRef.set(weeklyProgress, {merge: true}).catch(e => console.warn("Sync on load failed", e));
+                    }
                     completedSubTests = new Set(weeklyProgress.completedSubTests || []);
                     showWeeklyTestFinalResult(weeklyProgress);
                     return;
@@ -871,12 +878,27 @@ async function loadSingleTest(testId) {
     dom.instructionsTitle.textContent = 'Loading Test Details...';
     dom.offlineStatus.style.display = 'block';
 
-    const testDocRef = db.collection('weeklytests').doc(testId);
+    // *** FIX: Looking in 'quizzes' collection for single tests ***
+    // (This assumes single tests are in 'quizzes' and chapters are in 'weeklyTestsdocs')
+    // If ALL tests are in 'weeklyTestsdocs', change 'quizzes' to 'weeklyTestsdocs'
+    const testDocRef = db.collection('quizzes').doc(testId);
     const testDoc = await testDocRef.get();
-    if (!testDoc.exists) throw new Error("Test not found.");
-    testMetadata = testDoc.data();
+    
+    if (!testDoc.exists) {
+         // If not in 'quizzes', check 'weeklyTestsdocs' as a fallback
+        console.warn("Test not in 'quizzes', checking 'weeklyTestsdocs'");
+        const fallbackRef = db.collection('weeklyTestsdocs').doc(testId);
+        const fallbackDoc = await fallbackRef.get();
+        if(!fallbackDoc.exists) {
+            throw new Error("Test not found in 'quizzes' or 'weeklyTestsdocs'.");
+        }
+        testMetadata = fallbackDoc.data();
+        questionsSnapshot = await fallbackRef.collection('questions').get();
+    } else {
+        testMetadata = testDoc.data();
+        questionsSnapshot = await testDocRef.collection('questions').get();
+    }
 
-    const questionsSnapshot = await testDocRef.collection('questions').get();
     questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
     if (questions.length === 0) throw new Error("This test has no questions.");
 
@@ -926,12 +948,14 @@ async function startSubTest(subQuizId, subQuizName) {
     dom.chapterSelectionWrapper.style.display = 'none';
     dom.instructionsScreen.style.display = 'flex';
     dom.instructionsTitle.textContent = `Loading ${subQuizName}...`;
-    dom.offlineStatus.style.display = 'block'; // *** RE-ENABLE offline status check ***
+    dom.offlineStatus.style.display = 'block'; 
 
     try {
-        const testDocRef = db.collection('quizzes').doc(subQuizId);
+        // *** FIX: Looking in 'weeklyTestsdocs' for the chapter quiz ***
+        const testDocRef = db.collection('weeklyTestsdocs').doc(subQuizId);
         const testDoc = await testDocRef.get();
-        if (!testDoc.exists) throw new Error(`Test not found: ${subQuizId}`);
+        if (!testDoc.exists) throw new Error(`Test not found in 'weeklyTestsdocs': ${subQuizId}`);
+        
         testMetadata = testDoc.data();
 
         const questionsSnapshot = await testDocRef.collection('questions').get();
@@ -945,10 +969,9 @@ async function startSubTest(subQuizId, subQuizName) {
         timeLeft = testMetadata.durationMinutes * 60;
         dom.timer.textContent = formatTime(timeLeft);
         
-        // *** RE-ADD online/offline listeners ***
         window.addEventListener('online', validateStartConditions);
         window.addEventListener('offline', validateStartConditions);
-        validateStartConditions(); // Check agreement and offline status
+        validateStartConditions(); 
 
     } catch (error) {
         console.error("Failed to load sub-test:", error);
@@ -1073,10 +1096,12 @@ async function saveWeeklyTestProgress(scoreBreakdown) {
     }
     
     // 5. (In Background) Try to sync to Firestore
-    if (weeklyTestAttemptRef) {
+    if (weeklyTestAttemptRef && navigator.onLine) {
         weeklyTestAttemptRef.set(weeklyProgress, { merge: true })
             .then(() => console.log("Progress successfully synced to Firestore in background."))
             .catch(err => console.warn("Failed to sync progress to Firestore in background:", err.message));
+    } else {
+        console.log("User is offline. Progress saved locally. Will sync when 'Save & Finish' is clicked.");
     }
 }
 // =====================================================================
@@ -1411,16 +1436,24 @@ function showWeeklyTestFinalResult(finalProgress) {
     const resultButtons = dom.resultButtonsContainer;
     resultButtons.innerHTML = '';
     
-    // NEW: Add Save & Finish button
-    resultButtons.innerHTML += `<button id="saveAndFinishBtn" class="submit-button btn-action"><i class="fas fa-save"></i> Save & Finish Test</button>`;
-    // This button will be shown *after* saving, or if it's already saved.
-    resultButtons.innerHTML += `<button id="retestWeeklyTestBtn" class="submit-button btn-action" style="display: none;"><i class="fas fa-redo"></i> Retest Full Test</button>`;
+    const retestButtonHtml = `<button id="retestWeeklyTestBtn" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest Full Test</button>`;
+    const saveButtonHtml = `<button id="saveAndFinishBtn" class="submit-button btn-action"><i class="fas fa-save"></i> Save & Finish Test</button>`;
+
+    // *** MODIFIED: Show "Save" button if NOT synced, show "Retest" if it IS synced ***
+    if (finalProgress.status === 'completed-synced') {
+        dom.syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Your final results are saved.`;
+        dom.syncStatus.className = 'synced';
+        resultButtons.innerHTML += retestButtonHtml;
+    } else {
+        dom.syncStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Your final results are saved locally. Connect to the internet and click 'Save' to sync to your account.`;
+        dom.syncStatus.className = 'error'; // Use 'error' style for visibility
+        resultButtons.innerHTML += saveButtonHtml;
+        resultButtons.innerHTML += retestButtonHtml;
+        document.getElementById('retestWeeklyTestBtn').style.display = 'none'; // Hide retest until saved
+    }
 
     populatePerformanceTable(topicStats); 
     renderPerformanceChart(topicStats);
-
-    dom.syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Weekly Test Completed!`;
-    dom.syncStatus.className = 'synced';
 }
 
 function animateScorecard(data) {
@@ -1641,12 +1674,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
             if (!weeklyTestAttemptRef) {
-                alert("Error: Cannot find test progress reference. Please refresh.");
-                return;
+                if (currentUser && mainTestId) {
+                    weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
+                } else {
+                    alert("Error: Cannot find test progress reference. Please refresh.");
+                    return;
+                }
             }
             
             target.disabled = true;
             target.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving...`;
+            
+            // *** MODIFIED: Save 'completed-synced' status ***
+            weeklyProgress.status = 'completed-synced'; 
             
             weeklyTestAttemptRef.set(weeklyProgress)
                 .then(() => {
@@ -1656,13 +1696,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     target.textContent = "Saved!";
                     localStorage.removeItem(weeklyProgressKey); 
                     target.style.display = 'none';
-                    document.getElementById('retestWeeklyTestBtn').style.display = 'flex';
+                    
+                    const retestBtn = document.getElementById('retestWeeklyTestBtn');
+                    if(retestBtn) retestBtn.style.display = 'flex';
                 })
                 .catch(err => {
                     console.error("Error saving final progress: ", err);
                     alert("Error saving progress. Please try again.");
                     target.disabled = false;
                     target.innerHTML = `<i class="fas fa-save"></i> Save & Finish Test`;
+                    weeklyProgress.status = 'completed'; // Revert status
                 });
         }
         
@@ -1678,7 +1721,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert("Could not delete progress. Check connection.");
                     });
                 } else if (!navigator.onLine) {
-                    alert("Please connect to the internet to clear your test progress.");
+                    alert("Please connect to the internet to clear your test progress from your account.");
                 } else {
                      localStorage.removeItem(weeklyProgressKey);
                      location.reload();
@@ -1716,7 +1759,7 @@ document.addEventListener('DOMContentLoaded', () => {
             weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
             
             const localProgress = JSON.parse(localStorage.getItem(weeklyProgressKey));
-            const isWeeklyCompleted = localProgress && localProgress.status === 'completed';
+            const isWeeklyCompleted = localProgress && (localProgress.status === 'completed' || localProgress.status === 'completed-synced');
 
             if (localStorage.getItem('testTaken') === 'true' && !isWeeklyCompleted) {
                 await resumeResultSession();
@@ -1751,7 +1794,8 @@ async function resumeResultSession() {
         weeklyProgressKey = `weeklyProgress_${testId}_${currentUser.uid}`;
     }
 
-    const weeklyTestRef = db.collection('weeklyTests').doc(testId);
+    // *** FIX: Check 'weeklyTestsdocs' ***
+    const weeklyTestRef = db.collection('weeklyTestsdocs').doc(testId); 
     const weeklyTestDoc = await weeklyTestRef.get();
 
     if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
@@ -1786,13 +1830,21 @@ async function resumeResultSession() {
     showResultScreen(breakdown, topicStats);
 
     try {
-        const testDocRef = db.collection('quizzes').doc(testIdToReview); 
-        const testDoc = await testDocRef.get();
+        // *** FIX: Check 'weeklyTestsdocs' first, then 'quizzes' ***
+        let testDocRef = db.collection('weeklyTestsdocs').doc(testIdToReview); 
+        let testDoc = await testDocRef.get();
+        
+        if (!testDoc.exists) {
+            console.warn("Test not in 'weeklyTestsdocs', checking 'quizzes'");
+            testDocRef = db.collection('quizzes').doc(testIdToReview);
+            testDoc = await testDocRef.get();
+        }
+
         if(testDoc.exists) {
             testMetadata = testDoc.data(); 
             const questionsSnapshot = await testDocRef.collection('questions').get();
             questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
-            console.log(`Loaded ${questions.length} questions for review.`);
+            console.log(`Loaded ${questions.length} questions for review from ${testDocRef.path}.`);
         } else {
             console.error("Could not find test document for review:", testIdToReview);
         }
@@ -1803,6 +1855,4 @@ async function resumeResultSession() {
 </script>
 </body>
 </html>
-
-
 
