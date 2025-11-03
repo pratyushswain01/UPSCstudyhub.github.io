@@ -754,8 +754,8 @@ function handleLogin() {
     });
 }
     
+// *** MODIFIED: Restored offline check for ALL tests ***
 function validateStartConditions() {
-    // *** MODIFIED: This check now applies to ALL tests ***
     const isOffline = !navigator.onLine;
     const isAgreed = dom.agreementCheckbox.checked;
 
@@ -773,8 +773,8 @@ function validateStartConditions() {
         dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
         dom.offlineStatus.className = 'status-waiting';
     }
-
-    // This is for weekly tests, show the offline status message
+    
+    // Ensure the offline status message is always visible on the instructions screen
     dom.offlineStatus.style.display = 'block';
 }
 
@@ -785,7 +785,7 @@ function startExam() {
     dom.body.classList.add('exam-active');
     updateSidebarPosition();
     
-    // *** MODIFIED: This listener applies to ALL tests ***
+    // *** MODIFIED: Add online listener for ALL tests ***
     window.removeEventListener('online', validateStartConditions);
     window.removeEventListener('offline', validateStartConditions);
     window.addEventListener('online', forceSubmitOnReconnect);
@@ -1563,6 +1563,7 @@ function populateReviewScreen() {
     });
 }
 function handleRetest() {
+    // *** MODIFIED: Restore offline check ***
     if (navigator.onLine) {
         dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
         return;
@@ -1634,7 +1635,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showChapterSelectionScreen(); 
         }
         
-        // --- NEW: Handler for Save & Finish button ---
         if (target.id === 'saveAndFinishBtn' || target.closest('#saveAndFinishBtn')) {
             if (!navigator.onLine) {
                 alert("Please connect to the internet to save your final results.");
@@ -1654,9 +1654,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     dom.syncStatus.textContent = "Your results are saved to your account.";
                     dom.syncStatus.className = 'synced';
                     target.textContent = "Saved!";
-                    // Remove local copy now that it's synced
                     localStorage.removeItem(weeklyProgressKey); 
-                    // Show the retest button
                     target.style.display = 'none';
                     document.getElementById('retestWeeklyTestBtn').style.display = 'flex';
                 })
@@ -1673,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (weeklyTestAttemptRef && navigator.onLine) {
                     weeklyTestAttemptRef.delete().then(() => {
                         console.log("Weekly test progress deleted from Firestore.");
-                        localStorage.removeItem(weeklyProgressKey); // Also clear local
+                        localStorage.removeItem(weeklyProgressKey);
                         location.reload();
                     }).catch(err => {
                         console.error("Error deleting progress: ", err);
@@ -1682,7 +1680,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (!navigator.onLine) {
                     alert("Please connect to the internet to clear your test progress.");
                 } else {
-                     localStorage.removeItem(weeklyProgressKey); // Just clear local
+                     localStorage.removeItem(weeklyProgressKey);
                      location.reload();
                 }
              }
@@ -1715,11 +1713,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             console.log("Auth state changed: User is signed in.", user.uid);
             
-            // This key must be set before checking localStorage
             weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
             
-            // Modified logic: Check for 'testTaken' (sub-test resume)
-            // *AND* that it's not a weekly test that has been fully completed
             const localProgress = JSON.parse(localStorage.getItem(weeklyProgressKey));
             const isWeeklyCompleted = localProgress && localProgress.status === 'completed';
 
@@ -1808,4 +1803,6 @@ async function resumeResultSession() {
 </script>
 </body>
 </html>
+
+
 
