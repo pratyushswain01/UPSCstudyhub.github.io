@@ -881,13 +881,13 @@ async function loadSingleTest(testId) {
     // *** FIX: Looking in 'quizzes' collection for single tests ***
     // (This assumes single tests are in 'quizzes' and chapters are in 'weeklyTestsdocs')
     // If ALL tests are in 'weeklyTestsdocs', change 'quizzes' to 'weeklyTestsdocs'
-    const testDocRef = db.collection('quizzes').doc(testId);
+    const testDocRef = db.collection('weeklyTestsdocs').doc(testId);
     const testDoc = await testDocRef.get();
     
     if (!testDoc.exists) {
          // If not in 'quizzes', check 'weeklyTestsdocs' as a fallback
         console.warn("Test not in 'quizzes', checking 'weeklyTestsdocs'");
-        const fallbackRef = db.collection('weeklyTestsdocs').doc(testId);
+        const fallbackRef = db.collection('quizzes').doc(testId);
         const fallbackDoc = await fallbackRef.get();
         if(!fallbackDoc.exists) {
             throw new Error("Test not found in 'quizzes' or 'weeklyTestsdocs'.");
