@@ -16,7 +16,7 @@
         @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .modal-content-enter { animation: scaleIn 0.3s ease-out forwards; }
         
-        /* New styles for the ed-tech layout */
+        /* === MODIFIED STYLES: Grid Card Layout === */
         .subject-section {
             margin-bottom: 3rem; /* 48px */
         }
@@ -24,14 +24,13 @@
             display: flex;
             align-items: center;
             gap: 0.75rem; /* 12px */
-            font-size: 1.5rem; /* 24px */
+            font-size: 1.8rem; /* 30px */
             font-weight: 700;
             color: #1e293b; /* slate-800 */
-            border-bottom: 2px solid #e2e8f0; /* slate-200 */
-            padding-bottom: 0.75rem; /* 12px */
             margin-bottom: 1.5rem; /* 24px */
         }
         .subject-icon {
+            /* This is from your old layout, we can keep it */
             width: 2.5rem; /* 40px */
             height: 2.5rem; /* 40px */
             border-radius: 0.5rem; /* 8px */
@@ -39,53 +38,71 @@
             align-items: center;
             justify-content: center;
         }
+        
+        /* This is the new grid layout from screenshot 2 */
         .chapter-list {
             display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem; /* 12px */
+            grid-template-columns: repeat(3, 1fr); /* 3 columns */
+            gap: 1.5rem; /* 24px */
         }
+
+        /* Responsive grid for tablets and phones */
+        @media (max-width: 1024px) {
+            .chapter-list {
+                grid-template-columns: repeat(2, 1fr); /* 2 columns */
+            }
+        }
+        @media (max-width: 640px) {
+            .chapter-list {
+                grid-template-columns: 1fr; /* 1 column */
+            }
+        }
+
+        /* New Card CSS from screenshot 2 */
         .chapter-card {
             background-color: #ffffff;
             border-radius: 0.75rem; /* 12px */
             border: 1px solid #e2e8f0; /* slate-200 */
-            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            padding: 1rem 1.5rem; /* 16px 24px */
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
             transition: all 0.2s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* To keep rounded corners */
         }
         .chapter-card:hover {
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            border-color: #cbd5e1; /* slate-300 */
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
         }
-        .chapter-info {
-            display: flex;
-            align-items: center;
-            gap: 1rem; /* 16px */
+        
+        .chapter-card-body {
+            padding: 1.5rem; /* 24px */
+            flex-grow: 1;
         }
-        .chapter-icon {
-            flex-shrink: 0;
-            width: 2.5rem; /* 40px */
-            height: 2.5rem; /* 40px */
-            border-radius: 9999px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-            font-size: 0.875rem; /* 14px */
-            background-color: #e0e7ff; /* indigo-100 */
-            color: #4338ca; /* indigo-700 */
-        }
+        
         .chapter-title {
             font-weight: 600;
-            color: #334155; /* slate-700 */
+            font-size: 1.125rem; /* 18px */
+            color: #1e293b; /* slate-800 */
+            margin-bottom: 0.75rem; /* 12px */
         }
-        .chapter-subtitle {
+        
+        .chapter-meta {
+            display: flex;
+            gap: 1rem; /* 16px */
             font-size: 0.875rem; /* 14px */
             color: #64748b; /* slate-500 */
         }
-        .chapter-action .btn {
+
+        .chapter-card-footer {
+            background-color: #f8fafc; /* slate-50 */
+            border-top: 1px solid #e2e8f0; /* slate-200 */
+            padding: 1rem 1.5rem; /* 16px 24px */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem; /* 8px */
@@ -94,6 +111,7 @@
             font-weight: 600;
             border-radius: 0.5rem; /* 8px */
             transition: all 0.2s;
+            text-decoration: none;
         }
         .btn-start {
             background-color: #2563eb; /* blue-600 */
@@ -102,14 +120,19 @@
         .btn-start:hover {
             background-color: #1d4ed8; /* blue-700 */
         }
-        .btn-unlock {
-            background-color: #f1f5f9; /* slate-100 */
-            color: #475569; /* slate-600 */
+        .btn-ai-study {
+            background: none;
+            border: none;
+            color: #4f46e5; /* indigo-600 */
+            font-weight: 600;
+            padding: 0;
+            cursor: pointer;
         }
-        .btn-unlock:hover {
-            background-color: #e2e8f0; /* slate-200 */
+        .btn-ai-study:hover {
+            color: #3730a3; /* indigo-800 */
         }
-
+        
+        /* === END OF MODIFIED STYLES === */
     </style>
 </head>
 <body class="text-slate-800 antialiased">
@@ -138,8 +161,8 @@
                 <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">Master every subject, one chapter at a time. Select a subject to begin your practice.</p>
             </div>
             
-            <div id="subjects-container" class="max-w-4xl mx-auto">
-                 </div>
+            <div id="subjects-container" class="max-w-7xl mx-auto"> 
+                </div>
 
         </main>
 
@@ -233,8 +256,9 @@
         });
 
         /**
-         * NEW FUNCTION: Fetches all tests from the 'ncertTests' collection
-         * and groups them by their 'subject' field.
+         * MODIFIED FUNCTION: 
+         * Fetches all tests from the 'ncertTests' collection
+         * and renders them in the new GRID CARD layout.
          */
         async function fetchAndRenderTestsFromNcertTests() {
             const container = document.getElementById('subjects-container');
@@ -261,7 +285,6 @@
             // 2. Group the tests by their 'subject' field in JavaScript
             const subjectsMap = new Map();
             tests.forEach(test => {
-                // Use the 'subject' field from your document, or "Uncategorized" if it's missing
                 const subjectName = test.subject || "Uncategorized"; 
                 
                 if (!subjectsMap.has(subjectName)) {
@@ -272,14 +295,12 @@
 
             // 3. Render the HTML
             let allHtml = '';
-            
-            // Sort subjects alphabetically
             const sortedSubjectNames = [...subjectsMap.keys()].sort();
 
             for (const subjectName of sortedSubjectNames) {
                 const subjectTests = subjectsMap.get(subjectName);
                 
-                // Default icon and color
+                // Use a default icon
                 const iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18c-2.305 0-4.408.867-6 2.292m0-14.25v14.25" /></svg>`;
                 const iconColor = 'bg-blue-100 text-blue-700';
 
@@ -299,23 +320,28 @@
 
                 subjectTests.forEach((test, index) => {
                     const isLocked = (test.isPremium || false) && !isPremiumUser;
-                    const testId = test.id; // This is the document ID (e.g., 'ncert_polity_ch1')
-                    const chapterTitle = test.title || 'Untitled Test'; // This is the 'title' field from your doc
+                    const testId = test.id;
+                    const chapterTitle = test.title || 'Untitled Test';
+                    const totalQuestions = test.totalQuestions || 0;
+                    const durationMinutes = test.durationMinutes || 0;
 
                     allHtml += `
                         <div class="chapter-card">
-                            <div class="chapter-info">
-                                <div class="chapter-icon">
-                                    ${String(index + 1).padStart(2, '0')}
-                                </div>
-                                <div>
-                                    <h3 class="chapter-title">${chapterTitle}</h3>
-                                    <p class="chapter-subtitle">NCERT Chapter Test</p>
+                            <div class="chapter-card-body">
+                                <h3 class="chapter-title">${chapterTitle}</h3>
+                                <div class="chapter-meta">
+                                    <span>${totalQuestions} Questions</span>
+                                    <span>${durationMinutes} Minutes</span>
                                 </div>
                             </div>
-                            <div class="chapter-action">
+                            <div class="chapter-card-footer">
+                                <button class="btn-ai-study">
+                                    <svg class="w-4 h-4 inline-block -mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                                    AI Study
+                                </button>
+                                
                                 ${isLocked ? `
-                                    <button data-testid="${testId}" class="unlock-btn btn btn-unlock">
+                                    <button data-testid="${testId}" class="unlock-btn btn" style="background-color: #f1f5f9; color: #475569;">
                                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" /></svg>
                                         Unlock
                                     </button>
