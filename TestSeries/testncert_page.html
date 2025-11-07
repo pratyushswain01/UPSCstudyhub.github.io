@@ -171,7 +171,6 @@
         /* Header */
        .site-header { background: #ffffff; padding: 10px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 101; position: relative; }
        .dark .site-header { background: #2a2a3a; border-bottom-color: #333; }
-       .site-logo { height: 40px; width: auto; }
        .site-branding { display: flex; flex-direction: column; }
        .site-branding .site-title { font-size: 1.4em; font-weight: 700; color: #3f51b5; line-height: 1.1; }
        .dark .site-branding .site-title { color: #8ab4f8; }
@@ -429,7 +428,7 @@
             <h2>Exam Portal Login</h2>
             <p id="testTitle">Loading test details...</p>
             <div id="loginError"></div>
-            <button id="loginBtn" class="btn-primary" onclick="handleLogin()">
+            <button id="loginBtn" class="btn-primary">
                 <i class="fa-brands fa-google"></i> &nbsp; Sign in with Google to Start
             </button>
         </div>
@@ -489,133 +488,148 @@
     </div>
 
     <div id="examUIWrapper">
-        <header class="site-header">
+        <header class="site-header" id="siteHeader">
             <img src="images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
             <div class="site-branding">
                 <span class="site-title" id="examHeaderTitle">NCERT Test</span>
                 <p class="site-tagline">UPSC Civil Services Exam Preparation</p>
             </div>
+             <div class="site-copyright">Copyright © 2025 Pratyush Swain</div>
         </header>
-
-        <div class="topbar">
+        <header class="topbar" id="topbar">
             <div class="topbar-left-group">
-                <div class="timer" id="timerDisplay">Time Left: 00:00:00</div>
-                 <div id="stopwatchWrapper">
-                    <div id="stopwatchDisplay">Time: 00:00:00</div>
+                <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Palette"><i class="fas fa-chevron-left"></i></button>
+                <div class="timer" id="timerDisplay">00:00:00</div>
+                <div id="stopwatchWrapper">
+                    <span id="stopwatchDisplay">00:00:00</span>
                     <div class="stopwatch-controls">
-                        <button id="pauseStopwatchBtn"><i class="fas fa-pause"></i></button>
-                        <button id="resumeStopwatchBtn" style="display: none;"><i class="fas fa-play"></i></button>
+                        <button id="stopwatchPlayPause" title="Play/Pause"><i class="fas fa-play"></i></button>
+                        <button id="stopwatchReset" title="Reset"><i class="fas fa-rotate-left"></i></button>
                     </div>
                 </div>
             </div>
-
             <div class="navigation-tabs">
-                <button class="nav-tab active" id="generalTabBtn" data-tab="general">General</button>
-                <button class="nav-tab locked" id="reviewTabBtn" data-tab="review">Review</button>
+                <button id="showMockTestTab" class="nav-tab active">Mock Test</button>
             </div>
-
             <div class="topbar-right-group">
                 <div class="dark-mode-toggle">
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="darkModeToggle">
-                        <span class="slider">
-                            <span class="toggle-icons">
-                                <i class="fas fa-sun"></i>
-                                <i class="fas fa-moon"></i>
-                            </span>
-                        </span>
-                    </label>
+                    <span class="toggle-label" id="toggleLabel">Dark</span>
+                    <label class="toggle-switch"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
                 </div>
+                <button id="btnSubmitTest" style="display: none;"><i class="fas fa-paper-plane"></i> Submit</button>
             </div>
+        </header>
+        
+        <div class="main-content" id="main-content">    
+            
+            <div id="mockTestWrapper" style="display: flex; width: 100%;">
+                <section class="question-area">
+                    <h2 class="question-header" id="questionNumber"></h2>
+                    <div class="question-content" id="questionText"></div>
+                    <ul class="options-list" id="optionsList"></ul>
+                </section>
+                
+                <aside class="sidebar" id="sidebar">
+                    <div class="sidebar-content">
+                        <div class="palette-title">Question Palette</div>
+                        <div class="question-palette" id="questionPalette"></div>
+                        <div class="palette-summary">
+                            <div class="summary-item"><span id="summaryAnswered">0</span> Answered</div>
+                            <div class="summary-item"><span id="summaryNotAnswered">0</span> Not Answered</div>
+                            <div class="summary-item"><span id="summaryMarked">0</span> Marked Review</div>
+                            <div class="summary-item"><span id="summaryNotVisited">0</span> Not Visited</div>
+                        </div>
+                        <div class="legend">
+                            <div class="legend-title">Legend</div>
+                            <div class="legend-item"><div class="legend-color answered"></div><span>Answered</span></div>
+                            <div class="legend-item"><div class="legend-color not-answered"></div><span>Not Answered</span></div>
+                            <div class="legend-item"><div class="legend-color marked"></div><span>Marked</span></div>
+                            <div class="legend-item"><div class="legend-color marked-answered"></div><span>Marked & Answered</span></div>
+                            <div class="legend-item"><div class="legend-color not-visited"></div><span>Not Visited</span></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            
+            <div id="resultScreenWrapper">
+                <h2 id="resultScreenTitle">Test Completed!</h2>
+                <p id="resultScreenSubtitle">Here is your score summary:</p>
+                
+                <div id="syncStatus"></div>
+
+                <div class="scorecard-details">
+                    <table class="scorecard-table">
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-check-circle" style="color: #4caf50; margin-right: 8px;"></i>Correct Answers</td>
+                                <td class="correct-val"><span id="correctCount">0</span> (<span id="correctMarks">0</span> Marks)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-times-circle" style="color: #f44336; margin-right: 8px;"></i>Incorrect Answers</td>
+                                <td class="incorrect-val"><span id="incorrectCount">0</span> (<span id="incorrectMarks">0</span> Marks)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-minus-circle" style="color: #ff9800; margin-right: 8px;"></i>Unattempted</td>
+                                <td class="unattempted-val"><span id="unattemptedCount">0</span></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Final Score</strong></td>
+                                <td class="total-val"><strong><span id="finalScoreAnimated">0</span> / <span id="totalPossibleScore">0</span></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="result-buttons" id="resultButtonsContainer">
+                     <button id="retestButton" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest</button>
+                     <button id="reviewAnswersButton" class="submit-button btn-action"><i class="fas fa-search"></i> Review Answers</button>
+                     <button onclick="window.location.href = 'testncert_page.html'" class="submit-button btn-action"><i class="fas fa-list"></i> Test Menu</button>
+                </div>
+                
+                </div>
+            
+            <div id="reviewScreenWrapper">
+                <div class="review-header"><h2 class="review-title">Review Your Answers</h2><button id="backToResultsBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Score</button></div>
+                <div id="reviewContainer"></div>
+            </div>
+
         </div>
-
-        <div class="main-content">
-            <div class="question-area" id="questionArea">
-                </div>
-
-            <aside class="sidebar" id="examSidebar">
-                <div class="sidebar-section" id="userProfile">
-                    <img id="userPhoto" src="images/default-user.png" alt="User Photo">
-                    <h4 id="userName">Loading...</h4>
-                    <p id="userEmail">Loading...</p>
-                </div>
-
-                <div class="sidebar-section">
-                    <h3 class="sidebar-title">Question Palette</h3>
-                    <div class="question-palette" id="questionPalette">
-                        </div>
-                    <div class="legend">
-                        <div class="legend-item"><span class="legend-color legend-answered"></span> Answered</div>
-                        <div class="legend-item"><span class="legend-color legend-not-answered"></span> Not Answered</div>
-                        <div class="legend-item"><span class="legend-color legend-review"></span> Marked for Review</div>
-                        <div class="legend-item"><span class="legend-color legend-not-visited"></span> Not Visited</div>
-                    </div>
-                </div>
-
-                <div class="sidebar-section" style="text-align: center;">
-                    <button class="btn-nav btn-submit" id="submitTestBtn">
-                        <i class="fas fa-check-circle"></i> Submit Test
-                    </button>
-                </div>
-            </aside>
-
-            <div class="question-area" id="resultScreen">
-                <div class="result-container">
-                    <div class="result-header">
-                        <h2>Test Submitted Successfully!</h2>
-                        <p>Here is your performance summary for <strong id="resultTestTitle">Test Name</strong>.</p>
-                    </div>
-
-                    <div class="result-summary">
-                        <div class="summary-box summary-score">
-                            <div class="value" id="finalScore">0</div>
-                            <div class="label">Your Score</div>
-                        </div>
-                        <div class="summary-box summary-correct">
-                            <div class="value" id="correctCount">0</div>
-                            <div class="label">Correct</div>
-                        </div>
-                        <div class="summary-box summary-incorrect">
-                            <div class="value" id="incorrectCount">0</div>
-                            <div class="label">Incorrect</div>
-                        </div>
-                        <div class="summary-box summary-unattempted">
-                            <div class="value" id="unattemptedCount">0</div>
-                            <div class="label">Unattempted</div>
-                        </div>
-                    </div>
-
-                    <div class="charts-container">
-                        <div class="chart-box">
-                            <h3>Score Analysis</h3>
-                            <canvas id="scoreChart"></canvas>
-                        </div>
-                        <div class="chart-box">
-                            <h3>Attempt Analysis</h3>
-                            <canvas id="attemptChart"></canvas>
-                        </div>
-                    </div>
-
-                    <div class="result-actions">
-                        <button class="btn-result" id="reviewAnswersBtn"><i class="fas fa-search"></i> Review Answers</button>
-                        <button class="btn-result" id="goHomeBtn" onclick="window.location.href = 'testncert_page.html'"><i class="fas fa-list"></i> Back to Test Menu</button>
-                    </div>
-
-                    <div class="answer-review-section" id="answerReviewSection">
-                        <h3>Answer Key & Explanations</h3>
-                        <div id="reviewContainer">
-                            </div>
-                    </div>
-                </div>
+        
+        <div class="fixed-action-area" id="mcqFooter">
+            <div class="action-buttons">
+                <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i><span>Previous</span></button>
+                <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i><span>Clear</span></button>
+                <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i><span>Mark</span></button>
+                <button class="btn-action" id="btnSaveNext"><i class="fas fa-check"></i><span>Save & Next</span></button>
             </div>
         </div>
     </div>
+    
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close-modal">×</span>
+            <h3>Enter Password to Retest</h3>
+            <p style="font-size: 0.9em; color: #666;">Retest requires you to be offline.</p>
+            <input type="password" id="passwordRetestInput" placeholder="Enter password...">
+            <div id="passwordError"></div>
+            <button id="verifyPasswordButton" class="submit-button btn-action">Verify</button>
+        </div>
+    </div>
+
 
     <script>
+        // ### CONFIGURATION ###
+        const RETEST_PASSWORD = "UPSChub"; // Password for retest
+        
         // --- Firebase Configuration ---
-       const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.appspot.com", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
-
-const appId = 'default-app-id';
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", 
+            authDomain: "upscstudyhub-github.firebaseapp.com", 
+            projectId: "upscstudyhub-github", 
+            storageBucket: "upscstudyhub-github.appspot.com", 
+            messagingSenderId: "451692540885", 
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
+        };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -627,37 +641,93 @@ const appId = 'default-app-id';
         let currentUser = null;
         let currentTest = null;
         let questions = [];
-        let userAnswers = {}; // { q1: { answer: 'a', status: 'answered' }, q2: { status: 'review' } }
+        let userAnswers = {}; // { q_id: { answer: 'a', status: 'answered' } }
+        let state = { current: 0, answers: [], marked: [], visited: [] }; // For palette
         let currentQuestionIndex = 0;
         let timerInterval = null;
-        let stopwatchInterval = null;
-        let stopwatchTime = 0;
-        let isStopwatchPaused = false;
         let testStartTime = null;
-        let testSessionId = null; // Unique ID for this test attempt
+        let testSessionId = null;
         let scoreChart = null;
         let attemptChart = null;
+        let animationInterval = null;
 
-        // --- DOM Elements ---
+        // --- DOM Elements (Adapted for new UI) ---
         const $ = (selector) => document.getElementById(selector);
+        
+        // Pre-Exam Screens
         const preExamScreen = $('preExamScreen');
         const chapterSelectionWrapper = $('chapterSelectionWrapper');
         const chapterGridContainer = $('chapterGridContainer');
         const loginScreen = $('loginScreen');
-        const instructionsScreen = $('instructionsScreen');
-        const submittingScreen = $('submittingScreen');
-        const examUIWrapper = $('examUIWrapper');
-        const questionArea = $('questionArea');
-        const questionPalette = $('questionPalette');
-        const timerDisplay = $('timerDisplay');
-        const stopwatchWrapper = $('stopwatchWrapper');
-        const stopwatchDisplay = $('stopwatchDisplay');
-        const pauseStopwatchBtn = $('pauseStopwatchBtn');
-        const resumeStopwatchBtn = $('resumeStopwatchBtn');
-        const resultScreen = $('resultScreen');
-        const loader = $('loader');
+        const loginBtn = $('loginBtn');
         const loginError = $('loginError');
+        const testTitle = $('testTitle');
+        const instructionsScreen = $('instructionsScreen');
+        const instructionsTestTitle = $('instructionsTestTitle');
+        const testDuration = $('testDuration');
+        const testTotalQuestions = $('testTotalQuestions');
+        const testMarksPerQuestion = $('testMarksPerQuestion');
+        const testNegativeMarks = $('testNegativeMarks');
+        const agreementCheckbox = $('agreementCheckbox');
+        const startExamBtn = $('startExamBtn');
         const startError = $('startError');
+        const submittingScreen = $('submittingScreen');
+        const loader = $('loader'); // Using the loader from File 1
+
+        // Exam UI
+        const examUIWrapper = $('examUIWrapper');
+        const examHeaderTitle = $('examHeaderTitle');
+        const timerDisplay = $('timerDisplay');
+        const stopwatchWrapper = $('stopwatchWrapper'); // Kept if you want to add it later
+        const darkModeToggle = $('darkModeToggle');
+        const toggleLabel = $('toggleLabel');
+        const btnToggleSidebar = $('btnToggleSidebar');
+        
+        // Main Content
+        const questionArea = document.querySelector('.question-area');
+        const questionNumber = $('questionNumber');
+        const questionText = $('questionText');
+        const optionsList = $('optionsList');
+        
+        // Sidebar
+        const sidebar = $('sidebar');
+        const questionPalette = $('questionPalette');
+        const summaryAnswered = $('summaryAnswered');
+        const summaryNotAnswered = $('summaryNotAnswered');
+        const summaryMarked = $('summaryMarked');
+        const summaryNotVisited = $('summaryNotVisited');
+        
+        // Footer Buttons
+        const btnPrevQuestion = $('btnPrevQuestion');
+        const btnSaveNext = $('btnSaveNext');
+        const btnMarkReview = $('btnMarkReview');
+        const btnClearResponse = $('btnClearResponse');
+        const btnSubmitTest = $('btnSubmitTest'); // Top submit button
+
+        // Result Screen
+        const resultScreenWrapper = $('resultScreenWrapper');
+        const resultScreenTitle = $('resultScreenTitle');
+        const correctCount = $('correctCount');
+        const correctMarks = $('correctMarks');
+        const incorrectCount = $('incorrectCount');
+        const incorrectMarks = $('incorrectMarks');
+        const unattemptedCount = $('unattemptedCount');
+        const finalScoreAnimated = $('finalScoreAnimated');
+        const totalPossibleScore = $('totalPossibleScore');
+        const resultButtonsContainer = $('resultButtonsContainer');
+
+        // Review Screen
+        const reviewScreenWrapper = $('reviewScreenWrapper');
+        const reviewContainer = $('reviewContainer');
+        const backToResultsBtn = $('backToResultsBtn');
+
+        // Password Modal
+        const passwordModal = $('passwordModal');
+        const closeModal = $('closeModal');
+        const verifyPasswordButton = $('verifyPasswordButton');
+        const passwordRetestInput = $('passwordRetestInput');
+        const passwordError = $('passwordError');
+
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -667,73 +737,79 @@ const appId = 'default-app-id';
             
             // Persist auth state
             auth.onAuthStateChanged(user => {
-                currentUser = user; // Set current user regardless
+                currentUser = user; 
                 
                 if (testId) {
                     // *** LOGIC 1: A testId IS in the URL ***
-                    // We are here to take a specific test.
                     if (user) {
-                        // User is logged in, load the test instructions
                         showLoader(true, 'Fetching user data...');
-                        displayUserInfo(user);
+                        // displayUserInfo(user); // No user profile in this UI
                         loadSingleTest(testId);
                     } else {
-                        // User is not logged in, show the login prompt
                         showLoader(false);
                         showLoginScreen(testId);
                     }
                 } else {
                     // *** LOGIC 2: NO testId in the URL ***
-                    // We are here to browse the list of tests.
-                    // No login is required to see the list.
                     showTestSelectionScreen();
                 }
             });
 
-            // Dark Mode Toggle
-            const darkModeToggle = $('darkModeToggle');
-            const agreementCheckbox = $('agreementCheckbox');
-            const startExamBtn = $('startExamBtn');
-
-            if (localStorage.getItem('darkMode') === 'enabled') {
-                document.body.classList.add('dark');
+            // Dark Mode
+            const storedTheme = localStorage.getItem('theme');
+            if (storedTheme === 'dark') {
                 darkModeToggle.checked = true;
+                toggleDarkMode(true);
             }
-            darkModeToggle.addEventListener('change', () => {
-                if (darkModeToggle.checked) {
-                    document.body.classList.add('dark');
-                    localStorage.setItem('darkMode', 'enabled');
-                } else {
-                    document.body.classList.remove('dark');
-                    localStorage.setItem('darkMode', 'disabled');
-                }
-                updateChartsTheme();
+            darkModeToggle.addEventListener('change', (e) => {
+                toggleDarkMode(e.target.checked);
+                localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
             });
 
-            // Enable start button only when agreement is checked
+            // Exam Listeners
             agreementCheckbox.addEventListener('change', () => {
                 startExamBtn.disabled = !agreementCheckbox.checked;
             });
-            
             startExamBtn.addEventListener('click', startExam);
-            $('submitTestBtn').addEventListener('click', confirmSubmit);
-            $('reviewAnswersBtn').addEventListener('click', () => {
-                $('answerReviewSection').style.display = 'block';
-                $('reviewAnswersBtn').style.display = 'none';
+            btnSubmitTest.addEventListener('click', () => confirmSubmit(false));
+            
+            // Footer Listeners
+            btnSaveNext.addEventListener('click', saveAndNext);
+            btnPrevQuestion.addEventListener('click', prevQuestion);
+            btnMarkReview.addEventListener('click', markForReview);
+            btnClearResponse.addEventListener('click', clearResponse);
+
+            // UI Listeners
+            btnToggleSidebar.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
+            backToResultsBtn.addEventListener('click', () => {
+                reviewScreenWrapper.style.display = 'none';
+                resultScreenWrapper.style.display = 'flex';
             });
             
-            // Stopwatch controls
-            pauseStopwatchBtn.addEventListener('click', pauseStopwatch);
-            resumeStopwatchBtn.addEventListener('click', resumeStopwatch);
+            // Result Button Listeners (dynamic)
+            resultButtonsContainer.addEventListener('click', (e) => {
+                if (e.target.id === 'retestButton' || e.target.closest('#retestButton')) {
+                    passwordModal.style.display = 'flex';
+                }
+                if (e.target.id === 'reviewAnswersButton' || e.target.closest('#reviewAnswersButton')) {
+                    resultScreenWrapper.style.display = 'none';
+                    reviewScreenWrapper.style.display = 'flex';
+                }
+            });
+
+            // Modal Listeners
+            closeModal.addEventListener('click', () => { passwordModal.style.display = 'none'; });
+            verifyPasswordButton.addEventListener('click', handleRetest);
 
             // Offline/Online status
-            updateOnlineStatus();
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
+            // Note: This UI doesn't have an offline status indicator, but we can add it.
+            // updateOnlineStatus(); 
+            // window.addEventListener('online', updateOnlineStatus);
+            // window.addEventListener('offline', updateOnlineStatus);
             
             // Prevent accidental navigation
             window.addEventListener('beforeunload', (e) => {
-                if (testSessionId && !resultScreen.style.display) {
+                if (testSessionId && resultScreenWrapper.style.display === 'none') {
                     const confirmationMessage = 'Are you sure you want to leave? Your progress will be saved, but the test will not be submitted.';
                     e.returnValue = confirmationMessage;
                     return confirmationMessage;
@@ -758,13 +834,13 @@ const appId = 'default-app-id';
 
             } catch (error) {
                 console.error("Error fetching ncertTests: ", error);
-                chapterGridContainer.innerHTML = `<p class="text-red-500 text-center">Could not load tests. Check Firestore rules for 'ncertTests'.</p>`;
+                chapterGridContainer.innerHTML = `<p style="color: red; text-align: center;">Could not load tests. Check Firestore rules for 'ncertTests'.</p>`;
                 showLoader(false);
                 return;
             }
 
             if (tests.length === 0) {
-                chapterGridContainer.innerHTML = `<p class="text-slate-500 text-center">No tests are available in the 'ncertTests' collection yet.</p>`;
+                chapterGridContainer.innerHTML = `<p style="color: #555; text-align: center;">No tests are available in the 'ncertTests' collection yet.</p>`;
                 showLoader(false);
                 return;
             }
@@ -814,21 +890,9 @@ const appId = 'default-app-id';
             showLoader(false);
         }
 
-        function updateOnlineStatus() {
-            const offlineStatus = $('offlineStatus');
-            if (navigator.onLine) {
-                offlineStatus.textContent = 'You are online. Ready to start.';
-                offlineStatus.className = 'status-ready';
-            } else {
-                offlineStatus.textContent = 'You are offline. Please check your connection.';
-                offlineStatus.className = 'status-waiting';
-            }
-        }
-
         function showLoader(show, text = 'Loading...') {
             if (show) {
                 loader.style.display = 'flex';
-                // You can add a text element to the loader if needed
             } else {
                 loader.style.display = 'none';
             }
@@ -844,7 +908,7 @@ const appId = 'default-app-id';
             loginScreen.style.display = 'block';
             instructionsScreen.style.display = 'none';
             examUIWrapper.style.display = 'none';
-            $('testTitle').textContent = `Loading test: ${testId}...`;
+            testTitle.textContent = `Loading test: ${testId}...`;
         }
 
         function showInstructionsScreen() {
@@ -855,32 +919,23 @@ const appId = 'default-app-id';
             examUIWrapper.style.display = 'none';
 
             // Populate instructions
-            $('instructionsTestTitle').textContent = currentTest.title;
-            $('testDuration').textContent = currentTest.duration || 'N/A';
-            $('testTotalQuestions').textContent = currentTest.totalQuestions || 'N/A';
-            $('testMarksPerQuestion').textContent = currentTest.marksPerQuestion || 'N/A';
-            $('testNegativeMarks').textContent = currentTest.negativeMarks !== undefined ? currentTest.negativeMarks : 'N/A';
-        }
-
-        function displayUserInfo(user) {
-            $('userName').textContent = user.displayName || 'Test User';
-            $('userEmail').textContent = user.email || '';
-            $('userPhoto').src = user.photoURL || 'images/default-user.png';
+            instructionsTestTitle.textContent = currentTest.title;
+            // Use field names from your screenshot
+            testDuration.textContent = currentTest.durationMinutes || 'N/A';
+            testTotalQuestions.textContent = currentTest.totalQuestions || 'N/A';
+            testMarksPerQuestion.textContent = currentTest.marksPerQuestion || '2'; // Default
+            testNegativeMarks.textContent = currentTest.negativeMarks !== undefined ? currentTest.negativeMarks : '0.66'; // Default
         }
 
         // --- Authentication ---
         function handleLogin() {
             showLoader(true, 'Signing in...');
             auth.signInWithPopup(provider)
-                .then(result => {
-                    currentUser = result.user;
-                    displayUserInfo(currentUser);
-                    // The onAuthStateChanged listener will handle loading the test
-                })
                 .catch(error => {
                     showError(`Login failed: ${error.message}`);
-                })
-                .finally(() => showLoader(false));
+                    showLoader(false);
+                });
+            // onAuthStateChanged will handle the successful login
         }
         
         // --- Data Fetching ---
@@ -892,7 +947,6 @@ const appId = 'default-app-id';
             
             showLoader(true, 'Loading test data...');
             try {
-                // ***MODIFICATION***: Only check 'ncertTests' collection
                 const docRef = firestore.collection('ncertTests').doc(testId);
                 const doc = await docRef.get();
 
@@ -902,22 +956,32 @@ const appId = 'default-app-id';
 
                 currentTest = { id: doc.id, ...doc.data() };
                 
+                // *** ADAPTED TO YOUR DATABASE ***
+                // Use fields from your screenshot
+                currentTest.duration = currentTest.durationMinutes || 30; // Use 'durationMinutes'
+                currentTest.totalQuestions = currentTest.totalQuestions || (currentTest.questions ? currentTest.questions.length : 0);
+                // Set defaults if not present
+                currentTest.marksPerQuestion = currentTest.marksPerQuestion || 2;
+                currentTest.negativeMarks = currentTest.negativeMarks !== undefined ? currentTest.negativeMarks : 0.66;
+                
                 // Validate test structure
                 if (!currentTest.questions || currentTest.questions.length === 0) {
-                    throw new Error('Test contains no questions.');
+                    throw new Error('Test contains no questions or questions are not in an array.');
                 }
                 questions = currentTest.questions;
+                // Ensure totalQuestions matches the array
                 currentTest.totalQuestions = questions.length;
 
-                // Update UI with test title
-                $('testTitle').textContent = `Test: ${currentTest.title}`;
+                testTitle.textContent = `Test: ${currentTest.title}`;
 
-                // Now that test is loaded, check for incomplete session
                 await checkIncompleteSession(testId);
                 
             } catch (error) {
                 console.error("Error loading test:", error);
-                showError(`Error: ${error.message}. Please check the test ID and your connection.`);
+                showError(`Error: ${error.message}. Please check the test ID and your connection.`, startError);
+                // Show a more user-friendly error on the instructions screen
+                instructionsScreen.innerHTML = `<h2>Error</h2><p>${error.message}</p><a href="testncert_page.html" class="btn-primary" style="text-decoration:none; text-align:center; margin-top:20px;">Back to Test Menu</a>`;
+                showInstructionsScreen();
                 showLoader(false);
             }
         }
@@ -941,23 +1005,20 @@ const appId = 'default-app-id';
                         testSessionId = session.id;
                         userAnswers = sessionData.userAnswers || {};
                         currentQuestionIndex = sessionData.currentQuestionIndex || 0;
-                        testStartTime = sessionData.startTime.toDate(); // Convert Firestore Timestamp to Date
+                        testStartTime = sessionData.startTime.toDate();
                         
-                        // Handle timer or stopwatch
+                        // Handle timer
                         if (currentTest.duration) {
-                            const elapsedTime = (new Date() - testStartTime) / 1000; // in seconds
+                            const elapsedTime = (new Date() - testStartTime) / 1000;
                             const remainingTime = (currentTest.duration * 60) - elapsedTime;
                             if (remainingTime > 0) {
                                 startTimer(remainingTime);
                             } else {
-                                // Time's up, force submit
                                 submitExam(true); 
                                 return;
                             }
                         } else {
-                            // Resume stopwatch
-                            stopwatchTime = sessionData.stopwatchTime || 0;
-                            startStopwatch();
+                            startStopwatch(sessionData.stopwatchTime || 0);
                         }
                         
                         showExamUI();
@@ -966,74 +1027,34 @@ const appId = 'default-app-id';
                     }
                 }
                 
-                // No session to resume, or user chose not to. Show instructions.
                 showInstructionsScreen();
                 showLoader(false);
 
             } catch (error) {
                 console.error("Error checking incomplete session: ", error);
                 showError(`Error resuming session: ${error.message}`, startError);
-                showInstructionsScreen(); // Fallback to instructions
-                showLoader(false);
-            }
-        }
-        
-        async function resumeResultSession(testId, sessionId) {
-            // This function is for resuming a *completed* test result view
-            showLoader(true, 'Loading your results...');
-            try {
-                // 1. Fetch Test Data (needed for questions and answers)
-                // ***MODIFICATION***: Only check 'ncertTests'
-                const testDoc = await firestore.collection('ncertTests').doc(testId).get();
-                if (!testDoc.exists) {
-                    throw new Error('Test data not found.');
-                }
-                currentTest = { id: testDoc.id, ...testDoc.data() };
-                questions = currentTest.questions;
-
-                // 2. Fetch Session/Result Data
-                const resultDoc = await firestore.collection('testResults').doc(sessionId).get();
-                if (!resultDoc.exists) {
-                    throw new Error('Your test result data could not be found.');
-                }
-                const resultData = resultDoc.data();
-
-                // 3. Check if this result belongs to the current user
-                if (resultData.userId !== currentUser.uid) {
-                    throw new Error('You are not authorized to view these results.');
-                }
-
-                // 4. Populate state and show results
-                userAnswers = resultData.userAnswers;
-                preExamScreen.style.display = 'none';
-                examUIWrapper.style.display = 'flex';
-                questionArea.style.display = 'none';
-                resultScreen.style.display = 'block';
-                document.body.classList.add('exam-active');
-                
-                displayResults(resultData.score, resultData.correct, resultData.incorrect, resultData.unattempted, resultData.totalScore);
-
-            } catch (error) {
-                console.error("Error resuming result session: ", error);
-                showError(`Error loading results: ${error.message}`);
-                showLoginScreen(testId); // Fallback to login
-            } finally {
+                showInstructionsScreen();
                 showLoader(false);
             }
         }
 
-        // --- Exam Logic ---
+        // --- Exam Logic (Adapted for new UI) ---
         async function startExam() {
-            if (!$('agreementCheckbox').checked) {
-                showError('You must agree to the instructions.', startError);
-                return;
-            }
+            if (agreementCheckbox.disabled) return;
             
             showLoader(true, 'Starting exam...');
             testStartTime = new Date();
             testSessionId = `ts_${currentUser.uid}_${currentTest.id}_${testStartTime.getTime()}`;
+            
+            // Reset state
             userAnswers = {};
             currentQuestionIndex = 0;
+            state = { 
+                current: 0, 
+                answers: Array(questions.length).fill(null), 
+                marked: Array(questions.length).fill(false), 
+                visited: Array(questions.length).fill(false) 
+            };
 
             try {
                 // Create a 'testSessions' document
@@ -1052,13 +1073,11 @@ const appId = 'default-app-id';
                 if (currentTest.duration && currentTest.duration > 0) {
                     timerDisplay.style.display = 'block';
                     stopwatchWrapper.style.display = 'none';
-                    startTimer(currentTest.duration * 60); // duration is in minutes
+                    startTimer(currentTest.duration * 60);
                 } else {
-                    // Use stopwatch mode
                     timerDisplay.style.display = 'none';
                     stopwatchWrapper.style.display = 'flex';
-                    stopwatchTime = 0;
-                    startStopwatch();
+                    startStopwatch(0);
                 }
 
             } catch (error) {
@@ -1072,24 +1091,27 @@ const appId = 'default-app-id';
         function showExamUI() {
             preExamScreen.style.display = 'none';
             examUIWrapper.style.display = 'flex';
-            questionArea.style.display = 'block';
-            resultScreen.style.display = 'none';
-            $('examHeaderTitle').textContent = currentTest.title || 'NCERT Test';
+            resultScreenWrapper.style.display = 'none';
+            reviewScreenWrapper.style.display = 'none';
+            document.querySelector('#mockTestWrapper').style.display = 'flex'; // Show test area
+            
+            examHeaderTitle.textContent = currentTest.title || 'NCERT Test';
             document.body.classList.add('exam-active');
+            
+            // Set initial state
+            state.visited[0] = true;
 
             buildPalette();
             displayQuestion(currentQuestionIndex);
+            updateSidebarPosition();
         }
 
         function startTimer(durationInSeconds) {
             let remainingTime = durationInSeconds;
+            clearInterval(timerInterval); // Clear any existing timer
             timerInterval = setInterval(() => {
                 remainingTime--;
-                const hours = Math.floor(remainingTime / 3600);
-                const minutes = Math.floor((remainingTime % 3600) / 60);
-                const seconds = remainingTime % 60;
-                
-                timerDisplay.textContent = `Time Left: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                timerDisplay.textContent = formatTime(remainingTime);
                 
                 if (remainingTime <= 0) {
                     clearInterval(timerInterval);
@@ -1098,161 +1120,143 @@ const appId = 'default-app-id';
                 }
             }, 1000);
         }
+        
+        function formatTime(totalSeconds) {
+            const hours = Math.floor(totalSeconds / 3600);
+            const minutes = Math.floor((totalSeconds % 3600) / 60);
+            const seconds = totalSeconds % 60;
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
 
-        function startStopwatch() {
-            isStopwatchPaused = false;
-            pauseStopwatchBtn.style.display = 'inline-block';
-            resumeStopwatchBtn.style.display = 'none';
-            
+        function startStopwatch(startTime = 0) {
+            // This UI doesn't use a stopwatch by default, but the logic is here.
+            stopwatchTime = startTime;
+            clearInterval(stopwatchInterval);
             stopwatchInterval = setInterval(() => {
-                if (!isStopwatchPaused) {
-                    stopwatchTime++;
-                    const hours = Math.floor(stopwatchTime / 3600);
-                    const minutes = Math.floor((stopwatchTime % 3600) / 60);
-                    const seconds = stopwatchTime % 60;
-                    stopwatchDisplay.textContent = `Time: ${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                
-                    // Save stopwatch time periodically
-                    if (stopwatchTime % 30 === 0) {
-                        updateSession();
-                    }
-                }
+                stopwatchTime++;
+                $('stopwatchDisplay').textContent = formatTime(stopwatchTime);
             }, 1000);
         }
-
-        function pauseStopwatch() {
-            isStopwatchPaused = true;
-            pauseStopwatchBtn.style.display = 'none';
-            resumeStopwatchBtn.style.display = 'inline-block';
-            updateSession(); // Save the paused time
-        }
-
-        function resumeStopwatch() {
-            isStopwatchPaused = false;
-            pauseStopwatchBtn.style.display = 'inline-block';
-            resumeStopwatchBtn.style.display = 'none';
+        
+        function updateSidebarPosition() {
+           const headerHeight = $('siteHeader').offsetHeight;
+           const topbarHeight = $('topbar').offsetHeight;
+           const totalHeaderHeight = headerHeight + topbarHeight;
+           sidebar.style.top = `${totalHeaderHeight}px`;
+           sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
         }
 
         function buildPalette() {
             questionPalette.innerHTML = '';
             questions.forEach((q, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'palette-btn';
+                const btn = document.createElement('div');
+                btn.className = 'question-number';
                 btn.textContent = index + 1;
                 btn.dataset.index = index;
                 btn.onclick = () => jumpToQuestion(index);
-                updatePaletteButton(index);
                 questionPalette.appendChild(btn);
             });
+            updatePalette(); // Initial palette coloring
         }
 
         function displayQuestion(index) {
             currentQuestionIndex = index;
+            state.current = index;
+            state.visited[index] = true;
+            
             const q = questions[index];
             if (!q) return;
 
             // Generate options HTML
             const optionsHTML = q.options.map((option, i) => {
                 const optionLetter = String.fromCharCode(97 + i); // a, b, c, d
-                const answerState = userAnswers[q.id] || {};
-                const isSelected = answerState.answer === optionLetter;
-                const isReview = answerState.status === 'review' && isSelected;
-                
-                let optionClass = 'option';
-                if (isSelected && !isReview) optionClass += ' selected';
-                if (isReview) optionClass += ' review';
+                const isSelected = state.answers[index] === optionLetter;
                 
                 return `
-                    <li class="${optionClass}" data-option="${optionLetter}" onclick="selectAnswer('${q.id}', '${optionLetter}')">
-                        <span class="option-letter">${optionLetter.toUpperCase()}</span>
+                    <li class="option ${isSelected ? 'selected' : ''}" data-option="${optionLetter}">
+                        <span class="option-radio"></span>
                         <span class="option-text">${option}</span>
                     </li>
                 `;
             }).join('');
 
             // Generate main question HTML
-            questionArea.innerHTML = `
-                <div class="question-container" data-qid="${q.id}">
-                    <h3 class="question-number">Question ${index + 1} of ${questions.length}</h3>
-                    <div class="question-text">${q.question}</div>
-                    <ul class="options-list">
-                        ${optionsHTML}
-                    </ul>
-                    <div class="question-nav-buttons">
-                        <button class="btn-nav" id="prevBtn" ${index === 0 ? 'disabled' : ''} onclick="prevQuestion()">
-                            <i class="fas fa-arrow-left"></i> Previous
-                        </button>
-                        <div>
-                            <button class="btn-nav btn-review" onclick="markForReview()">
-                                <i class="fas fa-flag"></i> Mark for Review
-                            </button>
-                            <button class="btn-nav" id="nextBtn" onclick="saveAndNext()">
-                                <i class="fas fa-save"></i> Save & Next
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            `;
+            questionNumber.textContent = `Question ${index + 1} of ${questions.length}`;
+            questionText.innerHTML = q.question; // Use innerHTML to render any HTML in question
+            optionsList.innerHTML = optionsHTML;
             
-            // Update current palette button
-            document.querySelectorAll('.palette-btn.current').forEach(btn => btn.classList.remove('current'));
-            document.querySelector(`.palette-btn[data-index='${index}']`).classList.add('current');
+            // Add click listeners to new options
+            optionsList.querySelectorAll('.option').forEach(opt => {
+                opt.addEventListener('click', () => selectOption(opt.dataset.option));
+            });
+            
+            btnSubmitTest.style.display = (index === questions.length - 1) ? 'flex' : 'none';
+            btnPrevQuestion.disabled = (index === 0);
+            btnSaveNext.querySelector('span').textContent = (index === questions.length - 1) ? "Save & Finish" : "Save & Next";
+
+            updatePalette();
         }
 
-        function selectAnswer(qid, option) {
-            const currentAnswer = userAnswers[qid] || {};
+        function selectOption(optionLetter) {
+            state.answers[currentQuestionIndex] = optionLetter;
             
-            // Toggle selection
-            if (currentAnswer.answer === option) {
-                delete currentAnswer.answer; // Deselect
-                currentAnswer.status = 'not-answered';
-            } else {
-                currentAnswer.answer = option;
-                currentAnswer.status = 'answered';
-            }
-            userAnswers[qid] = currentAnswer;
+            // Update userAnswers (for session resume)
+            const qid = questions[currentQuestionIndex].id;
+            if (!userAnswers[qid]) userAnswers[qid] = {};
+            userAnswers[qid].answer = optionLetter;
+            userAnswers[qid].status = 'answered';
 
-            // Re-render question to show selection
+            // Redraw options to show selection
             displayQuestion(currentQuestionIndex);
-            updatePaletteButton(currentQuestionIndex);
         }
 
         function saveAndNext() {
-            // Update status if not already answered
+            // Update status (for palette)
             const qid = questions[currentQuestionIndex].id;
             if (!userAnswers[qid]) {
-                userAnswers[qid] = { status: 'not-answered' };
+                 userAnswers[qid] = { status: 'not-answered' };
             } else if (userAnswers[qid].status !== 'review') {
-                userAnswers[qid].status = userAnswers[qid].answer ? 'answered' : 'not-answered';
+                 userAnswers[qid].status = userAnswers[qid].answer ? 'answered' : 'not-answered';
             }
             
-            updatePaletteButton(currentQuestionIndex);
+            updatePalette();
             updateSession(); // Save progress
             
             if (currentQuestionIndex < questions.length - 1) {
                 displayQuestion(currentQuestionIndex + 1);
             } else {
-                // At the last question, loop back or show alert
-                alert('You are at the last question.');
+                confirmSubmit(false); // At last question, Save & Next is Submit
             }
         }
 
         function markForReview() {
             const qid = questions[currentQuestionIndex].id;
-            if (!userAnswers[qid]) {
-                userAnswers[qid] = { status: 'review' };
-            } else {
+            state.marked[currentQuestionIndex] = !state.marked[currentQuestionIndex]; // Toggle mark
+
+            if (!userAnswers[qid]) userAnswers[qid] = {};
+            
+            // Set status for review
+            if(state.marked[currentQuestionIndex]) {
                 userAnswers[qid].status = 'review';
+            } else {
+                // Unmarking, set back to answered or not-answered
+                userAnswers[qid].status = userAnswers[qid].answer ? 'answered' : 'not-answered';
             }
             
-            updatePaletteButton(currentQuestionIndex);
-            updateSession(); // Save progress
-
-            if (currentQuestionIndex < questions.length - 1) {
-                displayQuestion(currentQuestionIndex + 1);
-            } else {
-                alert('You are at the last question.');
+            updatePalette();
+            updateSession();
+        }
+        
+        function clearResponse() {
+            state.answers[currentQuestionIndex] = null;
+            
+            const qid = questions[currentQuestionIndex].id;
+            if (userAnswers[qid]) {
+                delete userAnswers[qid].answer;
+                userAnswers[qid].status = state.marked[currentQuestionIndex] ? 'review' : 'not-answered';
             }
+            
+            displayQuestion(currentQuestionIndex); // Redraw to remove selection
         }
 
         function prevQuestion() {
@@ -1265,32 +1269,48 @@ const appId = 'default-app-id';
             displayQuestion(index);
         }
 
-        function updatePaletteButton(index) {
-            const btn = document.querySelector(`.palette-btn[data-index='${index}']`);
-            if (!btn) return;
+        function updatePalette() {
+            let answeredCount = 0;
+            let notAnsweredCount = 0;
+            let markedCount = 0;
+            let notVisitedCount = 0;
             
-            const qid = questions[index].id;
-            const answerState = userAnswers[qid];
-            
-            btn.className = 'palette-btn'; // Reset
-            if (answerState) {
-                if (answerState.status === 'answered') {
+            questionPalette.querySelectorAll('.question-number').forEach((btn, index) => {
+                const isAnswered = state.answers[index] !== null;
+                const isMarked = state.marked[index];
+                const isVisited = state.visited[index];
+
+                btn.className = 'question-number'; // Reset
+
+                if (isAnswered && isMarked) {
+                    btn.classList.add('marked-answered');
+                    answeredCount++;
+                    markedCount++;
+                } else if (isAnswered) {
                     btn.classList.add('answered');
-                } else if (answerState.status === 'review') {
-                    btn.classList.add('review');
-                } else if (answerState.status === 'not-answered' && !answerState.answer) {
-                     btn.classList.add('not-answered');
+                    answeredCount++;
+                } else if (isMarked) {
+                    btn.classList.add('marked');
+                    markedCount++;
+                    notAnsweredCount++; // Marked but unanswered
+                } else if (isVisited) {
+                    btn.classList.add('not-answered');
+                    notAnsweredCount++;
+                } else {
+                    btn.classList.add('not-visited');
+                    notVisitedCount++;
                 }
-            } else {
-                // Not visited yet, but if they are on it, it's not-answered
+                
                 if (index === currentQuestionIndex) {
-                     btn.classList.add('not-answered');
+                    btn.classList.add('current');
                 }
-            }
-            
-            if (index === currentQuestionIndex) {
-                btn.classList.add('current');
-            }
+            });
+
+            // Update sidebar summary
+            summaryAnswered.textContent = answeredCount;
+            summaryNotAnswered.textContent = notAnsweredCount;
+            summaryMarked.textContent = markedCount;
+            summaryNotVisited.textContent = notVisitedCount;
         }
 
         async function updateSession() {
@@ -1309,28 +1329,16 @@ const appId = 'default-app-id';
                 await firestore.collection('testSessions').doc(testSessionId).update(sessionData);
             } catch (error) {
                 console.warn("Could not update session: ", error.message);
-                // Don't stop the exam, just log the warning
             }
         }
 
-        // --- Submission and Results ---
+        // --- Submission and Results (Adapted for new UI) ---
         function confirmSubmit() {
-            let answered = 0;
-            let notAnswered = 0;
-            let markedForReview = 0;
+            const answered = state.answers.filter(a => a !== null).length;
+            const notAnswered = state.visited.filter((v, i) => v && state.answers[i] === null).length;
+            const marked = state.marked.filter(m => m).length;
 
-            questions.forEach(q => {
-                const state = userAnswers[q.id];
-                if (!state || (!state.answer && state.status !== 'review')) {
-                    notAnswered++;
-                } else if (state.status === 'review') {
-                    markedForReview++;
-                } else if (state.status === 'answered' || state.answer) {
-                    answered++;
-                }
-            });
-
-            if (confirm(`Are you sure you want to submit?\n\nAnswered: ${answered}\nNot Answered: ${notAnswered}\nMarked for Review: ${markedForReview}\n\n(Answers marked for review WILL be evaluated)`)) {
+            if (confirm(`Are you sure you want to submit?\n\nAnswered: ${answered}\nNot Answered: ${notAnswered}\nMarked for Review: ${marked}\n\n(Answers marked for review WILL be evaluated)`)) {
                 submitExam(false);
             }
         }
@@ -1346,10 +1354,10 @@ const appId = 'default-app-id';
             submittingScreen.style.display = 'block';
             loginScreen.style.display = 'none';
             instructionsScreen.style.display = 'none';
+            chapterSelectionWrapper.style.display = 'none';
             examUIWrapper.style.display = 'none';
             document.body.classList.remove('exam-active');
             
-            // Stop timers
             if (timerInterval) clearInterval(timerInterval);
             if (stopwatchInterval) clearInterval(stopwatchInterval);
 
@@ -1358,22 +1366,26 @@ const appId = 'default-app-id';
             let correct = 0;
             let incorrect = 0;
             let unattempted = 0;
-            const marksPerQ = currentTest.marksPerQuestion || 2;
-            const negativeMarks = currentTest.negativeMarks !== undefined ? currentTest.negativeMarks : 0;
+            const marksPerQ = currentTest.marksPerQuestion;
+            const negativeMarks = currentTest.negativeMarks;
             const totalScore = questions.length * marksPerQ;
             
-            questions.forEach(q => {
-                const correctAnswer = q.answer;
-                const userAnswerState = userAnswers[q.id];
+            // Use 'state.answers' for calculation
+            state.answers.forEach((ans, index) => {
+                const correctAnswer = questions[index].answer;
+                const qid = questions[index].id;
                 
-                if (!userAnswerState || !userAnswerState.answer) {
+                if (ans === null) {
                     unattempted++;
-                } else if (userAnswerState.answer === correctAnswer) {
+                    if(userAnswers[qid]) userAnswers[qid].status = 'not-answered';
+                } else if (ans === correctAnswer) {
                     correct++;
                     score += marksPerQ;
+                    if(userAnswers[qid]) userAnswers[qid].status = 'correct';
                 } else {
                     incorrect++;
                     score -= negativeMarks;
+                    if(userAnswers[qid]) userAnswers[qid].status = 'incorrect';
                 }
             });
 
@@ -1394,7 +1406,7 @@ const appId = 'default-app-id';
                     incorrect: incorrect,
                     unattempted: unattempted,
                     totalQuestions: questions.length,
-                    userAnswers: userAnswers,
+                    userAnswers: userAnswers, // Save the detailed object
                     marksPerQuestion: marksPerQ,
                     negativeMarks: negativeMarks
                 });
@@ -1402,15 +1414,18 @@ const appId = 'default-app-id';
                 // --- 3. Delete In-Progress Session ---
                 if (testSessionId) {
                     await firestore.collection('testSessions').doc(testSessionId).delete();
-                    testSessionId = null; // Prevent resubmission
+                    testSessionId = null; 
                 }
 
                 // --- 4. Display Results ---
                 showLoader(false);
                 submittingScreen.style.display = 'none';
-                examUIWrapper.style.display = 'flex'; // Show exam wrapper again
-                questionArea.style.display = 'none'; // Hide question area
-                resultScreen.style.display = 'block'; // Show result screen
+                examUIWrapper.style.display = 'flex';
+                document.querySelector('#mockTestWrapper').style.display = 'none'; // Hide test area
+                sidebar.style.display = 'none';
+                document.querySelector('#mcqFooter').style.display = 'none';
+                
+                resultScreenWrapper.style.display = 'flex'; // Show result screen
                 document.body.classList.add('exam-active');
                 
                 displayResults(score, correct, incorrect, unattempted, totalScore);
@@ -1423,174 +1438,130 @@ const appId = 'default-app-id';
         }
         
         function displayResults(score, correct, incorrect, unattempted, totalScore) {
-            $('resultTestTitle').textContent = currentTest.title;
-            $('finalScore').textContent = `${score} / ${totalScore}`;
-            $('correctCount').textContent = correct;
-            $('incorrectCount').textContent = incorrect;
-            $('unattemptedCount').textContent = unattempted;
+            resultScreenTitle.textContent = `Test Completed: ${currentTest.title}`;
+            totalPossibleScore.textContent = totalScore;
 
-            // Render Charts
-            renderScoreChart(score, totalScore - score);
-            renderAttemptChart(correct, incorrect, unattempted);
-
-            // Render Answer Review
+            const scoreBreakdown = {
+                correctCount: correct,
+                incorrectCount: incorrect,
+                unattemptedCount: unattempted,
+                correctMarks: correct * currentTest.marksPerQuestion,
+                incorrectMarks: incorrect * currentTest.negativeMarks * -1, // Show as negative
+                totalScore: score
+            };
+            
+            animateScorecard(scoreBreakdown);
             renderAnswerReview();
         }
 
-        function renderScoreChart(score, scoreLost) {
-            const ctx = $('scoreChart').getContext('2d');
-            const isDark = document.body.classList.contains('dark');
-            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-            const labelColor = isDark ? '#eee' : '#333';
-
-            if (scoreChart) scoreChart.destroy();
-            scoreChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Your Score', 'Marks Lost'],
-                    datasets: [{
-                        data: [Math.max(0, score), Math.max(0, scoreLost)], // Ensure no negative values
-                        backgroundColor: ['#4caf50', '#f44336'],
-                        borderColor: [isDark ? '#2a2a3a' : '#ffffff'],
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: labelColor }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function renderAttemptChart(correct, incorrect, unattempted) {
-            const ctx = $('attemptChart').getContext('2d');
-            const isDark = document.body.classList.contains('dark');
-            const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-            const labelColor = isDark ? '#eee' : '#333';
-            
-            if (attemptChart) attemptChart.destroy();
-            attemptChart = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Correct', 'Incorrect', 'Unattempted'],
-                    datasets: [{
-                        data: [correct, incorrect, unattempted],
-                        backgroundColor: ['#4caf50', '#f44336', '#9e9e9e'],
-                        borderColor: [isDark ? '#2a2a3a' : '#ffffff'],
-                        borderWidth: 3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: { color: labelColor }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.label}: ${context.raw}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateChartsTheme() {
-            const isDark = document.body.classList.contains('dark');
-            const labelColor = isDark ? '#eee' : '#333';
-            const borderColor = isDark ? '#2a2a3a' : '#ffffff';
-
-            if (scoreChart) {
-                scoreChart.options.plugins.legend.labels.color = labelColor;
-                scoreChart.data.datasets[0].borderColor = borderColor;
-                scoreChart.update();
-            }
-            if (attemptChart) {
-                attemptChart.options.plugins.legend.labels.color = labelColor;
-                attemptChart.data.datasets[0].borderColor = borderColor;
-                attemptChart.update();
-            }
+        function animateScorecard(data) {
+           let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
+           const animationSpeed = 20;
+           const duration = 1200;
+           const steps = duration / animationSpeed;
+           const stepValues = {};
+           for (const key in current) {
+               if(data[key] === undefined) data[key] = 0;
+               stepValues[key] = (data[key] - current[key]) / steps;
+           }
+           clearInterval(animationInterval);
+           animationInterval = setInterval(() => {
+               let finished = true;
+               for (const key in current) {
+                   if (Math.abs(current[key] - data[key]) > Math.abs(stepValues[key])) {
+                       current[key] += stepValues[key];
+                       finished = false;
+                   } else {
+                       current[key] = data[key];
+                   }
+               }
+               correctCount.textContent = Math.round(current.correctCount);
+               correctMarks.textContent = `${Math.round(current.correctMarks) > 0 ? '+' : ''}${Math.round(current.correctMarks)}`;
+               incorrectCount.textContent = Math.round(current.incorrectCount);
+               incorrectMarks.textContent = Math.round(current.incorrectMarks);
+               unattemptedCount.textContent = Math.round(current.unattemptedCount);
+               finalScoreAnimated.textContent = Math.round(current.totalScore);
+               if(finished) clearInterval(animationInterval);
+           }, animationSpeed);
         }
         
         function renderAnswerReview() {
-            const container = $('reviewContainer');
-            container.innerHTML = '';
+            reviewContainer.innerHTML = '';
             
             questions.forEach((q, index) => {
                 const correctAnswer = q.answer;
-                const userAnswerState = userAnswers[q.id];
-                const userAnswer = userAnswerState ? userAnswerState.answer : null;
+                const userAnswer = state.answers[index]; // Use simple state array
                 
                 let reviewClass = '';
                 let statusText = '';
-                if (!userAnswer) {
-                    reviewClass = 'unattempted';
-                    statusText = 'Unattempted';
+                if (userAnswer === null) {
+                    reviewClass = 'unanswered';
+                    statusText = 'Unanswered';
                 } else if (userAnswer === correctAnswer) {
-                    reviewClass = 'correct-answer';
+                    reviewClass = 'correct';
                     statusText = 'Correct';
                 } else {
-                    reviewClass = 'incorrect-answer';
+                    reviewClass = 'incorrect';
                     statusText = 'Incorrect';
                 }
                 
                 const optionsHTML = q.options.map((option, i) => {
                     const optionLetter = String.fromCharCode(97 + i);
-                    let liClass = '';
+                    let liClass = 'review-option';
                     let icon = '<i class="far fa-circle"></i>';
                     
                     if (optionLetter === correctAnswer) {
-                        liClass = 'correct';
+                        liClass += ' review-correct';
                         icon = '<i class="fas fa-check-circle"></i>';
                     }
                     if (optionLetter === userAnswer && userAnswer !== correctAnswer) {
-                        liClass = 'incorrect';
+                        liClass += ' review-incorrect';
                         icon = '<i class="fas fa-times-circle"></i>';
-                    }
-                    if (optionLetter === userAnswer) {
-                        liClass += ' selected';
                     }
                     
                     return `<li class="${liClass}">${icon} ${option}</li>`;
                 }).join('');
                 
                 const explanationHTML = q.explanation ? `
-                    <div class="explanation">
-                        <span class="explanation-title">Explanation:</span>
+                    <div class="review-explanation">
+                        <strong>Explanation:</strong>
                         <div>${q.explanation}</div>
                     </div>
                 ` : '';
 
                 const questionElement = document.createElement('div');
-                questionElement.className = `review-question ${reviewClass}`;
+                questionElement.className = `review-question`;
                 questionElement.innerHTML = `
-                    <h4 class="review-q-text">Q ${index + 1}: ${q.question}</h4>
-                    <p><strong>Your Answer:</strong> ${userAnswer ? String(userAnswer).toUpperCase() : 'N/A'} (${statusText})</p>
-                    <p><strong>Correct Answer:</strong> ${String(correctAnswer).toUpperCase()}</p>
-                    <ul class="review-options">
+                    <h4 class="review-q-text" style="font-weight: 600; margin-bottom: 15px;">Q ${index + 1}: ${q.question}</h4>
+                    <ul class="review-option-list">
                         ${optionsHTML}
                     </ul>
+                    <div class="review-status ${reviewClass}">${statusText}</div>
                     ${explanationHTML}
                 `;
-                container.appendChild(questionElement);
+                reviewContainer.appendChild(questionElement);
             });
         }
+        
+        function handleRetest() {
+            if (navigator.onLine) {
+                 passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
+                 return;
+            }
+            if (passwordRetestInput.value === RETEST_PASSWORD) {
+                // Clear local storage for this test
+                // This simple version just reloads the page
+                window.location.reload();
+            } else {
+                passwordError.textContent = 'Incorrect password.';
+            }
+        }
+        
+        function toggleDarkMode(isDark) {
+            document.body.classList.toggle('dark', isDark);
+            toggleLabel.textContent = isDark ? 'Light' : 'Dark';
+        }
+
     </script>
 </body>
 </html>
