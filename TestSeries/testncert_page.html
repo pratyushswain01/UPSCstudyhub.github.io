@@ -902,6 +902,30 @@
             element.textContent = message;
         }
 
+        function handleLoadError(error) {
+            console.error("Fatal error loading test:", error);
+            showLoader(false);
+            
+            // This function replaces the entire page with a centered error card
+            preExamScreen.style.display = 'flex';
+            chapterSelectionWrapper.style.display = 'none';
+            loginScreen.style.display = 'none';
+            instructionsScreen.style.display = 'none';
+            examUIWrapper.style.display = 'none';
+
+            // This HTML creates the centered card, similar to your screenshot
+            preExamScreen.innerHTML = `
+                <div class="login-card" style="max-width: 550px;">
+                    <h2 style="color: #3f51b5; font-size: 1.8em;">Error</h2>
+                    <p style="font-size: 1.1em; color: #555; margin-top: 15px; margin-bottom: 15px;">Could not load test data.</p>
+                    
+                    <p style="font-size: 0.9em; color: #777; margin-bottom: 25px;">${error.message}</p>
+                    
+                    <a href="testncert_page.html" class="btn-primary" style="text-decoration: none; display: block; width: 100%;">Back to Test Menu</a>
+                </div>
+            `;
+        }
+
         function showLoginScreen(testId) {
             preExamScreen.style.display = 'flex';
             chapterSelectionWrapper.style.display = 'none';
@@ -976,14 +1000,10 @@
 
                 await checkIncompleteSession(testId);
                 
-            } catch (error) {
-                console.error("Error loading test:", error);
-                showError(`Error: ${error.message}. Please check the test ID and your connection.`, startError);
-                // Show a more user-friendly error on the instructions screen
-                instructionsScreen.innerHTML = `<h2>Error</h2><p>${error.message}</p><a href="testncert_page.html" class="btn-primary" style="text-decoration:none; text-align:center; margin-top:20px;">Back to Test Menu</a>`;
-                showInstructionsScreen();
-                showLoader(false);
-            }
+               } catch (error) {
+    // This one line will now show the nice error card
+    handleLoadError(error); 
+}
         }
         
         async function checkIncompleteSession(testId) {
