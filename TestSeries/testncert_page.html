@@ -79,6 +79,92 @@
        .btn-start-exam:disabled { background: #9fa8da; cursor: not-allowed; }
        .dark.btn-start-exam:disabled { background: #2c3a7a; }
         #startError { color: #d32f2f; text-align: center; height: 1.2em; font-weight: 500; }
+        
+        /* === NEW: CHAPTER SELECTION STYLES === */
+         #chapterSelectionWrapper {
+            display: none; /* Hidden by default */
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: left;
+         }
+         #chapterSelectionWrapper h1 {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #3f51b5;
+            margin-bottom: 10px;
+         }
+         .dark #chapterSelectionWrapper h1 {
+             color: #8ab4f8;
+         }
+         #chapterSelectionWrapper p {
+             font-size: 1.1em;
+             color: #555;
+             margin-bottom: 30px;
+         }
+         .dark #chapterSelectionWrapper p {
+             color: #ccc;
+         }
+         .subject-group h2 {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #3f51b5;
+            padding-bottom: 8px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+         }
+         .dark .subject-group h2 {
+             color: #eee;
+             border-bottom-color: #8ab4f8;
+         }
+         .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+         }
+         .chapter-button {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px 25px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100px;
+            text-decoration: none;
+         }
+         .chapter-button:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+         }
+         .chapter-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f9f9f9;
+         }
+         .chapter-button h3 {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #3f51b5;
+            margin: 0;
+         }
+         .dark .chapter-button {
+            background: #2a2a3a;
+            border-color: #444;
+         }
+         .dark .chapter-button h3 {
+            color: #8ab4f8;
+         }
+         .dark .chapter-button:disabled {
+            background-color: #242434;
+         }
+         /* === END: CHAPTER SELECTION STYLES === */
+        
         /* Exam UI Wrapper */
         #examUIWrapper { display: none; flex-direction: column; height: 100%; position: relative; }
         
@@ -323,6 +409,18 @@
 
     <div class="pre-exam-screen" id="preExamScreen">
         
+        <div id="chapterSelectionWrapper">
+            <header class="site-header" style="padding-left: 0; padding-right: 0;">
+                <img src="images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
+                <span class="site-copyright">Powered By UPSChub<br>Pratyush swain (Creater & Writer)</span>
+            </header>
+            <h1>NCERT Chapter-wise Tests</h1>
+            <p>Master every subject, one chapter at a time. Select a test to begin.</p>
+            
+            <div id="chapterGridContainer">
+                </div>
+        </div>
+
         <div class="login-card" id="loginScreen">
             <header class="site-header">
                 <img src="images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
@@ -500,7 +598,7 @@
 
                     <div class="result-actions">
                         <button class="btn-result" id="reviewAnswersBtn"><i class="fas fa-search"></i> Review Answers</button>
-                        <button class="btn-result" id="goHomeBtn" onclick="window.location.href = 'index.html'"><i class="fas fa-home"></i> Go to Homepage</button>
+                        <button class="btn-result" id="goHomeBtn" onclick="window.location.href = 'testncert_page.html'"><i class="fas fa-list"></i> Back to Test Menu</button>
                     </div>
 
                     <div class="answer-review-section" id="answerReviewSection">
@@ -548,6 +646,8 @@
         // --- DOM Elements ---
         const $ = (selector) => document.getElementById(selector);
         const preExamScreen = $('preExamScreen');
+        const chapterSelectionWrapper = $('chapterSelectionWrapper');
+        const chapterGridContainer = $('chapterGridContainer');
         const loginScreen = $('loginScreen');
         const instructionsScreen = $('instructionsScreen');
         const submittingScreen = $('submittingScreen');
@@ -570,24 +670,28 @@
             const urlParams = new URLSearchParams(window.location.search);
             const testId = urlParams.get('testId');
             
-            if (!testId) {
-                showError('No test ID provided. Please go back and select a test.');
-                showLoader(false);
-                return;
-            }
-
             // Persist auth state
             auth.onAuthStateChanged(user => {
-                if (user) {
-                    currentUser = user;
-                    showLoader(true, 'Fetching user data...');
-                    displayUserInfo(user);
-                    // Check for existing session *after* loading test data
-                    loadSingleTest(testId);
+                currentUser = user; // Set current user regardless
+                
+                if (testId) {
+                    // *** LOGIC 1: A testId IS in the URL ***
+                    // We are here to take a specific test.
+                    if (user) {
+                        // User is logged in, load the test instructions
+                        showLoader(true, 'Fetching user data...');
+                        displayUserInfo(user);
+                        loadSingleTest(testId);
+                    } else {
+                        // User is not logged in, show the login prompt
+                        showLoader(false);
+                        showLoginScreen(testId);
+                    }
                 } else {
-                    currentUser = null;
-                    showLoader(false);
-                    showLoginScreen(testId);
+                    // *** LOGIC 2: NO testId in the URL ***
+                    // We are here to browse the list of tests.
+                    // No login is required to see the list.
+                    showTestSelectionScreen();
                 }
             });
 
@@ -641,6 +745,79 @@
                 }
             });
         });
+        
+        // --- NEW: Chapter Selection Logic ---
+        async function showTestSelectionScreen() {
+            showLoader(true, 'Loading available tests...');
+            preExamScreen.style.display = 'flex';
+            chapterSelectionWrapper.style.display = 'block';
+            loginScreen.style.display = 'none';
+            instructionsScreen.style.display = 'none';
+            examUIWrapper.style.display = 'none';
+            
+            let tests = [];
+            try {
+                // Fetch all test documents from 'ncertTests'
+                const querySnapshot = await firestore.collection("ncertTests").get();
+                querySnapshot.forEach((doc) => tests.push({ id: doc.id, ...doc.data() }));
+
+            } catch (error) {
+                console.error("Error fetching ncertTests: ", error);
+                chapterGridContainer.innerHTML = `<p class="text-red-500 text-center">Could not load tests. Check Firestore rules for 'ncertTests'.</p>`;
+                showLoader(false);
+                return;
+            }
+
+            if (tests.length === 0) {
+                chapterGridContainer.innerHTML = `<p class="text-slate-500 text-center">No tests are available in the 'ncertTests' collection yet.</p>`;
+                showLoader(false);
+                return;
+            }
+
+            // Group tests by their 'subject' field
+            const subjectsMap = new Map();
+            tests.forEach(test => {
+                const subjectName = test.subject || "Uncategorized"; // Use 'subject' field
+                if (!subjectsMap.has(subjectName)) {
+                    subjectsMap.set(subjectName, []);
+                }
+                subjectsMap.get(subjectName).push(test);
+            });
+
+            // Render the HTML
+            let allHtml = '';
+            const sortedSubjectNames = [...subjectsMap.keys()].sort();
+
+            for (const subjectName of sortedSubjectNames) {
+                const subjectTests = subjectsMap.get(subjectName);
+                
+                allHtml += `
+                    <section class="subject-group">
+                        <h2>${subjectName}</h2>
+                        <div class="chapter-grid">
+                `;
+
+                // Sort tests by title
+                subjectTests.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+
+                subjectTests.forEach((test, index) => {
+                    const testId = test.id;
+                    const chapterTitle = test.title || 'Untitled Test';
+                    
+                    // Create an <a> tag that links to this same page, but with a testId
+                    allHtml += `
+                        <a href="testncert_page.html?testId=${testId}" class="chapter-button">
+                            <h3>${chapterTitle}</h3>
+                        </a>
+                    `;
+                });
+                
+                allHtml += '</div></section>';
+            }
+            
+            chapterGridContainer.innerHTML = allHtml;
+            showLoader(false);
+        }
 
         function updateOnlineStatus() {
             const offlineStatus = $('offlineStatus');
@@ -668,6 +845,7 @@
 
         function showLoginScreen(testId) {
             preExamScreen.style.display = 'flex';
+            chapterSelectionWrapper.style.display = 'none';
             loginScreen.style.display = 'block';
             instructionsScreen.style.display = 'none';
             examUIWrapper.style.display = 'none';
@@ -676,6 +854,7 @@
 
         function showInstructionsScreen() {
             preExamScreen.style.display = 'flex';
+            chapterSelectionWrapper.style.display = 'none';
             loginScreen.style.display = 'none';
             instructionsScreen.style.display = 'flex';
             examUIWrapper.style.display = 'none';
