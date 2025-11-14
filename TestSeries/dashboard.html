@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Series Dashboard - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .footer-nav a.active { color: #2563EB; transform: scale(1.1); }
+        .footer-nav a { transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
+        .tab-active { background-color: #3B82F6; color: white; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 20px; border-radius: 50%;
+            opacity: 0; animation: fall 5s linear infinite;
+        }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
+        .toggle-checkbox { transition: transform 0.2s ease-in-out; }
+        .toggle-checkbox:checked { transform: translateX(1rem); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+        .faq-question.open + .faq-answer { max-height: 200px; }
+        .faq-question .icon { transition: transform 0.3s ease-in-out; }
+        .faq-question.open .icon { transform: rotate(180deg); }
+        .calendar-day.has-activity { background-color: #bfdbfe; color: #1e40af; border-radius: 50%; font-weight: bold; }
+        .calendar-day.selected-day { background-color: #3b82f6; color: white; border-radius: 50%; }
+
+        #welcome-banner {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+            overflow: hidden;
+        }
+        #welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.35);
+            border-radius: 1rem;
+            z-index: 1;
+        }
+        #welcome-banner > * {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+    <script>
+      tailwind.config = { darkMode: 'class' }
+    </script>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+
+
+    <div id="flash-notification" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[100] md:left-auto md:translate-x-0 md:right-5 md:bottom-5">
+    <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border dark:border-slate-700 p-4 transform transition-all duration-300 translate-y-8 opacity-0">
+        <div class="flex items-start gap-3">
+            <div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-full">
+                <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            </div>
+            <div class="flex-1">
+                <p id="flash-title" class="font-bold text-slate-800 dark:text-white"></p>
+                <p id="flash-message" class="text-sm text-slate-600 dark:text-slate-300 mt-1"></p>
+                <button id="flash-action-btn" class="hidden mt-3 text-sm font-semibold text-blue-600 hover:underline">View Now</button>
+            </div>
+            <button id="flash-close-btn" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+    <div id="app-view" class="hidden">
+        <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                    <a href="dashboard.html" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
+                        <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-8 w-8 rounded-lg">
+                        <span>UPSChub</span>
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <button id="streak-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
+                        </button>
+                        <div id="streak-tooltip" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl p-3 z-20 text-sm">
+                            <p><strong>Current Streak:</strong> <span id="current-streak">0</span> days</p>
+                            <p><strong>Highest Streak:</strong> <span id="highest-streak">0</span> days</p>
+                            <p><strong>Today's Tests:</strong> <span id="today-tests">0</span></p>
+                            <p class="text-xs text-slate-500 mt-2">Complete 2 tests to extend your streak!</p>
+                        </div>
+                    </div>
+                    <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </button>
+                    <div id="account-info-div" class="relative">
+                        <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20">
+                            <div class="px-4 py-2 border-b dark:border-slate-700">
+                                <p class="font-semibold text-sm" id="dropdown-display-name">UPSC Aspirant</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate" id="user-email-display"></p>
+                            </div>
+                            <div class="py-1">
+                                <a href="#" id="dropdown-profile-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">My Profile</a>
+                                <a href="#" id="dropdown-settings-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Settings</a>
+                                <div class="p-2">
+                                    <div class="p-2 flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50">
+                                        <span class="text-sm font-medium">Dark Mode</span>
+                                        <div class="relative inline-block w-10 align-middle select-none">
+                                            <input type="checkbox" id="dropdown-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                            <label for="dropdown-theme-toggle" class="toggle-label block overflow:hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200 dark:border-slate-700"></div>
+                            <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="relative min-h-screen">
+             <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+             <aside id="sidebar" class="fixed top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-40 pt-20">
+                 <nav class="p-4">
+                     <ul class="space-y-2">
+                         <li><a href="TestSeries/planner_test.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> Planner</a></li>
+                         <li><a href="#" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg> Browse</a></li>
+                         <li><a href="TestSeries/test_hub.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Test Series</a></li>
+                         <li><a href="TestSeries/ncert_test.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 10h16M4 14h10M4 18h6" /></svg> NCERT Test Series</a></li>
+                         <li><a href="TestSeries/weekly_test.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 8h18M3 12h18M3 16h18M8 3v18" /></svg> Weekly Test Series</a></li>
+                         <li><a href="TestSeries/doubts.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg> Doubts</a></li>
+                         <li><a href="TestSeries/test_details.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Analysis</a></li>
+                     </ul>
+                 </nav>
+             </aside>
+
+            <main id="main-content" class="flex-1 transition-all duration-300 ease-in-out">
+                <div class="container mx-auto p-4 sm:p-6 pb-24">
+                    <div id="home-view">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            
+                            <div class="lg:col-span-2 space-y-6">
+                                <div id="welcome-banner" class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg text-white">
+                                    <div class="flex justify-between items-start">
+                                        <div>
+                                            <h1 id="welcome-heading" class="text-3xl font-bold">Welcome back!</h1>
+                                            <p class="mt-1 opacity-80">Here's your performance summary. Keep up the great work!</p>
+                                        </div>
+                                        <div id="date-time-container" class="text-right flex-shrink-0 ml-4 hidden sm:block">
+                                            <p id="time-display" class="text-2xl font-bold">12:00:00 AM</p>
+                                            <p id="date-display" class="text-sm opacity-80">Monday, October 6, 2025</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. %</p><p id="accuracy-value" class="text-lg font-bold">--%</p></div> </div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Tests Taken</p><p id="tests-taken-value" class="text-lg font-bold">--</p></div>
+                                    </div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7l6 6-6 6" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. Score</p><p id="avg-score-value" class="text-lg font-bold">--</p></div>
+                                    </div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21M9 17.25v-10.5a2.25 2.25 0 00-2-2.25H4.5M9 17.25H5.63c.09-.44.18-1.04.26-1.723A1.875 1.875 0 003.75 14.25H2.25c-.621 0-1.125-.504-1.125-1.125v-1.5c0-.621.504-1.125 1.125-1.125H3.75m9 6.75v-1.007a3 3 0 00.879-2.122L16.5 21m-6.75-3.75h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H16.5m-6.75 12.75v-10.5a2.25 2.25 0 012.25-2.25H12" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Best Subject</p><p id="best-subject-value" class="text-lg font-bold">--</p></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                                    <h3 class="text-lg font-bold mb-4">Performance Overview</h3>
+                                    <div>
+                                        <canvas id="performanceChart"></canvas>
+                                    </div>
+                                </div>
+
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                                    <h3 class="text-lg font-bold mb-4">Recent Test Results</h3>
+                                    <div id="recent-tests-container" class="space-y-4">
+                                        </div>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-1 space-y-6">
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
+                                    <h3 id="activity-date-heading" class="text-lg font-bold mb-4 flex justify-between items-center">
+                                        <span>Today's Schedule</span>
+                                        <button id="add-task-btn" class="p-1 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700" title="Add new task">
+                                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                                        </button>
+                                    </h3>
+                                    
+                                    <div id="productivity-section" class="mb-6 hidden">
+                                        <div class="flex justify-between items-center mb-1">
+                                            <h4 class="text-sm font-semibold">Day's Progress</h4>
+                                            <span id="productivity-percentage" class="text-sm font-bold text-slate-600 dark:text-slate-300">0%</span>
+                                        </div>
+                                        <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2.5">
+                                            <div id="productivity-bar" class="bg-green-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+                                        </div>
+                                    </div>
+
+                                    <div id="dashboard-activity-timeline" class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:h-full before:w-0.5 before:bg-slate-200 dark:before:bg-slate-700">
+                                         </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="notifications-view" class="hidden">
+                         <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Notifications</h1>
+                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
+                             <div class="p-4 flex items-start gap-4">
+                                 <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg></div>
+                                 <div class="flex-1"><p class="font-semibold">New Test Added: GS Mains Full-Length Test #2 is now available.</p><p class="text-sm text-slate-500">2 hours ago</p></div>
+                                 <button class="text-sm text-blue-600 hover:underline font-semibold">Mark as Read</button>
+                             </div>
+                             <div class="p-4 flex items-start gap-4">
+                                 <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                 <div class="flex-1"><p class="font-semibold">Payment Successful! Your premium membership is now active.</p><p class="text-sm text-slate-500">1 day ago</p></div>
+                             </div>
+                         </div>
+                    </div>
+
+                    <div id="settings-view" class="hidden">
+                        <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-8">Settings</h1>
+                        <div class="max-w-3xl mx-auto space-y-8">
+                            <div>
+                                <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Account</h2>
+                                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
+                                    <div class="p-4 flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold" id="settings-display-name">UPSC Aspirant</p>
+                                                <p class="text-sm text-slate-500 dark:text-slate-400" id="settings-user-email"></p>
+                                            </div>
+                                        </div>
+                                        <button id="edit-profile-btn" class="text-sm font-semibold text-blue-600 hover:underline">Edit</button>
+                                    </div>
+                                    <div id="subscription-item" class="p-4 flex items-center justify-between"></div>
+                                    <button id="change-password-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg><span class="font-semibold">Change Password</span></div>
+                                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Preferences</h2>
+                                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
+                                    <button id="notification-prefs-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="font-semibold">Notification Settings</span></div>
+                                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Support & Legal</h2>
+                                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
+                                    <button id="faq-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><span class="font-semibold">FAQs</span></div>
+                                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                    <button id="contact-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg><span class="font-semibold">Contact Us</span></div>
+                                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                    <button id="terms-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg><span class="font-semibold">Terms of Service</span></div>
+                                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                    <button id="privacy-btn" class="w-full text-left p-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                                        <div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg><span class="font-semibold">Privacy Policy</span></div>
+                                        <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                <button id="logout-btn-settings" class="w-full text-left font-semibold text-slate-700 dark:text-slate-300 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700/50">Logout</button>
+                                <button id="delete-account-btn" class="w-full text-left font-semibold text-red-600 dark:text-red-500 bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm hover:bg-red-50 dark:hover:bg-red-500/10">Delete Account</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
+                        <p class="text-sm text-slate-500 dark:text-slate-400">© 2025 UPSChub. All Rights Reserved.</p>
+                   </div>
+                </div>
+            </main>
+        </div>
+        
+        <footer class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-[0_-2px_5px_-1px_rgba(0,0,0,0.1)] z-50">
+             <nav class="container mx-auto px-4 h-16 flex justify-around items-center footer-nav">
+               <a href="homeUPSChub.html" id="nav-home" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span class="text-xs font-medium">Home</span></a>
+               <a href="TestSeries/dashboard.html" id="nav-dashboard" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span class="text-xs font-medium">Dashboard</span></a>
+               <a href="#" id="nav-tests" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg><span class="text-xs font-medium">Tests</span></a>
+               <a href="#" id="nav-notifications" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="text-xs font-medium">Notify</span></a>
+               <a href="#" id="nav-settings" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066 2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg><span class="text-xs font-medium">Settings</span></a>
+            </nav>
+        </footer>
+    </div>
+    
+    <div id="add-task-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700">
+                <h3 class="text-xl font-bold">Add to Schedule</h3>
+            </div>
+            <form id="add-task-form">
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="task-title" class="text-sm font-medium">Task Title</label>
+                        <input type="text" id="task-title" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg" placeholder="e.g., Revise Polity Notes">
+                    </div>
+                    <div>
+                        <label for="task-type" class="text-sm font-medium">Category</label>
+                        <select id="task-type" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                            <option value="STUDY">Study</option>
+                            <option value="REVISION">Revision</option>
+                            <option value="TEST">Test</option>
+                            <option value="BREAK">Break</option>
+                            <option value="OTHER">Other</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                         <div>
+                            <label for="task-start-time" class="text-sm font-medium">Start Time</label>
+                            <input type="time" id="task-start-time" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                        </div>
+                        <div>
+                            <label for="task-end-time" class="text-sm font-medium">End Time</label>
+                            <input type="time" id="task-end-time" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3">
+                    <button type="button" id="cancel-add-task" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="calendar-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700 flex justify-between items-center">
+                <div id="calendar-header" class="flex items-center gap-4">
+                    <button id="prev-month" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">&lt;</button>
+                    <h3 id="month-year" class="text-lg font-bold"></h3>
+                    <button id="next-month" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">&gt;</button>
+                </div>
+                <button id="close-calendar-modal" class="text-2xl leading-none">&times;</button>
+            </div>
+            <div class="p-4">
+                <div id="calendar-grid" class="grid grid-cols-7 gap-1 text-center text-sm"></div>
+            </div>
+            <div id="activity-log" class="p-4 border-t dark:border-slate-700 max-h-40 overflow-y-auto">
+                <p class="text-sm text-slate-500">Select a date to see activity.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-profile-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Edit Profile</h3></div><form id="profile-form"><div class="p-6 space-y-4"><div><label for="display-name" class="text-sm font-medium">Display Name</label><input type="text" id="display-name" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-profile" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Save</button></div></form></div>
+    </div>
+    <div id="change-password-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Change Password</h3></div><form id="password-form"><div class="p-6 space-y-4"><div><label for="current-password" class="text-sm font-medium">Current Password</label><input type="password" id="current-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div><div><label for="new-password" class="text-sm font-medium">New Password</label><input type="password" id="new-password" required minlength="6" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-password" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Update</button></div></form></div>
+    </div>
+    <div id="notification-prefs-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700"><h3 class="text-xl font-bold">Notification Preferences</h3></div><div class="p-6 space-y-4 divide-y divide-slate-200 dark:divide-slate-700"><div class="pt-4 first:pt-0"><div class="flex items-center justify-between"><label for="email-toggle" class="font-semibold cursor-pointer">Email Newsletters</label><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="email-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="email-toggle" class="toggle-label block overflow:hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div><p class="text-sm text-slate-500 mt-1">Receive occasional emails about new features.</p></div><div class="pt-4"><div class="flex items-center justify-between"><label for="in-app-toggle" class="font-semibold cursor-pointer">In-App Announcements</label><div class="relative inline-block w-10 align-middle select-none"><input type="checkbox" id="in-app-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/><label for="in-app-toggle" class="toggle-label block overflow:hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label></div></div><p class="text-sm text-slate-500 mt-1">Get notified about new tests inside the app.</p></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end"><button type="button" id="close-notification-prefs" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Done</button></div>
+        </div>
+    </div>
+    <div id="delete-account-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700 text-center"><h3 class="text-xl font-bold text-red-600">Delete Account</h3><p class="text-sm text-slate-500 mt-1">This action is permanent.</p></div><form id="delete-account-form"><div class="p-6 space-y-4"><p class="text-sm">To confirm, please enter your password. All your data will be permanently erased.</p><div><label for="delete-confirm-password" class="text-sm font-medium">Your Password</label><input type="password" id="delete-confirm-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg"></div></div><div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3"><button type="button" id="cancel-delete-account" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button><button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700">Permanently Delete</button></div></form></div>
+    </div>
+    <div id="contact-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md"><div class="p-6 border-b dark:border-slate-700 flex justify-between items-center"><h3 class="text-xl font-bold">Contact Support</h3><button id="close-contact-modal" class="text-2xl leading-none">&times;</button></div><div class="p-6 space-y-4"><a href="mailto:pratyushkumarswain01@gmail.com?subject=UPSChub Support" class="block text-center w-full p-4 rounded-lg bg-blue-500 text-white font-semibold hover:bg-blue-600">Send an Email</a><a href="https://wa.me/918658567727?text=Hello" target="_blank" class="block text-center w-full p-4 rounded-lg bg-green-500 text-white font-semibold hover:bg-green-600">Message on WhatsApp</a><a href="tel:+918249395283" class="block text-center w-full p-4 rounded-lg bg-slate-600 text-white font-semibold hover:bg-slate-700">Request a Call Back</a><p class="text-xs text-center text-slate-500">Tapping "Request a Call Back" will open your phone's dialer.</p></div></div>
+    </div>
+    <div id="faq-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-lg"><div class="p-6 border-b dark:border-slate-700 flex justify-between items-center"><h3 class="text-xl font-bold">FAQs</h3><button id="close-faq-modal" class="text-2xl leading-none">&times;</button></div><div id="faq-container" class="p-6 space-y-2 max-h-[60vh] overflow-y-auto"></div></div>
+    </div>
+    <div id="terms-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-lg"><div class="p-6 border-b dark:border-slate-700 flex justify-between items-center"><h3 class="text-xl font-bold">Terms of Service</h3><button id="close-terms-modal" class="text-2xl leading-none">&times;</button></div><div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto text-sm text-slate-600 dark:text-slate-300"><h4 class="font-bold">Last Updated: October 3, 2025</h4><p>Welcome to UPSChub...</p></div></div>
+    </div>
+    <div id="privacy-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-lg"><div class="p-6 border-b dark:border-slate-700 flex justify-between items-center"><h3 class="text-xl font-bold">Privacy Policy</h3><button id="close-privacy-modal" class="text-2xl leading-none">&times;</button></div><div class="p-6 space-y-4 max-h-[60vh] overflow-y-auto text-sm text-slate-600 dark:text-slate-300"><h4 class="font-bold">Last Updated: October 3, 2025</h4><p>Your privacy is important to us...</p></div></div>
+    </div>
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6"><p id="alert-message" class="font-medium"></p><button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button></div>
+    </div>
+    <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center modal-backdrop">
+        <div id="confetti-container" class="absolute inset-0 overflow-hidden"></div>
+        <div class="text-center text-white" id="success-message-content"><svg class="w-24 h-24 mx-auto text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg><h2 class="text-4xl font-bold mt-4">Welcome to Premium!</h2><p class="mt-2 text-lg opacity-80">You now have lifetime access.</p><button id="close-success-animation" class="mt-8 bg-white text-blue-600 font-bold px-8 py-3 rounded-lg shadow-lg">Start Exploring</button></div>
+    </div>
+    <div id="congrats-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-8 relative overflow-hidden">
+            <div id="congrats-confetti-container" class="absolute inset-0"></div>
+            <div class="relative z-10">
+                <svg class="w-20 h-20 mx-auto text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <h3 class="text-2xl font-bold mt-4">Congratulations!</h3>
+                <p id="congrats-message" class="mt-2 text-slate-600 dark:text-slate-300">You've completed all your tasks for today. Great job!</p>
+                <button id="close-congrats-modal" class="mt-6 px-8 py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Awesome!</button>
+            </div>
+        </div>
+    </div>
+
+<script type="module">
+    // --- FIREBASE IMPORTS ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc, getDoc, setDoc, collection, query, getDocs, orderBy, serverTimestamp, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+    // Use a unique App ID for different instances if necessary, otherwise default is fine
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- ELEMENT SELECTORS ---
+    const appView = document.getElementById('app-view');
+    const userEmailDisplay = document.getElementById('user-email-display');
+    const userEmailDisplaySettings = document.getElementById('settings-user-email');
+    const displayNameSettings = document.getElementById('settings-display-name');
+    const welcomeHeading = document.getElementById('welcome-heading');
+    const welcomeBanner = document.getElementById('welcome-banner');
+    const timeDisplay = document.getElementById('time-display');
+    const dateDisplay = document.getElementById('date-display');
+    const accountBtn = document.getElementById('account-btn');
+    const accountDropdown = document.getElementById('account-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+    const logoutBtnSettings = document.getElementById('logout-btn-settings');
+    const profileModal = document.getElementById('edit-profile-modal');
+    const passwordModal = document.getElementById('change-password-modal');
+    const alertModal = document.getElementById('alert-modal');
+    const alertMessage = document.getElementById('alert-message');
+    const profileForm = document.getElementById('profile-form');
+    const passwordForm = document.getElementById('password-form');
+    const editProfileBtn = document.getElementById('edit-profile-btn');
+    const changePasswordBtn = document.getElementById('change-password-btn');
+    const subscriptionItem = document.getElementById('subscription-item');
+    const successAnimationModal = document.getElementById('success-animation-modal');
+    const successMessageContent = document.getElementById('success-message-content');
+    const confettiContainer = document.getElementById('confetti-container');
+    const closeSuccessAnimationBtn = document.getElementById('close-success-animation');
+    const notificationPrefsBtn = document.getElementById('notification-prefs-btn');
+    const notificationPrefsModal = document.getElementById('notification-prefs-modal');
+    const closeNotificationPrefsBtn = document.getElementById('close-notification-prefs');
+    const emailToggle = document.getElementById('email-toggle');
+    const inAppToggle = document.getElementById('in-app-toggle');
+    const deleteAccountBtn = document.getElementById('delete-account-btn');
+    const deleteAccountModal = document.getElementById('delete-account-modal');
+    const deleteAccountForm = document.getElementById('delete-account-form');
+    const cancelDeleteAccountBtn = document.getElementById('cancel-delete-account');
+    const contactBtn = document.getElementById('contact-btn');
+    const contactModal = document.getElementById('contact-modal');
+    const closeContactModalBtn = document.getElementById('close-contact-modal');
+    const faqBtn = document.getElementById('faq-btn');
+    const faqModal = document.getElementById('faq-modal');
+    const closeFaqModalBtn = document.getElementById('close-faq-modal');
+    const faqContainer = document.getElementById('faq-container');
+    const termsBtn = document.getElementById('terms-btn');
+    const termsModal = document.getElementById('terms-modal');
+    const closeTermsModalBtn = document.getElementById('close-terms-modal');
+    const privacyBtn = document.getElementById('privacy-btn');
+    const privacyModal = document.getElementById('privacy-modal');
+    const closePrivacyModalBtn = document.getElementById('close-privacy-modal');
+    const dropdownDisplayName = document.getElementById('dropdown-display-name');
+    const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
+    const dropdownProfileBtn = document.getElementById('dropdown-profile-btn');
+    const dropdownSettingsBtn = document.getElementById('dropdown-settings-btn');
+    const streakBtn = document.getElementById('streak-btn');
+    const streakTooltip = document.getElementById('streak-tooltip');
+    const currentStreakSpan = document.getElementById('current-streak');
+    const highestStreakSpan = document.getElementById('highest-streak');
+    const todayTestsSpan = document.getElementById('today-tests');
+    const calendarBtn = document.getElementById('calendar-btn');
+    const calendarModal = document.getElementById('calendar-modal');
+    const closeCalendarModalBtn = document.getElementById('close-calendar-modal');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    // Renamed to avoid conflict - use mainContentElement for DOM manipulation
+    const mainContentElement = document.getElementById('main-content');
+    const dashboardActivityTimeline = document.getElementById('dashboard-activity-timeline');
+    const addTaskBtn = document.getElementById('add-task-btn');
+    const addTaskModal = document.getElementById('add-task-modal');
+    const addTaskForm = document.getElementById('add-task-form');
+    const cancelAddTaskBtn = document.getElementById('cancel-add-task');
+    const productivitySection = document.getElementById('productivity-section');
+    const productivityBar = document.getElementById('productivity-bar');
+    const productivityPercentage = document.getElementById('productivity-percentage');
+    const congratsModal = document.getElementById('congrats-modal');
+    const closeCongratsModalBtn = document.getElementById('close-congrats-modal');
+    const congratsConfettiContainer = document.getElementById('congrats-confetti-container');
+
+    // Navigation and View Management Elements
+    const spaViews = { home: document.getElementById('home-view'), notifications: document.getElementById('notifications-view'), settings: document.getElementById('settings-view') };
+    const navButtons = { home: document.getElementById('nav-home'), dashboard: document.getElementById('nav-dashboard'), tests: document.getElementById('nav-tests'), notifications: document.getElementById('nav-notifications'), settings: document.getElementById('nav-settings') };
+
+
+    let selectedDateStr = new Date().toISOString().split('T')[0];
+    let performanceChartInstance = null;
+    let timeUpdateInterval = null;
+    let currentDayString = new Date().toISOString().split('T')[0];
+    let todaysTasks = [];
+    let currentDate = new Date(); // Used for calendar
+
+    // --- HELPER FUNCTION ---
+    function showAlert(message) { alertMessage.textContent = message; alertModal.classList.remove('hidden'); }
+    document.getElementById('alert-ok').addEventListener('click', () => alertModal.classList.add('hidden'));
+
+    // --- SIDEBAR LOGIC ---
+    function handleSidebarState() {
+        if (!sidebar || !sidebarBackdrop || !mainContentElement) return; // Add null checks
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebarBackdrop.classList.add('hidden');
+            mainContentElement.classList.remove('md:ml-64');
+        } else {
+            if (window.innerWidth < 768) {
+                sidebarBackdrop.classList.remove('hidden');
+                 mainContentElement.classList.remove('md:ml-64'); // Ensure margin is removed on small screens
+            } else {
+                 sidebarBackdrop.classList.add('hidden'); // Hide backdrop on large screens
+                 mainContentElement.classList.add('md:ml-64');
+            }
+        }
+    }
+    function toggleSidebar() { sidebar.classList.toggle('-translate-x-full'); handleSidebarState(); }
+    // Initial setup based on screen size
+    if (window.innerWidth >= 768) { sidebar.classList.remove('-translate-x-full'); } else { sidebar.classList.add('-translate-x-full'); }
+    handleSidebarState(); // Call once on load
+
+    // --- NOTIFICATION FUNCTIONS ---
+    async function checkAndDisplayNotifications(user) {
+        if (!user) return;
+        try {
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            const userDoc = await getDoc(userDocRef);
+            const userData = userDoc.exists() ? userDoc.data() : {};
+            const lastSeenTimestamp = userData.lastSeenNotificationTimestamp || null;
+
+            const notificationsRef = collection(db, 'notifications');
+            const q = lastSeenTimestamp
+                ? query(notificationsRef, where("timestamp", ">", lastSeenTimestamp), orderBy("timestamp", "desc"), limit(1))
+                : query(notificationsRef, orderBy("timestamp", "desc"), limit(1));
+
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                const latestNotification = querySnapshot.docs[0].data();
+                const latestTimestamp = latestNotification.timestamp;
+
+                const flash = document.getElementById('flash-notification');
+                document.getElementById('flash-title').textContent = latestNotification.title;
+                document.getElementById('flash-message').textContent = latestNotification.message;
+
+                const actionBtn = document.getElementById('flash-action-btn');
+                if (latestNotification.actionLink) {
+                    actionBtn.classList.remove('hidden');
+                    actionBtn.onclick = () => { window.location.href = latestNotification.actionLink; };
+                } else {
+                    actionBtn.classList.add('hidden');
+                }
+
+                flash.classList.remove('hidden');
+                setTimeout(() => {
+                    flash.querySelector('.transform').classList.remove('translate-y-8', 'opacity-0');
+                }, 100);
+
+                // Update last seen timestamp only if the doc exists, otherwise it's handled in the main listener
+                if (userDoc.exists()) {
+                     await updateDoc(userDocRef, { lastSeenNotificationTimestamp: latestTimestamp });
+                }
+            }
+        } catch (error) {
+            console.error("Error checking notifications:", error);
+        }
+    }
+
+    async function renderAllNotifications() {
+        const container = document.querySelector('#notifications-view .divide-y');
+        if (!container) return;
+        container.innerHTML = '<p class="p-4 text-center text-slate-500">Loading notifications...</p>';
+
+        try {
+            const notificationsRef = collection(db, 'notifications');
+            const q = query(notificationsRef, orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                container.innerHTML = '<p class="p-4 text-center text-slate-500">No notifications yet.</p>';
+                return;
+            }
+
+            container.innerHTML = ''; // Clear loading message
+            querySnapshot.forEach(doc => {
+                const notification = doc.data();
+                const date = notification.timestamp ? notification.timestamp.toDate().toLocaleDateString() : 'Just now';
+                const notificationHTML = `
+                    <div class="p-4 flex items-start gap-4">
+                        <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" /></svg></div>
+                        <div class="flex-1"><p class="font-semibold">${notification.title || 'Notification'}</p><p class="text-sm text-slate-600 dark:text-slate-400 mt-1">${notification.message || ''}</p><p class="text-xs text-slate-500 mt-2">${date}</p></div>
+                        ${notification.actionLink ? `<a href="${notification.actionLink}" class="text-sm text-blue-600 hover:underline font-semibold flex-shrink-0">View</a>` : ''}
+                    </div>`;
+                container.insertAdjacentHTML('beforeend', notificationHTML);
+            });
+         } catch (error) {
+             console.error("Error rendering notifications:", error);
+             container.innerHTML = '<p class="p-4 text-center text-red-500">Could not load notifications.</p>';
+         }
+    }
+
+    // --- AUTHENTICATION & REAL-TIME DATA (Single Listener) ---
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            console.log('User is logged in. Setting up dashboard...');
+            appView.classList.remove('hidden'); // Show the main app content
+
+            // Initial data fetch and UI setup
+            checkAndDisplayNotifications(user);
+            renderPerformanceChart(); // Initialize chart structure
+            processUserPerformance(user.uid); // Fetch and display performance data
+
+            // Set up real-time listener for user data (profile, settings, activity)
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            const unsubscribe = onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    const userData = docSnap.data();
+                    const displayName = userData.displayName || user.displayName || 'UPSC Aspirant';
+
+                    // Update UI elements that depend on user data
+                    if (dropdownDisplayName) dropdownDisplayName.textContent = displayName;
+                    if (displayNameSettings) displayNameSettings.textContent = displayName;
+                    if (userEmailDisplay) userEmailDisplay.textContent = user.email;
+                    if (userEmailDisplaySettings) userEmailDisplaySettings.textContent = user.email;
+
+                    updateSubscriptionUI(userData.isPremium);
+                    updateStreakUI(userData.streak, userData.activity);
+                    updateDashboardActivity(selectedDateStr); // Update schedule for the selected date
+
+                    // Update notification preferences toggles
+                    if (userData.preferences) {
+                        if (emailToggle) emailToggle.checked = userData.preferences.receiveEmails ?? true;
+                        if (inAppToggle) inAppToggle.checked = userData.preferences.receiveInAppAnnouncements ?? true;
+                    }
+
+                    // Initialize time/greeting only once
+                    if (!timeUpdateInterval) {
+                        initializeTimeBasedUI();
+                    }
+                } else {
+                    // Create user document if it doesn't exist (first login)
+                    console.log("Creating user document in Firestore...");
+                    setDoc(userDocRef, {
+                        displayName: user.displayName || 'UPSC Aspirant',
+                        email: user.email,
+                        createdAt: serverTimestamp(),
+                        isPremium: false,
+                        preferences: { receiveEmails: true, receiveInAppAnnouncements: true },
+                        streak: { current: 0, highest: 0, lastUpdatedDate: null },
+                        activity: {}
+                    }).catch(error => console.error("Error creating user document:", error));
+                    // Initial UI update for new user
+                    if (dropdownDisplayName) dropdownDisplayName.textContent = user.displayName || 'UPSC Aspirant';
+                     if (displayNameSettings) displayNameSettings.textContent = user.displayName || 'UPSC Aspirant';
+                    if (userEmailDisplay) userEmailDisplay.textContent = user.email;
+                    if (userEmailDisplaySettings) userEmailDisplaySettings.textContent = user.email;
+                    updateSubscriptionUI(false);
+                     updateStreakUI({ current: 0, highest: 0 }, {});
+                     updateDashboardActivity(selectedDateStr);
+                     if (!timeUpdateInterval) initializeTimeBasedUI();
+                }
+            }, (error) => {
+                 console.error("Error listening to user document:", error);
+                 // Optionally show an error message to the user
+            });
+
+            // Attach all event listeners for buttons, modals, etc.
+            attachAllEventListeners();
+
+            // Set the active navigation button
+             showView('home');
+
+
+        } else {
+            // User is signed out - Redirect to login page
+            console.log('User is not logged in. Redirecting to auth page...');
+            // Make sure the redirect path is correct relative to your site structure
+            window.location.href = './auth.html'; // Adjust if auth.html is in a different folder
+        }
+    });
+
+
+    // --- Time and Greeting ---
+    function initializeTimeBasedUI() {
+        updateTimeAndGreeting();
+        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+        timeUpdateInterval = setInterval(updateTimeAndGreeting, 1000);
+    }
+
+    function updateTimeAndGreeting() {
+        const morningImage = 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop';
+        const afternoonImage = 'https://images.unsplash.com/photo-1590306362572-215a054a88f5?q=80&w=2070&auto=format&fit=crop';
+        const eveningImage = 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=1974&auto=format&fit=crop';
+
+        const now = new Date();
+        const hour = now.getHours();
+
+        // Check if the day has changed
+        const newDayString = now.toISOString().split('T')[0];
+        if (newDayString !== currentDayString) {
+            console.log("Day has changed! Updating dashboard for new day.");
+            currentDayString = newDayString;
+            selectedDateStr = newDayString; // Update selected date to today
+            currentDate = new Date(); // Update calendar's date
+            updateDashboardActivity(selectedDateStr); // Reload today's schedule
+            renderCalendar(); // Re-render calendar
+        }
+
+        // Check for task reminders
+        const currentTime = now.toTimeString().substring(0, 5); // Format HH:MM
+        todaysTasks.forEach(task => {
+            if (task.startTime === currentTime && !task.notified) {
+                showAlert(`Reminder: It's time for your task "${task.title}"`);
+                task.notified = true; // Mark as notified for this session
+            }
+        });
+
+        // Update greeting and banner image
+        const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
+        let greetingText, backgroundImageUrl;
+        if (hour >= 5 && hour < 12) {
+            greetingText = `Good Morning, ${name}!`;
+            backgroundImageUrl = morningImage;
+        } else if (hour >= 12 && hour < 18) {
+            greetingText = `Good Afternoon, ${name}!`;
+            backgroundImageUrl = afternoonImage;
+        } else {
+            greetingText = `Good Evening, ${name}!`;
+            backgroundImageUrl = eveningImage;
+        }
+        if (welcomeHeading) welcomeHeading.textContent = greetingText;
+        if (welcomeBanner) welcomeBanner.style.backgroundImage = `url('${backgroundImageUrl}')`;
+        if (timeDisplay) timeDisplay.textContent = now.toLocaleTimeString('en-US');
+        if (dateDisplay) dateDisplay.textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    // --- Streak UI ---
+     function updateStreakUI(streakData, activityData) {
+        if (!streakData || !currentStreakSpan || !highestStreakSpan || !todayTestsSpan) return;
+
+        const todayStr = new Date().toISOString().split('T')[0];
+        const todaysActivities = activityData ? (activityData[todayStr] || []) : [];
+        // Count tasks of type 'TEST' for today from the activity schedule
+        const todayTestsCount = todaysActivities.filter(item => item.type === 'TEST').length;
+
+        currentStreakSpan.textContent = streakData.current || 0;
+        highestStreakSpan.textContent = streakData.highest || 0;
+        todayTestsSpan.textContent = todayTestsCount;
+    }
+
+    // --- EVENT LISTENERS ---
+    function attachAllEventListeners() {
+        // --- Sidebar ---
+        if (sidebarToggle) sidebarToggle.onclick = toggleSidebar;
+        if (sidebarBackdrop) sidebarBackdrop.onclick = toggleSidebar;
+
+        // --- Header Buttons ---
+        if (streakBtn) {
+           streakBtn.onmouseenter = () => streakTooltip && streakTooltip.classList.remove('hidden');
+           streakBtn.onmouseleave = () => streakTooltip && streakTooltip.classList.add('hidden');
+        }
+        if (calendarBtn) calendarBtn.onclick = () => { renderCalendar(); calendarModal && calendarModal.classList.remove('hidden'); };
+        if (closeCalendarModalBtn) closeCalendarModalBtn.onclick = () => calendarModal && calendarModal.classList.add('hidden');
+        if (accountBtn) accountBtn.onclick = () => accountDropdown && accountDropdown.classList.toggle('hidden');
+
+        // --- Global Click for Dropdown ---
+        document.onclick = (e) => {
+            if (accountBtn && !accountBtn.contains(e.target) && accountDropdown && !accountDropdown.contains(e.target)) {
+                accountDropdown.classList.add('hidden');
+            }
+        };
+
+        // --- Flash Notification ---
+        const flashCloseBtn = document.getElementById('flash-close-btn');
+        if (flashCloseBtn) {
+            flashCloseBtn.onclick = () => {
+                const flash = document.getElementById('flash-notification');
+                const transformDiv = flash ? flash.querySelector('.transform') : null;
+                 if (transformDiv) transformDiv.classList.add('translate-y-8', 'opacity-0');
+                setTimeout(() => flash && flash.classList.add('hidden'), 300);
+            };
+        }
+
+        // --- Footer Navigation ---
+        if (navButtons.home) navButtons.home.onclick = (e) => { e.preventDefault(); window.location.href = 'homeUPSChub.html'; };
+        if (navButtons.dashboard) navButtons.dashboard.onclick = (e) => { e.preventDefault(); showView('home'); };
+        if (navButtons.tests) navButtons.tests.onclick = (e) => { e.preventDefault(); window.location.href = 'TestSeries/Prem_testSeries.html'; };
+        if (navButtons.notifications) navButtons.notifications.onclick = (e) => { e.preventDefault(); showView('notifications'); renderAllNotifications(); };
+        if (navButtons.settings) navButtons.settings.onclick = (e) => { e.preventDefault(); showView('settings'); };
+
+        // --- Account Dropdown ---
+        if (dropdownProfileBtn) dropdownProfileBtn.onclick = (e) => { e.preventDefault(); showView('settings'); accountDropdown && accountDropdown.classList.add('hidden'); profileModal && profileModal.classList.remove('hidden'); const nameInput = document.getElementById('display-name'); if(nameInput) nameInput.value = dropdownDisplayName.textContent; }; // Pre-fill name
+        if (dropdownSettingsBtn) dropdownSettingsBtn.onclick = (e) => { e.preventDefault(); showView('settings'); accountDropdown && accountDropdown.classList.add('hidden'); };
+        if (logoutBtn) logoutBtn.onclick = handleLogout;
+        if (dropdownThemeToggle) dropdownThemeToggle.onchange = toggleTheme;
+
+        // --- Settings View Buttons ---
+        if (logoutBtnSettings) logoutBtnSettings.onclick = handleLogout;
+        if (editProfileBtn) editProfileBtn.onclick = () => { profileModal && profileModal.classList.remove('hidden'); const nameInput = document.getElementById('display-name'); if(nameInput) nameInput.value = dropdownDisplayName.textContent; }; // Pre-fill name
+        const cancelProfileBtn = document.getElementById('cancel-profile');
+        if (cancelProfileBtn) cancelProfileBtn.onclick = () => profileModal && profileModal.classList.add('hidden');
+        if (profileForm) profileForm.onsubmit = async (e) => { e.preventDefault(); const newName = document.getElementById('display-name').value; const user = auth.currentUser; if (!user || !newName) return; try { await updateProfile(user, { displayName: newName }); const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); await updateDoc(userDocRef, { displayName: newName }); profileModal && profileModal.classList.add('hidden'); showAlert('Profile updated!'); } catch (error) { showAlert('Failed to update profile.'); } };
+        if (changePasswordBtn) changePasswordBtn.onclick = () => passwordModal && passwordModal.classList.remove('hidden');
+        const cancelPasswordBtn = document.getElementById('cancel-password');
+        if(cancelPasswordBtn) cancelPasswordBtn.onclick = () => passwordModal && passwordModal.classList.add('hidden');
+        if (passwordForm) passwordForm.onsubmit = async (e) => { e.preventDefault(); const currentPassword = document.getElementById('current-password').value; const newPassword = document.getElementById('new-password').value; const user = auth.currentUser; if (!user || !currentPassword || !newPassword ) return; const credential = EmailAuthProvider.credential(user.email, currentPassword); try { await reauthenticateWithCredential(user, credential); await updatePassword(user, newPassword); passwordModal && passwordModal.classList.add('hidden'); passwordForm.reset(); showAlert('Password updated successfully!'); } catch (error) { showAlert('Failed to change password. Check current password.'); } };
+        if (notificationPrefsBtn) notificationPrefsBtn.onclick = () => notificationPrefsModal && notificationPrefsModal.classList.remove('hidden');
+        if (closeNotificationPrefsBtn) closeNotificationPrefsBtn.onclick = () => notificationPrefsModal && notificationPrefsModal.classList.add('hidden');
+        if (emailToggle) emailToggle.onchange = (e) => updateNotificationPreference('receiveEmails', e.target.checked);
+        if (inAppToggle) inAppToggle.onchange = (e) => updateNotificationPreference('receiveInAppAnnouncements', e.target.checked);
+        if (deleteAccountBtn) deleteAccountBtn.onclick = () => deleteAccountModal && deleteAccountModal.classList.remove('hidden');
+        if (cancelDeleteAccountBtn) cancelDeleteAccountBtn.onclick = () => deleteAccountModal && deleteAccountModal.classList.add('hidden');
+        if (deleteAccountForm) deleteAccountForm.onsubmit = async (e) => { e.preventDefault(); const password = document.getElementById('delete-confirm-password').value; const user = auth.currentUser; if (!user || !password) return; const credential = EmailAuthProvider.credential(user.email, password); try { await reauthenticateWithCredential(user, credential); const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); await deleteDoc(userDocRef); // Delete Firestore data first
+ await deleteUser(user); // Then delete auth user
+ // Auth state change will handle redirect
+ } catch (error) { showAlert('Failed to delete account. Please check your password.'); } };
+        if (contactBtn) contactBtn.onclick = () => contactModal && contactModal.classList.remove('hidden');
+        if (closeContactModalBtn) closeContactModalBtn.onclick = () => contactModal && contactModal.classList.add('hidden');
+        if (termsBtn) termsBtn.onclick = () => termsModal && termsModal.classList.remove('hidden');
+        if (closeTermsModalBtn) closeTermsModalBtn.onclick = () => termsModal && termsModal.classList.add('hidden');
+        if (privacyBtn) privacyBtn.onclick = () => privacyModal && privacyModal.classList.remove('hidden');
+        if (closePrivacyModalBtn) closePrivacyModalBtn.onclick = () => privacyModal && privacyModal.classList.add('hidden');
+        if (faqBtn) faqBtn.onclick = () => { renderFAQs(); faqModal && faqModal.classList.remove('hidden'); };
+        if (closeFaqModalBtn) closeFaqModalBtn.onclick = () => faqModal && faqModal.classList.add('hidden');
+        if (faqContainer) faqContainer.onclick = (e) => { const question = e.target.closest('.faq-question'); if (question) { question.classList.toggle('open'); } };
+
+        // --- Task/Activity Buttons ---
+        if (addTaskBtn) addTaskBtn.onclick = () => { addTaskForm && addTaskForm.reset(); addTaskModal && addTaskModal.classList.remove('hidden'); };
+        if (cancelAddTaskBtn) cancelAddTaskBtn.onclick = () => { addTaskModal && addTaskModal.classList.add('hidden'); };
+        if (addTaskForm) addTaskForm.onsubmit = async (e) => { e.preventDefault(); const user = auth.currentUser; if (!user) return; const newTask = { id: 'task_' + Date.now(), title: document.getElementById('task-title').value, type: document.getElementById('task-type').value, startTime: document.getElementById('task-start-time').value, endTime: document.getElementById('task-end-time').value, status: 'PENDING' }; const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); try { const docSnap = await getDoc(userDocRef); const userData = docSnap.exists() ? docSnap.data() : {}; const activities = userData.activity || {}; const dayActivities = activities[selectedDateStr] || []; dayActivities.push(newTask); activities[selectedDateStr] = dayActivities; await setDoc(userDocRef, { activity: activities }, { merge: true }); updateDashboardActivity(selectedDateStr); addTaskModal && addTaskModal.classList.add('hidden'); } catch (error) { showAlert("Failed to add the task."); } };
+        if (dashboardActivityTimeline) {
+             dashboardActivityTimeline.onclick = async (e) => { if (e.target.matches('.delete-task-btn')) { const taskId = e.target.dataset.taskId; const dateStr = e.target.dataset.dateStr; const user = auth.currentUser; if (!user || !taskId || !dateStr || !confirm("Are you sure you want to delete this task?")) return; const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); try { const docSnap = await getDoc(userDocRef); if (!docSnap.exists()) return; const userData = docSnap.data(); const activities = userData.activity || {}; if (activities[dateStr]) { activities[dateStr] = activities[dateStr].filter(task => task.id !== taskId); if (activities[dateStr].length === 0) { delete activities[dateStr]; } } await updateDoc(userDocRef, { activity: activities }); /* onSnapshot will trigger updateDashboardActivity */ } catch (error) { showAlert("Failed to delete task."); } } };
+             dashboardActivityTimeline.onchange = async (e) => { if (e.target.matches('.task-completion-checkbox')) { const taskId = e.target.dataset.taskId; const dateStr = e.target.dataset.dateStr; const newStatus = e.target.checked ? 'COMPLETED' : 'PENDING'; const user = auth.currentUser; if (!user || !taskId || !dateStr) return; const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); try { const docSnap = await getDoc(userDocRef); if (!docSnap.exists()) return; const userData = docSnap.data(); const activities = userData.activity || {}; const dayActivities = activities[dateStr] || []; const taskIndex = dayActivities.findIndex(task => task.id === taskId); if (taskIndex > -1) { dayActivities[taskIndex].status = newStatus; activities[dateStr] = dayActivities; await updateDoc(userDocRef, { activity: activities }); /* onSnapshot will trigger updateDashboardActivity */ } } catch (error) { showAlert("Failed to update task status."); e.target.checked = !e.target.checked; } } }; // Revert checkbox on error
+        }
+
+        // --- Success Animation Close ---
+        if (closeSuccessAnimationBtn) closeSuccessAnimationBtn.onclick = () => { successAnimationModal && successAnimationModal.classList.add('hidden'); confettiContainer && (confettiContainer.innerHTML = ''); };
+
+        // --- Congrats Modal Close ---
+         if (closeCongratsModalBtn) closeCongratsModalBtn.onclick = () => { congratsModal && congratsModal.classList.add('hidden'); congratsConfettiContainer && (congratsConfettiContainer.innerHTML = ''); };
+
+         // --- Calendar Month Navigation ---
+         const prevMonthBtn = document.getElementById('prev-month');
+         const nextMonthBtn = document.getElementById('next-month');
+         if(prevMonthBtn) prevMonthBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() - 1); renderCalendar(); };
+         if(nextMonthBtn) nextMonthBtn.onclick = () => { currentDate.setMonth(currentDate.getMonth() + 1); renderCalendar(); };
+
+    }
+
+    // --- UTILITY FUNCTIONS ---
+    async function updateNotificationPreference(prefName, value) { const user = auth.currentUser; if (!user) return; const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); try { await updateDoc(userDocRef, { [`preferences.${prefName}`]: value }); } catch (error) { showAlert('Could not save preference.'); } }
+    function renderFAQs() { const faqs = [{ q: "Is the payment secure?", a: "Yes, all payments are processed through Razorpay, a PCI DSS Level 1 compliant, secure payment gateway." },{ q: "What is the validity of the test series?", a: "You get lifetime access to all current and future tests in this series." }]; if(faqContainer) faqContainer.innerHTML = faqs.map(faq => `<div class="border-b dark:border-slate-700 last:border-b-0"><button class="faq-question w-full flex justify-between items-center text-left py-4"><span class="font-semibold">${faq.q}</span><svg class="icon w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg></button><div class="faq-answer pb-4 text-slate-600 dark:text-slate-300"><p>${faq.a}</p></div></div>`).join(''); }
+    function updateSubscriptionUI(isPremium) {
+         if (!subscriptionItem) return;
+         if (isPremium) {
+              subscriptionItem.innerHTML = `<div class="flex items-center gap-4"><svg class="h-6 w-6 text-amber-500" viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" /></svg><div><p class="font-semibold">Premium Member</p><p class="text-sm text-slate-500">Lifetime Access</p></div></div><span class="text-sm font-semibold text-green-600">Active</span>`;
+         } else {
+             subscriptionItem.innerHTML = `<div class="flex items-center gap-4"><svg class="h-6 w-6 text-slate-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg><div><p class="font-semibold">Free Member</p><p class="text-sm text-slate-500">Free tests only</p></div></div><button id="upgrade-btn" class="text-sm font-semibold text-blue-600 hover:underline">Upgrade</button>`;
+             const upgradeBtn = document.getElementById('upgrade-btn');
+             if (upgradeBtn) upgradeBtn.onclick = handleUpgrade;
+         }
+    }
+    function handleUpgrade() { const user = auth.currentUser; if (!user) return; /* Replace with your actual Razorpay Key */ const razorpayKey = "rzp_test_YourKey"; var options = { "key": razorpayKey, "amount": 9900, "currency": "INR", "name": "UPSChub", "description": "UPSChub Lifetime Access", "handler": function (response){ console.log("Payment successful:", response); const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid); updateDoc(userDocRef, { isPremium: true }).then(() => showSuccessAnimation()).catch(err => console.error("Error updating premium status:", err)); }, "prefill": { "email": user.email }, "theme": { "color": "#2563EB" } }; try { var rzp1 = new Razorpay(options); rzp1.open(); } catch(err) { console.error("Razorpay Error:", err); showAlert("Could not initiate payment. Please try again."); } }
+    function showSuccessAnimation() { if(!successAnimationModal || !successMessageContent || !confettiContainer) return; successAnimationModal.classList.remove('hidden'); setTimeout(() => { successMessageContent.classList.remove('scale-95', 'opacity-0'); successMessageContent.classList.add('scale-100', 'opacity-100'); }, 100); confettiContainer.innerHTML = ''; for (let i = 0; i < 100; i++) { const confetti = document.createElement('div'); confetti.classList.add('confetti-piece'); confetti.style.left = Math.random() * 100 + 'vw'; confetti.style.animationDelay = Math.random() * 2 + 's'; confetti.style.backgroundColor = ['#fde68a', '#fca5a5', '#818cf8', '#67e8f9'][Math.floor(Math.random() * 4)]; if (Math.random() > 0.5) { confetti.style.animationDirection = 'reverse'; } confettiContainer.appendChild(confetti); } }
+
+    // --- Performance Data Processing and Rendering (Corrected Functions) ---
+
+    // **FIX 1: Corrected Data Fetching**
+    async function processUserPerformance(userId) {
+        console.log("Processing user performance..."); // Log start
+        try {
+            // 1. MODIFIED: Read from "testHistory" (the correct collection)
+            const testResultsRef = collection(db, `artifacts/${appId}/users/${userId}/testHistory`);
+            // 2. MODIFIED: Order by "timestamp" (the correct field)
+            const q = query(testResultsRef, orderBy("timestamp", "asc"));
+
+            const querySnapshot = await getDocs(q);
+            const allResults = [];
+            querySnapshot.forEach((doc) => {
+                // 3. MODIFIED: Add the document ID, which is needed for the review link
+                allResults.push({ id: doc.id, ...doc.data() });
+            });
+             console.log("Fetched results:", allResults.length); // Log count
+
+            if (allResults.length === 0) {
+                console.log("No test results found.");
+                updateStatCards([]);
+                updateRecentResults([]);
+                updatePerformanceChart([]);
+                return;
+            }
+
+            updateStatCards(allResults);
+            // 4. MODIFIED: Reverse the array for "Recent Tests" (newest first)
+            updateRecentResults(allResults.slice().reverse());
+            updatePerformanceChart(allResults);
+            console.log("Performance UI updated.");
+
+         } catch (error) {
+            console.error("Error processing user performance:", error);
+            // Optionally clear the charts/tables or show an error state
+            updateStatCards([]);
+            updateRecentResults([]);
+            updatePerformanceChart([]);
+         }
+    }
+
+    // **FIX 2: Corrected Stat Cards** (with toFixed(2) for Avg. %)
+    function updateStatCards(results) {
+        const testsTaken = results.length;
+         const accuracyValueEl = document.getElementById('accuracy-value');
+         const testsTakenValueEl = document.getElementById('tests-taken-value');
+         const avgScoreValueEl = document.getElementById('avg-score-value');
+         const bestSubjectValueEl = document.getElementById('best-subject-value');
+
+         // Ensure elements exist before updating
+        if (!accuracyValueEl || !testsTakenValueEl || !avgScoreValueEl || !bestSubjectValueEl) {
+             console.error("One or more stat card elements not found.");
+             return;
+         }
+
+        if (testsTaken === 0) {
+            accuracyValueEl.textContent = '0.00%'; // Show two decimals
+            testsTakenValueEl.textContent = '0';
+            avgScoreValueEl.textContent = '0.0'; // Show one decimal for score
+            bestSubjectValueEl.textContent = 'N/A';
+            return;
+        }
+
+        // 1. MODIFIED: Calculate "Avg. Percentage"
+        const totalPercentage = results.reduce((sum, test) => sum + (test.percentage || 0), 0);
+        // **toFixed(2) applied here**
+        const overallAccuracy = (totalPercentage / testsTaken).toFixed(2);
+
+        // 2. MODIFIED: Calculate Avg Score
+        const totalScore = results.reduce((sum, test) => sum + (test.score || 0), 0);
+        const avgScore = (totalScore / testsTaken).toFixed(1); // Keep score to 1 decimal
+
+        // Calculate Best Subject based on Average Percentage
+        const subjectStats = {};
+        results.forEach(test => {
+            const subject = test.subject || 'General'; // Handle missing subject
+            if (!subjectStats[subject]) {
+                subjectStats[subject] = { totalPercentage: 0, count: 0 };
+            }
+            subjectStats[subject].totalPercentage += (test.percentage || 0);
+            subjectStats[subject].count++;
+        });
+
+        let bestSubject = 'N/A';
+        let highestAvg = -Infinity;
+        for (const subject in subjectStats) {
+            const avg = subjectStats[subject].totalPercentage / subjectStats[subject].count;
+            if (avg > highestAvg) {
+                highestAvg = avg;
+                bestSubject = subject;
+            }
+        }
+
+        // 6. MODIFIED: Update UI elements
+        accuracyValueEl.textContent = `${overallAccuracy}%`;
+        testsTakenValueEl.textContent = testsTaken;
+        avgScoreValueEl.textContent = avgScore;
+        bestSubjectValueEl.textContent = bestSubject;
+    }
+
+
+    // **FIX 4: Corrected Recent Results Links**
+   function updateRecentResults(results) {
+        const container = document.getElementById('recent-tests-container');
+        if (!container) return; // Add null check
+        container.innerHTML = ''; // Clear previous results
+
+        if (results.length === 0) {
+            container.innerHTML = `<p class="text-sm text-center text-slate-500">Complete a test to see your results here.</p>`;
+            return;
+        }
+
+        // Show the 2 most recent tests
+        const recentTests = results.slice(0, 2);
+
+        recentTests.forEach(test => {
+            // Ensure test.id exists (it should if processUserPerformance worked)
+            const reviewId = test.id;
+             const testId = test.testId;
+             if (!reviewId || !testId) {
+                  console.warn("Skipping recent test entry due to missing id or testId:", test);
+                  return; // Skip if crucial data is missing
+             }
+
+            // 1. MODIFIED: Get the correct review link.
+            const reviewLink = `TestSeries/test_sample.html?testId=${testId}&reviewId=${reviewId}`;
+
+            const testHTML = `
+            <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div>
+                    <div class="flex items-center gap-3 mb-1">
+                        <span class="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-xs font-semibold px-2.5 py-0.5 rounded-full">Completed</span>
+                        <span class="text-xs font-medium text-slate-500">${test.subject || 'General'}</span>
+                    </div>
+                    <h4 class="font-bold">${test.testName || 'Unnamed Test'}</h4>
+                </div>
+                <a href="${reviewLink}" class="w-full sm:w-auto text-center bg-green-600 hover:bg-green-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm">View Analysis</a>
+            </div>`;
+            container.insertAdjacentHTML('beforeend', testHTML);
+        });
+    }
+
+    // **FIX 3: Corrected Dashboard Graph (Line Chart)**
+    function updatePerformanceChart(results) {
+        if (!performanceChartInstance) {
+            console.log("Chart instance not ready yet for update.");
+            return;
+        }
+         console.log("Updating performance chart with results:", results.length);
+
+        // 1. MODIFIED: Use the real "testName" for the labels
+        const labels = results.map(test => test.testName || 'Test');
+        // 2. MODIFIED: Plot the "percentage" (which goes from 0-100)
+        const scores = results.map(test => test.percentage || 0); // Default to 0 if percentage is missing
+
+        performanceChartInstance.data.labels = labels;
+        performanceChartInstance.data.datasets[0].data = scores;
+        performanceChartInstance.update();
+         console.log("Performance chart updated.");
+    }
+
+    // --- Chart Rendering (Initial Setup) ---
+    function renderPerformanceChart() {
+         console.log("Initializing performance chart structure.");
+        const canvas = document.getElementById('performanceChart');
+         if(!canvas) {
+              console.error("Performance chart canvas not found!");
+              return;
+         }
+        const ctx = canvas.getContext('2d');
+        if (performanceChartInstance) {
+            performanceChartInstance.destroy(); // Destroy previous instance if any
+        }
+        const isDark = document.documentElement.classList.contains('dark');
+        const tickColor = isDark ? '#94a3b8' : '#64748b'; // slate-400 : slate-500
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+        performanceChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [], // Start empty, will be populated by updatePerformanceChart
+                datasets: [{
+                    label: 'Test Percentage', // Corrected label
+                    data: [], // Start empty
+                    borderColor: '#3B82F6', // blue-500
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Important to allow height flexibility
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100, // Percentage scale
+                        ticks: { color: tickColor },
+                        grid: { color: gridColor }
+                    },
+                    x: {
+                        ticks: { color: tickColor, autoSkip: true, maxTicksLimit: 10 }, // Limit labels if too many
+                        grid: { display: false } // Hide vertical grid lines for cleaner look
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                         callbacks: {
+                              label: function(context) {
+                                   let label = context.dataset.label || '';
+                                   if (label) { label += ': '; }
+                                   if (context.parsed.y !== null) {
+                                        // Display percentage with 2 decimals in tooltip
+                                        label += context.parsed.y.toFixed(2) + '%';
+                                   }
+                                   return label;
+                              }
+                         }
+                    }
+                }
+            }
+        });
+         console.log("Performance chart initialized.");
+    }
+
+
+    // --- Dashboard Activity/Schedule ---
+    async function updateDashboardActivity(dateStr) {
+        const user = auth.currentUser;
+        if (!user || !dashboardActivityTimeline || !activityDateHeading) return; // Add null checks
+
+        const timelineContainer = dashboardActivityTimeline; // Use existing constant
+         const timelineHeader = document.getElementById('activity-date-heading').querySelector('span'); // Direct access if needed
+
+        try {
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            const docSnap = await getDoc(userDocRef);
+            const activityData = docSnap.exists() ? docSnap.data().activity || {} : {};
+            const activities = activityData[dateStr] || [];
+
+            // Reset notified status only for tasks belonging to the currently viewed day
+             if (dateStr === currentDayString) {
+                todaysTasks = activities.filter(item => !!item.id && item.status === 'PENDING').map(task => ({ ...task, notified: false }));
+             }
+
+            // Update header text
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (dateStr === todayStr) {
+                if (timelineHeader) timelineHeader.textContent = "Today's Schedule";
+            } else {
+                const d = new Date(dateStr + 'T12:00:00Z'); // Use Zulu time
+                if (timelineHeader) timelineHeader.textContent = `Schedule for ${d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`;
+            }
+
+            // Render timeline
+            timelineContainer.innerHTML = ''; // Clear previous items
+            if (activities.length > 0) {
+                activities.sort((a, b) => (a.startTime || '99:99').localeCompare(b.startTime || '99:99')); // Sort by start time
+
+                activities.forEach(item => {
+                    const isUserTask = !!item.id;
+                    const isCompleted = item.status === 'COMPLETED';
+
+                    const formatTime = (time24) => { /* ... (keep existing formatTime) ... */
+                          if (!time24) return '';
+                          const [hours, minutes] = time24.split(':');
+                          const h = parseInt(hours, 10);
+                          const ampm = h >= 12 ? 'PM' : 'AM';
+                          const h12 = h % 12 || 12;
+                          return `${h12}:${minutes} ${ampm}`;
+                     };
+
+                    const displayTime = isUserTask ? `${formatTime(item.startTime)} - ${formatTime(item.endTime)}` : formatTime(item.time); // Assuming non-user tasks might have just 'time'
+                    const displayTitle = item.title || item.testName || 'Activity'; // Fallback title
+                    const displayDetails = isUserTask ? `Category: ${item.type}` : `${item.duration || ''}${item.questions ? ` · ${item.questions} Qs` : ''}`; // More compact details
+
+                    // Choose icon and color
+                    let iconSvg, bgColorClass, textColorClass;
+                    switch (item.type?.toUpperCase()) { // Use optional chaining and uppercase for robustness
+                        case 'TEST':
+                            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd" /></svg>`;
+                            bgColorClass = 'bg-blue-500'; textColorClass = 'text-blue-500 dark:text-blue-400';
+                            break;
+                        case 'STUDY':
+                             iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 16c1.642 0 3.14-.364 4.5-1v-1.447c-1.12.446-2.313.69-3.5.69-1.255 0-2.443-.29-3.5-.804V6.052c1.057-.514 2.245-.804 3.5-.804 1.187 0 2.38.254 3.5.69V4.804z" /><path d="M11 4.804A7.968 7.968 0 0114.5 4c1.255 0 2.443.29 3.5.804v10A7.969 7.969 0 0014.5 16c-1.642 0-3.14-.364-4.5-1v-1.447c1.12.446 2.313.69 3.5.69 1.255 0 2.443-.29 3.5-.804V6.052c-1.057-.514-2.245-.804-3.5-.804-1.187 0-2.38.254-3.5.69V4.804z" /></svg>`;
+                             bgColorClass = 'bg-purple-500'; textColorClass = 'text-purple-500 dark:text-purple-400';
+                             break;
+                        case 'REVISION':
+                            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" /></svg>`;
+                            bgColorClass = 'bg-green-500'; textColorClass = 'text-green-500 dark:text-green-400';
+                            break;
+                         case 'BREAK':
+                            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" /></svg>`;
+                            bgColorClass = 'bg-yellow-500'; textColorClass = 'text-yellow-500 dark:text-yellow-400';
+                            break;
+                        default: // OTHER
+                            iconSvg = `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>`;
+                            bgColorClass = 'bg-gray-500'; textColorClass = 'text-gray-500 dark:text-gray-400';
+                    }
+
+                    const activityHTML = `
+                    <div class="relative ${isCompleted ? 'opacity-60' : ''}">
+                        <div class="flex items-center absolute left-0 -translate-x-1/2 transform">
+                            <div class="h-10 w-10 ${bgColorClass} rounded-full flex items-center justify-center text-white z-10">${iconSvg}</div>
+                        </div>
+                        <div class="ml-10 pl-6 pb-2">
+                            <div class="bg-slate-50 dark:bg-slate-800/50 p-4 rounded-lg shadow-sm">
+                                <div class="flex justify-between items-start gap-4">
+                                    <div class="flex-1 min-w-0"> {/* Added min-w-0 for text truncation */}
+                                        <p class="text-xs font-bold ${textColorClass}">${displayTime}</p>
+                                        <h4 class="font-bold text-slate-800 dark:text-slate-200 ${isCompleted ? 'line-through' : ''} truncate">${displayTitle}</h4> {/* Added truncate */}
+                                        <p class="text-sm text-slate-500 dark:text-slate-400 truncate">${displayDetails}</p> {/* Added truncate */}
+                                    </div>
+                                    ${isUserTask ? `<input type="checkbox" class="task-completion-checkbox h-5 w-5 rounded text-blue-600 focus:ring-blue-500 cursor-pointer flex-shrink-0 mt-1" data-task-id="${item.id}" data-date-str="${dateStr}" ${isCompleted ? 'checked' : ''}>` : ''}
+                                </div>
+                                ${isUserTask ? `<div class="mt-2 text-right"><button class="delete-task-btn text-xs font-semibold text-red-500 hover:text-red-700" data-task-id="${item.id}" data-date-str="${dateStr}">Delete</button></div>` : ''}
+                            </div>
+                        </div>
+                    </div>`;
+                    timelineContainer.innerHTML += activityHTML;
+                });
+            } else {
+                timelineContainer.innerHTML = '<p class="text-sm text-slate-500 dark:text-slate-400 pl-8">No activities scheduled for this day.</p>';
+            }
+            updateProductivityUI(activities, dateStr); // Update progress bar
+         } catch(error) {
+              console.error("Error updating dashboard activity:", error);
+              timelineContainer.innerHTML = '<p class="text-sm text-red-500 dark:text-red-400 pl-8">Could not load schedule.</p>';
+         }
+    }
+
+
+    function updateProductivityUI(activities, dateStr) {
+         if (!productivitySection || !productivityBar || !productivityPercentage) return; // Null checks
+        const userTasks = activities.filter(item => !!item.id); // Filter only user-added tasks
+        if (userTasks.length === 0) {
+            productivitySection.classList.add('hidden');
+            return;
+        }
+        productivitySection.classList.remove('hidden');
+        const completedTasks = userTasks.filter(task => task.status === 'COMPLETED').length;
+        const totalTasks = userTasks.length;
+        const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0; // Avoid division by zero
+        productivityBar.style.width = `${percentage}%`;
+        productivityPercentage.textContent = `${percentage}%`;
+
+        // Show congrats modal only if ALL tasks for TODAY are completed
+        const todayStr = new Date().toISOString().split('T')[0];
+        if (percentage === 100 && dateStr === todayStr && totalTasks > 0) { // Add check for totalTasks > 0
+            const congratsMsg = document.getElementById('congrats-message');
+            if (congratsMsg) congratsMsg.textContent = "You've completed all your tasks for today. Great job!";
+            showCongratsAnimation();
+        }
+    }
+
+
+    function showCongratsAnimation() {
+         if(!congratsModal || !congratsConfettiContainer) return; // Null checks
+        congratsModal.classList.remove('hidden');
+        congratsConfettiContainer.innerHTML = ''; // Clear previous confetti
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti-piece');
+            confetti.style.position = 'absolute'; // Ensure positioning context
+            confetti.style.left = Math.random() * 100 + '%'; // Use %
+            confetti.style.animationDuration = (Math.random() * 3 + 2) + 's';
+            confetti.style.animationDelay = Math.random() * 1 + 's';
+            confetti.style.backgroundColor = ['#fde68a', '#fca5a5', '#818cf8', '#67e8f9'][Math.floor(Math.random() * 4)];
+            // Adjust animation keyframes if needed in CSS, or use inline styles carefully
+            confetti.style.top = '-20px'; // Start above
+            confetti.style.animationName = 'fall'; // Ensure animation name matches CSS
+             confetti.style.animationIterationCount = 'infinite'; // Keep falling
+             confetti.style.animationTimingFunction = 'linear';
+            congratsConfettiContainer.appendChild(confetti);
+        }
+    }
+    // Note: closeCongratsModalBtn listener is in attachAllEventListeners
+
+    // --- Calendar Logic ---
+    async function renderCalendar() {
+        const user = auth.currentUser;
+        if (!user || !calendarGrid || !monthYearElement) return; // Add null checks for elements
+
+        const monthYearElement = document.getElementById('month-year');
+        const year = currentDate.getFullYear();
+        const month = currentDate.getMonth();
+
+        monthYearElement.textContent = `${currentDate.toLocaleString('default', { month: 'long' })} ${year}`;
+        calendarGrid.innerHTML = ''; // Clear previous grid
+
+        // Add day headers
+        ['S','M','T','W','T','F','S'].forEach(day => {
+            const dayEl = document.createElement('div');
+            dayEl.className = "font-bold text-xs text-slate-500 uppercase"; // Adjusted style
+            dayEl.textContent = day;
+            calendarGrid.appendChild(dayEl);
+        });
+
+        // Add empty cells for the first day offset
+        const firstDayOfMonth = new Date(year, month, 1).getDay();
+        for (let i = 0; i < firstDayOfMonth; i++) {
+            calendarGrid.appendChild(document.createElement('div'));
+        }
+
+        // Fetch activity data
+        let activityData = {}; // Default to empty
+         try {
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            const docSnap = await getDoc(userDocRef);
+             activityData = docSnap.exists() ? docSnap.data().activity || {} : {};
+         } catch (error) {
+              console.error("Error fetching activity data for calendar:", error);
+              // Handle error - maybe show a message in the activity log
+              const activityLog = document.getElementById('activity-log');
+               if(activityLog) activityLog.innerHTML = `<p class="text-sm text-red-500">Could not load activity data.</p>`;
+         }
+
+
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dayEl = document.createElement('div');
+            dayEl.textContent = day;
+            dayEl.className = "p-2 cursor-pointer rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 calendar-day text-center"; // Ensure text center
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+            // Check if there's activity for this date
+            if (activityData[dateStr] && activityData[dateStr].length > 0) {
+                dayEl.classList.add('has-activity');
+            }
+
+            // Highlight the selected day
+            if(dateStr === selectedDateStr){
+                dayEl.classList.add('selected-day');
+                dayEl.classList.remove('hover:bg-slate-200', 'dark:hover:bg-slate-700'); // Remove hover effect on selected
+            }
+
+            // Add click listener
+            dayEl.onclick = () => {
+                selectedDateStr = dateStr;
+                updateDashboardActivity(dateStr); // Update dashboard view
+                 // Optionally update activity log in modal directly
+                renderCalendarActivityLog(activityData[dateStr] || []);
+                // Re-render calendar is simpler to manage selection state visually
+                 renderCalendar();
+                // Keep modal open after selection, user closes it manually
+                // calendarModal && calendarModal.classList.add('hidden');
+            };
+            calendarGrid.appendChild(dayEl);
+        }
+         // Initial render of activity log for the selected date
+         renderCalendarActivityLog(activityData[selectedDateStr] || []);
+    }
+     // Helper function to update the activity log within the calendar modal
+     function renderCalendarActivityLog(activities) {
+          const activityLog = document.getElementById('activity-log');
+           if (!activityLog) return;
+           if(activities.length === 0) {
+                activityLog.innerHTML = `<p class="text-sm text-slate-500 dark:text-slate-400">No activities scheduled for this day.</p>`;
+                return;
+           }
+           // Sort and display activities for the selected date
+           activities.sort((a, b) => (a.startTime || '99:99').localeCompare(b.startTime || '99:99'));
+           activityLog.innerHTML = activities.map(item => {
+                const formatTime = (time24) => { /* ... (copy from updateDashboardActivity) ... */
+                     if (!time24) return ''; const [hours, minutes] = time24.split(':'); const h = parseInt(hours, 10); const ampm = h >= 12 ? 'PM' : 'AM'; const h12 = h % 12 || 12; return `${h12}:${minutes} ${ampm}`;
+                };
+                const time = formatTime(item.startTime);
+                const title = item.title || 'Activity';
+                return `<div class="text-sm mb-1"><span class="font-semibold">${time}:</span> ${title} ${item.status === 'COMPLETED' ? '<span class="text-green-500">(Done)</span>' : ''}</div>`;
+           }).join('');
+     }
+
+
+    // --- Navigation and Theme ---
+    function handleLogout(e) { e.preventDefault(); signOut(auth).catch(error => console.error("Logout error:", error)); }
+
+    function showView(viewName) {
+        console.log("Showing view:", viewName); // Log view change
+        Object.values(spaViews).forEach(v => v && v.classList.add('hidden')); // Add null check
+        if(spaViews[viewName]) {
+            spaViews[viewName].classList.remove('hidden');
+        } else {
+             console.warn(`View "${viewName}" not found.`);
+             spaViews.home && spaViews.home.classList.remove('hidden'); // Fallback to home
+        }
+        Object.values(navButtons).forEach(b => b && b.classList.remove('active')); // Add null check
+        const activeNavButton = (viewName === 'home') ? navButtons.dashboard : navButtons[viewName];
+        if (activeNavButton) {
+             activeNavButton.classList.add('active');
+        }
+    }
+    function applyTheme(theme) {
+        if (theme === 'dark') { document.documentElement.classList.add('dark'); if(dropdownThemeToggle) dropdownThemeToggle.checked = true; }
+        else { document.documentElement.classList.remove('dark'); if(dropdownThemeToggle) dropdownThemeToggle.checked = false; }
+        // Re-render chart with correct colors if it exists
+         if(performanceChartInstance) {
+              renderPerformanceChart(); // Re-initializes with new theme colors
+              processUserPerformance(auth.currentUser?.uid); // Re-fetch data to populate the re-rendered chart
+         }
+    }
+    function toggleTheme() { const isDark = !document.documentElement.classList.contains('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
+    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+     // showView is called within onAuthStateChanged after user is confirmed
+
+
+    // --- Service Worker Registration Logic ---
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            // Make sure the path is correct relative to the HTML file's location
+            // If dashboard.html is at /TestSeries/dashboard.html and sw.js is at /TestSeries/sw.js
+            navigator.serviceWorker
+                .register('sw.js') // Register from the current directory
+                .then((registration) => {
+                    console.log('Service Worker registered successfully from:', registration.scope);
+                })
+                .catch((error) => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
+
+
+    // --- Maintenance Mode Check ---
+    (function() {
+        const statusUrl = 'https://gist.githubusercontent.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4/raw/status.json'; // Removed specific commit hash
+        const params = new URLSearchParams(window.location.search);
+        const isDeveloper = params.get('dev') === 'true';
+
+        if (!isDeveloper) {
+            fetch(statusUrl + '?cachebust=' + new Date().getTime()) // Prevent caching
+                .then(response => {
+                    if (!response.ok) { throw new Error('Network response was not ok'); }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.maintenanceMode === true) {
+                        // Redirect to maintenance page within the same directory level
+                        console.log("Maintenance mode ON. Redirecting...");
+                        window.location.href = 'maintenance.html';
+                    } else {
+                        console.log('Maintenance mode is OFF. No redirect needed.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking maintenance status:', error);
+                    // Decide if you want to block access if the status check fails
+                    // showAlert("Could not verify application status. Please check your connection.");
+                });
+        } else {
+            console.log('Developer mode active, skipping maintenance check.');
+        }
+    })();
+
+</script>
+</body>
+</html>
+

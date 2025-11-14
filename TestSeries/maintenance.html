@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deployment in Progress - UPSChub</title>
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --accent-blue: #2563EB;
+            --path-color: #E5E7EB;
+            --path-active-color: #3B82F6;
+            --node-icon-color: #D1D5DB;
+        }
+
+        body {
+            font-family: 'Sora', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            display: flex;
+            flex-direction: column; /* Arrange content vertically */
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            animation: fadeIn 1.5s ease-out;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; } to { opacity: 1; }
+        }
+
+        /* --- Pipeline SVG Animation --- */
+        .pipeline-svg {
+            width: 100%;
+            margin-bottom: 24px;
+        }
+        
+        .pipeline-svg .path {
+            stroke: var(--path-color);
+            stroke-width: 2;
+        }
+        
+        .pipeline-svg .node-icon {
+            fill: var(--node-icon-color);
+            transition: fill 0.5s ease;
+        }
+        
+        .pipeline-svg .node-icon.active {
+            fill: var(--accent-blue);
+        }
+
+        .pipeline-svg #data-orb {
+            fill: var(--path-active-color);
+            filter: drop-shadow(0 0 5px var(--path-active-color));
+            /* Animation will be controlled by JavaScript */
+        }
+        
+        /* --- Typography and Status --- */
+        h1 {
+            font-size: 2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 40px;
+        }
+
+        #dynamic-status {
+            font-family: monospace;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            height: 24px;
+            margin-bottom: 20px;
+        }
+
+        #timer {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--accent-blue);
+            height: 48px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+
+        /* --- Footer --- */
+        footer {
+            width: 100%;
+            padding: 20px 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-top: 1px solid var(--path-color);
+        }
+    </style>
+</head>
+<body>
+
+    <main class="container">
+        <svg class="pipeline-svg" viewBox="0 0 800 120">
+            <path class="path" d="M 60 60 H 740" />
+
+            <g id="stage-1">
+                <circle cx="60" cy="60" r="20" fill="var(--path-color)" />
+                <path class="node-icon" d="M60 49l-7 14h14zM60 71V55" fill-rule="evenodd" stroke="#ffffff" stroke-width="1.5" />
+                <text x="60" y="105" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Developer</text>
+            </g>
+
+            <g id="stage-2">
+                <circle cx="230" cy="60" r="20" fill="var(--path-color)" />
+                <path class="node-icon" d="M235 48h-5l-3 4-3-4h-5v18h5l3-4 3 4h5V48zm-2 14h-2v-4h2v4zm-3-5h-2v-4h2v4z" fill-rule="evenodd"/>
+                <text x="230" y="105" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Code Commit</text>
+            </g>
+
+            <g id="stage-3">
+                <circle cx="400" cy="60" r="20" fill="var(--path-color)" />
+                <path class="node-icon" d="M400 46l-8 8 3 3-8 8 3 3 8-8 8 8 3-3-8-8 3-3-8-8-3 3z" />
+                <text x="400" y="105" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Build & Test</text>
+            </g>
+            
+            <g id="stage-4">
+                <circle cx="570" cy="60" r="20" fill="var(--path-color)" />
+                <path class="node-icon" d="M570 46l10 10-10 10-2-2 6-6h-16v-4h16l-6-6z" />
+                <text x="570" y="105" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Deploy</text>
+            </g>
+
+            <g id="stage-5">
+                <circle cx="740" cy="60" r="20" fill="var(--path-color)" />
+                <path class="node-icon" d="M740 50c-3 0-6 3-6 6v4h12v-4c0-3-3-6-6-6zm-4 12v2h8v-2z" />
+                <text x="740" y="105" font-size="14" fill="var(--text-secondary)" text-anchor="middle">Live for User</text>
+            </g>
+
+            <circle id="data-orb" r="6" cx="60" cy="60">
+                <animateMotion dur="12s" repeatCount="indefinite" path="M 60 60 H 740" />
+            </circle>
+        </svg>
+
+        <h1>Enhancements in Progress</h1>
+        <p>Our systems are currently undergoing a scheduled upgrade. We're working to bring you an improved experience.</p>
+        
+        <div id="dynamic-status">Status: Initializing...</div>
+        <div id="timer" class="hidden"></div>
+
+    </main>
+
+    <footer>
+        &copy; 2025 UPSChub. All Rights Reserved.
+    </footer>
+    
+    <script>
+        // --- CONFIGURATION ---
+        const GIST_RAW_URL = 'https://gist.githubusercontent.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4/raw/fc39784c51250fdee0d9ce9c669bbb7eb55b818c/status.json';
+        const REDIRECT_URL = 'dashboard.html';
+        const COUNTDOWN_SECONDS = 30;
+
+        // --- DOM ELEMENTS ---
+        const stages = Array.from({length: 5}, (_, i) => document.querySelector(`#stage-${i+1} .node-icon`));
+        const dynamicStatus = document.getElementById('dynamic-status');
+        const timerEl = document.getElementById('timer');
+
+        // --- ANIMATION & STATUS SEQUENCE ---
+        const sequence = [
+            { duration: 3000, status: "Status: We are developing...", activeStage: 1 },
+            { duration: 3000, status: "Status: Committing new code...", activeStage: 2 },
+            { duration: 3000, status: "Status: Running system diagnostics...", activeStage: 3 },
+            { duration: 3000, status: "Status: Deploying to live servers...", activeStage: 4 },
+            { duration: 0, status: "Status: Fetching trouble... Finalizing...", activeStage: 5 }
+        ];
+
+        let currentStep = 0;
+
+        function runSequence() {
+            if (currentStep >= sequence.length) return;
+            const step = sequence[currentStep];
+            
+            stages.forEach((el, index) => el.classList.toggle('active', index < step.activeStage));
+            dynamicStatus.textContent = step.status;
+
+            if (step.duration > 0) {
+                setTimeout(() => { currentStep++; runSequence(); }, step.duration);
+            } else {
+                checkLiveStatus();
+            }
+        }
+
+function checkLiveStatus() {
+    fetch(GIST_RAW_URL + '?cachebust=' + new Date().getTime())
+        .then(response => response.json())
+        .then(data => {
+            // --- ADD THESE TWO LINES FOR DEBUGGING ---
+            console.log('Received data:', data);
+            console.log('Type of maintenanceMode:', typeof data.maintenanceMode);
+
+            if (data.maintenanceMode === false) {
+                startCountdown();
+            } else {
+                dynamicStatus.textContent = "Status: Still developing... Retrying verification.";
+                setTimeout(checkLiveStatus, 5000);
+            }
+        })
+        .catch(error => {
+            console.error('Status check failed:', error);
+            dynamicStatus.textContent = "Status: Fetching trouble... Retrying connection.";
+            setTimeout(checkLiveStatus, 5000);
+        });
+}
+
+function startCountdown() {
+    let timeLeft = COUNTDOWN_SECONDS;
+    timerEl.classList.remove('hidden');
+    document.getElementById('data-orb').style.display = 'none';
+    document.querySelector('.pipeline-svg').style.opacity = '0.5';
+
+    const countdownInterval = setInterval(() => {
+        dynamicStatus.textContent = "Status: System is Live!";
+        timerEl.innerHTML = `Redirecting to dashboard in <strong>${timeLeft}</strong>...`;
+
+        if (timeLeft <= 0) {
+            clearInterval(countdownInterval);
+            // --- I'VE FIXED THE URL HERE (ADDED QUOTES) ---
+            window.location.href = 'TestSeries/dashboard.html';
+        }
+        timeLeft--;
+    }, 1000);
+}
+
+        // --- START ---
+        document.addEventListener('DOMContentLoaded', runSequence);
+    </script>
+</body>
+</html>

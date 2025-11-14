@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Test History - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        
+        /* Styles for color-coded scores */
+        .score-badge-green { background-color: #ecfdf5; color: #16a34a; border: 1px solid #a7f3d0; }
+        .score-badge-yellow { background-color: #fefce8; color: #ca8a04; border: 1px solid #fef08a; }
+        .score-badge-red { background-color: #fef2f2; color: #ef4444; border: 1px solid #fecaca; }
+
+        .chart-container {
+            height: 350px;
+        }
+
+        .tab-button[aria-selected="true"] {
+            background-color: #3b82f6; /* bg-blue-600 */
+            color: white;
+        }
+        .tab-button[aria-selected="false"] {
+            background-color: #e2e8f0; /* bg-slate-200 */
+            color: #475569; /* text-slate-600 */
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+        <div class="text-center">
+            <svg class="animate-spin h-8 w-8 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p class="mt-2 text-slate-500">Authenticating...</p>
+        </div>
+    </div>
+
+    <div id="main-content" class="hidden flex flex-col min-h-screen">
+        <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-40">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <a href="TestSeries/dashboard.html" class="flex items-center gap-3 text-2xl font-bold text-blue-600">
+                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
+                    <span>UPSChub</span>
+                </a>
+                <a href="TestSeries/dashboard.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Go to Dashboard</a>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-6 flex-grow">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-10">
+                    <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight">My Test History</h1>
+                    <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">A detailed report of all the tests you've attempted. Track your progress and review your performance.</p>
+                </div>
+
+                <section id="analytics-section" class="mb-12 hidden">
+                    <h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">Performance Analytics</h2>
+                    <div class="bg-white rounded-xl shadow-lg border border-slate-200/80 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                             <div role="tablist" class="flex p-1 bg-slate-100 rounded-lg">
+                                <button role="tab" aria-selected="true" data-period="day" class="tab-button px-4 py-1.5 text-sm font-semibold rounded-md transition-colors">Daily</button>
+                                <button role="tab" aria-selected="false" data-period="week" class="tab-button px-4 py-1.5 text-sm font-semibold rounded-md transition-colors">Weekly</button>
+                                <button role="tab" aria-selected="false" data-period="month" class="tab-button px-4 py-1.5 text-sm font-semibold rounded-md transition-colors">Monthly</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-2 p-4 rounded-lg bg-slate-50/50">
+                                <h3 class="font-semibold text-slate-800 mb-2">Average Score Over Time</h3>
+                                <div id="line-chart-loader" class="flex items-center justify-center h-[350px]"><svg class="animate-spin h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                                <div class="chart-container"><canvas id="score-line-chart"></canvas></div>
+                            </div>
+                            <div class="p-4 rounded-lg bg-slate-50/50">
+                                 <h3 class="font-semibold text-slate-800 mb-2">Tests by Subject</h3>
+                                <div id="pie-chart-loader" class="flex items-center justify-center h-[350px]"><svg class="animate-spin h-6 w-6 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg></div>
+                                <div class="chart-container"><canvas id="subject-pie-chart"></canvas></div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <div class="bg-white rounded-xl shadow-lg border border-slate-200/80 overflow-hidden">
+                    <div id="history-table-container" class="overflow-x-auto">
+                        <div id="table-loader">
+                            <div class="p-4 border-b border-slate-200 animate-pulse"><div class="h-6 w-1/4 bg-slate-200 rounded-md"></div></div>
+                            <div class="p-4 space-y-4"><div class="h-8 bg-slate-200 rounded-md"></div><div class="h-8 bg-slate-100 rounded-md"></div><div class="h-8 bg-slate-200 rounded-md"></div><div class="h-8 bg-slate-100 rounded-md"></div></div>
+                        </div>
+                        <table id="history-table" class="hidden min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Test Name</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Subject</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Score</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Percentage</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Date Attempted</th>
+                                    <th scope="col" class="relative px-6 py-3"><span class="sr-only">Review</span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-table-body" class="bg-white divide-y divide-slate-200"></tbody>
+                        </table>
+                        <div id="empty-state" class="hidden text-center p-12">
+                             <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <h3 class="mt-2 text-lg font-semibold text-slate-800">No Tests Taken Yet</h3>
+                            <p class="mt-1 text-sm text-slate-500">Your test history will appear here once you complete a test.</p>
+                            <a href="TestSeries/Prem_testSeries.html" class="mt-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-semibold rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">Go to Test Series</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="bg-slate-800 text-slate-400 mt-16 py-8">
+            <div class="container mx-auto px-4 sm:px-6 text-center">
+                <p class="text-sm">&copy; 2025 UPSChub. All Rights Reserved.</p>
+                <p class="text-xs mt-3 max-w-2xl mx-auto"><strong class="text-slate-300">WARNING:</strong> This content is protected by copyright law. Unauthorized reproduction, distribution, or sharing of this material, in whole or in part, is strictly prohibited and may result in legal action.</p>
+            </div>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.appspot.com", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = 'default-app-id';
+
+        const pageLoader = document.getElementById('page-loader');
+        const mainContent = document.getElementById('main-content');
+        const analyticsSection = document.getElementById('analytics-section');
+        const tableLoader = document.getElementById('table-loader');
+        const historyTable = document.getElementById('history-table');
+        const historyTableBody = document.getElementById('history-table-body');
+        const emptyState = document.getElementById('empty-state');
+        const tabs = document.querySelectorAll('.tab-button');
+
+        let lineChartInstance = null;
+        let pieChartInstance = null;
+        let allTestData = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                pageLoader.classList.add('hidden');
+                mainContent.classList.remove('hidden');
+                mainContent.classList.add('fade-in');
+                await fetchTestHistory(user.uid);
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function fetchTestHistory(userId) {
+            try {
+                const historyCollectionRef = collection(db, `artifacts/${appId}/users/${userId}/testHistory`);
+                const q = query(historyCollectionRef, orderBy("timestamp", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    tableLoader.classList.add('hidden');
+                    emptyState.classList.remove('hidden');
+                } else {
+                    allTestData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    renderHistoryTable(allTestData);
+                    analyticsSection.classList.remove('hidden');
+                    analyticsSection.classList.add('fade-in');
+                    updateCharts('day');
+                    tableLoader.classList.add('hidden');
+                    historyTable.classList.remove('hidden');
+                    historyTable.classList.add('fade-in');
+                }
+            } catch (error) {
+                console.error("Error fetching test history:", error);
+                tableLoader.innerHTML = `<p class="p-8 text-center text-red-500">Could not load test history. Please try again later.</p>`;
+            }
+        }
+        
+        function processChartData(period) {
+            const subjectCounts = {};
+            const scoreData = {};
+
+            allTestData.forEach(attempt => {
+                const subject = attempt.subject || 'General';
+                subjectCounts[subject] = (subjectCounts[subject] || 0) + 1;
+
+                if (!attempt.timestamp) return; // Skip if no timestamp
+                const date = attempt.timestamp.toDate();
+                let key;
+
+                if (period === 'day') {
+                    key = new Date(date.getFullYear(), date.getMonth(), date.getDate()).toISOString().split('T')[0];
+                } else if (period === 'week') {
+                    const firstDayOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
+                    key = new Date(firstDayOfWeek.getFullYear(), firstDayOfWeek.getMonth(), firstDayOfWeek.getDate()).toISOString().split('T')[0];
+                } else { // month
+                    key = new Date(date.getFullYear(), date.getMonth(), 1).toISOString().split('T')[0];
+                }
+                
+                if (!scoreData[key]) {
+                    scoreData[key] = { totalPercentage: 0, count: 0 };
+                }
+                scoreData[key].totalPercentage += attempt.percentage;
+                scoreData[key].count++;
+            });
+            
+            const lineChartLabels = Object.keys(scoreData).sort();
+            const lineChartData = lineChartLabels.map(label => scoreData[label].totalPercentage / scoreData[label].count);
+
+            return {
+                pieData: {
+                    labels: Object.keys(subjectCounts),
+                    data: Object.values(subjectCounts),
+                },
+                lineData: {
+                    labels: lineChartLabels,
+                    data: lineChartData,
+                }
+            };
+        }
+        
+        function renderLineChart(labels, data, period) {
+            document.getElementById('line-chart-loader').style.display = 'none';
+            document.getElementById('score-line-chart').style.display = 'block';
+            const ctx = document.getElementById('score-line-chart').getContext('2d');
+            if (lineChartInstance) lineChartInstance.destroy();
+            lineChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Average Score (%)',
+                        data: data,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.3,
+                        pointBackgroundColor: '#3b82f6'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'time', time: { unit: period }, grid: { display: false } },
+                        y: { beginAtZero: true, max: 100, grid: { color: '#e2e8f0' } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderPieChart(labels, data) {
+             document.getElementById('pie-chart-loader').style.display = 'none';
+             document.getElementById('subject-pie-chart').style.display = 'block';
+            const ctx = document.getElementById('subject-pie-chart').getContext('2d');
+            if (pieChartInstance) pieChartInstance.destroy();
+            pieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Tests by Subject',
+                        data: data,
+                        backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#ef4444', '#8b5cf6', '#f59e0b'],
+                        borderColor: '#fff',
+                        hoverOffset: 4
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+            });
+        }
+
+        function updateCharts(period) {
+            const { pieData, lineData } = processChartData(period);
+            renderLineChart(lineData.labels, lineData.data, period);
+            renderPieChart(pieData.labels, pieData.data);
+        }
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.setAttribute('aria-selected', 'false'));
+                tab.setAttribute('aria-selected', 'true');
+                const period = tab.dataset.period;
+                updateCharts(period);
+            });
+        });
+
+        function renderHistoryTable(attempts) {
+            historyTableBody.innerHTML = '';
+            attempts.forEach(attempt => {
+                if (!attempt.timestamp) return; // Skip if data is malformed
+                const date = attempt.timestamp.toDate();
+                const formattedDate = date.toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit', hour12: true });
+
+                let scoreClass = 'score-badge-red';
+                if (attempt.percentage >= 75) scoreClass = 'score-badge-green';
+                else if (attempt.percentage >= 50) scoreClass = 'score-badge-yellow';
+
+                const row = `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${attempt.testName}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${attempt.subject}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-700">${attempt.score} / ${attempt.totalQuestions}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${scoreClass}">${attempt.percentage.toFixed(2)}%</span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${formattedDate}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <a href="TestSeries/test_sample.html?testId=${attempt.testId}&reviewId=${attempt.id}" class="text-blue-600 hover:text-blue-800">Review</a>
+                        </td>
+                    </tr>
+                `;
+                historyTableBody.innerHTML += row;
+            });
+        }
+    </script>
+</body>
+</html>

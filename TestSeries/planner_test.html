@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Hub - Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f1f5f9; /* slate-100 */
+        }
+        /* Loader */
+        #loader-overlay {
+            @apply fixed inset-0 bg-white dark:bg-slate-900 flex flex-col items-center justify-center z-50 transition-opacity duration-300;
+        }
+        .loader-spinner {
+            @apply w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin;
+        }
+        
+        /* Main content fade-in */
+        #app-view {
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #app-view.loaded {
+            opacity: 1;
+        }
+
+        /* Custom modal styles */
+        #message-modal-overlay {
+            @apply fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm opacity-0 transition-opacity duration-200;
+        }
+        #message-modal-overlay.fadeIn {
+            opacity: 1;
+        }
+        #message-modal .modal-content {
+            @apply bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-sm opacity-0 transform scale-95 transition-all duration-300;
+        }
+        #message-modal .modal-content.slideUp {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px) scale(0.95); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes slideDown { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(30px) scale(0.95); } }
+
+        /* Progress Bar Animation */
+        .progress-bar div {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Gradient Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 400px;
+            z-index: -1;
+            opacity: 0.6;
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.15) 0%, rgba(241, 245, 249, 0) 100%);
+        }
+
+        /* Admin Mode */
+        .admin-only { display: none !important; } /* Use important to override potential inline styles */
+        body.admin-mode .admin-only { display: flex !important; } /* Or 'block' */
+        body.admin-mode #admin-empty-cta { display: block !important; } /* Special case for button */
+
+        /* Dark mode compatibility */
+        body.dark { background-color: #0f172a; /* slate-900 */ }
+        body.dark #loader-overlay { background-color: #0f172a; }
+        body.dark #login-prompt { background-color: #1e293b; /* slate-800 */ }
+        body.dark .bg-white { background-color: #1e293b; /* slate-800 */ }
+        body.dark .text-slate-800 { color: #e2e8f0; /* slate-200 */ }
+        body.dark .text-slate-700 { color: #cbd5e1; /* slate-300 */ }
+        body.dark .text-slate-600 { color: #94a3b8; /* slate-400 */ }
+        body.dark .text-slate-500 { color: #64748b; /* slate-500 */ }
+        body.dark .text-slate-400 { color: #94a3b8; /* slate-400 */ }
+        body.dark .border-slate-200 { border-color: #334155; /* slate-700 */ }
+        body.dark .bg-slate-50 { background-color: #334155; /* slate-700 */ }
+        body.dark .bg-slate-100 { background-color: #1e293b; /* slate-800 */ }
+        body.dark .bg-slate-200 { background-color: #334155; /* slate-700 */ }
+        body.dark .hover\:bg-slate-100:hover { background-color: #334155; /* slate-700 */ }
+        body.dark .hover\:bg-slate-200:hover { background-color: #475569; /* slate-600 */ }
+        body.dark .border-slate-300 { border-color: #475569; /* slate-600 */ }
+        body.dark input, body.dark button { border-color: #475569; /* slate-600 */ }
+        body.dark ::placeholder { color: #64748b; /* slate-500 */ }
+        body.dark #message-modal .modal-content { background-color: #1e293b; /* slate-800 */ }
+        body.dark .bg-red-100 { background-color: rgba(220, 38, 38, 0.2); }
+        body.dark .text-red-600 { color: #f87171; /* red-400 */ }
+    </style>
+     </head>
+<body class="min-h-screen antialiased">
+
+    <script>
+        // Apply theme early to prevent flash
+        const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.body.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+            document.body.classList.remove('dark');
+        }
+    </script>
+
+    <div id="loader-overlay">
+        <div class="loader-spinner"></div>
+        <p class="text-lg font-medium text-slate-600 dark:text-slate-400 mt-4">Connecting...</p>
+    </div>
+    
+    <div id="app-view" class="flex flex-col min-h-screen"> 
+        
+        <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-10">
+            <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-3">
+                        <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg"/>
+                        <h1 class="text-xl sm:text-2xl font-bold text-slate-800">
+                            Test Planner
+                        </h1>
+                    </div>
+                    
+                    <div class="flex items-center space-x-3 sm:space-x-4">
+                        <span id="admin-badge" class="hidden px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300 text-sm font-bold rounded-full">Admin Mode</span>
+
+                        <a href="./dashboard.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-3 sm:px-4 rounded-lg shadow-sm transition-all duration-200 text-sm sm:text-base flex items-center space-x-2">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="7" height="9" x="3" y="3" rx="1"></rect><rect width="7" height="5" x="14" y="3" rx="1"></rect><rect width="7" height="9" x="14" y="12" rx="1"></rect><rect width="7" height="5" x="3" y="16" rx="1"></rect></svg>
+                            <span>Dashboard</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main id="main-content" class="container mx-auto max-w-7xl p-4 sm:p-6 lg:p-8 flex-1">
+            
+            <div id="login-prompt" class="hidden flex flex-col items-center justify-center h-full min-h-[50vh] bg-white rounded-xl shadow-lg p-8">
+                <svg class="w-16 h-16 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 1 0-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 0 0 2.25-2.25v-6.75a2.25 2.25 0 0 0-2.25-2.25H6.75a2.25 2.25 0 0 0-2.25 2.25v6.75a2.25 2.25 0 0 0 2.25 2.25Z" /></svg>
+                <h2 class="text-2xl font-bold text-slate-800 mb-2">Please Log In</h2>
+                <p class="text-slate-600 text-center" id="login-message">You must be logged in to access this page.</p>
+                <p class="text-sm text-slate-500 mt-4">Your User ID (if available): <span id="userIdDisplay" class="font-medium">...</span></p>
+            </div>
+
+            <div id="app-content" class="hidden">
+                <div class="max-w-4xl mx-auto space-y-6">
+                    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                        
+                        <div class="p-5 border-b border-slate-200">
+                            <h3 class="text-base font-semibold text-slate-800">Tasks for:</h3>
+                            <div class="flex items-baseline justify-between">
+                                <time id="selected-date-display" class="text-2xl font-bold text-blue-600 cursor-pointer">January 1, 2024</time>
+                                <div class="flex space-x-1">
+                                    <button id="prev-day" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" /></svg>
+                                    </button>
+                                    <button id="next-day" class="p-2 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-700 transition-colors">
+                                        <svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" /></svg>
+                                    </button>
+                                </div>
+                            </div>
+                            <input type="date" id="date-picker" class="absolute -left-[9999px] opacity-0" />
+                        </div>
+                        
+                        <div class="p-5 space-y-4">
+                            <div>
+                                <div class="flex justify-between mb-1">
+                                    <span class="text-sm font-medium text-slate-600">Completion</span>
+                                    <span id="progress-text" class="text-sm font-medium text-blue-600">0 / 0</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2.5 progress-bar">
+                                    <div id="progress-bar-inner" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <ul id="test-list" class="space-y-3">
+                                <li id="test-list-loader" class="text-center py-4 text-slate-500">Loading tasks...</li>
+                            </ul>
+
+                            <div id="empty-state" class="text-center py-6 hidden">
+                                <svg class="w-12 h-12 mx-auto text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.125 2.25h-4.5c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125v-9M10.125 2.25h.375a9 9 0 0 1 9 9v.375M10.125 2.25A3.375 3.375 0 0 1 13.5 5.625v1.5c0 .621.504 1.125 1.125 1.125h1.5a3.375 3.375 0 0 1 3.375 3.375M9 15l2.25 2.25L15 12" /></svg>
+                                <h4 class="mt-2 text-lg font-semibold text-slate-700">No Tasks Scheduled</h4>
+                                <p class="mt-1 text-sm text-slate-500">No tasks are scheduled for this day.</p>
+                                <button id="admin-empty-cta" class="admin-only mt-4 bg-blue-50 hover:bg-blue-100 text-blue-600 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 text-sm">
+                                    Add a task
+                                </button>
+                            </div>
+                            
+                            <form id="add-test-form" class="admin-only pt-4 border-t border-slate-200 space-y-3">
+                                <h4 class="text-base font-semibold text-slate-800">Add New Task</h4>
+                                <div>
+                                    <label for="new-test-name" class="block text-sm font-medium text-slate-700 mb-1">Task Name</label>
+                                    <input type="text" id="new-test-name" class="w-full px-3 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="e.g., Polity Test 1">
+                                </div>
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200 flex items-center justify-center space-x-2">
+                                    <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path d="M10.75 4.75a.75.75 0 0 0-1.5 0v4.5h-4.5a.75.75 0 0 0 0 1.5h4.5v4.5a.75.75 0 0 0 1.5 0v-4.5h4.5a.75.75 0 0 0 0-1.5h-4.5v-4.5Z" /></svg>
+                                    <span>Add Task</span>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+        
+        <footer class="text-center py-4 px-4 text-sm text-slate-500">
+            © <span id="footer-year">2024</span> UPSChub. All rights reserved.
+        </footer>
+    </div>
+    
+    <div id="message-modal" class="fixed inset-0 flex items-center justify-center p-4 z-50 hidden" role="alertdialog" aria-modal="true" aria-labelledby="message-modal-title">
+        <div id="message-modal-overlay" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm opacity-0 transition-opacity duration-200"></div>
+        <div class="modal-content text-center" role="document">
+            <div id="message-modal-icon" class="mx-auto mb-4 w-12 h-12 rounded-full flex items-center justify-center bg-red-100">
+                <svg class="w-6 h-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg>
+            </div>
+            <h3 id="message-modal-title" class="text-lg font-semibold text-slate-800">Error</h3>
+            <p id="message-modal-text" class="text-sm text-slate-600 mt-2">Something went wrong.</p>
+            <button id="message-modal-close" class="mt-6 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg shadow-sm transition-all duration-200">
+                Close
+            </button>
+        </div>
+    </div>
+
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence // This is the correct name
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            getDoc,
+            setDoc,
+            updateDoc,
+            arrayUnion,
+            arrayRemove,
+            onSnapshot,
+            Timestamp,
+            setLogLevel
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // --- App State ---
+        let db, auth;
+        let currentUserId = null;
+        
+        // This is your Admin User ID from your previous code
+        const ADMIN_UID = "eIVSLAoiYUPWpmoXwoB7FGGDLq93"; 
+        
+        let isAdmin = false;
+        let currentDate = new Date(); 
+        let currentSchedule = []; 
+        let currentCompletion = []; 
+        let unsubscribeSchedule = () => {};
+        let unsubscribeCompletion = () => {};
+
+        // This is your Firebase Config from your auth.html file
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+        };
+        const appId = 'default-app-id'; 
+
+        // --- UI Elements ---
+        function getUiElements() {
+            const $ = (selector) => document.getElementById(selector);
+            return {
+                appView: $("app-view"),
+                loaderOverlay: $("loader-overlay"),
+                loginPrompt: $("login-prompt"),
+                loginMessage: $("login-message"),
+                appContent: $("app-content"),
+                adminBadge: $("admin-badge"),
+                userIdDisplay: $("userIdDisplay"),
+                datePicker: $("date-picker"),
+                prevDayBtn: $("prev-day"),
+                nextDayBtn: $("next-day"),
+                selectedDateDisplay: $("selected-date-display"),
+                testList: $("test-list"),
+                testListLoader: $("test-list-loader"),
+                emptyState: $("empty-state"),
+                newTestNameInput: $("new-test-name"),
+                addTestForm: $("add-test-form"),
+                progressText: $("progress-text"),
+                progressBarInner: $("progress-bar-inner"),
+                mainContent: $("main-content"),
+                messageModal: $("message-modal"),
+                messageModalOverlay: $("message-modal-overlay"),
+                messageModalClose: $("message-modal-close"),
+                messageModalTitle: $("message-modal-title"),
+                messageModalText: $("message-modal-text"),
+                adminEmptyCta: $("admin-empty-cta"),
+                footerYear: $("footer-year")
+            };
+        }
+        
+        // --- Utility Functions ---
+        function getYYYYMMDD(date) { return date.toISOString().split('T')[0]; }
+        function formatReadableDate(date) { return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }); }
+        
+        function showMessage(title, text) {
+            const ui = getUiElements();
+            if (!ui.messageModal || !ui.messageModalOverlay || !ui.messageModalTitle || !ui.messageModalText) return; 
+            ui.messageModalTitle.textContent = title;
+            ui.messageModalText.textContent = text;
+            ui.messageModal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                ui.messageModalOverlay.classList.add('fadeIn');
+                ui.messageModal.querySelector('.modal-content').classList.add('slideUp');
+            });
+        }
+
+        function hideMessage() {
+            const ui = getUiElements();
+            if (!ui.messageModal || !ui.messageModalOverlay) return; 
+            ui.messageModalOverlay.classList.remove('fadeIn');
+            ui.messageModal.querySelector('.modal-content').classList.remove('slideUp');
+            setTimeout(() => {
+                 if (ui.messageModal) ui.messageModal.classList.add('hidden');
+            }, 300); 
+        }
+
+        // --- Core UI Logic ---
+        function renderTestList() {
+            const ui = getUiElements();
+             if (!ui.testList || !ui.emptyState || !ui.testListLoader) {
+                 console.error("renderTestList: Missing essential UI elements.");
+                 return;
+             }
+
+            ui.testListLoader.classList.add('hidden');
+            ui.testList.innerHTML = ''; 
+            
+            if (currentSchedule.length === 0) {
+                ui.emptyState.classList.remove('hidden');
+            } else {
+                ui.emptyState.classList.add('hidden');
+                currentSchedule.forEach(test => {
+                    const isCompleted = currentCompletion.includes(test.id);
+                    const li = document.createElement('li');
+                    li.className = 'flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-700';
+                    li.innerHTML = `
+                        <div class="flex items-center space-x-3 flex-1 min-w-0">
+                            <input type="checkbox" data-id="${test.id}" id="test-${test.id}" class="h-5 w-5 text-blue-600 rounded border-slate-300 focus:ring-blue-500 flex-shrink-0 cursor-pointer" ${isCompleted ? 'checked' : ''}>
+                            <label for="test-${test.id}" class="text-base ${isCompleted ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-slate-700 dark:text-slate-300'} break-words cursor-pointer">${test.name}</label>
+                        </div>
+                        <button data-id="${test.id}" class="admin-only text-red-400 hover:text-red-600 p-1 rounded-md hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors flex-shrink-0 ml-2" aria-label="Delete test">
+                            <svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8.75 1A2.75 2.75 0 0 0 6 3.75v.443c-.795.077-1.58.11-2.368.11a.75.75 0 0 0 0 1.5h1.248v10.5h.01c.02 1.258 1.03 2.25 2.28 2.25h8.46c1.25 0 2.26-1.002 2.279-2.268v-10.5h1.248a.75.75 0 0 0 0-1.5c-.788 0-1.573-.033-2.368-.11V3.75A2.75 2.75 0 0 0 11.25 1h-2.5ZM7.5 3.75c0-.69.56-1.25 1.25-1.25h2.5c.69 0 1.25.56 1.25 1.25v.443c-.795.077-1.58.11-2.368.11a12.2 12.2 0 0 1-2.368-.11V3.75Zm3 7.5a.75.75 0 0 1 .75.75v3.5a.75.75 0 0 1-1.5 0v-3.5a.75.75 0 0 1 .75-.75Zm4-1.25a.75.75 0 0 0-.75.75v3.5a.75.75 0 0 0 1.5 0v-3.5a.75.75 0 0 0-.75-.75Z" clip-rule="evenodd" /></svg>
+                        </button>
+                    `;
+                    ui.testList.appendChild(li);
+                });
+            }
+            updateProgressBar();
+            updateAdminUI(); 
+        }
+
+        function updateProgressBar() {
+            const ui = getUiElements();
+            if (!ui.progressText || !ui.progressBarInner) return;
+            const total = currentSchedule.length;
+            const completed = currentCompletion.length;
+            const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+            ui.progressText.textContent = `${completed} / ${total}`;
+            ui.progressBarInner.style.width = `${percentage}%`;
+        }
+        
+        function updateAdminUI() {
+            const ui = getUiElements();
+            if (!ui.adminBadge || !ui.adminEmptyCta || !ui.addTestForm) return; 
+            
+            if (isAdmin) {
+                document.body.classList.add('admin-mode');
+                ui.adminBadge.classList.remove('hidden'); 
+            } else {
+                document.body.classList.remove('admin-mode');
+                 ui.adminBadge.classList.add('hidden'); 
+            }
+            const adminOnlyElements = document.querySelectorAll('#test-list .admin-only');
+            adminOnlyElements.forEach(el => el.style.display = isAdmin ? 'flex' : 'none');
+            ui.adminEmptyCta.style.display = (isAdmin && currentSchedule.length === 0) ? 'block' : 'none';
+            ui.addTestForm.style.display = isAdmin ? 'block' : 'none';
+        }
+        
+        function changeDate(newDate) {
+            const ui = getUiElements();
+            if (!ui.selectedDateDisplay || !ui.datePicker) return;
+            currentDate = newDate;
+            ui.selectedDateDisplay.textContent = formatReadableDate(currentDate);
+            ui.datePicker.value = getYYYYMMDD(currentDate);
+            listenToDataForDate(); 
+        }
+
+        // --- Event Handlers ---
+        async function handleAddTest(e) {
+            e.preventDefault();
+            const ui = getUiElements();
+            if (!ui.newTestNameInput || !ui.addTestForm) return;
+            const testName = ui.newTestNameInput.value.trim();
+            if (!testName || !isAdmin) return;
+            
+            const newTest = { id: crypto.randomUUID(), name: testName, createdAt: Timestamp.now() };
+            const dateKey = getYYYYMMDD(currentDate);
+            const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
+            
+            const addButton = ui.addTestForm.querySelector('button[type="submit"]');
+            if (addButton) addButton.disabled = true; 
+
+            try {
+                await setDoc(scheduleDocRef, { tests: arrayUnion(newTest) }, { merge: true });
+                ui.newTestNameInput.value = '';
+            } catch (error) {
+                console.error("Error adding test:", error);
+                showMessage("Error", "Could not add the new test. Please try again.");
+            } finally {
+                 if (addButton) addButton.disabled = false; 
+            }
+        }
+
+        async function handleDeleteTest(e) {
+            const button = e.target.closest('button.admin-only');
+            if (!button || !isAdmin || !currentUserId) return; 
+            
+            const testId = button.dataset.id;
+            const test = currentSchedule.find(t => t.id === testId);
+            if (!test) return;
+
+            if (!confirm(`Are you sure you want to delete "${test.name}"?`)) {
+                 return;
+            }
+            
+            const dateKey = getYYYYMMDD(currentDate);
+            const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
+            
+             button.disabled = true;
+
+            try {
+                 const scheduleDoc = await getDoc(scheduleDocRef);
+                 let testsArray = [];
+                 if (scheduleDoc.exists()) {
+                      testsArray = scheduleDoc.data().tests || [];
+                 }
+                 const testToRemove = testsArray.find(t => t.id === testId); 
+                 
+                 if (testToRemove) {
+                      await updateDoc(scheduleDocRef, { tests: arrayRemove(testToRemove) });
+                 } else {
+                      console.warn("Test object not found in DB for removal.");
+                 }
+
+                const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
+                await updateDoc(completionDocRef, { completed: arrayRemove(testId) });
+                
+            } catch (error) {
+                console.error("Error deleting test:", error);
+                showMessage("Error", "Could not delete the test. Please try again.");
+                 button.disabled = false;
+            } 
+        }
+
+
+        async function handleToggleTest(e) {
+            const checkbox = e.target;
+            if (checkbox.type !== 'checkbox' || !currentUserId) return;
+            const testId = checkbox.dataset.id;
+            const isCompleted = checkbox.checked;
+            const dateKey = getYYYYMMDD(currentDate);
+            const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
+
+            checkbox.disabled = true;
+
+            try {
+                 await setDoc(completionDocRef, { 
+                     completed: isCompleted ? arrayUnion(testId) : arrayRemove(testId) 
+                 }, { merge: true });
+                 
+            } catch (error) {
+                console.error("Error updating completion:", error);
+                showMessage("Error", "Could not update test status. Please try again.");
+                checkbox.checked = !isCompleted;
+            } finally {
+                checkbox.disabled = false;
+            }
+        }
+        
+        // --- Firebase Listeners ---
+        function listenToDataForDate() { 
+            const ui = getUiElements();
+            unsubscribeSchedule();
+            unsubscribeCompletion(); 
+            
+            const dateKey = getYYYYMMDD(currentDate);
+            
+            if(ui.testListLoader) ui.testListLoader.classList.remove('hidden');
+            if(ui.emptyState) ui.emptyState.classList.add('hidden'); 
+            if(ui.testList) ui.testList.innerHTML = ''; 
+
+            const scheduleDocRef = doc(db, `artifacts/${appId}/public/data/schedules`, dateKey);
+            unsubscribeSchedule = onSnapshot(scheduleDocRef, (docSnap) => {
+                 console.log("Schedule snapshot received:", docSnap.exists() ? docSnap.data() : 'No data');
+                 currentSchedule = docSnap.exists() ? (docSnap.data().tests || []) : [];
+                 currentSchedule.sort((a, b) => (a.createdAt?.seconds || 0) - (b.createdAt?.seconds || 0));
+                 renderTestList(); 
+            }, (error) => {
+                 console.error("Error listening to schedule:", error);
+                 showMessage("Error", "Could not load test schedule.");
+                 currentSchedule = []; 
+                 if(ui.testListLoader) ui.testListLoader.classList.add('hidden'); 
+                 renderTestList();
+            });
+            
+            if (currentUserId) {
+                const completionDocRef = doc(db, `artifacts/${appId}/users/${currentUserId}/completion`, dateKey);
+                unsubscribeCompletion = onSnapshot(completionDocRef, (docSnap) => { 
+                     console.log("Completion snapshot received:", docSnap.exists() ? docSnap.data() : 'No data');
+                     currentCompletion = docSnap.exists() ? (docSnap.data().completed || []) : [];
+                     renderTestList(); 
+                }, (error) => {
+                     console.error("Error listening to completion:", error);
+                     showMessage("Error", "Could not load your test completion status.");
+                     currentCompletion = []; 
+                     renderTestList(); 
+                });
+            } else {
+                 console.warn("No user ID available for completion listener.");
+                 currentCompletion = []; 
+                 renderTestList(); 
+            }
+        }
+        
+        // --- Initializes the application ---
+        function initApp() {
+            console.log("initApp called");
+            const ui = getUiElements();
+            
+            if (!ui.loaderOverlay || !ui.loginPrompt || !ui.appView || !ui.mainContent || !ui.footerYear) {
+                 console.error("Core page elements missing. Cannot initialize.");
+                 document.body.innerHTML = "<p style='color:red; font-family: sans-serif; padding: 20px;'>Error: Core page elements missing. Cannot initialize.</p>";
+                 return;
+            }
+
+             if(ui.footerYear) ui.footerYear.textContent = new Date().getFullYear();
+
+            try {
+                console.log("Initializing Firebase...");
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                console.log("Firebase initialized.");
+
+                setPersistence(auth, browserLocalPersistence) // Correct persistence
+                    .then(() => {
+                        console.log("Persistence set to local.");
+                        
+                        // ======================================================
+                        // === THIS IS THE "PATIENT" onAuthStateChanged FIX ===
+                        // ======================================================
+                        onAuthStateChanged(auth, (user) => {
+                            console.log("Auth state changed. User:", user ? user.uid : 'null');
+                             const currentUI = getUiElements(); 
+                            try {
+                                if (user) {
+                                    // === USER IS LOGGED IN ===
+                                    currentUserId = user.uid;
+                                    isAdmin = user.uid === ADMIN_UID;
+                                    
+                                    console.log("User authenticated:", currentUserId, "isAdmin:", isAdmin);
+                                    if(currentUI.userIdDisplay) currentUI.userIdDisplay.textContent = currentUserId; 
+                                    
+                                    currentUI.appView.classList.add('loaded'); 
+                                    currentUI.loginPrompt.classList.add('hidden');
+                                    currentUI.appContent.classList.remove('hidden'); 
+
+                                    attachAppEventListeners(currentUI); 
+                                    updateAdminUI(); 
+                                    changeDate(new Date()); 
+                                    console.log("App content setup complete.");
+                                    
+                                } else {
+                                    // === USER IS NOT LOGGED IN (OR WE ARE CHECKING) ===
+                                    console.log("User not authenticated. Verifying...");
+                                    currentUserId = null;
+                                    isAdmin = false; 
+                                    if(currentUI.userIdDisplay) currentUI.userIdDisplay.textContent = "Not Logged In";
+                                    
+                                    // Show the "verifying" message
+                                    currentUI.appView.classList.add('loaded');
+                                    currentUI.appContent.classList.add('hidden');
+                                    currentUI.loginPrompt.classList.remove('hidden');
+                                    if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Verifying login status...";
+
+                                    // SET A TIMER TO DOUBLE-CHECK
+                                    setTimeout(() => {
+                                        // After 1.5 seconds, check auth.currentUser
+                                        if (!auth.currentUser) {
+                                            // If it's STILL null, the user is *really* logged out. Now we redirect.
+                                            console.log("User confirmed logged out. Redirecting to auth.html...");
+                                            if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Redirecting to login page...";
+                                            
+                                            // Make sure this matches your file name
+                                            window.location.href = "auth.html?redirect=testplanner.html";
+                                        } else {
+                                            // False alarm! The 'if (user)' block already ran or will run.
+                                            console.log("False alarm, user is logged in. Staying on page.");
+                                        }
+                                    }, 1500); // Wait 1.5 seconds to be sure
+                                }
+                            } catch (authError) {
+                                 console.error("Error during auth state processing:", authError);
+                                 showMessage("Error", "An error occurred while loading your session.");
+                                 currentUI.appView.classList.add('loaded'); 
+                                 currentUI.appContent.classList.add('hidden');
+                                 currentUI.loginPrompt.classList.remove('hidden');
+                                 if(currentUI.loginMessage) currentUI.loginMessage.textContent = "Error loading session. Please try logging in again.";
+                            } finally {
+                                // This hides the initial "Connecting..." spinner
+                                if (currentUI.loaderOverlay) {
+                                     currentUI.loaderOverlay.classList.add('hidden');
+                                     console.log("Loader overlay hidden.");
+                                } else {
+                                     console.warn("Loader overlay not found in finally block.");
+                                }
+                            }
+                        }); // === END OF onAuthStateChanged ===
+                    
+                    })
+                    .catch((error) => {
+                         console.error("Set persistence error:", error);
+                         const errorUI = getUiElements(); 
+                         if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
+                         if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
+                         if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Auth Init Failed";
+                         if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not initialize login session.";
+                         if(errorUI.appView) errorUI.appView.classList.add('loaded'); 
+                         showMessage("Auth Error", `Could not initialize authentication: ${error.message}. Please refresh.`);
+                    });
+
+            } catch(e) {
+                 console.error("Firebase Init Error:", e);
+                 const errorUI = getUiElements(); 
+                 if(errorUI.loaderOverlay) errorUI.loaderOverlay.classList.add('hidden');
+                 if(errorUI.loginPrompt) errorUI.loginPrompt.classList.remove('hidden');
+                  if(errorUI.userIdDisplay) errorUI.userIdDisplay.textContent = "Firebase Init Error";
+                  if(errorUI.loginMessage) errorUI.loginMessage.textContent = "Could not connect to services.";
+                 if(errorUI.appView) errorUI.appView.classList.add('loaded'); 
+                 showMessage("Fatal Error", `Could not initialize Firebase: ${e.message}. Please refresh the page.`);
+            }
+        }
+
+        // --- Attach Event Listeners ---
+         function attachAppEventListeners(ui) {
+             console.log("Attaching app event listeners...");
+              if (!ui.prevDayBtn || !ui.nextDayBtn || !ui.selectedDateDisplay || !ui.datePicker || !ui.addTestForm || !ui.testList || !ui.adminEmptyCta || !ui.messageModalClose || !ui.messageModalOverlay) {
+                  console.error("Cannot attach listeners: One or more UI elements missing.");
+                  showMessage("UI Error", "Some page elements could not be found. Functionality may be limited.");
+                  return;
+             }
+
+            ui.prevDayBtn.onclick = () => { changeDate(new Date(currentDate.setDate(currentDate.getDate() - 1))); };
+            ui.nextDayBtn.onclick = () => { changeDate(new Date(currentDate.setDate(currentDate.getDate() + 1))); };
+            ui.selectedDateDisplay.onclick = () => ui.datePicker.showPicker(); 
+            ui.datePicker.onchange = (e) => { 
+                 const [year, month, day] = e.target.value.split('-').map(Number); 
+                 const newDate = new Date(); 
+                 newDate.setFullYear(year, month - 1, day); 
+                 newDate.setHours(0, 0, 0, 0); 
+                 changeDate(newDate); 
+            };
+            ui.addTestForm.onsubmit = handleAddTest;
+            ui.testList.onclick = (e) => { 
+                if (e.target.type === 'checkbox') { handleToggleTest(e); } 
+                else if (e.target.closest('button.admin-only')) { handleDeleteTest(e); }
+                 else if (e.target.tagName === 'LABEL') {
+                     const checkboxId = e.target.getAttribute('for');
+                     const checkbox = checkboxId ? document.getElementById(checkboxId) : null;
+                     if (checkbox && checkbox.type === 'checkbox') {
+                         checkbox.checked = !checkbox.checked;
+                         handleToggleTest({ target: checkbox }); 
+                     }
+                 }
+            };
+            ui.adminEmptyCta.onclick = () => ui.newTestNameInput && ui.newTestNameInput.focus();
+            ui.messageModalClose.onclick = hideMessage;
+            ui.messageModalOverlay.onclick = hideMessage; 
+             console.log("App event listeners attached.");
+         }
+
+
+        // --- Start the App ---
+        document.addEventListener('DOMContentLoaded', initApp);
+
+    </script>
+</body>
+</html>

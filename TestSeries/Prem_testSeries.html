@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Series - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; /* bg-slate-50 */
+        }
+        
+        /* --- Animations --- */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes scaleOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.95); opacity: 0; } }
+        @keyframes confetti-fall {
+            0% { transform: translateY(-100vh) rotateZ(0deg); }
+            100% { transform: translateY(100vh) rotateZ(360deg); }
+        }
+
+        .modal-enter { animation: fadeIn 0.3s ease-out forwards; }
+        .modal-leave { animation: fadeOut 0.3s ease-in forwards; }
+        .modal-content-enter { animation: scaleIn 0.3s ease-out forwards; }
+        .modal-content-leave { animation: scaleOut 0.3s ease-in forwards; }
+
+        .confetti-piece {
+            position: absolute;
+            width: 10px;
+            height: 20px;
+            top: -50px;
+            animation: confetti-fall 4s linear infinite;
+        }
+
+        /* --- Custom Styles --- */
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(5px); }
+        .premium-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0.95) 100%);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 1rem;
+            border-radius: 0.75rem; /* 12px */
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <header class="bg-white/80 backdrop-blur-sm border-b border-slate-200 sticky top-0 z-50">
+        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <a href="TestSeries/dashboard.html" class="flex items-center gap-3 text-2xl font-bold text-blue-600">
+                <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-9 w-9 rounded-lg">
+                <span>UPSChub</span>
+            </a>
+            <a href="TestSeries/dashboard.html" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors duration-200">Go to Dashboard</a>
+        </div>
+    </header>
+
+    <section class="bg-slate-100 border-b border-slate-200">
+        <div class="container mx-auto px-4 sm:px-6 py-12 text-center">
+            <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-800 tracking-tight">UPSChub Test Series</h1>
+            <p class="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
+                Gauge your preparation, identify your weaknesses, and conquer the exam with our comprehensive subject-wise tests.
+            </p>
+        </div>
+    </section>
+
+    <main id="main-content" class="container mx-auto p-4 sm:p-6 hidden">
+        <div class="mb-8 flex flex-col sm:flex-row gap-4 justify-between items-center">
+            <div class="relative w-full sm:max-w-xs">
+                <input type="text" id="search-input" placeholder="Search by subject or test name..." class="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                </div>
+            </div>
+            <div class="relative w-full sm:w-auto">
+                <select id="sort-select" class="appearance-none w-full bg-white border border-slate-300 text-slate-700 py-2.5 pl-3 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm">
+                    <option value="default">Sort by: Default</option>
+                    <option value="name-asc">Name (A-Z)</option>
+                    <option value="name-desc">Name (Z-A)</option>
+                    <option value="questions-asc">Questions (Low to High)</option>
+                    <option value="questions-desc">Questions (High to Low)</option>
+                </select>
+                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-700">
+                    <svg class="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                </div>
+            </div>
+        </div>
+        
+        <div id="test-list-container" class="space-y-12">
+            <div>
+                <div class="h-8 w-1/3 bg-slate-200 rounded-md mb-6 animate-pulse"></div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="h-44 bg-white rounded-xl shadow-md animate-pulse"></div>
+                    <div class="h-44 bg-white rounded-xl shadow-md animate-pulse hidden md:block"></div>
+                    <div class="h-44 bg-white rounded-xl shadow-md animate-pulse hidden lg:block"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <div id="loader" class="flex justify-center items-center h-screen flex-col">
+        <svg class="animate-spin h-8 w-8 text-blue-600 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <p class="text-slate-500">Checking authentication...</p>
+    </div>
+
+    <div id="upgrade-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white rounded-2xl shadow-lg w-full max-w-md" id="upgrade-modal-content">
+            <div class="p-6 text-center bg-gradient-to-br from-blue-100 to-indigo-200 rounded-t-2xl">
+                <div class="w-16 h-16 mx-auto bg-blue-600/10 rounded-full flex items-center justify-center">
+                     <svg class="w-10 h-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <h3 class="text-2xl font-bold mt-4 text-slate-800">Go Premium!</h3>
+                <p class="text-slate-500 mt-1">Unlock your full potential with lifetime access.</p>
+            </div>
+            <div class="p-6">
+                <ul class="space-y-3 text-slate-700">
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Access to <span class="font-semibold">All Test Series</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Detailed <span class="font-semibold">Performance Analytics</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Unlimited <span class="font-semibold">Practice Questions</span></span></li>
+                    <li class="flex items-center gap-3"><svg class="w-5 h-5 text-green-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg><span>Priority <span class="font-semibold">Support</span></span></li>
+                </ul>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-b-2xl flex flex-col sm:flex-row justify-end gap-3">
+                <button type="button" id="close-upgrade-modal" class="px-4 py-2.5 text-sm font-semibold rounded-lg bg-slate-200/80 hover:bg-slate-200 transition-colors">Maybe Later</button>
+                <button type="button" id="upgrade-btn-modal" class="px-6 py-2.5 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg shadow-blue-500/20 transition-all">
+                    Upgrade Now <span class="line-through opacity-70 ml-1">₹199</span> <span class="ml-1 font-bold">₹99</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="success-animation-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div id="confetti-container" class="absolute inset-0 overflow-hidden"></div>
+        <div class="relative z-10 bg-white text-center p-8 rounded-2xl shadow-2xl max-w-sm w-full">
+            <svg class="mx-auto h-20 w-20 text-green-500 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+            <h2 class="text-3xl font-extrabold text-slate-800 mb-2">Upgrade Successful!</h2>
+            <p class="text-slate-500">Welcome to UPSChub Premium! You now have unlimited access to all features.</p>
+            <button id="close-success-modal" class="mt-6 w-full px-4 py-2.5 font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Start Learning</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        const mainContent = document.getElementById('main-content');
+        const loader = document.getElementById('loader');
+        
+        const upgradeModal = document.getElementById('upgrade-modal');
+        const upgradeModalContent = document.getElementById('upgrade-modal-content');
+        const closeUpgradeModalBtn = document.getElementById('close-upgrade-modal');
+        const upgradeBtnModal = document.getElementById('upgrade-btn-modal');
+
+        const successAnimationModal = document.getElementById('success-animation-modal');
+        const closeSuccessModalBtn = document.getElementById('close-success-modal');
+
+        let isPremiumUser = false;
+        let allTests = []; // Store all fetched tests here to avoid re-fetching
+
+        function showUpgradeModal() {
+            upgradeModal.classList.remove('hidden');
+            upgradeModal.classList.add('modal-enter');
+            upgradeModalContent.classList.add('modal-content-enter');
+            upgradeModal.classList.remove('modal-leave');
+            upgradeModalContent.classList.remove('modal-content-leave');
+        }
+
+        function hideUpgradeModal() {
+            upgradeModal.classList.add('modal-leave');
+            upgradeModalContent.classList.add('modal-content-leave');
+            setTimeout(() => {
+                upgradeModal.classList.add('hidden');
+                upgradeModal.classList.remove('modal-enter', 'modal-leave');
+                upgradeModalContent.classList.remove('modal-content-enter', 'modal-content-leave');
+            }, 300);
+        }
+
+        function showSuccessAnimation() {
+            successAnimationModal.classList.remove('hidden');
+            startConfetti();
+            setTimeout(() => {
+                hideSuccessAnimation(true);
+            }, 5000);
+        }
+        
+        function hideSuccessAnimation(shouldReload = false) {
+            successAnimationModal.classList.add('hidden');
+            stopConfetti();
+            if (shouldReload) {
+                window.location.reload();
+            }
+        }
+        
+        function startConfetti() {
+            const container = document.getElementById('confetti-container');
+            container.innerHTML = '';
+            const colors = ['#60a5fa', '#3b82f6', '#fbbf24', '#f97316', '#10b981'];
+            for (let i = 0; i < 100; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti-piece';
+                confetti.style.left = `${Math.random() * 100}vw`;
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = `${Math.random() * 4}s`;
+                container.appendChild(confetti);
+            }
+        }
+
+        function stopConfetti() {
+            document.getElementById('confetti-container').innerHTML = '';
+        }
+
+        async function handleUpgrade() {
+            const user = auth.currentUser;
+            if (!user) { console.error("No user signed in to upgrade."); return; }
+            var options = {
+                "key": "rzp_test_YourKey",
+                "amount": 9900, "currency": "INR", "name": "UPSChub",
+                "description": "UPSChub Lifetime Premium Access",
+                "handler": async function (response){
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    try {
+                        await updateDoc(userDocRef, { isPremium: true });
+                        isPremiumUser = true;
+                        hideUpgradeModal();
+                        showSuccessAnimation();
+                    } catch (error) {
+                        console.error("Error updating premium status: ", error);
+                        alert("Upgrade successful but failed to update your status. Please contact support.");
+                    }
+                },
+                "prefill": { "email": user.email },
+                "theme": { "color": "#2563EB" }
+            };
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                const docSnap = await getDoc(userDocRef);
+                if (docSnap.exists()) {
+                    isPremiumUser = docSnap.data().isPremium || false;
+                } else {
+                    await setDoc(userDocRef, { isPremium: false }, { merge: true });
+                    isPremiumUser = false;
+                }
+
+                if (!isPremiumUser) {
+                    const fixedUpgradeButton = `
+                        <button id="fixed-upgrade-btn" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-40 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl hover:scale-105 transform-gpu transition-all flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                            Go Premium: <span class="line-through opacity-70 ml-1">₹199</span> <span class="ml-1">₹99</span>
+                        </button>`;
+                    document.body.insertAdjacentHTML('beforeend', fixedUpgradeButton);
+                    document.getElementById('fixed-upgrade-btn').addEventListener('click', showUpgradeModal);
+                }
+
+                loader.style.display = 'none';
+                mainContent.classList.remove('hidden');
+                
+                await fetchAllTests();
+
+                const searchInput = document.getElementById('search-input');
+                const sortSelect = document.getElementById('sort-select');
+                
+                searchInput.addEventListener('input', renderTests);
+                sortSelect.addEventListener('change', renderTests);
+
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        (function() {
+    // ✅ Use your new Gist URL (raw JSON)
+    const statusUrl = 'https://gist.githubusercontent.com/pratyushswain01/9505fae5d1eaddc656578f1640fe6ae4/raw/b025d77d5b5c72b999f7f488b5fa2d4784069703/status.json';
+
+    // Optional: allow developer bypass via ?dev=true
+    const params = new URLSearchParams(window.location.search);
+    const isDeveloper = params.get('dev') === 'true';
+
+    // Only check maintenance status if not developer
+    if (!isDeveloper) {
+        fetch(statusUrl + '?cachebust=' + new Date().getTime()) // avoids caching
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Could not fetch maintenance status. The Gist URL might be incorrect.');
+                    return;
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data && data.maintenanceMode === true) {
+                    window.location.href = './maintenance.html';
+                }
+            })
+            .catch(error => {
+                console.error('Error checking maintenance status:', error);
+            });
+    }
+})();
+
+        
+        async function fetchAllTests() {
+            try {
+                const querySnapshot = await getDocs(collection(db, "quizzes"));
+                querySnapshot.forEach((doc) => {
+                    allTests.push({ id: doc.id, ...doc.data() });
+                });
+                renderTests(); // Initial render after fetching
+            } catch (error) {
+                console.error("Error fetching tests: ", error);
+                document.getElementById('test-list-container').innerHTML = '<p class="text-red-500 text-center">Failed to load tests. Please try again later.</p>';
+            }
+        }
+        
+        function renderTests() {
+            const container = document.getElementById('test-list-container');
+            const searchTerm = document.getElementById('search-input').value.toLowerCase();
+            const sortValue = document.getElementById('sort-select').value;
+
+            let processedTests = allTests.filter(test => 
+                test.testName.toLowerCase().includes(searchTerm) ||
+                (test.subject && test.subject.toLowerCase().includes(searchTerm))
+            );
+            
+            processedTests.sort((a, b) => (a.chapter || 0) - (b.chapter || 0)); 
+
+            switch (sortValue) {
+                case 'name-asc':
+                    processedTests.sort((a, b) => a.testName.localeCompare(b.testName));
+                    break;
+                case 'name-desc':
+                    processedTests.sort((a, b) => b.testName.localeCompare(a.testName));
+                    break;
+                case 'questions-asc':
+                    processedTests.sort((a, b) => (a.totalQuestions || 0) - (b.totalQuestions || 0));
+                    break;
+                case 'questions-desc':
+                    processedTests.sort((a, b) => (b.totalQuestions || 0) - (a.totalQuestions || 0));
+                    break;
+            }
+            
+            container.innerHTML = '';
+
+            if (processedTests.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-center">${allTests.length === 0 ? 'No tests are available at the moment.' : 'No tests match your search criteria.'}</p>`;
+                return;
+            }
+
+            const testsBySubject = {};
+            processedTests.forEach(test => {
+                const subject = test.subject || 'General';
+                if (!testsBySubject[subject]) {
+                    testsBySubject[subject] = [];
+                }
+                testsBySubject[subject].push(test);
+            });
+            
+            for (const subject in testsBySubject) {
+                const subjectSection = document.createElement('section');
+                
+                const subjectHeader = `<h2 class="text-3xl font-bold text-slate-700 mb-6 tracking-tight">${subject}</h2>`;
+                
+                const testsGrid = document.createElement('div');
+                testsGrid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+                
+                testsBySubject[subject].forEach(test => {
+                    let testCardHTML;
+                    if (isPremiumUser) {
+                        // --- MODIFICATION START ---
+                        // The main document for a chapter now acts as a container.
+                        // Specific details like question count are inside each set, so we display general info here.
+                        testCardHTML = `
+                        <div class="bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 flex flex-col">
+                            <div class="p-6 flex-grow">
+                                <h3 class="text-xl font-bold text-slate-800">${test.testName}</h3>
+                                <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                    <span>Subject: ${test.subject}</span>
+                                    <span>Chapter: ${test.chapter || 'N/A'}</span>
+                                </div>
+                            </div>
+                            <div class="bg-slate-50/70 p-4 border-t border-slate-200/60 rounded-b-xl">
+                                <p class="text-sm font-semibold text-slate-600 mb-3">Practice Sets:</p>
+                                <div class="grid grid-cols-3 gap-2">
+                                    ${[1, 2, 3].map(setNum => `
+                                        <a href="TestSeries/test_sample.html?testId=${test.id}&set=${setNum}" 
+                                           class="text-center px-3 py-1.5 text-xs font-semibold rounded-md bg-blue-100 text-blue-700 hover:bg-blue-200 hover:text-blue-800 transition-colors">
+                                           Set ${setNum}
+                                        </a>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>`;
+                        // --- MODIFICATION END ---
+                    } else {
+                        // This is the view for non-premium users, showing a locked state.
+                        testCardHTML = `
+                        <div class="relative p-6 bg-white rounded-xl shadow-md test-card-locked overflow-hidden">
+                            <h3 class="text-xl font-bold text-slate-800">${test.testName}</h3>
+                            <div class="mt-4 flex justify-between text-sm text-slate-500 border-t border-slate-100 pt-3">
+                                <span>Subject: ${test.subject}</span>
+                                <span>Chapter: ${test.chapter || 'N/A'}</span>
+                            </div>
+                            <div class="premium-overlay">
+                                <svg class="w-10 h-10 text-slate-600 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                <p class="font-bold text-lg text-slate-700 mb-4">Premium Test</p>
+                                <button class="unlock-btn px-5 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition-colors">Unlock Now</button>
+                            </div>
+                        </div>`;
+                    }
+                    testsGrid.insertAdjacentHTML('beforeend', testCardHTML);
+                });
+                
+                subjectSection.innerHTML = subjectHeader;
+                subjectSection.appendChild(testsGrid);
+                container.appendChild(subjectSection);
+            }
+
+            if (!isPremiumUser) {
+                document.querySelectorAll('.test-card-locked, .unlock-btn').forEach(el => {
+                    el.addEventListener('click', showUpgradeModal);
+                });
+            }
+        }
+
+        closeUpgradeModalBtn.addEventListener('click', hideUpgradeModal);
+        upgradeBtnModal.addEventListener('click', handleUpgrade);
+        closeSuccessModalBtn.addEventListener('click', () => hideSuccessAnimation(true));
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker
+                    .register('https://pratyushswain01.github.io/UPSCstudyhub.github.io/TestSeries/sw.js')
+                    .then((registration) => {
+                        console.log('Service Worker registered successfully on Premium Tests page.');
+                    })
+                    .catch((error) => {
+                        console.error('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

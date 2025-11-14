@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Hub: Curated Notes</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-start: #4c51bf;
+            --primary-end: #3b82f6;
+            --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+            
+            /* Light Mode */
+            --bg-light: #f1f5f9;
+            --card-bg-light: #ffffff;
+            --text-primary-light: #1e293b;
+            --text-secondary-light: #64748b;
+            --border-light: #e2e8f0;
+
+            /* Dark Mode */
+            --bg-dark: #0f172a;
+            --card-bg-dark: #1e293b;
+            --text-primary-dark: #f8fafc;
+            --text-secondary-dark: #94a3b8;
+            --border-dark: #334155;
+
+            /* Pastel Colors for Filters */
+            --pastel-blue: #e0f2fe;
+            --pastel-blue-dark: #1e40af;
+            --pastel-pink: #fce7f3;
+            --pastel-pink-dark: #831843;
+            --pastel-green: #dcfce7;
+            --pastel-green-dark: #14532d;
+            --pastel-purple: #f3e8ff;
+            --pastel-purple-dark: #581c87;
+            --pastel-orange: #fff7ed;
+            --pastel-orange-dark: #7c2d12;
+            --pastel-cyan: #e0f7fa;
+            --pastel-cyan-dark: #006064;
+            --pastel-lime: #f0f4c3;
+            --pastel-lime-dark: #558b2f;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary-light);
+            transition: background-color 0.4s ease, color 0.4s ease;
+            padding-top: 64px; /* Only header height */
+            padding-bottom: 70px;
+        }
+
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-primary-dark);
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+        }
+
+        /* --- Reusable Header --- */
+        .app-header {
+            position: fixed; top: 0; left: 0; right: 0; height: 64px;
+            display: flex; align-items: center; justify-content: center;
+            background: var(--card-bg-light);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+            z-index: 1000; transition: all 0.4s ease;
+        }
+        body.dark-mode .app-header {
+            background: var(--card-bg-dark);
+            box-shadow: 0 1px 5px rgba(255, 255, 255, 0.05);
+        }
+        .header-content-wrapper {
+            width: 100%; max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 0 24px;
+        }
+        .app-header .logo-img {
+            height: 40px; /* Adjust logo height as needed */
+            width: auto;
+        }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .icon-btn {
+            font-size: 20px; color: var(--text-secondary-light); cursor: pointer;
+            width: 40px; height: 40px; display: grid; place-items: center;
+            border-radius: 50%; transition: all 0.2s;
+        }
+        body.dark-mode .icon-btn { color: var(--text-secondary-dark); }
+        .icon-btn:hover { background-color: rgba(0, 0, 0, 0.05); }
+        body.dark-mode .icon-btn:hover { background-color: rgba(255, 255, 255, 0.1); }
+
+        /* --- Main Content Wrapper --- */
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* --- Notes Hero Section --- */
+        .notes-hero {
+            text-align: center;
+            padding: 60px 0 40px;
+            background-color: var(--card-bg-light);
+            border-bottom: 1px solid var(--border-light);
+            position: relative;
+            overflow: hidden;
+        }
+        body.dark-mode .notes-hero {
+            background-color: var(--card-bg-dark);
+            border-bottom-color: var(--border-dark);
+        }
+        .notes-hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="2" fill="%23e2e8f0"/><circle cx="75" cy="75" r="2" fill="%23e2e8f0"/></svg>');
+            background-size: 20px;
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 1;
+        }
+        body.dark-mode .notes-hero::before {
+            background-image: url('data:image/svg+xml;utf8,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="25" cy="25" r="2" fill="%23334155"/><circle cx="75" cy="75" r="2" fill="%23334155"/></svg>');
+        }
+        .notes-hero > .main-content { position: relative; z-index: 2; }
+
+        .notes-hero h2 {
+            font-size: clamp(1.2rem, 3vw, 1.5rem);
+            color: var(--primary-start);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .notes-hero h1 {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            color: var(--text-primary-light);
+            margin-bottom: 15px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .notes-hero p {
+            font-size: clamp(1rem, 2.5vw, 1.2rem);
+            color: var(--text-secondary-light);
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+        }
+        body.dark-mode .notes-hero p {
+            color: var(--text-secondary-dark);
+        }
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .search-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1rem;
+            color: var(--text-secondary-light);
+        }
+        .search-input {
+            width: 100%;
+            padding: 18px 20px 18px 55px;
+            font-size: 1rem;
+            border-radius: 50px;
+            border: 1px solid var(--border-light);
+            background-color: var(--bg-light);
+            transition: all 0.3s;
+            color: var(--text-primary-light);
+        }
+        body.dark-mode .search-input {
+            border-color: var(--border-dark);
+            background-color: var(--card-bg-dark);
+            color: var(--text-primary-dark);
+        }
+        .search-input::placeholder {
+            color: var(--text-secondary-light);
+            opacity: 0.8;
+        }
+        body.dark-mode .search-input::placeholder {
+            color: var(--text-secondary-dark);
+        }
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-start);
+            box-shadow: 0 0 0 4px rgba(76, 81, 191, 0.2);
+        }
+
+        /* --- Notes Filter Bar --- */
+        .notes-filter-bar {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 30px 0;
+            margin-top: -20px; /* Overlap with hero a bit */
+            position: relative;
+            z-index: 5;
+        }
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .filter-btn i { opacity: 0.8; }
+        .filter-btn .fa-angle-down { margin-left: 5px; }
+
+        .filter-btn.books { background-color: var(--pastel-blue); color: var(--pastel-blue-dark); }
+        .filter-btn.pyqs { background-color: var(--pastel-pink); color: var(--pastel-pink-dark); }
+        .filter-btn.notes { background-color: var(--pastel-purple); color: var(--pastel-purple-dark); }
+        .filter-btn.ca { background-color: var(--pastel-green); color: var(--pastel-green-dark); }
+        .filter-btn.resources { background-color: var(--pastel-orange); color: var(--pastel-orange-dark); }
+        .filter-btn.mock { background-color: var(--pastel-cyan); color: var(--pastel-cyan-dark); }
+
+
+        .filter-btn:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        
+        .dropdown { position: relative; }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 110%;
+            left: 0;
+            background-color: var(--card-bg-light);
+            min-width: 200px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border-radius: 12px;
+            z-index: 10;
+            padding: 8px 0;
+            border: 1px solid var(--border-light);
+            text-align: left;
+        }
+        body.dark-mode .dropdown-content {
+             background-color: var(--card-bg-dark);
+             border-color: var(--border-dark);
+        }
+        .dropdown-content a {
+            color: var(--text-primary-light);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            font-size: 0.9rem;
+        }
+        body.dark-mode .dropdown-content a { color: var(--text-primary-dark); }
+        .dropdown-content a:hover { background-color: var(--bg-light); }
+        body.dark-mode .dropdown-content a:hover { background-color: var(--border-dark); }
+        .dropdown.active .dropdown-content { display: block; }
+
+        /* --- Section Titles --- */
+        .section-title {
+            font-size: 1.8rem;
+            margin-top: 50px;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-light);
+            color: var(--text-primary-light);
+        }
+        body.dark-mode .section-title { border-bottom-color: var(--border-dark); color: var(--text-primary-dark); }
+
+        /* --- Notes Grid --- */
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+        .note-card {
+            background-color: var(--card-bg-light);
+            border-radius: 16px;
+            border: 1px solid var(--border-light);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+        body.dark-mode .note-card {
+            background-color: var(--card-bg-dark);
+            border-color: var(--border-dark);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .note-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        body.dark-mode .note-card:hover { box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3); }
+
+        .note-card-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--border-light);
+        }
+        body.dark-mode .note-card-image { border-bottom-color: var(--border-dark); }
+        .note-card-content { padding: 24px; flex-grow: 1; display: flex; flex-direction: column; }
+        .note-card h3 { font-size: 1.25rem; margin-bottom: 8px; line-height: 1.3; }
+        .note-card p {
+            font-size: 0.95rem; color: var(--text-secondary-light);
+            line-height: 1.6; margin-bottom: 16px; flex-grow: 1;
+        }
+        body.dark-mode .note-card p { color: var(--text-secondary-dark); }
+        .note-card-footer {
+            padding: 16px 24px;
+            background-color: var(--bg-light);
+            border-top: 1px solid var(--border-light);
+            text-align: center;
+        }
+        body.dark-mode .note-card-footer {
+            background-color: #0f172a;
+            border-top-color: var(--border-dark);
+        }
+        .action-btn {
+            background: var(--primary-gradient); color: white;
+            padding: 10px 20px; border-radius: 8px;
+            text-decoration: none; font-weight: 500;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+        .action-btn:hover { box-shadow: 0 5px 15px rgba(0,0,0,0.15); transform: scale(1.03); }
+
+        /* --- Explore by Subject Grid --- */
+        .subject-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 20px;
+            padding-bottom: 50px;
+        }
+        .subject-item {
+            background-color: var(--card-bg-light);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-primary-light);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        body.dark-mode .subject-item {
+            background-color: var(--card-bg-dark);
+            border-color: var(--border-dark);
+            color: var(--text-primary-dark);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .subject-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            border-color: var(--primary-start);
+        }
+        body.dark-mode .subject-item:hover {
+             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        .subject-item i {
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .subject-item span {
+            font-size: 0.9rem;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        /* --- Sidebar & Overlay --- */
+        .sidebar-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); z-index: 1001; display: none;
+        }
+        .sidebar-overlay.active { display: block; }
+        .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--card-bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
+        body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
+        .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
+        .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
+        .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+
+        /* --- Reusable Footer --- */
+        .site-footer {
+            width: 100%; background-color: var(--card-bg-light); color: var(--text-secondary-light);
+            padding: 50px 0 30px; margin-top: 40px; border-top: 1px solid var(--border-light);
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+        body.dark-mode .site-footer {
+            background-color: var(--card-bg-dark); color: var(--text-secondary-dark);
+            border-top-color: var(--border-dark);
+        }
+        .footer-content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+        .footer-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        .footer-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--text-primary-light);
+        }
+        body.dark-mode .footer-title {
+            color: var(--text-primary-dark);
+        }
+        .footer-links ul {
+            list-style: none;
+        }
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        .footer-links a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.2s ease;
+        }
+        .footer-links a:hover {
+            color: var(--primary-start);
+        }
+        .footer-social a {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            color: white;
+            font-size: 1rem;
+            margin-right: 10px;
+            text-decoration: none;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .footer-social a:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-light);
+            margin-top: 20px; font-size: 0.85rem; }
+        body.dark-mode .footer-bottom { border-top-color: var(--border-dark); }
+        .footer-bottom a { color: inherit; font-weight: 500; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; color: var(--primary-end); }
+
+        /* --- Reusable Bottom Nav --- */
+        .bottom-nav {
+            position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
+            background: var(--card-bg-light); border-top: 1px solid var(--border-light);
+            display: flex; justify-content: space-around; z-index: 1000;
+        }
+        body.dark-mode .bottom-nav {
+            background: var(--card-bg-dark); border-top-color: var(--border-dark);
+        }
+        .nav-item {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: var(--text-secondary-light); text-decoration: none; flex-grow: 1;
+            transition: color 0.2s, transform 0.2s; cursor: pointer;
+        }
+        body.dark-mode .nav-item { color: var(--text-secondary-dark); }
+        .nav-item i { font-size: 20px; margin-bottom: 4px; }
+        .nav-item span { font-size: 11px; font-weight: 500; }
+        .nav-item.active, .nav-item:hover { color: var(--primary-start); }
+
+        /* Media Queries for Responsiveness */
+        @media (max-width: 768px) {
+            .notes-filter-bar {
+                justify-content: flex-start;
+                overflow-x: auto;
+                padding-bottom: 15px;
+                scroll-snap-type: x mandatory;
+                -webkit-overflow-scrolling: touch;
+            }
+            .notes-filter-bar::-webkit-scrollbar { display: none; }
+            .filter-btn { flex-shrink: 0; scroll-snap-align: start; }
+            .notes-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="app-header">
+        <div class="header-content-wrapper">
+            <a href="index.html" class="logo">
+                <img src="images/LOGO.jpg" alt="UPSC Hub Logo" class="logo-img">
+            </a>
+            <div class="header-right">
+                <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="sidebar-overlay"></div>
+    
+    <div class="side-bar">
+        <div class="sidebar-header">
+            <h3 class="title">Complete Menu</h3>
+            <div id="close-btn"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="profile">
+            <img src="images/LOGO.jpg" alt="UPSC Hub Logo">
+            <h3 class="name">UPSC Hub</h3>
+            <p class="role">Your Success Partner</p>
+        </div>
+        <nav class="navbar">
+            <div class="sidebar-category"><h4>Learn</h4></div>
+            <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+            <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+            <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
+            <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+            <div class="sidebar-category"><h4>Practice & Tools</h4></div>
+            <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+            <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+            <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test details</span></a>
+            <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+            <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+            <div class="sidebar-category"><h4>Resources</h4></div>
+            <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+            <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+            <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+            <div class="sidebar-category"><h4>Support & Info</h4></div>
+            <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+            <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+            <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+            <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+        </nav>
+    </div>
+
+    <main>
+        <section class="notes-hero">
+            <div class="main-content">
+                <h2>Welcome to Your Knowledge Hub</h2>
+                <h1>Find the Best UPSC Notes & Resources</h1>
+                <p>Dive into our meticulously curated collection of study materials, previous year questions, current affairs, and more, designed to streamline your preparation.</p>
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" placeholder="Search for notes, e.g., 'Indian Economy', 'Art & Culture PYQs'">
+                </div>
+            </div>
+        </section>
+
+        <div class="main-content">
+            <nav class="notes-filter-bar">
+                <button class="filter-btn books"><i class="fas fa-book-open"></i> Books & Magazines</button>
+                <div class="dropdown" id="pyqs-dropdown">
+                    <button class="filter-btn pyqs"><i class="fas fa-medal"></i> UPSC PYQs <i class="fas fa-angle-down"></i></button>
+                    <div class="dropdown-content">
+                        <a href="#">Prelims GS Paper I</a>
+                        <a href="#">Prelims GS Paper II (CSAT)</a>
+                        <a href="#">Mains GS Paper I</a>
+                        <a href="#">Mains GS Paper II</a>
+                        <a href="#">Mains GS Paper III</a>
+                        <a href="#">Mains GS Paper IV</a>
+                    </div>
+                </div>
+                <div class="dropdown" id="notes-dropdown">
+                    <button class="filter-btn notes"><i class="fas fa-feather-alt"></i> UPSC Notes <i class="fas fa-angle-down"></i></button>
+                    <div class="dropdown-content">
+                        <a href="Polity.notes.html">Polity & Governance</a>
+                        <a href="#">History & Art Culture</a>
+                        <a href="#">Economy & Budget</a>
+                        <a href="#">Environment & Ecology</a>
+                        <a href="#">Science & Technology</a>
+                        <a href="#">Geography & Disaster Mgmt.</a>
+                        <a href="#">International Relations</a>
+                    </div>
+                </div>
+                <button class="filter-btn ca"><i class="fas fa-newspaper"></i> Current Affairs & Editorials</button>
+                <button class="filter-btn mock"><i class="fas fa-clipboard-check"></i> Mock Test Analysis</button>
+                <button class="filter-btn resources"><i class="fas fa-list-alt"></i> Other Resources</button>
+            </nav>
+
+            <section class="notes-grid-container">
+                 <h2 class="section-title">Welcome ! Future bureaucrats
+...</h2>
+                 <div class="notes-grid">
+                     </div>
+            </section>
+
+            <section class="notes-grid-container">
+                <h2 class="section-title">Explore by Subject</h2>
+                <div class="subject-grid">
+                    <a href="Polity.notes.html" class="subject-item">
+                        <i class="fas fa-landmark"></i>
+                        <span>Polity & Governance</span>
+                    </a>
+                    <a href="#" class="subject-item">
+                        <i class="fas fa-history"></i>
+                        <span>History & Art Culture</span>
+                    </a>
+                    <a href="#" class="subject-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Economy & Budget</span>
+                    </a>
+                    <a href="#" class="subject-item">
+                        <i class="fas fa-leaf"></i>
+                        <span>Environment & Ecology</span>
+                    </a>
+                    <a href="#" class="subject-item">
+                        <i class="fas fa-flask"></i>
+                        <span>Science & Technology</span>
+                    </a>
+                    <a href="#" class="subject-item">
+                        <i class="fas fa-map-marked-alt"></i>
+                        <span>Geography & Disaster Mgmt.</span>
+                    </a>
+                     <a href="#" class="subject-item">
+                        <i class="fas fa-globe"></i>
+                        <span>International Relations</span>
+                    </a>
+                     <a href="#" class="subject-item">
+                        <i class="fas fa-gavel"></i>
+                        <span>Ethics & Integrity</span>
+                    </a>
+                </div>
+            </section>
+        </div>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-content-wrapper">
+            <div class="footer-container">
+                <div class="footer-about">
+                    <h3 class="footer-title">UPSC Hub</h3>
+                    <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
+                </div>
+                <div class="footer-links">
+                    <h3 class="footer-title">Quick Links</h3>
+                    <ul>
+                        <li><a href="about.html">About Us</a></li>
+                        <li><a href="contact.html">Contact Support</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="TESTseries-daily.html">Test Series</a></li>
+                    </ul>
+                </div>
+                <div class="footer-social">
+                    <h3 class="footer-title">Connect With Us</h3>
+                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2024 UPSC Hub. All Rights Reserved.</p>
+                <p><a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms of Use</a></p>
+            </div>
+        </div>
+    </footer>
+    
+    <nav class="bottom-nav">
+        <a href="homeUPSChub.html" class="nav-item"> <i class="fas fa-home"></i> <span>Home</span> </a>
+        <a href="planner.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>Planner</span> </a>
+        <a href="notes.html" class="nav-item active"> <i class="fas fa-book-open"></i> <span>Notes</span> </a>
+        <div id="menu-btn" class="nav-item"> <i class="fas fa-bars"></i> <span>Menu</span> </div>
+    </nav>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Theme toggle logic
+            const toggleBtn = document.querySelector('#toggle-btn');
+            const body = document.body;
+            const applyTheme = (theme) => {
+                body.classList.toggle('dark-mode', theme === 'dark');
+                toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+                toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+            };
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            applyTheme(savedTheme);
+            toggleBtn.addEventListener('click', () => {
+                const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
+                localStorage.setItem('theme', newTheme);
+                applyTheme(newTheme);
+            });
+
+            // Sidebar toggle logic
+            const menuBtn = document.querySelector('#menu-btn');
+            const closeBtn = document.querySelector('#close-btn');
+            const sideBar = document.querySelector('.side-bar');
+            const sidebarOverlay = document.querySelector('.sidebar-overlay');
+            if (menuBtn && sideBar && sidebarOverlay) {
+                menuBtn.addEventListener('click', () => {
+                    sideBar.classList.add('active');
+                    sidebarOverlay.classList.add('active');
+                });
+            }
+            if (closeBtn && sideBar && sidebarOverlay) {
+                closeBtn.addEventListener('click', () => {
+                    sideBar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
+            if (sidebarOverlay && sideBar) {
+                sidebarOverlay.addEventListener('click', () => {
+                    sideBar.classList.remove('active');
+                    sidebarOverlay.classList.remove('active');
+                });
+            }
+
+            // Dropdown toggle for filter bar
+            document.querySelectorAll('.dropdown').forEach(dropdown => {
+                const button = dropdown.querySelector('.filter-btn');
+                button.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    dropdown.classList.toggle('active');
+                    document.querySelectorAll('.dropdown.active').forEach(otherDropdown => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.classList.remove('active');
+                        }
+                    });
+                });
+            });
+            document.addEventListener('click', (event) => {
+                document.querySelectorAll('.dropdown.active').forEach(dropdown => {
+                    if (!dropdown.contains(event.target)) {
+                        dropdown.classList.remove('active');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
