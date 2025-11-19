@@ -11,11 +11,11 @@
 
     <style>
         :root {
-            --primary-start: #4c51bf;
-            --primary-end: #3b82f6;
+            --primary-start: #4c51bf; /* Indigo-ish */
+            --primary-end: #3b82f6;   /* Blue-ish */
             --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
             --primary-bg-gradient: radial-gradient(circle at 10% 20%, #90a5f8, transparent 50%),
-                                  radial-gradient(circle at 80% 70%, #9d6efc, transparent 50%);
+                                   radial-gradient(circle at 80% 70%, #9d6efc, transparent 50%);
 
             /* Light Mode */
             --bg-light: #f1f5f9;
@@ -30,6 +30,11 @@
             --text-primary-dark: #f8fafc;
             --text-secondary-dark: #94a3b8;
             --border-dark: #334155;
+
+            /* UPSC Card Colors (Derived from the first snippet) */
+            --upsc-prelims: #2563eb;
+            --upsc-mains: #dc2626;
+            --upsc-interview: #059669;
         }
 
         * {
@@ -75,7 +80,7 @@
             box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
             z-index: 1000;
             transition: all 0.4s ease;
-            padding: 0; /* Ensures 100% width */
+            padding: 0;
         }
         body.dark-mode .app-header {
             background: var(--card-bg-dark);
@@ -171,7 +176,232 @@
             color: var(--text-secondary-dark);
         }
 
-        /* --- Quick Actions --- */
+        /* --- UPSC Prep Hub Section (Integrated Styles) --- */
+        .upsc-prep-hub {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .hub-title-pill {
+            background: var(--card-bg-light);
+            padding: 8px 20px;
+            border-radius: 100px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 15px;
+            animation: fadeDown 0.6s ease-out forwards;
+        }
+        body.dark-mode .hub-title-pill {
+            background: var(--card-bg-dark);
+            box-shadow: 0 4px 15px rgba(255,255,255,0.05), 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        .hub-main-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary-light);
+            margin: 0;
+            letter-spacing: -0.3px;
+        }
+        body.dark-mode .hub-main-title { color: var(--text-primary-dark); }
+        .hub-title-icon {
+            font-size: 0.9rem;
+            color: white;
+            background: var(--upsc-prelims);
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(37, 99, 235, 0.3);
+        }
+
+        .tree-structure {
+            width: 100%;
+            max-width: 700px; /* Adjusted max width for better fit */
+            height: 80px;
+            position: relative;
+            margin: 0 auto -2px;
+            pointer-events: none;
+        }
+        .tree-svg {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+        .branch-path {
+            fill: none;
+            stroke: var(--border-light);
+            stroke-width: 2;
+            stroke-linecap: round;
+        }
+        body.dark-mode .branch-path { stroke: var(--border-dark); }
+        .flow-path {
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-dasharray: 6 120;
+            animation: flowData 2s infinite linear;
+            opacity: 1;
+        }
+        .joint-circle {
+            fill: var(--card-bg-light);
+            stroke-width: 2;
+            r: 4;
+        }
+        body.dark-mode .joint-circle { fill: var(--card-bg-dark); }
+
+
+        /* UPSC Cards (Nodes) */
+        .nodes-container {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            width: 100%;
+            max-width: 700px; /* Matches tree width */
+            margin: 0 auto;
+            perspective: 1000px;
+        }
+        .node-card {
+            flex: 1;
+            position: relative;
+            background: var(--card-bg-light);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03), 0 0 0 1px rgba(0,0,0,0.05);
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: slideUp 0.5s ease-out forwards;
+        }
+        body.dark-mode .node-card {
+            background: var(--card-bg-dark);
+            box-shadow: 0 4px 6px -1px rgba(255, 255, 255, 0.05), 0 2px 4px -1px rgba(255, 255, 255, 0.03), 0 0 0 1px rgba(255,255,255,0.05);
+        }
+
+        .card-body {
+            padding: 20px 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        .node-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 12px;
+            transition: transform 0.3s ease;
+            background: #f1f5f9;
+        }
+
+        /* Styles per type */
+        .prelims .node-icon { color: var(--upsc-prelims); background: #eff6ff; }
+        .mains .node-icon { color: var(--upsc-mains); background: #fef2f2; }
+        .interview .node-icon { color: var(--upsc-interview); background: #f0fdf4; }
+
+        /* Staggered Animation */
+        .mains { animation-delay: 0.1s; }
+        .interview { animation-delay: 0.2s; }
+
+        /* Typography */
+        .node-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-primary-light);
+            margin-bottom: 4px;
+        }
+        body.dark-mode .node-title { color: var(--text-primary-dark); }
+        .node-desc {
+            font-size: 0.75rem;
+            color: var(--text-secondary-light);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            max-width: 200px;
+        }
+        body.dark-mode .node-desc { color: var(--text-secondary-dark); }
+
+        /* Button Styles */
+        .card-btn {
+            padding: 8px 24px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .prelims .card-btn {
+            color: var(--upsc-prelims);
+            background: rgba(37, 99, 235, 0.1);
+            border: 1px solid rgba(37, 99, 235, 0.1);
+        }
+        .prelims .card-btn:hover {
+            background: var(--upsc-prelims);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .mains .card-btn {
+            color: var(--upsc-mains);
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid rgba(220, 38, 38, 0.1);
+        }
+        .mains .card-btn:hover {
+            background: var(--upsc-mains);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .interview .card-btn {
+            color: var(--upsc-interview);
+            background: rgba(5, 150, 105, 0.1);
+            border: 1px solid rgba(5, 150, 105, 0.1);
+        }
+        .interview .card-btn:hover {
+            background: var(--upsc-interview);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+
+        /* Hover Effects */
+        .node-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0,0,0,0.05);
+        }
+        body.dark-mode .node-card:hover {
+            box-shadow: 0 10px 25px -5px rgba(255, 255, 255, 0.1), 0 0 0 1px rgba(255,255,255,0.05);
+        }
+        .node-card:hover .node-icon {
+            transform: scale(1.1) rotate(10deg);
+        }
+
+        /* Animated Top Border on Hover */
+        .node-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: #e2e8f0;
+            transform: scaleX(0);
+            transform-origin: center;
+            transition: transform 0.3s ease;
+        }
+
+        .node-card.prelims:hover::before { background: var(--upsc-prelims); transform: scaleX(1); }
+        .node-card.mains:hover::before { background: var(--upsc-mains); transform: scaleX(1); }
+        .node-card.interview:hover::before { background: var(--upsc-interview); transform: scaleX(1); }
+
+        /* --- Quick Actions (re-used from target) --- */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -211,15 +441,8 @@
             font-size: 0.8rem;
             font-weight: 500;
         }
-        .new-badge {
-            position: absolute;
-            top: 5px; right: 5px;
-            background: #e11d48; color: #fff;
-            font-size: 10px; font-weight: bold;
-            padding: 2px 6px; border-radius: 10px;
-            animation: pulse 1.5s infinite;
-        }
-        
+
+
         /* --- AI Section --- */
         .ai-section {
             background-color: var(--card-bg-light);
@@ -237,7 +460,7 @@
             border-color: var(--border-dark);
         }
         .ai-section::before {
-            content: "\f0d0"; /* Font Awesome brain icon */
+            content: "\f0d0";
             font-family: "Font Awesome 5 Free";
             font-weight: 900;
             position: absolute;
@@ -313,7 +536,7 @@
         .ai-tool-card .action-link i { margin-left: 5px; transition: transform 0.2s; }
         .ai-tool-card:hover .action-link i { transform: translateX(4px); }
 
-        /* --- Dashboard Grid & Cards --- */
+        /* --- Dashboard Grid & Cards (re-used from target) --- */
         .card-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -343,12 +566,12 @@
         body.dark-mode .card:hover {
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
-        
+
         .card-img {
-            width: calc(100% + 48px); /* Counteract padding */
+            width: calc(100% + 48px);
             height: 150px;
             object-fit: cover;
-            margin: -24px -24px 20px -24px; /* Negative margin to make it flush, plus bottom margin */
+            margin: -24px -24px 20px -24px;
             border-radius: 16px 16px 0 0;
         }
 
@@ -399,7 +622,7 @@
             box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
 
-        /* --- Sidebar & Overlay --- */
+        /* --- Sidebar, Footer, Bottom Nav styles (re-used from target) --- */
         .sidebar-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.5); z-index: 1001; display: none;
@@ -411,7 +634,6 @@
         .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
         .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
         
-        /* --- Footer --- */
         .site-footer {
             width: 100%;
             background-color: var(--card-bg-light);
@@ -441,7 +663,6 @@
         .footer-bottom a { color: inherit; font-weight: 500; text-decoration: none; }
         .footer-bottom a:hover { text-decoration: underline; color: var(--primary-end); }
         
-        /* --- Bottom Navigation --- */
         .bottom-nav {
             position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
             background: var(--card-bg-light); border-top: 1px solid var(--border-light);
@@ -463,12 +684,27 @@
         .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
         
         /* --- Animations --- */
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slideUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes flowData {
+            to { stroke-dashoffset: -126; }
+        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes popIn { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
         @keyframes pulse { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.7); } 50% { transform: scale(1.05); box-shadow: 0 0 0 5px rgba(225, 29, 72, 0); } }
 
         /* Responsive */
+        @media (max-width: 700px) {
+            .nodes-container { flex-direction: column; gap: 12px; max-width: 90%; }
+            .tree-structure { display: none; }
+            .upsc-prep-hub { margin-bottom: 20px; }
+        }
         @media (max-width: 768px) {
             .quick-actions, .ai-tools-grid { grid-template-columns: 1fr; }
         }
@@ -535,6 +771,76 @@
             <p>Structured resources, expert analysis, and powerful tools to ace the Civil Services Exam.</p>
         </section>
 
+        <section class="upsc-prep-hub">
+            <div class="hub-title-pill">
+                <div class="hub-title-icon"><i class="fas fa-layer-group"></i></div>
+                <h2 class="hub-main-title">UPSC Exam Stages</h2>
+            </div>
+
+            <div class="tree-structure">
+                <svg class="tree-svg" viewBox="0 0 700 80" preserveAspectRatio="none">
+                    <defs>
+                        <linearGradient id="grad-blue" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#e2e8f0" />
+                            <stop offset="100%" stop-color="var(--upsc-prelims)" />
+                        </linearGradient>
+                        <linearGradient id="grad-red" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#e2e8f0" />
+                            <stop offset="100%" stop-color="var(--upsc-mains)" />
+                        </linearGradient>
+                        <linearGradient id="grad-green" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#e2e8f0" />
+                            <stop offset="100%" stop-color="var(--upsc-interview)" />
+                        </linearGradient>
+                    </defs>
+
+                    <path class="branch-path" d="M350,0 L350,20" />
+                    
+                    <path class="branch-path" d="M350,20 C350,60 116,30 116,80" />
+                    <path class="flow-path" stroke="url(#grad-blue)" d="M350,20 C350,60 116,30 116,80" />
+
+                    <path class="branch-path" d="M350,20 L350,80" />
+                    <path class="flow-path" stroke="url(#grad-red)" d="M350,20 L350,80" />
+
+                    <path class="branch-path" d="M350,20 C350,60 583,30 583,80" />
+                    <path class="flow-path" stroke="url(#grad-green)" d="M350,20 C350,60 583,30 583,80" />
+
+                    <circle class="joint-circle" cx="350" cy="20" stroke="#94a3b8" />
+                    <circle class="joint-circle" cx="116" cy="80" stroke="var(--upsc-prelims)" />
+                    <circle class="joint-circle" cx="350" cy="80" stroke="var(--upsc-mains)" />
+                    <circle class="joint-circle" cx="583" cy="80" stroke="var(--upsc-interview)" />
+                </svg>
+            </div>
+
+            <div class="nodes-container">
+                <div class="node-card prelims">
+                    <div class="card-body">
+                        <div class="node-icon"><i class="fas fa-bullseye"></i></div>
+                        <span class="node-title">Prelims</span>
+                        <p class="node-desc">GS, CSAT & Trends</p>
+                        <a href="prelims.html" class="card-btn">Open <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="node-card mains">
+                    <div class="card-body">
+                        <div class="node-icon"><i class="fas fa-pen-fancy"></i></div>
+                        <span class="node-title">Mains</span>
+                        <p class="node-desc">Answer Writing & Essay</p>
+                        <a href="mains.html" class="card-btn">Open <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="node-card interview">
+                    <div class="card-body">
+                        <div class="node-icon"><i class="fas fa-user-tie"></i></div>
+                        <span class="node-title">Interview</span>
+                        <p class="node-desc">DAF & Personality</p>
+                        <a href="interview.html" class="card-btn">Open <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
         <section class="quick-actions">
             <a href="notes.html" class="quick-action-item">
                 <div class="quick-action-icon"><i class="fas fa-sticky-note"></i></div>
@@ -562,7 +868,7 @@
 
             <div class="ai-tools-grid">
                 <a href="UPSChubAI/AI.UPSChub.html" class="ai-tool-card">
-                   <h4>UPSChub.ai</h4>
+                    <h4>UPSChub.ai</h4>
 <p>Your AI-powered UPSC companion — from quizzes and answer evaluation to personalized learning and smart revisions.</p>
 <span class="action-link"> Explore UPSChub.ai <i class="fas fa-arrow-right"></i></span>
 
