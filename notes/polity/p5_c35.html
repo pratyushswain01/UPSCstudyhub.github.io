@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subordinate Courts - UPSChub</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Custom style from template for icon lists */
+        .icon-list li {
+            display: flex;
+            align-items: flex-start;
+        }
+        .icon-list i {
+            margin-top: 0.25em; /* Aligns icon with the first line of text */
+            margin-right: 0.75rem;
+            flex-shrink: 0; /* Prevents icon from shrinking */
+        }
+        /* Assuming watermark-bg is a pseudo-element or complex background */
+        .watermark-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            opacity: 0.03; /* Example opacity */
+            background-image: url('../../images/LOGO.jpg'); /* Example path */
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: 400px;
+            pointer-events: none; /* Allows clicking through */
+        }
+        /* Custom styles for notes content */
+        .notes-content p, .notes-content li {
+            line-height: 1.6;
+        }
+        .notes-content h4 {
+            line-height: 1.4;
+        }
+        .notes-content table ul {
+            list-style-position: inside;
+            list-style-type: disc;
+            padding-left: 1rem;
+        }
+
+        /* --- CSS FOR TREE STRUCTURE DIAGRAM --- */
+        .tree {
+            width: 100%;
+            overflow-x: auto;
+            padding-bottom: 40px;
+            text-align: center;
+        }
+        .tree ul {
+            padding-top: 20px; 
+            position: relative;
+            transition: all 0.5s;
+            display: flex;
+            justify-content: center;
+        }
+        .tree li {
+            float: left; text-align: center;
+            list-style-type: none;
+            position: relative;
+            padding: 20px 5px 0 5px;
+            transition: all 0.5s;
+        }
+        /* Connectors */
+        .tree li::before, .tree li::after{
+            content: ''; 
+            position: absolute; top: 0; right: 50%;
+            border-top: 2px solid #9ca3af; 
+            width: 50%; height: 20px;
+        }
+        .tree li::after{
+            right: auto; left: 50%;
+            border-left: 2px solid #9ca3af;
+        }
+        .tree li:only-child::after, .tree li:only-child::before {
+            display: none;
+        }
+        .tree li:only-child{ padding-top: 0;}
+        .tree li:first-child::before, .tree li:last-child::after{
+            border: 0 none;
+        }
+        .tree li:last-child::before{
+            border-right: 2px solid #9ca3af;
+            border-radius: 0 5px 0 0;
+        }
+        .tree li:first-child::after{
+            border-radius: 5px 0 0 0;
+        }
+        .tree ul ul::before{
+            content: ''; 
+            position: absolute; top: 0; left: 50%;
+            border-left: 2px solid #9ca3af;
+            width: 0; height: 20px;
+        }
+        /* Tree Boxes */
+        .tree-box {
+            border: 2px solid #2563eb;
+            padding: 8px 10px;
+            text-decoration: none;
+            color: #1e293b;
+            font-family: arial, verdana, tahoma;
+            font-size: 13px;
+            font-weight: bold;
+            display: inline-block;
+            border-radius: 5px;
+            background: white;
+            min-width: 100px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .tree-box:hover {
+            background-color: #eff6ff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+        }
+        /* Branch Specific Colors */
+        .t-civil { border-color: #10b981; color: #064e3b; }
+        .t-criminal { border-color: #ef4444; color: #7f1d1d; }
+        .t-metro { border-color: #f59e0b; color: #78350f; }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen font-sans bg-gray-100">
+
+    <div class="watermark-bg"></div>
+
+    <header class="bg-white shadow-md sticky top-0 z-20">
+        <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <img    
+                    src="../../images/LOGO.jpg"    
+                    alt="UPSChub Logo"    
+                    class="w-10 h-10 rounded-full"
+                />
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">UPSChub</h1>
+            </div>
+
+            <div id="header-datetime" class="text-right text-gray-600">
+                <div class="font-semibold text-sm md:text-lg" id="time-display">--:--:-- --</div>
+                <div class="text-xs" id="date-display">------------, ---- --, ----</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-8 relative z-10">
+        <div class="max-w-6xl mx-auto bg-white rounded-lg shadow-xl p-5 md:p-12 border-t-4 border-blue-600">
+            
+            <h2 class="text-3xl md:text-5xl font-extrabold text-center mb-6 md:mb-8 text-blue-800 leading-tight">Subordinate Courts in India</h2>
+            
+            <a href="../../Polity.notes.html" class="inline-flex items-center mb-8 md:mb-10 text-blue-600 hover:text-blue-800 transition-colors duration-300 group">
+                <i class="fas fa-arrow-left mr-3 group-hover:-translate-x-1 transition-transform"></i>
+                Back to Main Menu
+            </a>
+
+            <article class="notes-content">
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Role and Challenges in India’s Judicial Landscape</h3>
+                
+                <div class="text-base sm:text-lg bg-blue-50 p-4 md:p-6 rounded-xl border-l-4 border-blue-400 text-blue-900 shadow-sm">
+                    <p>India is a federal State with a single and <strong>unified judicial system</strong> with a <strong>three-tier structure</strong> – <strong>SUPREME COURT</strong> (at top), <strong>HIGH COURT</strong> (at state/s level) and <strong>SUBORDINATE COURTS</strong> (at district level).</p>
+                </div>
+                
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Constitutional Framework & Hierarchy</h3>
+                <div class="bg-gray-50 p-4 md:p-6 rounded-lg shadow-inner border border-gray-200 mt-6">
+                    <ul class="icon-list text-gray-800 text-sm md:text-base space-y-3">
+                        <li><i class="fas fa-book text-blue-600"></i><span><strong>Part VI (State):</strong> Spanning from <strong>Article 233 to 237</strong> of the Indian Constitution.</span></li>
+                        <li><i class="fas fa-sitemap text-blue-600"></i><span>The state judiciary includes a <strong>High Court (HC)</strong> and a hierarchy of subordinate courts, also known as lower courts, operating under the HC at district and lower levels.</span></li>
+                    </ul>
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Judicial Appointments</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div class="bg-blue-50 p-5 rounded-lg shadow-md border-l-4 border-blue-500">
+                        <h4 class="text-lg font-bold text-blue-800 mb-3"><i class="fas fa-user-tie mr-2"></i>District Judges (Art 233)</h4>
+                        <p class="text-sm mb-2">The <strong>GOVERNOR</strong> of the state, in consultation with the HC, is responsible for the appointment, posting, and promotion of district judges within the state.</p>
+                        <p class="text-sm font-semibold mt-3">Qualification Criteria:</p>
+                        <ul class="text-sm space-y-1 list-disc list-inside">
+                            <li>He should <strong>not</strong> already be in the service of the Central or the state.</li>
+                            <li>He should have been an <strong>advocate for seven years</strong>.</li>
+                            <li>He should be <strong>recommended by the HC</strong> for appointment.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-indigo-50 p-5 rounded-lg shadow-md border-l-4 border-indigo-500">
+                        <h4 class="text-lg font-bold text-indigo-800 mb-3"><i class="fas fa-users mr-2"></i>Other Judges</h4>
+                        <p class="text-sm">Made by the <strong>Governor</strong> of the state after consultation with the <strong>STATE PUBLIC SERVICE COMMISSION</strong> and the <strong>HC</strong> of the concerned state.</p>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Control and Jurisdiction</h3>
+                <div class="bg-gray-50 p-4 md:p-6 rounded-lg shadow-inner border border-gray-200 mt-6">
+                    <ul class="icon-list text-gray-800 text-sm md:text-base space-y-3">
+                        <li><i class="fas fa-gavel text-blue-600"></i><span><strong>High Court Control:</strong> The High Court has authority over district courts and other subordinate courts, including the posting, promotion, and leave of individuals in the state’s judicial service who hold positions below that of a district judge.</span></li>
+                        <li><i class="fas fa-user-shield text-blue-600"></i><span><strong>Magistrates:</strong> The <strong>Governor</strong> may direct that the above-mentioned provisions relating to persons in the state judicial service apply to any class or classes of magistrates in the state.</span></li>
+                        <li><i class="fas fa-map text-blue-600"></i><span><strong>Structure Variation:</strong> The states determine the organizational structure, jurisdiction, and nomenclature of the subordinate judiciary, leading to slight variations between states.</span></li>
+                        <li><i class="fas fa-layer-group text-blue-600"></i><span>Generally, there are <strong>three levels of civil and criminal courts</strong> below the state’s High Court.</span></li>
+                    </ul>
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Schematic- Hierarchical Structure</h3>
+                
+                <div class="space-y-6 text-gray-800 text-base md:text-lg mt-6">
+                    <div>
+                        <h4 class="text-xl font-bold text-blue-700 mb-2">1. District Judge</h4>
+                        <p>He is the <strong>highest judicial authority in the district</strong>.</p>
+                        <ul class="list-disc list-inside ml-4 mt-2 bg-gray-50 p-4 rounded-lg text-sm md:text-base">
+                            <li>In <strong>civil matters</strong>, the district judge is referred to as the <strong>District Judge</strong>.</li>
+                            <li>In <strong>criminal matters</strong>, the district judge is known as the <strong>Sessions Judge</strong>.</li>
+                            <li>The district judge has both <strong>original and appellate jurisdiction</strong> in civil and criminal cases.</li>
+                            <li>The district judge performs both judicial and administrative functions and has supervisory authority over all subordinate courts within the district.</li>
+                            <li><strong>Appeals:</strong> Appeals against the district judge’s orders and judgments can be made to the High Court.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xl font-bold text-blue-700 mb-2">2. Sessions Judge Powers</h4>
+                        <p>The Sessions Judge has the authority to impose any sentence, including <strong>life imprisonment</strong> and <strong>the death penalty</strong>.</p>
+                        <p class="mt-2 bg-yellow-50 p-2 border-l-4 border-yellow-500 rounded text-sm"><strong>Note:</strong> Capital punishment passed by him is <strong>subject to confirmation by the HC</strong>, whether there is an appeal or not.</p>
+                    </div>
+
+                    <div>
+                        <h4 class="text-xl font-bold text-blue-700 mb-2">3. Courts Below District Level</h4>
+                        <p>Below the District and Sessions Court, there is:</p>
+                        <ul class="list-disc list-inside ml-4 mt-2">
+                            <li>The <strong>Court of Subordinate Judge</strong> for civil cases.</li>
+                            <li>The Court of <strong>Chief Judicial Magistrate</strong> for criminal cases.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Economic Survey 2018-2019: Critical Issues</h3>
+                <div class="bg-red-50 p-4 md:p-6 rounded-lg shadow-inner border border-red-200 mt-6">
+                    <ul class="icon-list text-gray-800 text-sm md:text-base space-y-3">
+                        <li><i class="fas fa-exclamation-triangle text-red-600"></i><span>Indian judiciary system has over <strong>53 crore pending cases</strong> (subordinate courts comprises about <strong>87.54%</strong>).</span></li>
+                        <li><i class="fas fa-chart-line text-red-600"></i><span><strong>Case Clearance Rate (CCR)</strong> for Subordinate courts – <strong>89%</strong>. (Due to CCR below 100%, cases are accumulating – Resulting pendency).</span></li>
+                        <li><i class="fas fa-user-plus text-red-600"></i><span><strong>Additional judges required</strong> in year – 2279.</span></li>
+                        <li><i class="fas fa-users text-red-600"></i><span>To eliminate the backlog within the next five years, <strong>8,152 additional judges</strong> are required.</span></li>
+                        <li><i class="fas fa-chair text-red-600"></i><span>Lower courts are currently operating at <strong>79% of their sanctioned strength</strong>.</span></li>
+                        <li><i class="fas fa-business-time text-red-600"></i><span>The backlog impedes dispute resolution, contract enforcement, investment, project progression, tax collection, and increases legal costs, raising the cost of doing business and <strong>lowering the EoDB</strong> (Ease of Doing Business) rank.</span></li>
+                    </ul>
+                    <p class="mt-4 text-sm font-semibold">Subordinate courts play a crucial role in the lives of common people by conducting trials and resolving civil disputes.</p>
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Challenges Upholding Common Man’s Rights</h3>
+                <div class="bg-gray-50 p-4 md:p-6 rounded-lg shadow-inner border border-gray-200 mt-6">
+                    <p class="mb-4">Subordinate courts are closely involved in matters that affect the life of the common man, such as conducting trials and settling civil disputes.</p>
+                    <p>But, <strong>high levels of vacancy</strong> for the posts of judges and <strong>pendency</strong> of cases are major issues which <strong>impedes efficient and effective justice delivery</strong> to citizens.</p>
+                </div>
+
+                <h4 class="text-xl font-semibold text-gray-800 mt-8 mb-4">Issues Encountered</h4>
+                <ul class="icon-list text-gray-800 text-sm md:text-base space-y-3">
+                    <li><i class="fas fa-clipboard-list text-blue-600"></i><span><strong>Issues in Recruitment:</strong> Sluggishness and procrastination in the process of calling for applications, holding recruitment examinations and declaring the results. (Subordinate courts are working at 79% their sanctioned strength).</span></li>
+                    <li><i class="fas fa-clock text-blue-600"></i><span><strong>Pendency of Cases:</strong> District and Subordinate courts account for 54 percent of pending cases.</span></li>
+                    <li><i class="fas fa-balance-scale-right text-blue-600"></i><span><strong>Lack of uniformity</strong> in frequency of hearings among the Lower courts in the country.</span></li>
+                    <li><i class="fas fa-hourglass-end text-blue-600"></i><span><strong>Inordinate delays</strong> in evidence collection and examination of witnesses which impacts the overall process of the court.</span></li>
+                </ul>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Multi-Dimensional Impacts of Judicial Pendency</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                    <div class="bg-yellow-50 p-5 rounded-lg shadow-md border-l-4 border-yellow-500">
+                        <h4 class="text-lg font-bold text-yellow-800 mb-3"><i class="fas fa-gavel mr-2"></i>Justice & Society</h4>
+                        <ul class="text-sm space-y-2 list-disc list-inside">
+                            <li><strong>Delayed Justice, Denied Justice:</strong> Speedy trial is a part of right to life and liberty (Art 21).</li>
+                            <li><strong>Erosion of Social and Ethical Infrastructure:</strong> Negative effect on social development, higher crime rates and erodes credibility of institutions.</li>
+                            <li><strong>Overcrowding of Prisons:</strong> Beyond <strong>150%</strong> of the capacity, results in “violation of human rights”.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-red-50 p-5 rounded-lg shadow-md border-l-4 border-red-500">
+                        <h4 class="text-lg font-bold text-red-800 mb-3"><i class="fas fa-rupee-sign mr-2"></i>Economy</h4>
+                        <ul class="text-sm space-y-2 list-disc list-inside">
+                            <li><strong>Affects the Economy:</strong> Judicial delays cost India around <strong>1.5% of its GDP</strong> annually.</li>
+                            <li>Pendency obstructs dispute resolution and contract enforcement.</li>
+                            <li>Discourages investments, stalls projects, hampers tax collection.</li>
+                            <li>Escalates legal costs, increasing the cost of doing business.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">WAY FORWARD</h3>
+                <div class="bg-green-50 p-4 md:p-6 rounded-lg shadow-inner border border-green-200 mt-6">
+                    <ul class="icon-list text-gray-800 text-sm md:text-base space-y-4">
+                        <li><i class="fas fa-handshake text-green-600"></i><span><strong>Coordination:</strong> A smooth and timely appointment process necessitates close coordination between the High Court and the State Public Service Commissions.</span></li>
+                        <li><i class="fas fa-dumbbell text-green-600"></i><span><strong>Capacity Building:</strong> Enhancing the induction process and building the capacity of both manpower and resources.</span></li>
+                        <li><i class="fas fa-server text-green-600"></i><span><strong>Enhancing Infrastructure:</strong> Improving court infrastructure and utilizing ICT tools such as LIMBS and e-Courts.</span></li>
+                        <li><i class="fas fa-users-cog text-green-600"></i><span><strong>Proportionate Recruitment:</strong> Of legal and paralegal staff too has to be addressed.</span></li>
+                        <li><i class="fas fa-user-md text-green-600"></i><span><strong>Specialisation:</strong> Survey (2018) highlights the need for more judges specialised in criminal cases as these form a major portion of pending cases along with lower CCR.</span></li>
+                        <li><i class="fas fa-award text-green-600"></i><span>Create an <strong>All-India Judicial Service (AIJS)</strong> to attract the best talent in India’s legal profession.</span></li>
+                        <li><i class="fas fa-calendar-alt text-green-600"></i><span><strong>Increase in Number of Working Days:</strong> Average annual working days for subordinate courts is <strong>244</strong>– could improve productivity and efficiency.</span></li>
+                    </ul>
+                </div>
+
+                <hr class="my-12 border-t-4 border-gray-200">
+
+                <h3 class="text-3xl md:text-4xl font-extrabold text-center mb-8 text-gray-800">Structure and Jurisdiction (Visual Representation)</h3>
+                
+                <div class="tree w-full overflow-x-auto flex justify-center mb-10">
+                    <ul>
+                        <li>
+                            <a href="#" class="tree-box" style="background-color: #1e3a8a; color: white; border-color: #1e3a8a;">High Court</a>
+                            <ul>
+                                <li>
+                                    <a href="#" class="tree-box t-metro">Metropolitan Areas</a>
+                                    <ul>
+                                        <li><a href="#" class="tree-box t-metro">City Civil & Sessions Court</a></li>
+                                        <li><a href="#" class="tree-box t-metro">Metropolitan Magistrate's Court</a></li>
+                                        <li><a href="#" class="tree-box t-metro">Small Cause Courts</a></li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <a href="#" class="tree-box">District & Sessions Judge</a>
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="tree-box t-civil">Civil Side</a>
+                                            <ul>
+                                                <li>
+                                                    <a href="#" class="tree-box t-civil">Subordinate Judge's Court</a>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="#" class="tree-box t-civil">Munsiff's Court</a>
+                                                            <ul>
+                                                                <li><a href="#" class="tree-box t-civil">Nyaya Panchayat</a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="tree-box t-criminal">Criminal Side</a>
+                                            <ul>
+                                                <li>
+                                                    <a href="#" class="tree-box t-criminal">Chief Judicial Magistrate</a>
+                                                    <ul>
+                                                        <li>
+                                                            <a href="#" class="tree-box t-criminal">Judicial Magistrate</a>
+                                                            <ul>
+                                                                <li><a href="#" class="tree-box t-criminal">Panchayat Adalat</a></li>
+                                                            </ul>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <p class="text-center text-sm text-gray-500 italic">Note: The architecture of subordinate judiciary varies across the states and is broadly classified as shown in figure.</p>
+
+
+<p class="text-center text-sm text-gray-500 italic">T & C applied UPSChub </p>
+
+
+                    <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Key Notes from Document</h3>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
+                            <h4 class="text-xl font-bold text-blue-800 mb-3">District/Session's Judge</h4>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>Highest judicial authority in the district having original and appellate jurisdiction in both civil and criminal matters.</li>
+                                <li>He is known as district judge when he deals with civil cases and session's judge when dealing with criminal cases.</li>
+                                <li><strong>Note:</strong> Sessions judge can impose any sentence including life imprisonment and capital punishment (for capital punishment need to confirm from High Court).</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-600">
+                            <h4 class="text-xl font-bold text-green-800 mb-3">Subordinate Courts & Munsiffs</h4>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li><strong>Subordinate judges:</strong> Unlimited pecuniary jurisdiction; act as first appeals from munsiffs.</li>
+                                <li><strong>Munsiff's court:</strong> Jurisdiction determined by High Courts.</li>
+                                <li><strong>Small Cause courts:</strong> Decide small value civil cases only.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-yellow-500">
+                            <h4 class="text-xl font-bold text-yellow-800 mb-3">Metropolitan & Panchayat Courts</h4>
+                            <ul class="list-disc list-inside text-gray-700 space-y-2">
+                                <li>The civil judicial administration in previously presidency towns is currently taken up by metropolitan courts.</li>
+                                <li><strong>Panchayat courts:</strong> Function in civil and criminal areas under regional names like Nyaya Panchayat, Panchayat Adalat, Gram Kutchery etc.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-white p-6 rounded-lg shadow border-l-4 border-red-500">
+                            <h4 class="text-xl font-bold text-red-800 mb-3">Magistrates</h4>
+                            <p class="text-gray-700">The Judicial and Metropolitan magistrates discharge judicial functions under administrative control of High Courts in contrast to Executive Magistrates who discharge executive function of maintaining law and order, under control of the state government.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-2xl md:text-3xl font-bold mt-10 mb-5 pb-3 border-b-2 border-blue-500 text-blue-800">Appointment of Judges in Subordinate Courts</h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h4 class="text-lg font-bold text-gray-900 mb-4">Appointment of District Judges</h4>
+                            <p class="mb-4 text-gray-700">Appointment, posting and promotion of district judges in a state are made by the governor of the state in consultation with the high court.</p>
+                            <h5 class="font-bold text-sm uppercase text-gray-500 mb-2">Qualification</h5>
+                            <ul class="list-disc list-inside text-gray-700 space-y-1">
+                                <li>He should not already be in the service of the Central or the state government.</li>
+                                <li>He should have been an advocate or a pleader for seven years.</li>
+                                <li>He should be recommended by the high court for appointment.</li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h4 class="text-lg font-bold text-gray-900 mb-4">Appointment of other Judges</h4>
+                            <p class="text-gray-700">Appointment of persons (other than district judges) to the judicial service of a state are made by the governor of the state after consultation with the State Public Service Commission and the High Court.</p>
+                        </div>
+                    </div>
+                    
+                    
+            </article>
+        </div>
+    </main>
+    
+    <footer class="bg-gray-800 text-gray-300 mt-12 border-t border-gray-700">
+        <div class="container mx-auto px-6 py-10">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                 <div class="md:col-span-2"><h3 class="font-bold text-lg text-white mb-3">UPSC Hub</h3><p class="text-sm">Your dedicated partner in the journey to crack the Civil Services Examination.</p></div>
+                 <div><h3 class="font-bold text-lg text-white mb-3">Quick Links</h3><ul class="space-y-2 text-sm"><li><a href="../../about.html" class="hover:text-blue-400">About Us</a></li><li><a href="#" class="hover:text-blue-400">Courses</a></li></ul></div>
+                 <div><h3 class="font-bold text-lg text-white mb-3">Connect</h3><div class="flex space-x-4 mt-2"><a href="#" class="text-gray-400 hover:text-blue-500"><i class="fab fa-facebook-f text-xl"></i></a><a href="#" class="text-gray-400 hover:text-blue-400"><i class="fab fa-twitter text-xl"></i></a></div></div>
+            </div>
+            <hr class="my-6 border-gray-700" /><div class="flex flex-col md:flex-row justify-between items-center text-sm text-gray-400"><p>&copy; 2025 UPSC Hub. All Rights Reserved.</p><div class="space-x-4 mt-2 md:mt-0"><a href="../../privacy.html" class="hover:text-blue-400">Privacy Policy</a><a href="../../terms.html" class="hover:text-blue-400">Terms of Use</a></div></div>
+        </div>
+    </footer>
+    
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
+            const timeEl = document.getElementById('time-display');
+            if (timeEl) {
+                timeEl.textContent = now.toLocaleTimeString('en-US', timeOpts);
+            }
+            const dateOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateEl = document.getElementById('date-display');
+            if (dateEl) {
+                dateEl.textContent = now.toLocaleDateString('en-US', dateOpts);
+            }
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+    </script>
+</body>
+</html>
