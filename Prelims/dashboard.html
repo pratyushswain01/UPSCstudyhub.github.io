@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Prelims Dashboard: GS & CSAT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- IMPORTANT: Base href adjusted for the new Prelims/ directory structure -->
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/Prelims/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .footer-nav a.active { color: #2563EB; transform: scale(1.1); }
+        .footer-nav a { transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
+        .tab-active { background-color: #3B82F6; color: white; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+         
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 20px; border-radius: 50%;
+            opacity: 0; animation: fall 5s linear infinite;
+        }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
+        .toggle-checkbox { transition: transform 0.2s ease-in-out; }
+        .toggle-checkbox:checked { transform: translateX(1rem); }
+        .sidebar-item.active { 
+            background-color: #3B82F6; 
+            color: white; 
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-item.active svg {
+            color: white;
+        }
+
+        /* Styling for the main content to look good */
+        .dashboard-container {
+            max-width: 1400px;
+            margin: auto;
+        }
+        
+        #welcome-banner {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+            overflow: hidden;
+        }
+        #welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.35);
+            border-radius: 1rem;
+            z-index: 1;
+        }
+        #welcome-banner > * {
+            position: relative;
+            z-index: 2;
+        }
+    </style>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+
+    <!-- Flash Notification & Modals (Place your full modal HTML here) -->
+    
+    <div id="app-view" class="">
+        <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                    <!-- Link adjusted relative to Prelims/dashboard.html -->
+                    <a href="../dashboard.html" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
+                        <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-8 w-8 rounded-lg">
+                        <span>UPSChub</span>
+                    </a>
+                </div>
+                <!-- ... (Header right side: Streak, Calendar, Account Dropdown) ... -->
+                <div class="flex items-center gap-4">
+                    <!-- Placeholder for Streak Button -->
+                    <button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
+                    </button>
+                    <!-- Placeholder for Calendar Button -->
+                    <button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                        <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    </button>
+                    <div id="account-info-div" class="relative">
+                        <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+         
+        <div class="relative min-h-screen">
+             <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+             
+             <!-- CUSTOMIZED SIDEBAR FOR PRELIMS FOCUS -->
+             <aside id="sidebar" class="fixed top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-40 pt-20 md:translate-x-0">
+                 <nav class="p-4">
+                     <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-3">Prelims Components</h3>
+                     <ul class="space-y-2">
+                         <!-- GS Section: Active Tab -->
+                         <li>
+                            <a href="#" id="sidebar-gs" data-target-view="gs-view" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium">
+                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m-9 14h7m-7 0L3 18m14 3a2 2 0 002-2v-2m-12-3V6a2 2 0 012-2h2m0 10V6a2 2 0 00-2-2h-2" /></svg> 
+                                General Studies (GS)
+                            </a>
+                        </li>
+                         <!-- CSAT Section: Inactive Tab -->
+                         <li>
+                            <a href="#" id="sidebar-csat" data-target-view="csat-view" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium">
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M18 21V5a2 2 0 00-2-2H8a2 2 0 00-2 2v16m12 0h2m-2 0h-5m-9 0H3m2 0h5M6 17h10M6 13h10" /></svg> 
+                                CSAT (Paper II)
+                            </a>
+                        </li>
+                     </ul>
+
+                     <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-6 mb-2 px-3 border-t pt-4 border-slate-200 dark:border-slate-700">Navigation</h3>
+                     <ul class="space-y-2">
+                         <!-- Links back to other main hubs (relative links remain correct: ../ means parent directory) -->
+                         <li><a href="../dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Main Dashboard</a></li>
+                         <li><a href="../TestSeries/test_hub.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Test Library</a></li>
+                     </ul>
+                 </nav>
+             </aside>
+
+             <!-- Main Content Area with conditional views -->
+             <main id="main-content" class="flex-1 transition-all duration-300 ease-in-out md:ml-64">
+                 <div class="dashboard-container mx-auto p-4 sm:p-6 pb-24">
+                     
+                     <!-- GS View: Default Active -->
+                     <div id="gs-view">
+                         <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">General Studies Performance</h1>
+                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                             
+                             <div class="lg:col-span-2 space-y-6">
+                                 <!-- Welcome Banner/GS Header -->
+                                 <div id="welcome-banner-gs" class="bg-gradient-to-r from-blue-600 to-cyan-700 p-6 rounded-2xl shadow-lg text-white">
+                                     <h2 id="gs-welcome-heading" class="text-3xl font-bold">GS: Focus on Accuracy!</h2>
+                                     <p class="mt-1 opacity-80">Your General Studies results and analysis for Prelims.</p>
+                                 </div>
+                                 
+                                 <!-- GS Stat Cards -->
+                                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                         <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. GS %</p><p id="gs-accuracy-value" class="text-lg font-bold">--%</p></div> 
+                                     </div>
+                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                         <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">GS Tests Done</p><p id="gs-tests-taken-value" class="text-lg font-bold">--</p></div>
+                                     </div>
+                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                         <div class="bg-red-100 dark:bg-red-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.398 17c-.77 1.333.192 3 1.732 3z" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Weakest Subject</p><p id="gs-weak-subject-value" class="text-lg font-bold">--</p></div>
+                                     </div>
+                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                         <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21M9 17.25v-10.5a2.25 2.25 0 00-2-2.25H4.5M9 17.25H5.63c.09-.44.18-1.04.26-1.723A1.875 1.875 0 003.75 14.25H2.25c-.621 0-1.125-.504-1.125-1.125v-1.5c0-.621.504-1.125 1.125-1.125H3.75m9 6.75v-1.007a3 3 0 00.879-2.122L16.5 21m-6.75-3.75h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H16.5m-6.75 12.75v-10.5a2.25 2.25 0 012.25-2.25H12" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Highest Score</p><p id="gs-best-score-value" class="text-lg font-bold">--</p></div>
+                                     </div>
+                                 </div>
+                                 
+                                 <!-- GS Performance Chart -->
+                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                                     <h3 class="text-lg font-bold mb-4">GS Score Trend (Last 8 Tests)</h3>
+                                     <div><canvas id="gsPerformanceChart"></canvas></div>
+                                 </div>
+                                 
+                                 <!-- GS Recent Test Results -->
+                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                                     <h3 class="text-lg font-bold mb-4">Recent GS Test Results</h3>
+                                     <div id="gs-recent-tests-container" class="space-y-4">
+                                         <p class="text-sm text-center text-slate-500">No recent GS results found.</p>
+                                     </div>
+                                 </div>
+                             </div>
+                             
+                             <!-- GS Quick Links / Right Sidebar -->
+                             <div class="lg:col-span-1 space-y-6">
+                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
+                                     <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
+                                         Subject Focus Area
+                                     </h3>
+                                     <div id="gs-subject-focus" class="space-y-3">
+                                         <!-- Links will be injected here -->
+                                        <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg"><p class="font-semibold text-red-600 text-sm">Action Needed: Modern History</p><p class="text-xs text-slate-500">3 consecutive low scores. Attempt Sectional Test 4.</p></div>
+                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"><p class="font-semibold text-yellow-600 text-sm">Revise: Environment</p><p class="text-xs text-slate-500">High variance in scores. Re-read key concepts.</p></div>
+                                        <div class="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg"><p class="font-semibold text-green-600 text-sm">Maintain: Polity</p><p class="text-xs text-slate-500">Consistently high scores. Aim for full tests.</p></div>
+                                     </div>
+                                     <button class="mt-4 w-full text-center text-sm font-semibold text-blue-600 hover:underline">View Detailed GS Analysis</button>
+                                 </div>
+                             </div>
+                         </div>
+                     </div>
+                     
+                     <!-- CSAT View: Initially Hidden -->
+                     <div id="csat-view" class="hidden">
+                        <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">CSAT Performance (Paper II)</h1>
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                             
+                            <div class="lg:col-span-2 space-y-6">
+                                <!-- Welcome Banner/CSAT Header -->
+                                <div id="welcome-banner-csat" class="bg-gradient-to-r from-amber-600 to-orange-700 p-6 rounded-2xl shadow-lg text-white">
+                                    <h2 id="csat-welcome-heading" class="text-3xl font-bold">CSAT: Focus on Qualification!</h2>
+                                    <p class="mt-1 opacity-80">Your Aptitude, Reasoning, and Comprehension results.</p>
+                                </div>
+                                
+                                <!-- CSAT Stat Cards -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. CSAT Score</p><p id="csat-avg-score" class="text-lg font-bold">--</p></div> 
+                                    </div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-purple-100 dark:bg-purple-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">CSAT Tests Done</p><p id="csat-tests-taken-value" class="text-lg font-bold">--</p></div>
+                                    </div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-pink-100 dark:bg-pink-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">RC Accuracy</p><p id="csat-rc-accuracy" class="text-lg font-bold">--%</p></div>
+                                    </div>
+                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                        <div class="bg-teal-100 dark:bg-teal-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Highest Score</p><p id="csat-best-score-value" class="text-lg font-bold">--</p></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- CSAT Performance Chart -->
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                                    <h3 class="text-lg font-bold mb-4">CSAT Score Trend (Last 8 Tests)</h3>
+                                    <div><canvas id="csatPerformanceChart"></canvas></div>
+                                </div>
+                                
+                                <!-- CSAT Recent Test Results -->
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                                    <h3 class="text-lg font-bold mb-4">Recent CSAT Test Results</h3>
+                                    <div id="csat-recent-tests-container" class="space-y-4">
+                                        <p class="text-sm text-center text-slate-500">No recent CSAT results found.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- CSAT Quick Links / Right Sidebar -->
+                            <div class="lg:col-span-1 space-y-6">
+                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
+                                    <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
+                                        Area to Focus
+                                    </h3>
+                                    <div id="csat-focus-area" class="space-y-3">
+                                        <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg"><p class="font-semibold text-red-600 text-sm">Priority: Data Interpretation</p><p class="text-xs text-slate-500">Avg. 40% accuracy. Complete practice set 3.</p></div>
+                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"><p class="font-semibold text-yellow-600 text-sm">Speed Check: Reading Comp.</p><p class="text-xs text-slate-500">Taking too much time per question. Target 2 mins/question.</p></div>
+                                    </div>
+                                    <button class="mt-4 w-full text-center text-sm font-semibold text-amber-600 hover:underline">View Detailed CSAT Analysis</button>
+                                </div>
+                            </div>
+                        </div>
+                     </div>
+
+                     <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
+                         <p class="text-sm text-slate-500 dark:text-slate-400">© 2025 UPSChub. All Rights Reserved.</p>
+                     </div>
+                 </div>
+             </main>
+        </div>
+         
+        <!-- Footer Navigation -->
+        <footer class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-[0_-2px_5px_-1px_rgba(0,0,0,0.1)] z-50">
+             <nav class="container mx-auto px-4 h-16 flex justify-around items-center footer-nav">
+                <!-- Links adjusted relative to Prelims/dashboard.html -->
+                <a href="../homeUPSChub.html" id="nav-home" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span class="text-xs font-medium">Home</span></a>
+                <a href="../dashboard.html" id="nav-dashboard" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span class="text-xs font-medium">Dashboard</span></a>
+                <a href="#" id="nav-tests" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-500 active"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg><span class="text-xs font-medium">Prelims</span></a>
+                <a href="#" id="nav-notifications" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="text-xs font-medium">Notify</span></a>
+                <a href="#" id="nav-settings" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg><span class="text-xs font-medium">Settings</span></a>
+             </nav>
+        </footer>
+    </div>
+
+    <!-- Modals (Place your full modal HTML here) -->
+
+
+<script type="module">
+    // --- FIREBASE IMPORTS ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- FIREBASE CONFIG ---
+    const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'prelims-app-id';
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- ELEMENT SELECTORS ---
+    const sidebar = document.getElementById('sidebar');
+    const mainContentElement = document.getElementById('main-content');
+    const sidebarGsLink = document.getElementById('sidebar-gs');
+    const sidebarCsatLink = document.getElementById('sidebar-csat');
+    const gsView = document.getElementById('gs-view');
+    const csatView = document.getElementById('csat-view');
+
+    let currentView = 'gs-view';
+    let gsChartInstance = null;
+    let csatChartInstance = null;
+    
+    // --- AUTHENTICATION & INITIALIZATION ---
+    onAuthStateChanged(auth, async user => {
+        if (user) {
+            console.log('User logged in. Loading Prelims Dashboard...');
+            
+            // Step 1: Authentication for Canvas environment
+            if (typeof __initial_auth_token !== 'undefined') { 
+                await signInWithCustomToken(auth, __initial_auth_token).catch(err => {
+                    console.error("Custom token sign-in failed:", err);
+                });
+            } else {
+                await signInAnonymously(auth).catch(err => {
+                    console.error("Anonymous sign-in failed:", err);
+                });
+            }
+            
+            // Step 2: Render UI and attach listeners
+            handleSidebarState(); 
+            attachEventListeners();
+            
+            // Step 3: Initialize Charts (required before data fetching)
+            renderPerformanceChart('gsPerformanceChart', '#3B82F6');
+            renderPerformanceChart('csatPerformanceChart', '#F59E0B');
+            
+            // Step 4: Load Data for Default View
+            loadPerformanceData(user.uid, currentView);
+
+        } else {
+            console.log('User is not logged in. Redirecting to auth page...');
+            // Link adjusted relative to Prelims/dashboard.html
+            window.location.href = '../auth.html'; 
+        }
+    });
+    
+    // --- SIDEBAR LOGIC ---
+    function handleSidebarState() {
+        if (window.innerWidth >= 768) {
+            sidebar.classList.remove('-translate-x-full'); 
+            mainContentElement.classList.add('md:ml-64');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            mainContentElement.classList.remove('md:ml-64');
+        }
+    }
+    
+    function toggleSidebar() { 
+        sidebar.classList.toggle('-translate-x-full'); 
+        // Logic to show/hide backdrop omitted for brevity in this file
+    }
+    
+    // --- VIEW SWITCHING ---
+    function switchView(newView) {
+        if (newView === currentView) return;
+
+        gsView.classList.add('hidden');
+        csatView.classList.add('hidden');
+        
+        // Remove active styling from all sidebar items
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active');
+            item.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
+            item.querySelector('svg').style.color = ''; // Reset color
+        });
+
+        if (newView === 'gs-view') {
+            gsView.classList.remove('hidden');
+            sidebarGsLink.classList.add('active');
+        } else if (newView === 'csat-view') {
+            csatView.classList.remove('hidden');
+            sidebarCsatLink.classList.add('active');
+        }
+
+        currentView = newView;
+        const user = auth.currentUser;
+        if (user) loadPerformanceData(user.uid, currentView);
+    }
+
+    // --- DATA FETCHING ---
+
+    /**
+     * Loads performance data for the selected Prelims component (GS or CSAT).
+     * @param {string} userId - The Firebase user UID.
+     * @param {string} type - 'gs-view' or 'csat-view'.
+     */
+    async function loadPerformanceData(userId, type) {
+        // Use the defined subcollections for GS and CSAT history
+        const collectionName = type === 'gs-view' ? 'gs_prelims_history' : 'csat_prelims_history';
+        const userHistoryRef = collection(db, `artifacts/${appId}/users/${userId}/${collectionName}`);
+        
+        console.log(`Fetching data for ${collectionName}...`);
+
+        try {
+            // Ordering by descending timestamp to get the latest results first
+            const q = query(userHistoryRef, orderBy("timestamp", "desc"));
+            const querySnapshot = await getDocs(q);
+            const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+            if (type === 'gs-view') {
+                updateGSStats(results);
+            } else {
+                updateCSATStats(results);
+            }
+
+        } catch (error) {
+            console.error(`Error fetching ${type} performance data:`, error);
+            // Fallback to empty state
+            if (type === 'gs-view') { updateGSStats([]); } else { updateCSATStats([]); }
+        }
+    }
+    
+    // --- UPDATE UI FUNCTIONS ---
+
+    function updateGSStats(results) {
+        const testsTaken = results.length;
+        const recentTests = results.slice(0, 3);
+        const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
+        const totalPercentage = results.reduce((sum, r) => sum + (r.percentage || 0), 0);
+        const avgPercentage = testsTaken > 0 ? (totalPercentage / testsTaken).toFixed(2) : '0.00';
+        const highestScore = results.reduce((max, r) => Math.max(max, r.score || 0), 0).toFixed(1);
+
+        document.getElementById('gs-accuracy-value').textContent = `${avgPercentage}%`;
+        document.getElementById('gs-tests-taken-value').textContent = testsTaken;
+        document.getElementById('gs-best-score-value').textContent = highestScore;
+
+        // Mock Weakest Subject logic (replace with actual logic if data supports it)
+        document.getElementById('gs-weak-subject-value').textContent = testsTaken > 0 ? 'Modern History' : '--';
+
+        // Update Chart
+        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend
+        updateChartData(gsChartInstance, chartData, 'gsPerformanceChart', 'testName', 'percentage');
+        
+        // Update Recent Results
+        updateRecentResults(document.getElementById('gs-recent-tests-container'), recentTests, 'GS');
+    }
+
+    function updateCSATStats(results) {
+        const testsTaken = results.length;
+        const recentTests = results.slice(0, 3);
+        const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
+        // Assuming rcAccuracy field exists in CSAT documents
+        const totalRCAccuracy = results.reduce((sum, r) => sum + (r.rcAccuracy || 0), 0); 
+        
+        const avgScore = testsTaken > 0 ? (totalScore / testsTaken).toFixed(1) : '0.0';
+        const avgRCAccuracy = testsTaken > 0 ? (totalRCAccuracy / testsTaken).toFixed(1) : '0.0';
+        const highestScore = results.reduce((max, r) => Math.max(max, r.score || 0), 0).toFixed(1);
+
+        document.getElementById('csat-avg-score').textContent = avgScore;
+        document.getElementById('csat-tests-taken-value').textContent = testsTaken;
+        document.getElementById('csat-rc-accuracy').textContent = `${avgRCAccuracy}%`;
+        document.getElementById('csat-best-score-value').textContent = highestScore;
+
+        // Update Chart
+        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend
+        // CSAT chart plots raw score (out of 200)
+        updateChartData(csatChartInstance, chartData, 'csatPerformanceChart', 'testName', 'score'); 
+
+        // Update Recent Results
+        updateRecentResults(document.getElementById('csat-recent-tests-container'), recentTests, 'CSAT');
+    }
+    
+    /**
+     * Renders the list of recent test results.
+     * @param {HTMLElement} container The DOM element to render the list in.
+     * @param {Array} results Array of test result objects.
+     * @param {string} type 'GS' or 'CSAT' to determine passing score logic.
+     */
+    function updateRecentResults(container, results, type) {
+        if (!container) return;
+        
+        if (results.length === 0) {
+            container.innerHTML = `<p class="text-sm text-center text-slate-500">No recent ${type} results found.</p>`;
+            return;
+        }
+
+        container.innerHTML = results.map(test => {
+            const reviewLink = `../TestSeries/test_sample.html?testId=${test.testId}&reviewId=${test.id}`; // Link adjusted up one level
+            const percentage = (test.percentage || 0).toFixed(1);
+            const score = (test.score || 0).toFixed(1);
+            
+            // GS Cutoff is around 100/200 (50%). CSAT cutoff is 66/200 (33%)
+            const isPassing = type === 'GS' ? test.score >= 100 : test.score >= 66;
+            const statusColor = isPassing ? 'text-green-600' : 'text-red-600'; 
+            
+            return `
+                <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span class="text-xs font-medium text-slate-500">${test.subject || 'Test'}</span>
+                        </div>
+                        <h4 class="font-bold">${test.testName || 'Unnamed Test'}</h4>
+                        <p class="text-sm text-slate-500 dark:text-slate-400">Score: <span class="${statusColor}">${score}</span> • Accuracy: ${percentage}%</p>
+                    </div>
+                    <a href="${reviewLink}" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm">View Analysis</a>
+                </div>`;
+        }).join('');
+    }
+    
+    // --- CHART FUNCTIONS ---
+    function renderPerformanceChart(canvasId, color) {
+        const canvas = document.getElementById(canvasId);
+        if(!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        let chartInstance;
+        
+        if (canvasId === 'gsPerformanceChart') {
+            if (gsChartInstance) gsChartInstance.destroy();
+            chartInstance = gsChartInstance;
+        } else {
+            if (csatChartInstance) csatChartInstance.destroy();
+            chartInstance = csatChartInstance;
+        }
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const tickColor = isDark ? '#94a3b8' : '#64748b'; 
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+        const yMax = canvasId === 'gsPerformanceChart' ? 100 : 200; // GS max 100%, CSAT max 200 marks
+        const label = canvasId === 'gsPerformanceChart' ? 'Percentage Score' : 'Raw Score (Max 200)';
+
+
+        chartInstance = new Chart(ctx, {
+            type: 'line',
+            data: { labels: [], datasets: [{ label: label, data: [], borderColor: color, backgroundColor: `${color}33`, borderWidth: 2, tension: 0.4, fill: true }] },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                scales: {
+                    y: { beginAtZero: true, max: yMax, ticks: { color: tickColor }, grid: { color: gridColor } },
+                    x: { ticks: { color: tickColor, autoSkip: false, maxRotation: 45, minRotation: 45 }, grid: { display: false } }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        if (canvasId === 'gsPerformanceChart') { gsChartInstance = chartInstance; } else { csatChartInstance = chartInstance; }
+    }
+    
+    function updateChartData(chartInstance, results, canvasId, labelField, dataField) {
+        if (!chartInstance) return;
+        
+        const labels = results.map(test => test[labelField] || 'Test');
+        const data = results.map(test => test[dataField] || 0);
+
+        chartInstance.data.labels = labels;
+        chartInstance.data.datasets[0].data = data;
+        chartInstance.update();
+    }
+
+
+    // --- EVENT LISTENERS ---
+    function attachEventListeners() {
+        document.getElementById('sidebar-toggle').onclick = toggleSidebar;
+        
+        // Sidebar View Switching
+        sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
+        sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
+
+        // Footer Navigation Active State (Set Prelims as active)
+        document.querySelectorAll('.footer-nav a').forEach(a => a.classList.remove('active'));
+        document.getElementById('nav-tests').classList.add('active');
+        document.getElementById('nav-tests').querySelector('svg').style.color = '#2563EB';
+
+        // Add theme toggle logic to handle chart color update (Assuming you include the dropdown HTML)
+        // const themeToggle = document.getElementById('dropdown-theme-toggle');
+        // if(themeToggle) themeToggle.onchange = toggleTheme;
+        
+        // Initial Sidebar styling for MD+ screens
+        if (window.innerWidth >= 768) {
+             mainContentElement.classList.add('md:ml-64');
+        }
+    }
+    
+    // --- THEME LOGIC (Copied from original for completeness) ---
+    function applyTheme(theme) {
+         if (theme === 'dark') { document.documentElement.classList.add('dark'); }
+         else { document.documentElement.classList.remove('dark'); }
+         // Re-render charts with correct colors upon theme change
+         if(auth.currentUser) {
+            if(gsChartInstance) { 
+                renderPerformanceChart('gsPerformanceChart', '#3B82F6');
+                loadPerformanceData(auth.currentUser.uid, 'gs-view');
+            }
+            if(csatChartInstance) { 
+                renderPerformanceChart('csatPerformanceChart', '#F59E0B');
+                loadPerformanceData(auth.currentUser.uid, 'csat-view');
+            }
+         }
+    }
+    // function toggleTheme() { const isDark = !document.documentElement.classList.contains('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
+    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+
+
+</script>
+</body>
+</html>
