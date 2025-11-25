@@ -433,7 +433,8 @@
 
     function updateGSStats(results) {
         const testsTaken = results.length;
-        const recentTests = results.slice(0, 3);
+        // Ensure only the latest 3 are used for the list, but all results are used for stats calculation
+        const recentTests = results.slice(0, 3); 
         const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
         const totalPercentage = results.reduce((sum, r) => sum + (r.percentage || 0), 0);
         const avgPercentage = testsTaken > 0 ? (totalPercentage / testsTaken).toFixed(2) : '0.00';
@@ -447,7 +448,7 @@
         document.getElementById('gs-weak-subject-value').textContent = testsTaken > 0 ? 'Modern History' : '--';
 
         // Update Chart
-        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend
+        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend (reversed for chart order)
         updateChartData(gsChartInstance, chartData, 'gsPerformanceChart', 'testName', 'percentage');
         
         // Update Recent Results
@@ -456,7 +457,8 @@
 
     function updateCSATStats(results) {
         const testsTaken = results.length;
-        const recentTests = results.slice(0, 3);
+        // Ensure only the latest 3 are used for the list, but all results are used for stats calculation
+        const recentTests = results.slice(0, 3); 
         const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
         // Assuming rcAccuracy field exists in CSAT documents
         const totalRCAccuracy = results.reduce((sum, r) => sum + (r.rcAccuracy || 0), 0); 
@@ -471,7 +473,7 @@
         document.getElementById('csat-best-score-value').textContent = highestScore;
 
         // Update Chart
-        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend
+        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend (reversed for chart order)
         // CSAT chart plots raw score (out of 200)
         updateChartData(csatChartInstance, chartData, 'csatPerformanceChart', 'testName', 'score'); 
 
@@ -494,7 +496,8 @@
         }
 
         container.innerHTML = results.map(test => {
-            const reviewLink = `../TestSeries/test_sample.html?testId=${test.testId}&reviewId=${test.id}`; // Link adjusted up one level
+            // Note: The review link needs to point up two levels since it's inside Prelims/ and the target is at TestSeries/
+            const reviewLink = `../../TestSeries/test_sample.html?testId=${test.testId}&reviewId=${test.id}`; 
             const percentage = (test.percentage || 0).toFixed(1);
             const score = (test.score || 0).toFixed(1);
             
@@ -559,8 +562,11 @@
     function updateChartData(chartInstance, results, canvasId, labelField, dataField) {
         if (!chartInstance) return;
         
-        const labels = results.map(test => test[labelField] || 'Test');
-        const data = results.map(test => test[dataField] || 0);
+        // Use slice(0).reverse() to ensure older results are on the left of the chart
+        const reversedResults = results.slice().reverse();
+        
+        const labels = reversedResults.map(test => test[labelField] || 'Test');
+        const data = reversedResults.map(test => test[dataField] || 0);
 
         chartInstance.data.labels = labels;
         chartInstance.data.datasets[0].data = data;
@@ -570,44 +576,48 @@
 
     // --- EVENT LISTENERS ---
     function attachEventListeners() {
-        document.getElementById('sidebar-toggle').onclick = toggleSidebar;
+        // Toggle Sidebar
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if(sidebarToggle) sidebarToggle.onclick = toggleSidebar;
         
         // Sidebar View Switching
-        sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
-        sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
+        if(sidebarGsLink) sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
+        if(sidebarCsatLink) sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
 
         // Footer Navigation Active State (Set Prelims as active)
         document.querySelectorAll('.footer-nav a').forEach(a => a.classList.remove('active'));
-        document.getElementById('nav-tests').classList.add('active');
-        document.getElementById('nav-tests').querySelector('svg').style.color = '#2563EB';
-
-        // Add theme toggle logic to handle chart color update (Assuming you include the dropdown HTML)
-        // const themeToggle = document.getElementById('dropdown-theme-toggle');
-        // if(themeToggle) themeToggle.onchange = toggleTheme;
-        
-        // Initial Sidebar styling for MD+ screens
-        if (window.innerWidth >= 768) {
-             mainContentElement.classList.add('md:ml-64');
+        const navTests = document.getElementById('nav-tests');
+        if(navTests) {
+            navTests.classList.add('active');
+            navTests.querySelector('svg').style.color = '#2563EB';
         }
+
+        // Handle generic sidebar toggle on click outside (only for mobile)
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+        if(sidebarBackdrop) sidebarBackdrop.onclick = toggleSidebar;
+        
+        // Assuming other modal/account buttons exist and are handled elsewhere if necessary.
     }
     
-    // --- THEME LOGIC (Copied from original for completeness) ---
+    // --- THEME LOGIC (Ensuring chart re-renders properly) ---
     function applyTheme(theme) {
          if (theme === 'dark') { document.documentElement.classList.add('dark'); }
          else { document.documentElement.classList.remove('dark'); }
-         // Re-render charts with correct colors upon theme change
+         
+         // Trigger chart re-render if theme changes
          if(auth.currentUser) {
             if(gsChartInstance) { 
                 renderPerformanceChart('gsPerformanceChart', '#3B82F6');
-                loadPerformanceData(auth.currentUser.uid, 'gs-view');
+                // Re-load data to apply the re-rendered chart settings
+                if (currentView === 'gs-view') loadPerformanceData(auth.currentUser.uid, 'gs-view');
             }
             if(csatChartInstance) { 
                 renderPerformanceChart('csatPerformanceChart', '#F59E0B');
-                loadPerformanceData(auth.currentUser.uid, 'csat-view');
+                if (currentView === 'csat-view') loadPerformanceData(auth.currentUser.uid, 'csat-view');
             }
          }
     }
-    // function toggleTheme() { const isDark = !document.documentElement.classList.contains('dark'); const newTheme = isDark ? 'dark' : 'light'; localStorage.setItem('color-theme', newTheme); applyTheme(newTheme); }
+    // Theme initialization must happen outside of functions to run immediately
     const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
 
