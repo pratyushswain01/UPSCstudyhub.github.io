@@ -87,20 +87,24 @@
                         <span>UPSChub</span>
                     </a>
                 </div>
-                <!-- ... (Header right side: Streak, Calendar, Account Dropdown) ... -->
+                <!-- Header right side -->
                 <div class="flex items-center gap-4">
-                    <!-- Placeholder for Streak Button -->
-                    <button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <!-- Placeholder for Streak Button (Requires HTML for streak-btn, streak-tooltip, etc. to function) -->
+                    <button id="streak-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                         <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
                     </button>
-                    <!-- Placeholder for Calendar Button -->
-                    <button class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                    <!-- Placeholder for Calendar Button (Requires HTML for calendar-modal, etc. to function) -->
+                    <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                         <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </button>
                     <div id="account-info-div" class="relative">
                         <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
                         </button>
+                        <!-- Placeholder for account dropdown (Requires HTML for account-dropdown, dropdown-display-name, etc. to function) -->
+                        <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20">
+                             <p class="px-4 py-2 text-sm text-slate-500">Loading...</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -291,14 +295,23 @@
         </footer>
     </div>
 
-    <!-- Modals (Place your full modal HTML here) -->
+    <!-- Placeholder HTML for missing modals/elements to prevent JS errors -->
+    <div id="alert-modal" class="hidden"> <p id="alert-message"></p><button id="alert-ok"></button></div>
+    <div id="streak-tooltip" class="hidden"> <span id="current-streak">0</span><span id="highest-streak">0</span></div>
+    <div id="user-email-display" class="hidden"></div>
+    <div id="dropdown-display-name" class="hidden">UPSC Aspirant</div>
+    <div id="dropdown-theme-toggle" class="hidden"></div>
+    <div id="settings-display-name" class="hidden"></div>
+    <div id="settings-user-email" class="hidden"></div>
+    <div id="subscription-item" class="hidden"></div>
+    <!-- End Placeholder HTML -->
 
 
 <script type="module">
     // --- FIREBASE IMPORTS ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, onSnapshot, collection, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, updateDoc, setDoc, collection, query, orderBy, getDocs, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
     // --- FIREBASE CONFIG ---
     const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
@@ -308,53 +321,85 @@
     const db = getFirestore(app);
 
     // --- ELEMENT SELECTORS ---
+    const appView = document.getElementById('app-view'); // Added
     const sidebar = document.getElementById('sidebar');
     const mainContentElement = document.getElementById('main-content');
     const sidebarGsLink = document.getElementById('sidebar-gs');
     const sidebarCsatLink = document.getElementById('sidebar-csat');
     const gsView = document.getElementById('gs-view');
     const csatView = document.getElementById('csat-view');
+    const accountDropdown = document.getElementById('account-dropdown'); // Added
 
+    // Elements required by general dashboard functions (added placeholders to HTML to prevent errors)
+    const alertModal = document.getElementById('alert-modal');
+    const alertMessage = document.getElementById('alert-message');
+    const dropdownDisplayName = document.getElementById('dropdown-display-name');
+    const welcomeBanner = document.getElementById('welcome-banner'); // For time-based greetings
+    
     let currentView = 'gs-view';
     let gsChartInstance = null;
     let csatChartInstance = null;
-    
-    // --- AUTHENTICATION & INITIALIZATION ---
-    onAuthStateChanged(auth, async user => {
-        if (user) {
-            console.log('User logged in. Loading Prelims Dashboard...');
-            
-            // Step 1: Authentication for Canvas environment
-            if (typeof __initial_auth_token !== 'undefined') { 
-                await signInWithCustomToken(auth, __initial_auth_token).catch(err => {
-                    console.error("Custom token sign-in failed:", err);
-                });
-            } else {
-                await signInAnonymously(auth).catch(err => {
-                    console.error("Anonymous sign-in failed:", err);
-                });
-            }
-            
-            // Step 2: Render UI and attach listeners
-            handleSidebarState(); 
-            attachEventListeners();
-            
-            // Step 3: Initialize Charts (required before data fetching)
-            renderPerformanceChart('gsPerformanceChart', '#3B82F6');
-            renderPerformanceChart('csatPerformanceChart', '#F59E0B');
-            
-            // Step 4: Load Data for Default View
-            loadPerformanceData(user.uid, currentView);
+    let timeUpdateInterval = null; // Added for time tracking
 
+    // --- UTILITY FUNCTIONS ---
+    function showAlert(message) { 
+        if (alertMessage && alertModal) {
+            alertMessage.textContent = message; 
+            alertModal.classList.remove('hidden'); 
         } else {
-            console.log('User is not logged in. Redirecting to auth page...');
-            // Link adjusted relative to Prelims/dashboard.html
-            window.location.href = '../auth.html'; 
+             console.error("Alert modal elements missing.");
         }
-    });
+    }
     
+    // --- TIME AND GREETING (Required for Welcome Banner) ---
+    function initializeTimeBasedUI() {
+        updateTimeAndGreeting();
+        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
+        timeUpdateInterval = setInterval(updateTimeAndGreeting, 1000);
+    }
+    
+    function updateTimeAndGreeting() {
+        const morningImage = 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop';
+        const afternoonImage = 'https://images.unsplash.com/photo-1590306362572-215a054a88f5?q=80&w=2070&auto=format&fit=crop';
+        const eveningImage = 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=1974&auto=format&fit=crop';
+
+        const now = new Date();
+        const hour = now.getHours();
+        
+        const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
+        let greetingText, backgroundImageUrl;
+        
+        if (hour >= 5 && hour < 12) {
+            greetingText = `Good Morning, ${name}!`;
+            backgroundImageUrl = morningImage;
+        } else if (hour >= 12 && hour < 18) {
+            greetingText = `Good Afternoon, ${name}!`;
+            backgroundImageUrl = afternoonImage;
+        } else {
+            greetingText = `Good Evening, ${name}!`;
+            backgroundImageUrl = eveningImage;
+        }
+        
+        // Update header elements if they exist in this Prelims dashboard structure
+        const gsWelcomeHeading = document.getElementById('gs-welcome-heading');
+        const csatWelcomeHeading = document.getElementById('csat-welcome-heading');
+
+        if (gsWelcomeHeading) gsWelcomeHeading.textContent = `GS: ${greetingText.replace(', Aspirant!', '!')}`;
+        if (csatWelcomeHeading) csatWelcomeHeading.textContent = `CSAT: ${greetingText.replace(', Aspirant!', '!')}`;
+        
+        // This dashboard doesn't have the main time/date display fields, so we only update the welcome headers
+        if (welcomeBanner) welcomeBanner.style.backgroundImage = `url('${backgroundImageUrl}')`; 
+    }
+    
+    // Placeholder for other global functions (needed to prevent crashes on event handlers)
+    function handleLogout(e) { e.preventDefault(); signOut(auth).catch(error => console.error("Logout error:", error)); }
+    function updateSubscriptionUI() { /* placeholder */ }
+    function handleUpgrade() { showAlert("Upgrade feature not fully implemented in this module."); }
+    // --- END UTILITY FUNCTIONS ---
+
     // --- SIDEBAR LOGIC ---
     function handleSidebarState() {
+        // ... (Logic kept as is) ...
         if (window.innerWidth >= 768) {
             sidebar.classList.remove('-translate-x-full'); 
             mainContentElement.classList.add('md:ml-64');
@@ -379,6 +424,7 @@
         // Remove active styling from all sidebar items
         document.querySelectorAll('.sidebar-item').forEach(item => {
             item.classList.remove('active');
+            // Re-apply hover styles 
             item.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
             item.querySelector('svg').style.color = ''; // Reset color
         });
@@ -386,9 +432,11 @@
         if (newView === 'gs-view') {
             gsView.classList.remove('hidden');
             sidebarGsLink.classList.add('active');
+            renderPerformanceChart('gsPerformanceChart', '#3B82F6'); // Re-initialize chart
         } else if (newView === 'csat-view') {
             csatView.classList.remove('hidden');
             sidebarCsatLink.classList.add('active');
+            renderPerformanceChart('csatPerformanceChart', '#F59E0B'); // Re-initialize chart
         }
 
         currentView = newView;
@@ -397,21 +445,13 @@
     }
 
     // --- DATA FETCHING ---
-
-    /**
-     * Loads performance data for the selected Prelims component (GS or CSAT).
-     * @param {string} userId - The Firebase user UID.
-     * @param {string} type - 'gs-view' or 'csat-view'.
-     */
     async function loadPerformanceData(userId, type) {
-        // Use the defined subcollections for GS and CSAT history
         const collectionName = type === 'gs-view' ? 'gs_prelims_history' : 'csat_prelims_history';
         const userHistoryRef = collection(db, `artifacts/${appId}/users/${userId}/${collectionName}`);
         
         console.log(`Fetching data for ${collectionName}...`);
 
         try {
-            // Ordering by descending timestamp to get the latest results first
             const q = query(userHistoryRef, orderBy("timestamp", "desc"));
             const querySnapshot = await getDocs(q);
             const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -424,7 +464,6 @@
 
         } catch (error) {
             console.error(`Error fetching ${type} performance data:`, error);
-            // Fallback to empty state
             if (type === 'gs-view') { updateGSStats([]); } else { updateCSATStats([]); }
         }
     }
@@ -433,7 +472,6 @@
 
     function updateGSStats(results) {
         const testsTaken = results.length;
-        // Ensure only the latest 3 are used for the list, but all results are used for stats calculation
         const recentTests = results.slice(0, 3); 
         const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
         const totalPercentage = results.reduce((sum, r) => sum + (r.percentage || 0), 0);
@@ -444,23 +482,18 @@
         document.getElementById('gs-tests-taken-value').textContent = testsTaken;
         document.getElementById('gs-best-score-value').textContent = highestScore;
 
-        // Mock Weakest Subject logic (replace with actual logic if data supports it)
         document.getElementById('gs-weak-subject-value').textContent = testsTaken > 0 ? 'Modern History' : '--';
 
-        // Update Chart
-        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend (reversed for chart order)
+        const chartData = results; 
         updateChartData(gsChartInstance, chartData, 'gsPerformanceChart', 'testName', 'percentage');
         
-        // Update Recent Results
         updateRecentResults(document.getElementById('gs-recent-tests-container'), recentTests, 'GS');
     }
 
     function updateCSATStats(results) {
         const testsTaken = results.length;
-        // Ensure only the latest 3 are used for the list, but all results are used for stats calculation
         const recentTests = results.slice(0, 3); 
         const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
-        // Assuming rcAccuracy field exists in CSAT documents
         const totalRCAccuracy = results.reduce((sum, r) => sum + (r.rcAccuracy || 0), 0); 
         
         const avgScore = testsTaken > 0 ? (totalScore / testsTaken).toFixed(1) : '0.0';
@@ -472,21 +505,12 @@
         document.getElementById('csat-rc-accuracy').textContent = `${avgRCAccuracy}%`;
         document.getElementById('csat-best-score-value').textContent = highestScore;
 
-        // Update Chart
-        const chartData = results.slice(0, 8).reverse(); // Last 8 tests for trend (reversed for chart order)
-        // CSAT chart plots raw score (out of 200)
+        const chartData = results; 
         updateChartData(csatChartInstance, chartData, 'csatPerformanceChart', 'testName', 'score'); 
 
-        // Update Recent Results
         updateRecentResults(document.getElementById('csat-recent-tests-container'), recentTests, 'CSAT');
     }
     
-    /**
-     * Renders the list of recent test results.
-     * @param {HTMLElement} container The DOM element to render the list in.
-     * @param {Array} results Array of test result objects.
-     * @param {string} type 'GS' or 'CSAT' to determine passing score logic.
-     */
     function updateRecentResults(container, results, type) {
         if (!container) return;
         
@@ -496,12 +520,10 @@
         }
 
         container.innerHTML = results.map(test => {
-            // Note: The review link needs to point up two levels since it's inside Prelims/ and the target is at TestSeries/
             const reviewLink = `../../TestSeries/test_sample.html?testId=${test.testId}&reviewId=${test.id}`; 
             const percentage = (test.percentage || 0).toFixed(1);
             const score = (test.score || 0).toFixed(1);
             
-            // GS Cutoff is around 100/200 (50%). CSAT cutoff is 66/200 (33%)
             const isPassing = type === 'GS' ? test.score >= 100 : test.score >= 66;
             const statusColor = isPassing ? 'text-green-600' : 'text-red-600'; 
             
@@ -529,17 +551,17 @@
         
         if (canvasId === 'gsPerformanceChart') {
             if (gsChartInstance) gsChartInstance.destroy();
-            chartInstance = gsChartInstance;
+            gsChartInstance = chartInstance;
         } else {
             if (csatChartInstance) csatChartInstance.destroy();
-            chartInstance = csatChartInstance;
+            csatChartInstance = chartInstance;
         }
 
         const isDark = document.documentElement.classList.contains('dark');
         const tickColor = isDark ? '#94a3b8' : '#64748b'; 
         const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
 
-        const yMax = canvasId === 'gsPerformanceChart' ? 100 : 200; // GS max 100%, CSAT max 200 marks
+        const yMax = canvasId === 'gsPerformanceChart' ? 100 : 200; 
         const label = canvasId === 'gsPerformanceChart' ? 'Percentage Score' : 'Raw Score (Max 200)';
 
 
@@ -562,7 +584,7 @@
     function updateChartData(chartInstance, results, canvasId, labelField, dataField) {
         if (!chartInstance) return;
         
-        // Use slice(0).reverse() to ensure older results are on the left of the chart
+        // Use slice().reverse() to ensure older results are on the left of the chart
         const reversedResults = results.slice().reverse();
         
         const labels = reversedResults.map(test => test[labelField] || 'Test');
@@ -583,6 +605,14 @@
         // Sidebar View Switching
         if(sidebarGsLink) sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
         if(sidebarCsatLink) sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
+        
+        // Account Dropdown Toggle (Assuming the required HTML for dropdown-btn/contents exists)
+        const accountBtn = document.getElementById('account-btn');
+        if(accountBtn) accountBtn.onclick = () => accountDropdown && accountDropdown.classList.toggle('hidden');
+        
+        // Logout Button (Assuming the dropdown contains a logout button with ID 'logout-btn')
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) logoutBtn.onclick = handleLogout;
 
         // Footer Navigation Active State (Set Prelims as active)
         document.querySelectorAll('.footer-nav a').forEach(a => a.classList.remove('active'));
@@ -596,10 +626,20 @@
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
         if(sidebarBackdrop) sidebarBackdrop.onclick = toggleSidebar;
         
-        // Assuming other modal/account buttons exist and are handled elsewhere if necessary.
+        // Global click handler to close dropdown
+        document.onclick = (e) => {
+            if (accountBtn && !accountBtn.contains(e.target) && accountDropdown && !accountDropdown.contains(e.target)) {
+                 accountDropdown.classList.add('hidden');
+            }
+        };
+
+        // Alert modal close handler
+        const alertOk = document.getElementById('alert-ok');
+        if(alertOk) alertOk.addEventListener('click', () => alertModal.classList.add('hidden'));
+
     }
     
-    // --- THEME LOGIC (Ensuring chart re-renders properly) ---
+    // --- THEME LOGIC ---
     function applyTheme(theme) {
          if (theme === 'dark') { document.documentElement.classList.add('dark'); }
          else { document.documentElement.classList.remove('dark'); }
@@ -608,7 +648,6 @@
          if(auth.currentUser) {
             if(gsChartInstance) { 
                 renderPerformanceChart('gsPerformanceChart', '#3B82F6');
-                // Re-load data to apply the re-rendered chart settings
                 if (currentView === 'gs-view') loadPerformanceData(auth.currentUser.uid, 'gs-view');
             }
             if(csatChartInstance) { 
