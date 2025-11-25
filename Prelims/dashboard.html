@@ -507,57 +507,61 @@
     
     // --- SIDEBAR LOGIC ---
     function handleSidebarState() {
+        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
         if (window.innerWidth >= 768) {
+            // Desktop: Sidebar visible by default, main content indented
             sidebar.classList.remove('-translate-x-full'); 
             mainContentElement.classList.add('md:ml-64');
+            if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
         } else {
+            // Mobile: Sidebar hidden by default, main content takes full width
             sidebar.classList.add('-translate-x-full');
             mainContentElement.classList.remove('md:ml-64');
+            if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
         }
     }
     
     function toggleSidebar() { 
-        sidebar.classList.toggle('-translate-x-full'); 
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        if (sidebarBackdrop) sidebarBackdrop.classList.toggle('hidden');
+
+        sidebar.classList.toggle('-translate-x-full'); 
+        
+        // Toggle backdrop visibility when sidebar state changes (primarily for mobile)
+        if (window.innerWidth < 768 && sidebarBackdrop) {
+             sidebarBackdrop.classList.toggle('hidden');
+        }
     }
     
     // --- VIEW SWITCHING (Handles Footer Navigation) ---
     function switchView(viewName) {
         let normalizedViewName;
 
-        // Determine if the request is for a component view or a static footer view
-        if (viewName === 'gs-view' || viewName === 'csat-view') {
-            normalizedViewName = viewName;
-            // Hide static footer views
-            spaViews.notifications.classList.add('hidden');
-            spaViews.settings.classList.add('hidden');
-            // Show only the requested component view
-            gsView.classList.add('hidden');
-            csatView.classList.add('hidden');
-            if (viewName === 'gs-view') {
-                gsView.classList.remove('hidden');
-            } else {
-                csatView.classList.remove('hidden');
-            }
-        } else {
-            normalizedViewName = viewName;
-            // Hide all content views
-            gsView.classList.add('hidden');
-            csatView.classList.add('hidden');
+        // Hide all major views
+        gsView.classList.add('hidden');
+        csatView.classList.add('hidden');
+        spaViews.notifications.classList.add('hidden');
+        spaViews.settings.classList.add('hidden');
 
-            // Hide/Show correct static view
-            for (const key in spaViews) {
-                if (key !== 'gs' && key !== 'csat' && spaViews[key]) {
-                    spaViews[key].classList.add('hidden');
-                }
-            }
-            if (spaViews[normalizedViewName]) {
-                spaViews[normalizedViewName].classList.remove('hidden');
-            }
+        // Determine target and show it
+        if (viewName === 'gs-view') {
+            normalizedViewName = 'gs-view';
+            gsView.classList.remove('hidden');
+        } else if (viewName === 'csat-view') {
+            normalizedViewName = 'csat-view';
+            csatView.classList.remove('hidden');
+        } else if (viewName === 'notifications') {
+            normalizedViewName = 'notifications';
+            spaViews.notifications.classList.remove('hidden');
+        } else if (viewName === 'settings') {
+            normalizedViewName = 'settings';
+            spaViews.settings.classList.remove('hidden');
+        } else {
+            // Default/Fallback
+            normalizedViewName = 'gs-view';
+            gsView.classList.remove('hidden');
         }
 
-        // Handle Sidebar Activation
+        // --- Sidebar Activation ---
         document.querySelectorAll('.sidebar-item').forEach(item => {
             item.classList.remove('active', 'bg-blue-500', 'text-white');
             item.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
@@ -571,15 +575,23 @@
                 link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
             }
         }
+        
+        // Close sidebar on mobile after clicking a link
+        if (window.innerWidth < 768) {
+             // Only close if a primary content link was clicked
+             if (normalizedViewName !== currentView) {
+                 toggleSidebar(); 
+             }
+        }
 
-        // Handle Footer Navigation Activation
+
+        // --- Footer Navigation Activation ---
         document.querySelectorAll('.footer-nav a').forEach(a => { a.classList.remove('active'); a.querySelector('svg').style.color = ''; });
         
         let activeNavButton = null;
         if (normalizedViewName === 'notifications') { activeNavButton = navNotifications; }
         else if (normalizedViewName === 'settings') { activeNavButton = navSettings; }
-        // We use nav-tests for the primary Prelims view state (GS/CSAT)
-        else if (normalizedViewName === 'gs-view' || normalizedViewName === 'csat-view') { activeNavButton = navTests; }
+        else { activeNavButton = navTests; } // Prelims is the primary 'Tests' view
 
         if (activeNavButton) {
             activeNavButton.classList.add('active');
@@ -588,7 +600,7 @@
         
         currentView = normalizedViewName;
 
-        // Load data/resources when switching to GS/CSAT
+        // Load resources (mock data update) when switching to GS/CSAT
         if (currentView === 'gs-view' || currentView === 'csat-view') {
              if (auth.currentUser) loadResourceData(auth.currentUser.uid, currentView);
         }
@@ -651,6 +663,7 @@
         if(sidebarCsatLink) sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
         
         // Footer Navigation (CRITICAL FUNCTIONALITY)
+        // These calls switch the view but also trigger toggleSidebar if on mobile (inside switchView)
         if (navNotifications) navNotifications.onclick = (e) => { e.preventDefault(); switchView('notifications'); };
         if (navSettings) navSettings.onclick = (e) => { e.preventDefault(); switchView('settings'); };
         if (navTests) navTests.onclick = (e) => { e.preventDefault(); switchView('gs-view'); }; // Default to GS view
@@ -677,6 +690,8 @@
         const alertOk = document.getElementById('alert-ok');
         if(alertOk) alertOk.addEventListener('click', () => alertModal.classList.add('hidden'));
 
+        // Handle window resize event to maintain correct sidebar state on desktop/mobile switch
+        window.addEventListener('resize', handleSidebarState);
     }
     
     // --- THEME LOGIC ---
