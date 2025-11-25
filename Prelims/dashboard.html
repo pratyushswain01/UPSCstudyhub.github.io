@@ -72,7 +72,13 @@
 </head>
 <body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
 
-    <!-- Flash Notification & Modals (Place your full modal HTML here) -->
+    <!-- MODAL PLACEHOLDERS (Minimal required structure) -->
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+            <p id="alert-message" class="font-medium"></p>
+            <button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button>
+        </div>
+    </div>
     
     <div id="app-view" class="hidden"> <!-- Initially hidden until user loads -->
         <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
@@ -89,11 +95,11 @@
                 </div>
                 <!-- Header right side -->
                 <div class="flex items-center gap-4">
-                    <!-- Placeholder for Streak Button (Requires HTML for streak-btn, streak-tooltip, etc. to function) -->
+                    <!-- Streak Placeholder -->
                     <button id="streak-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                         <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
                     </button>
-                    <!-- Placeholder for Calendar Button (Requires HTML for calendar-modal, etc. to function) -->
+                    <!-- Calendar Placeholder -->
                     <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
                         <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                     </button>
@@ -101,9 +107,14 @@
                         <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
                         </button>
-                        <!-- Placeholder for account dropdown (Requires HTML for account-dropdown, dropdown-display-name, etc. to function) -->
+                        <!-- Account Dropdown -->
                         <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20">
-                             <p class="px-4 py-2 text-sm text-slate-500">Loading...</p>
+                            <div class="px-4 py-2 border-b dark:border-slate-700">
+                                <p class="font-semibold text-sm" id="dropdown-display-name">UPSC Aspirant</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate" id="user-email-display">user@example.com</p>
+                            </div>
+                            <div class="border-t border-slate-200 dark:border-slate-700"></div>
+                            <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
                         </div>
                     </div>
                 </div>
@@ -136,7 +147,6 @@
 
                      <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-6 mb-2 px-3 border-t pt-4 border-slate-200 dark:border-slate-700">Navigation</h3>
                      <ul class="space-y-2">
-                         <!-- Links back to other main hubs (relative links remain correct: ../ means parent directory) -->
                          <li><a href="../dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Main Dashboard</a></li>
                          <li><a href="../TestSeries/test_hub.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Test Library</a></li>
                      </ul>
@@ -149,64 +159,81 @@
                      
                      <!-- GS View: Default Active -->
                      <div id="gs-view">
-                         <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">General Studies Performance</h1>
+                         <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">General Studies Resources</h1>
                          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                              
                              <div class="lg:col-span-2 space-y-6">
                                  <!-- Welcome Banner/GS Header -->
                                  <div id="welcome-banner-gs" class="bg-gradient-to-r from-blue-600 to-cyan-700 p-6 rounded-2xl shadow-lg text-white">
-                                     <h2 id="gs-welcome-heading" class="text-3xl font-bold">GS: Focus on Accuracy!</h2>
-                                     <p class="mt-1 opacity-80">Your General Studies results and analysis for Prelims.</p>
+                                     <h2 id="gs-welcome-heading" class="text-3xl font-bold">GS: Focus on Coverage!</h2>
+                                     <p class="mt-1 opacity-80">Explore the syllabus and essential reading list for General Studies.</p>
                                  </div>
                                  
-                                 <!-- GS Stat Cards -->
+                                 <!-- GS Stat Cards (Re-purposed for Key Syllabus Areas) -->
                                  <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                                      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. GS %</p><p id="gs-accuracy-value" class="text-lg font-bold">--%</p></div> 
+                                         <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.247m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.247" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Total Subjects</p><p id="gs-total-subjects" class="text-lg font-bold">7 Major</p></div> 
                                      </div>
                                      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">GS Tests Done</p><p id="gs-tests-taken-value" class="text-lg font-bold">--</p></div>
+                                         <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Current Affairs</p><p id="gs-ca-focus" class="text-lg font-bold">18 Months</p></div>
                                      </div>
                                      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-red-100 dark:bg-red-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.398 17c-.77 1.333.192 3 1.732 3z" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Weakest Subject</p><p id="gs-weak-subject-value" class="text-lg font-bold">--</p></div>
+                                         <div class="bg-red-100 dark:bg-red-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2m0 0h2m-2 0V6m-2 4h2m0 0V6m0 4h2m-2 0V6m-2 4h2m0 0V6m-2 4h2m0 0V6m-2 4h2m0 0V6" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Mandatory Readings</p><p id="gs-mandatory-readings" class="text-lg font-bold">NCERTs (6-12)</p></div>
                                      </div>
                                      <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21M9 17.25v-10.5a2.25 2.25 0 00-2-2.25H4.5M9 17.25H5.63c.09-.44.18-1.04.26-1.723A1.875 1.875 0 003.75 14.25H2.25c-.621 0-1.125-.504-1.125-1.125v-1.5c0-.621.504-1.125 1.125-1.125H3.75m9 6.75v-1.007a3 3 0 00.879-2.122L16.5 21m-6.75-3.75h10.5a2.25 2.25 0 002.25-2.25V6.75a2.25 2.25 0 00-2.25-2.25H16.5m-6.75 12.75v-10.5a2.25 2.25 0 012.25-2.25H12" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Highest Score</p><p id="gs-best-score-value" class="text-lg font-bold">--</p></div>
+                                         <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 00-2 2v8a2 2 0 002 2m0-10V4m0 2a2 2 0 012 2v8a2 2 0 01-2 2m-3-3h6" /></svg></div>
+                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Revision Cycles</p><p id="gs-revision-cycles" class="text-lg font-bold">3+ Recommended</p></div>
                                      </div>
                                  </div>
                                  
-                                 <!-- GS Performance Chart -->
+                                 <!-- GS Syllabus Overview (Replaces Chart) -->
                                  <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                     <h3 class="text-lg font-bold mb-4">GS Score Trend (Last 8 Tests)</h3>
-                                     <div><canvas id="gsPerformanceChart"></canvas></div>
+                                     <h3 class="text-lg font-bold mb-4">UPSC Prelims GS Syllabus Core Areas</h3>
+                                     <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                                         <li>Current events of National and International importance.</li>
+                                         <li>History of India and Indian National Movement.</li>
+                                         <li>Indian and World Geography - Physical, Social, Economic Geography of India and the World.</li>
+                                         <li>Indian Polity and Governance - Constitution, Political System, Panchayati Raj, Public Policy, Rights Issues, etc.</li>
+                                         <li>Economic and Social Development - Sustainable Development, Poverty, Inclusion, Demographics, Social Sector Initiatives, etc.</li>
+                                         <li>General issues on Environmental Ecology, Bio-diversity and Climate Change.</li>
+                                         <li>General Science.</li>
+                                     </ul>
+                                     <button class="mt-4 text-center text-sm font-semibold text-blue-600 hover:underline">Download Detailed Syllabus PDF</button>
                                  </div>
                                  
-                                 <!-- GS Recent Test Results -->
+                                 <!-- GS Essential Books (Replaces Recent Results) -->
                                  <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                     <h3 class="text-lg font-bold mb-4">Recent GS Test Results</h3>
-                                     <div id="gs-recent-tests-container" class="space-y-4">
-                                         <p class="text-sm text-center text-slate-500">No recent GS results found.</p>
+                                     <h3 class="text-lg font-bold mb-4">GS Essential Reading List (Standard Books)</h3>
+                                     <div id="gs-recent-tests-container" class="space-y-4 text-sm">
+                                         <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
+                                             <p class="font-semibold">Polity:</p> <span class="text-slate-500">M. Laxmikanth</span>
+                                         </div>
+                                         <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
+                                             <p class="font-semibold">Modern History:</p> <span class="text-slate-500">Spectrum (Rajiv Ahir)</span>
+                                         </div>
+                                         <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
+                                             <p class="font-semibold">Geography:</p> <span class="text-slate-500">G.C. Leong + NCERTs</span>
+                                         </div>
                                      </div>
+                                     <button class="mt-4 w-full text-center text-sm font-semibold text-blue-600 hover:underline">View Full Book List & Notes</button>
                                  </div>
                              </div>
                              
-                             <!-- GS Quick Links / Right Sidebar -->
+                             <!-- GS Study Pattern / Right Sidebar -->
                              <div class="lg:col-span-1 space-y-6">
                                  <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
                                      <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
-                                         Subject Focus Area
+                                         Recommended Study Pattern
                                      </h3>
                                      <div id="gs-subject-focus" class="space-y-3">
-                                         <!-- Links will be injected here -->
-                                        <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg"><p class="font-semibold text-red-600 text-sm">Action Needed: Modern History</p><p class="text-xs text-slate-500">3 consecutive low scores. Attempt Sectional Test 4.</p></div>
-                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"><p class="font-semibold text-yellow-600 text-sm">Revise: Environment</p><p class="text-xs text-slate-500">High variance in scores. Re-read key concepts.</p></div>
-                                        <div class="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg"><p class="font-semibold text-green-600 text-sm">Maintain: Polity</p><p class="text-xs text-slate-500">Consistently high scores. Aim for full tests.</p></div>
+                                        <div class="p-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-lg"><p class="font-semibold text-indigo-600 text-sm">Phase 1 (Concepts):</p><p class="text-xs text-slate-500">Complete 70% of static syllabus. Daily CA reading.</p></div>
+                                        <div class="p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg"><p class="font-semibold text-purple-600 text-sm">Phase 2 (Integration):</p><p class="text-xs text-slate-500">Attempt subject tests, link CA to static portions.</p></div>
+                                        <div class="p-3 bg-teal-50 dark:bg-teal-900/10 rounded-lg"><p class="font-semibold text-teal-600 text-sm">Phase 3 (Testing):</p><p class="text-xs text-slate-500">Full-length mocks & intensive revision (3 cycles min).</p></div>
                                      </div>
-                                     <button class="mt-4 w-full text-center text-sm font-semibold text-blue-600 hover:underline">View Detailed GS Analysis</button>
+                                     <button class="mt-4 w-full text-center text-sm font-semibold text-blue-600 hover:underline">Create Custom Study Plan</button>
                                  </div>
                              </div>
                          </div>
@@ -214,62 +241,80 @@
                      
                      <!-- CSAT View: Initially Hidden -->
                      <div id="csat-view" class="hidden">
-                        <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">CSAT Performance (Paper II)</h1>
+                        <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">CSAT Resources (Paper II)</h1>
                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                              
                             <div class="lg:col-span-2 space-y-6">
                                 <!-- Welcome Banner/CSAT Header -->
                                 <div id="welcome-banner-csat" class="bg-gradient-to-r from-amber-600 to-orange-700 p-6 rounded-2xl shadow-lg text-white">
-                                    <h2 id="csat-welcome-heading" class="text-3xl font-bold">CSAT: Focus on Qualification!</h2>
-                                    <p class="mt-1 opacity-80">Your Aptitude, Reasoning, and Comprehension results.</p>
+                                    <h2 id="csat-welcome-heading" class="text-3xl font-bold">CSAT: Focus on Practice!</h2>
+                                    <p class="mt-1 opacity-80">Resources for Aptitude, Reasoning, and Comprehension.</p>
                                 </div>
                                 
-                                <!-- CSAT Stat Cards -->
+                                <!-- CSAT Stat Cards (Re-purposed) -->
                                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Avg. CSAT Score</p><p id="csat-avg-score" class="text-lg font-bold">--</p></div> 
+                                        <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Total Questions</p><p id="csat-total-questions" class="text-lg font-bold">80 Qs</p></div> 
                                     </div>
                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
                                         <div class="bg-purple-100 dark:bg-purple-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">CSAT Tests Done</p><p id="csat-tests-taken-value" class="text-lg font-bold">--</p></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Qualifying Score</p><p id="csat-qualifying-score" class="text-lg font-bold">66 Marks</p></div>
                                     </div>
                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-pink-100 dark:bg-pink-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">RC Accuracy</p><p id="csat-rc-accuracy" class="text-lg font-bold">--%</p></div>
+                                        <div class="bg-pink-100 dark:bg-pink-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">RC Weightage</p><p id="csat-rc-weightage" class="text-lg font-bold">~40-45%</p></div>
                                     </div>
                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-teal-100 dark:bg-teal-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Highest Score</p><p id="csat-best-score-value" class="text-lg font-bold">--</p></div>
+                                        <div class="bg-teal-100 dark:bg-teal-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></div>
+                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Practice Goal</p><p id="csat-practice-goal" class="text-lg font-bold">Daily 1 hr</p></div>
                                     </div>
                                 </div>
                                 
-                                <!-- CSAT Performance Chart -->
+                                <!-- CSAT Syllabus Overview (Replaces Chart) -->
                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                    <h3 class="text-lg font-bold mb-4">CSAT Score Trend (Last 8 Tests)</h3>
-                                    <div><canvas id="csatPerformanceChart"></canvas></div>
+                                    <h3 class="text-lg font-bold mb-4">CSAT Syllabus Core Areas</h3>
+                                    <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                                        <li>Comprehension</li>
+                                        <li>Interpersonal skills including communication skills;</li>
+                                        <li>Logical reasoning and analytical ability.</li>
+                                        <li>Decision-making and problem-solving.</li>
+                                        <li>General mental ability.</li>
+                                        <li>Basic numeracy (Class X level) and Data Interpretation (Class X level).</li>
+                                    </ul>
+                                    <button class="mt-4 text-center text-sm font-semibold text-amber-600 hover:underline">View Topic-wise Breakdown</button>
                                 </div>
                                 
-                                <!-- CSAT Recent Test Results -->
+                                <!-- CSAT Essential Books (Replaces Recent Results) -->
                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                    <h3 class="text-lg font-bold mb-4">Recent CSAT Test Results</h3>
-                                    <div id="csat-recent-tests-container" class="space-y-4">
-                                        <p class="text-sm text-center text-slate-500">No recent CSAT results found.</p>
+                                    <h3 class="text-lg font-bold mb-4">CSAT Essential Reading/Practice List</h3>
+                                    <div id="csat-recent-tests-container" class="space-y-4 text-sm">
+                                        <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
+                                            <p class="font-semibold">Reading Comprehension:</p> <span class="text-slate-500">Past Year Papers (Critical)</span>
+                                        </div>
+                                        <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
+                                            <p class="font-semibold">Aptitude/Reasoning:</p> <span class="text-slate-500">RS Aggarwal (Select Chapters)</span>
+                                        </div>
+                                        <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
+                                            <p class="font-semibold">General Mental Ability:</p> <span class="text-slate-500">M.K. Pandey</span>
+                                        </div>
                                     </div>
+                                    <button class="mt-4 w-full text-center text-sm font-semibold text-amber-600 hover:underline">View Advanced Practice Sources</button>
                                 </div>
                             </div>
                             
-                            <!-- CSAT Quick Links / Right Sidebar -->
+                            <!-- CSAT Strategy / Right Sidebar -->
                             <div class="lg:col-span-1 space-y-6">
                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
                                     <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
-                                        Area to Focus
+                                        CSAT Strategy Guide
                                     </h3>
                                     <div id="csat-focus-area" class="space-y-3">
-                                        <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg"><p class="font-semibold text-red-600 text-sm">Priority: Data Interpretation</p><p class="text-xs text-slate-500">Avg. 40% accuracy. Complete practice set 3.</p></div>
-                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"><p class="font-semibold text-yellow-600 text-sm">Speed Check: Reading Comp.</p><p class="text-xs text-slate-500">Taking too much time per question. Target 2 mins/question.</p></div>
+                                        <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg"><p class="font-semibold text-red-600 text-sm">Rule 1: Never Ignore</p><p class="text-xs text-slate-500">CSAT is qualifying but high failure rates mean it must be respected.</p></div>
+                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"><p class="font-semibold text-yellow-600 text-sm">Rule 2: Selectivity</p><p class="text-xs text-slate-500">Master 40-45 Qs with high accuracy, don't try all 80.</p></div>
+                                        <div class="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg"><p class="font-semibold text-green-600 text-sm">Rule 3: Time Management</p><p class="text-xs text-slate-500">Practice full length mocks under strict 2-hour conditions.</p></div>
                                     </div>
-                                    <button class="mt-4 w-full text-center text-sm font-semibold text-amber-600 hover:underline">View Detailed CSAT Analysis</button>
+                                    <button class="mt-4 w-full text-center text-sm font-semibold text-amber-600 hover:underline">CSAT Time Allocation Planner</button>
                                 </div>
                             </div>
                         </div>
@@ -375,7 +420,8 @@
             renderPerformanceChart('csatPerformanceChart', '#F59E0B');
             
             // Step 4: Load Data for Default View (GS)
-            loadPerformanceData(user.uid, currentView);
+            // Note: Since we are now showing STATIC content (syllabus/books), loadData is simplified/mocked
+            loadResourceData(user.uid, currentView);
 
         } else {
             console.log('User is not logged in. Redirecting to auth page...');
@@ -471,176 +517,78 @@
         if (newView === 'gs-view') {
             gsView.classList.remove('hidden');
             sidebarGsLink.classList.add('active');
-            renderPerformanceChart('gsPerformanceChart', '#3B82F6'); 
+            // Since this view is now static content, no need to redraw the chart on switch, but we keep the canvas elements for layout consistency.
         } else if (newView === 'csat-view') {
             csatView.classList.remove('hidden');
             sidebarCsatLink.classList.add('active');
-            renderPerformanceChart('csatPerformanceChart', '#F59E0B'); 
         }
 
         currentView = newView;
         const user = auth.currentUser;
-        if (user) loadPerformanceData(user.uid, currentView);
+        if (user) loadResourceData(user.uid, currentView); // Use simplified resource loader
     }
 
-    // --- DATA FETCHING & UI UPDATES ---
-    async function loadPerformanceData(userId, type) {
-        const collectionName = type === 'gs-view' ? 'gs_prelims_history' : 'csat_prelims_history';
-        const userHistoryRef = collection(db, `artifacts/${appId}/users/${userId}/${collectionName}`);
-        
-        console.log(`Fetching data for ${collectionName}...`);
+    // --- DATA FETCHING (SIMPLIFIED FOR RESOURCE VIEW) ---
+    // We retain this function structure to simulate loading and updating data, 
+    // but the implementation now sets static resource content.
+    async function loadResourceData(userId, type) {
+        console.log(`Loading static resource view for ${type}...`);
 
-        try {
-            const q = query(userHistoryRef, orderBy("timestamp", "desc"));
-            const querySnapshot = await getDocs(q);
-            const results = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-            if (type === 'gs-view') {
-                updateGSStats(results);
-            } else {
-                updateCSATStats(results);
+        // Mock data structure, simulating an API call if needed later
+        const mockResources = {
+            'gs-view': {
+                subjects: 7,
+                ca_focus: '18 Months',
+                mandatory: 'NCERTs (6-12)',
+                cycles: '3+ Recommended',
+                rc_accuracy: 'N/A'
+            },
+            'csat-view': {
+                total_qs: 80,
+                qualifying: '66 Marks',
+                rc_weightage: '~40-45%',
+                practice: 'Daily 1 hr'
             }
+        };
 
-        } catch (error) {
-            console.error(`Error fetching ${type} performance data:`, error);
-            if (type === 'gs-view') { updateGSStats([]); } else { updateCSATStats([]); }
-        }
-    }
-    
-    function updateGSStats(results) {
-        const testsTaken = results.length;
-        const recentTests = results.slice(0, 3); 
-        const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
-        const totalPercentage = results.reduce((sum, r) => sum + (r.percentage || 0), 0);
-        const avgPercentage = testsTaken > 0 ? (totalPercentage / testsTaken).toFixed(2) : '0.00';
-        const highestScore = results.reduce((max, r) => Math.max(max, r.score || 0), 0).toFixed(1);
+        const data = mockResources[type];
 
-        document.getElementById('gs-accuracy-value').textContent = `${avgPercentage}%`;
-        document.getElementById('gs-tests-taken-value').textContent = testsTaken;
-        document.getElementById('gs-best-score-value').textContent = highestScore;
-
-        document.getElementById('gs-weak-subject-value').textContent = testsTaken > 0 ? 'Modern History' : '--';
-
-        const chartData = results; 
-        updateChartData(gsChartInstance, chartData, 'gsPerformanceChart', 'testName', 'percentage');
-        
-        updateRecentResults(document.getElementById('gs-recent-tests-container'), recentTests, 'GS');
-    }
-
-    function updateCSATStats(results) {
-        const testsTaken = results.length;
-        const recentTests = results.slice(0, 3); 
-        const totalScore = results.reduce((sum, r) => sum + (r.score || 0), 0);
-        const totalRCAccuracy = results.reduce((sum, r) => sum + (r.rcAccuracy || 0), 0); 
-        
-        const avgScore = testsTaken > 0 ? (totalScore / testsTaken).toFixed(1) : '0.0';
-        const avgRCAccuracy = testsTaken > 0 ? (totalRCAccuracy / testsTaken).toFixed(1) : '0.0';
-        const highestScore = results.reduce((max, r) => Math.max(max, r.score || 0), 0).toFixed(1);
-
-        document.getElementById('csat-avg-score').textContent = avgScore;
-        document.getElementById('csat-tests-taken-value').textContent = testsTaken;
-        document.getElementById('csat-rc-accuracy').textContent = `${avgRCAccuracy}%`;
-        document.getElementById('csat-best-score-value').textContent = highestScore;
-
-        const chartData = results; 
-        updateChartData(csatChartInstance, chartData, 'csatPerformanceChart', 'testName', 'score'); 
-
-        updateRecentResults(document.getElementById('csat-recent-tests-container'), recentTests, 'CSAT');
-    }
-    
-    function updateRecentResults(container, results, type) {
-        if (!container) return;
-        
-        if (results.length === 0) {
-            container.innerHTML = `<p class="text-sm text-center text-slate-500">No recent ${type} results found.</p>`;
-            return;
-        }
-
-        container.innerHTML = results.map(test => {
-            // Note: The review link needs to point up two levels since it's inside Prelims/ and the target is at TestSeries/
-            const reviewLink = `../../TestSeries/test_sample.html?testId=${test.testId}&reviewId=${test.id}`; 
-            const percentage = (test.percentage || 0).toFixed(1);
-            const score = (test.score || 0).toFixed(1);
+        // Update the UI based on the view type
+        if (type === 'gs-view') {
+            document.getElementById('gs-total-subjects').textContent = data.subjects + ' Major';
+            document.getElementById('gs-ca-focus').textContent = data.ca_focus;
+            document.getElementById('gs-mandatory-readings').textContent = data.mandatory;
+            document.getElementById('gs-revision-cycles').textContent = data.cycles;
+            // Clear or hide chart containers if they aren't used for static content visualization
+            // We keep the divs but stop chart rendering.
             
-            const isPassing = type === 'GS' ? test.score >= 100 : test.score >= 66;
-            const statusColor = isPassing ? 'text-green-600' : 'text-red-600'; 
-            
-            return `
-                <div class="p-4 rounded-lg border dark:border-slate-700 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div>
-                        <div class="flex items-center gap-3 mb-1">
-                            <span class="text-xs font-medium text-slate-500">${test.subject || 'Test'}</span>
-                        </div>
-                        <h4 class="font-bold">${test.testName || 'Unnamed Test'}</h4>
-                        <p class="text-sm text-slate-500 dark:text-slate-400">Score: <span class="${statusColor}">${score}</span> • Accuracy: ${percentage}%</p>
-                    </div>
-                    <a href="${reviewLink}" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-lg transition-colors text-sm">View Analysis</a>
-                </div>`;
-        }).join('');
-    }
-    
-    // --- CHART FUNCTIONS ---
-    function renderPerformanceChart(canvasId, color) {
-        const canvas = document.getElementById(canvasId);
-        if(!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        let chartInstance;
-        
-        // Destroy existing instance if switching views/re-rendering
-        if (canvasId === 'gsPerformanceChart') {
-            if (gsChartInstance) gsChartInstance.destroy();
-        } else {
-            if (csatChartInstance) csatChartInstance.destroy();
+        } else { // CSAT
+            document.getElementById('csat-total-questions').textContent = data.total_qs + ' Qs';
+            document.getElementById('csat-qualifying-score').textContent = data.qualifying;
+            document.getElementById('csat-rc-weightage').textContent = data.rc_weightage;
+            document.getElementById('csat-practice-goal').textContent = data.practice;
+            // Clear or hide chart containers if they aren't used for static content visualization
         }
-
-        const isDark = document.documentElement.classList.contains('dark');
-        const tickColor = isDark ? '#94a3b8' : '#64748b'; 
-        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
-
-        const yMax = canvasId === 'gsPerformanceChart' ? 100 : 200; 
-        const label = canvasId === 'gsPerformanceChart' ? 'Percentage Score' : 'Raw Score (Max 200)';
-
-
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: { labels: [], datasets: [{ label: label, data: [], borderColor: color, backgroundColor: `${color}33`, borderWidth: 2, tension: 0.4, fill: true }] },
-            options: {
-                responsive: true, maintainAspectRatio: false,
-                scales: {
-                    y: { beginAtZero: true, max: yMax, ticks: { color: tickColor }, grid: { color: gridColor } },
-                    x: { ticks: { color: tickColor, autoSkip: false, maxRotation: 45, minRotation: 45 }, grid: { display: false } }
-                },
-                plugins: { legend: { display: false } }
-            }
-        });
-
-        // Save the new instance
-        if (canvasId === 'gsPerformanceChart') { gsChartInstance = chartInstance; } else { csatChartInstance = chartInstance; }
+        
+        // This is where you would normally populate the syllabus and book list, 
+        // but since those are now static HTML blocks, we leave them alone.
     }
     
-    function updateChartData(chartInstance, results, canvasId, labelField, dataField) {
-        if (!chartInstance) return;
-        
-        // Use slice().reverse() to ensure older results are on the left of the chart
-        const reversedResults = results.slice().reverse();
-        
-        const labels = reversedResults.map(test => test[labelField] || 'Test');
-        const data = reversedResults.map(test => test[dataField] || 0);
-
-        chartInstance.data.labels = labels;
-        chartInstance.data.datasets[0].data = data;
-        chartInstance.update();
-    }
-
-
+    // --- EMPTY/DUMMY FUNCTIONS FOR LAYOUT CONSISTENCY ---
+    // These functions are kept but do nothing related to actual data fetching/charting
+    function renderPerformanceChart(canvasId, color) { /* Retained for initialization structure, logic removed/simplified */ }
+    function updateChartData(chartInstance, results, canvasId, labelField, dataField) { /* Retained for initialization structure */ }
+    function updateRecentResults(container, results, type) { /* Removed logic as content is static HTML */ }
+    function updateGSStats(results) { /* Removed logic as content is static HTML */ }
+    function updateCSATStats(results) { /* Removed logic as content is static HTML */ }
+    
     // --- EVENT LISTENERS ---
     function attachEventListeners() {
         // Toggle Sidebar
         const sidebarToggle = document.getElementById('sidebar-toggle');
         if(sidebarToggle) sidebarToggle.onclick = toggleSidebar;
         
-        // Sidebar View Switching
+        // Sidebar View Switching (CRITICAL FUNCTIONALITY)
         if(sidebarGsLink) sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
         if(sidebarCsatLink) sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
         
@@ -681,16 +629,9 @@
          if (theme === 'dark') { document.documentElement.classList.add('dark'); }
          else { document.documentElement.classList.remove('dark'); }
          
-         // Trigger chart re-render if theme changes
+         // Re-render only needed to update UI colors, no data fetching needed
          if(auth.currentUser) {
-            if(gsChartInstance) { 
-                renderPerformanceChart('gsPerformanceChart', '#3B82F6');
-                if (currentView === 'gs-view') loadPerformanceData(auth.currentUser.uid, 'gs-view');
-            }
-            if(csatChartInstance) { 
-                renderPerformanceChart('csatPerformanceChart', '#F59E0B');
-                if (currentView === 'csat-view') loadPerformanceData(auth.currentUser.uid, 'csat-view');
-            }
+            loadResourceData(auth.currentUser.uid, currentView);
          }
     }
     // Theme initialization must happen outside of functions to run immediately
