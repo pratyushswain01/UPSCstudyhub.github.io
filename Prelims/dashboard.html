@@ -319,6 +319,22 @@
                             </div>
                         </div>
                      </div>
+                     
+                     <!-- NEW: NOTIFICATIONS VIEW (FOR FOOTER NAVIGATION) -->
+                     <div id="notifications-view" class="hidden">
+                         <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Notifications (Prelims Hub)</h1>
+                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 text-center text-slate-500">
+                             No new updates regarding Prelims resources.
+                         </div>
+                     </div>
+                     
+                     <!-- NEW: SETTINGS VIEW (FOR FOOTER NAVIGATION) -->
+                     <div id="settings-view" class="hidden">
+                         <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Settings & Profile</h1>
+                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 text-center text-slate-500">
+                             General settings are handled here. (Functionality placeholders retained in JS)
+                         </div>
+                     </div>
 
                      <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
                          <p class="text-sm text-slate-500 dark:text-slate-400">© 2025 UPSChub. All Rights Reserved.</p>
@@ -369,6 +385,7 @@
     // --- ELEMENT SELECTORS ---
     const appView = document.getElementById('app-view'); 
     const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
     const mainContentElement = document.getElementById('main-content');
     const sidebarGsLink = document.getElementById('sidebar-gs');
     const sidebarCsatLink = document.getElementById('sidebar-csat');
@@ -376,6 +393,17 @@
     const csatView = document.getElementById('csat-view');
     const accountDropdown = document.getElementById('account-dropdown'); 
     const accountBtn = document.getElementById('account-btn');
+    const navNotifications = document.getElementById('nav-notifications');
+    const navSettings = document.getElementById('nav-settings');
+    const navTests = document.getElementById('nav-tests');
+
+    // View containers added for the router logic
+    const spaViews = { 
+        gs: gsView, 
+        csat: csatView, 
+        notifications: document.getElementById('notifications-view'), 
+        settings: document.getElementById('settings-view') 
+    };
 
     // Required by utility functions (defined as placeholders in HTML)
     const alertModal = document.getElementById('alert-modal');
@@ -416,12 +444,15 @@
             attachEventListeners();
             
             // Step 3: Initialize Charts (required before data fetching)
+            // We initialize but never populate them since this is a resource page.
             renderPerformanceChart('gsPerformanceChart', '#3B82F6');
             renderPerformanceChart('csatPerformanceChart', '#F59E0B');
             
             // Step 4: Load Data for Default View (GS)
-            // Note: Since we are now showing STATIC content (syllabus/books), loadData is simplified/mocked
-            loadResourceData(user.uid, currentView);
+            loadResourceData(user.uid, 'gs-view');
+
+            // Set initial active view state
+            switchView('gs-view');
 
         } else {
             console.log('User is not logged in. Redirecting to auth page...');
@@ -447,7 +478,6 @@
     }
     
     function updateTimeAndGreeting() {
-        // Mock images for demonstration
         const morningImage = 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop';
         const afternoonImage = 'https://images.unsplash.com/photo-1590306362572-215a054a88f5?q=80&w=2070&auto=format&fit=crop';
         const eveningImage = 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=1974&auto=format&fit=crop';
@@ -456,25 +486,18 @@
         const hour = now.getHours();
         
         const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
-        let greetingText, backgroundImageUrl;
+        let greetingText;
         
         if (hour >= 5 && hour < 12) {
             greetingText = `Good Morning, ${name}!`;
-            backgroundImageUrl = morningImage;
         } else if (hour >= 12 && hour < 18) {
             greetingText = `Good Afternoon, ${name}!`;
-            backgroundImageUrl = afternoonImage;
         } else {
             greetingText = `Good Evening, ${name}!`;
-            backgroundImageUrl = eveningImage;
         }
         
         const gsWelcomeHeading = document.getElementById('gs-welcome-heading');
         const csatWelcomeHeading = document.getElementById('csat-welcome-heading');
-
-        // Only update the banner background if the GS view is active (default for this code structure)
-        const activeBanner = currentView === 'gs-view' ? document.getElementById('welcome-banner-gs') : document.getElementById('welcome-banner-csat');
-        if (activeBanner) activeBanner.style.backgroundImage = `url('${backgroundImageUrl}')`; 
         
         if (gsWelcomeHeading) gsWelcomeHeading.textContent = `GS: ${greetingText.replace(', Aspirant!', '!')}`;
         if (csatWelcomeHeading) csatWelcomeHeading.textContent = `CSAT: ${greetingText.replace(', Aspirant!', '!')}`;
@@ -499,49 +522,89 @@
         if (sidebarBackdrop) sidebarBackdrop.classList.toggle('hidden');
     }
     
-    // --- VIEW SWITCHING ---
-    function switchView(newView) {
-        if (newView === currentView) return;
+    // --- VIEW SWITCHING (Handles Footer Navigation) ---
+    function switchView(viewName) {
+        let normalizedViewName;
 
-        gsView.classList.add('hidden');
-        csatView.classList.add('hidden');
-        
-        // Remove active styling from all sidebar items
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.classList.remove('active');
-            item.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
-            // Ensure icons match text color when inactive
-            item.querySelector('svg').style.color = ''; 
-        });
+        // Determine if the request is for a component view or a static footer view
+        if (viewName === 'gs-view' || viewName === 'csat-view') {
+            normalizedViewName = viewName;
+            // Hide static footer views
+            spaViews.notifications.classList.add('hidden');
+            spaViews.settings.classList.add('hidden');
+            // Show only the requested component view
+            gsView.classList.add('hidden');
+            csatView.classList.add('hidden');
+            if (viewName === 'gs-view') {
+                gsView.classList.remove('hidden');
+            } else {
+                csatView.classList.remove('hidden');
+            }
+        } else {
+            normalizedViewName = viewName;
+            // Hide all content views
+            gsView.classList.add('hidden');
+            csatView.classList.add('hidden');
 
-        if (newView === 'gs-view') {
-            gsView.classList.remove('hidden');
-            sidebarGsLink.classList.add('active');
-            // Since this view is now static content, no need to redraw the chart on switch, but we keep the canvas elements for layout consistency.
-        } else if (newView === 'csat-view') {
-            csatView.classList.remove('hidden');
-            sidebarCsatLink.classList.add('active');
+            // Hide/Show correct static view
+            for (const key in spaViews) {
+                if (key !== 'gs' && key !== 'csat' && spaViews[key]) {
+                    spaViews[key].classList.add('hidden');
+                }
+            }
+            if (spaViews[normalizedViewName]) {
+                spaViews[normalizedViewName].classList.remove('hidden');
+            }
         }
 
-        currentView = newView;
-        const user = auth.currentUser;
-        if (user) loadResourceData(user.uid, currentView); // Use simplified resource loader
+        // Handle Sidebar Activation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.classList.remove('active', 'bg-blue-500', 'text-white');
+            item.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
+            item.querySelector('svg').style.color = '';
+        });
+        
+        if (normalizedViewName === 'gs-view' || normalizedViewName === 'csat-view') {
+            const link = document.getElementById(`sidebar-${normalizedViewName.split('-')[0]}`);
+            if (link) {
+                link.classList.add('active');
+                link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
+            }
+        }
+
+        // Handle Footer Navigation Activation
+        document.querySelectorAll('.footer-nav a').forEach(a => { a.classList.remove('active'); a.querySelector('svg').style.color = ''; });
+        
+        let activeNavButton = null;
+        if (normalizedViewName === 'notifications') { activeNavButton = navNotifications; }
+        else if (normalizedViewName === 'settings') { activeNavButton = navSettings; }
+        // We use nav-tests for the primary Prelims view state (GS/CSAT)
+        else if (normalizedViewName === 'gs-view' || normalizedViewName === 'csat-view') { activeNavButton = navTests; }
+
+        if (activeNavButton) {
+            activeNavButton.classList.add('active');
+            activeNavButton.querySelector('svg').style.color = '#2563EB';
+        }
+        
+        currentView = normalizedViewName;
+
+        // Load data/resources when switching to GS/CSAT
+        if (currentView === 'gs-view' || currentView === 'csat-view') {
+             if (auth.currentUser) loadResourceData(auth.currentUser.uid, currentView);
+        }
     }
 
-    // --- DATA FETCHING (SIMPLIFIED FOR RESOURCE VIEW) ---
-    // We retain this function structure to simulate loading and updating data, 
-    // but the implementation now sets static resource content.
+
+    // --- DATA FETCHING (STATIC/RESOURCE VIEW LOGIC) ---
     async function loadResourceData(userId, type) {
         console.log(`Loading static resource view for ${type}...`);
 
-        // Mock data structure, simulating an API call if needed later
         const mockResources = {
             'gs-view': {
                 subjects: 7,
                 ca_focus: '18 Months',
                 mandatory: 'NCERTs (6-12)',
                 cycles: '3+ Recommended',
-                rc_accuracy: 'N/A'
             },
             'csat-view': {
                 total_qs: 80,
@@ -553,59 +616,51 @@
 
         const data = mockResources[type];
 
-        // Update the UI based on the view type
+        // Update the UI based on the view type (Static content update)
         if (type === 'gs-view') {
             document.getElementById('gs-total-subjects').textContent = data.subjects + ' Major';
             document.getElementById('gs-ca-focus').textContent = data.ca_focus;
             document.getElementById('gs-mandatory-readings').textContent = data.mandatory;
             document.getElementById('gs-revision-cycles').textContent = data.cycles;
-            // Clear or hide chart containers if they aren't used for static content visualization
-            // We keep the divs but stop chart rendering.
             
         } else { // CSAT
             document.getElementById('csat-total-questions').textContent = data.total_qs + ' Qs';
             document.getElementById('csat-qualifying-score').textContent = data.qualifying;
             document.getElementById('csat-rc-weightage').textContent = data.rc_weightage;
             document.getElementById('csat-practice-goal').textContent = data.practice;
-            // Clear or hide chart containers if they aren't used for static content visualization
         }
-        
-        // This is where you would normally populate the syllabus and book list, 
-        // but since those are now static HTML blocks, we leave them alone.
     }
     
-    // --- EMPTY/DUMMY FUNCTIONS FOR LAYOUT CONSISTENCY ---
-    // These functions are kept but do nothing related to actual data fetching/charting
-    function renderPerformanceChart(canvasId, color) { /* Retained for initialization structure, logic removed/simplified */ }
-    function updateChartData(chartInstance, results, canvasId, labelField, dataField) { /* Retained for initialization structure */ }
-    function updateRecentResults(container, results, type) { /* Removed logic as content is static HTML */ }
-    function updateGSStats(results) { /* Removed logic as content is static HTML */ }
-    function updateCSATStats(results) { /* Removed logic as content is static HTML */ }
-    
+    // --- DUMMY/CHART FUNCTIONS (Kept for compatibility, but simplified to avoid data fetch) ---
+    function renderPerformanceChart(canvasId, color) { /* Logic omitted */ }
+    function updateChartData(chartInstance, results, canvasId, labelField, dataField) { /* Logic omitted */ }
+    function updateRecentResults(container, results, type) { /* Logic omitted */ }
+    function updateGSStats(results) { /* Logic omitted */ }
+    function updateCSATStats(results) { /* Logic omitted */ }
+    function updateSubscriptionUI() { /* Logic omitted */ }
+    function handleUpgrade() { showAlert("Upgrade feature not fully implemented in this module."); }
+
+
     // --- EVENT LISTENERS ---
     function attachEventListeners() {
-        // Toggle Sidebar
-        const sidebarToggle = document.getElementById('sidebar-toggle');
+        // Toggle Sidebar (Header Button)
         if(sidebarToggle) sidebarToggle.onclick = toggleSidebar;
         
         // Sidebar View Switching (CRITICAL FUNCTIONALITY)
         if(sidebarGsLink) sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
         if(sidebarCsatLink) sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
         
+        // Footer Navigation (CRITICAL FUNCTIONALITY)
+        if (navNotifications) navNotifications.onclick = (e) => { e.preventDefault(); switchView('notifications'); };
+        if (navSettings) navSettings.onclick = (e) => { e.preventDefault(); switchView('settings'); };
+        if (navTests) navTests.onclick = (e) => { e.preventDefault(); switchView('gs-view'); }; // Default to GS view
+
         // Account Dropdown Toggle 
         if(accountBtn) accountBtn.onclick = () => accountDropdown && accountDropdown.classList.toggle('hidden');
         
         // Logout Button 
         const logoutBtn = document.getElementById('logout-btn');
         if (logoutBtn) logoutBtn.onclick = handleLogout;
-
-        // Footer Navigation Active State (Set Prelims as active)
-        document.querySelectorAll('.footer-nav a').forEach(a => a.classList.remove('active'));
-        const navTests = document.getElementById('nav-tests');
-        if(navTests) {
-            navTests.classList.add('active');
-            navTests.querySelector('svg').style.color = '#2563EB';
-        }
 
         // Handle generic sidebar toggle on click outside (only for mobile)
         const sidebarBackdrop = document.getElementById('sidebar-backdrop');
@@ -626,15 +681,19 @@
     
     // --- THEME LOGIC ---
     function applyTheme(theme) {
-         if (theme === 'dark') { document.documentElement.classList.add('dark'); }
-         else { document.documentElement.classList.remove('dark'); }
+         const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
+         if (theme === 'dark') { 
+            document.documentElement.classList.add('dark'); 
+            if(dropdownThemeToggle) dropdownThemeToggle.checked = true;
+         } else { 
+            document.documentElement.classList.remove('dark'); 
+            if(dropdownThemeToggle) dropdownThemeToggle.checked = false;
+         }
          
-         // Re-render only needed to update UI colors, no data fetching needed
          if(auth.currentUser) {
             loadResourceData(auth.currentUser.uid, currentView);
          }
     }
-    // Theme initialization must happen outside of functions to run immediately
     const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     applyTheme(savedTheme);
 
