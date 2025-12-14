@@ -53,6 +53,41 @@
             list-style-type: disc;
             padding-left: 1rem;
         }
+
+        /* Feedback Section Custom Styles */
+        .feedback-box {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            transition: all 0.3s ease;
+            min-height: 80px; /* Ensure consistent height */
+        }
+        /* Vertical separator between buttons */
+        .vertical-separator {
+            height: 32px;
+            width: 2px;
+            background-color: #2563eb; /* Blue-600 */
+            margin: 0 8px;
+        }
+        /* Custom button styling */
+        .feedback-btn {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            background-color: #00b894; /* Teal color */
+            transition: transform 0.2s ease, background-color 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        .feedback-btn:hover {
+            transform: scale(1.1);
+            background-color: #00a383;
+        }
+        .feedback-btn i {
+            font-size: 1.25rem;
+        }
     </style>
 </head>
 
@@ -502,6 +537,36 @@
                     </ul>
                 </div>
 
+                <div id="feedback-section" class="feedback-box bg-white rounded-lg mt-12 p-5 flex items-center justify-between">
+                    
+                    <div id="feedback-initial" class="flex items-center justify-between w-full">
+                        <span class="text-blue-600 font-semibold text-base md:text-lg">What are your Feelings</span>
+                        
+                        <div class="flex items-center">
+                            <button onclick="handleFeedback('happy')" class="feedback-btn focus:outline-none" title="Happy">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            
+                            <div class="vertical-separator"></div>
+                            
+                            <button onclick="handleFeedback('neutral')" class="feedback-btn focus:outline-none" title="Neutral">
+                                <i class="fas fa-meh"></i>
+                            </button>
+                            
+                            <div class="vertical-separator"></div>
+                            
+                            <button onclick="handleFeedback('sad')" class="feedback-btn focus:outline-none" title="Sad">
+                                <i class="fas fa-frown"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="feedback-result" class="hidden w-full text-center">
+                        <p id="feedback-message" class="text-gray-800 text-lg font-medium"></p>
+                    </div>
+
+                </div>
+
             </article>
         </div>
     </main>
@@ -518,25 +583,43 @@
     </footer>
     
     <script>
+        // Date Time Script
         function updateDateTime() {
             const now = new Date();
-            
-            // Time
             const timeOpts = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
             const timeEl = document.getElementById('time-display');
-            if (timeEl) {
-                timeEl.textContent = now.toLocaleTimeString('en-US', timeOpts);
-            }
+            if (timeEl) timeEl.textContent = now.toLocaleTimeString('en-US', timeOpts);
             
-            // Date
             const dateOpts = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             const dateEl = document.getElementById('date-display');
-            if (dateEl) {
-                dateEl.textContent = now.toLocaleDateString('en-US', dateOpts);
-            }
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', dateOpts);
         }
         updateDateTime();
         setInterval(updateDateTime, 1000);
+
+        // Feedback Logic
+        function handleFeedback(type) {
+            const initialView = document.getElementById('feedback-initial');
+            const resultView = document.getElementById('feedback-result');
+            const messageEl = document.getElementById('feedback-message');
+
+            let message = "";
+            if (type === 'happy') {
+                message = "Thanks for your feedback";
+            } else if (type === 'neutral') {
+                message = "aww....we will try for best....";
+            } else if (type === 'sad') {
+                message = "give them a feedback....try to improve you and your mindset fool";
+            }
+
+            // Set the message text
+            messageEl.textContent = message;
+
+            // Toggle visibility
+            initialView.classList.add('hidden');
+            resultView.classList.remove('hidden');
+            resultView.classList.add('block');
+        }
     </script>
 </body>
 </html>
