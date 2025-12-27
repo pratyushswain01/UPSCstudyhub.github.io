@@ -142,22 +142,27 @@
     // --- AUTH PERSISTENCE AND STATE ---
     setPersistence(auth, browserLocalPersistence)
         .then(() => {
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    // SET SESSION KEY
-                    localStorage.setItem('upschub_session', user.email); 
+          onAuthStateChanged(auth, user => {
+    if (user) {
+        // Only redirect if the user didn't JUST click logout
+        // We check if the local guard exists. 
+        // If it doesn't exist but Firebase says 'user', we set it (returning user).
+        if (!localStorage.getItem('upschub_session')) {
+            localStorage.setItem('upschub_session', user.email);
+        }
 
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirectUrl = urlParams.get('redirect') || 'schedule.html';
-                    
-                    console.log("Redirecting to:", redirectUrl);
-                    window.location.href = redirectUrl;
-                } else {
-                    // Hide loader so user can log in
-                    loader.style.display = 'none';
-                    localStorage.removeItem('upschub_session');
-                }
-            });
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect') || 'schedule.html';
+        
+        console.log("Redirecting to:", redirectUrl);
+        window.location.href = redirectUrl;
+    } else {
+        // No user found or just logged out
+        loader.style.display = 'none'; // Hide the "Verifying Session" spinner
+        localStorage.removeItem('upschub_session');
+        console.log("User is logged out. Staying on Auth page.");
+    }
+});
         })
         .catch((error) => {
             console.error(error);
