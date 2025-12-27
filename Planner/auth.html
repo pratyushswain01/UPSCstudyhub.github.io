@@ -115,30 +115,31 @@
     setPersistence(auth, browserLocalPersistence)
         .then(() => {
             // Now attach the "smart" auth state observer
-            onAuthStateChanged(auth, user => {
-                if (user) {
-                    // User is logged in, check where to redirect
-                    console.log("User logged in, checking for redirect...");
+onAuthStateChanged(auth, user => {
+    if (user) {
+        // --- THE CRITICAL FIX ---
+        // You must set the session key here so the planner knows you are authenticated
+        localStorage.setItem('upschub_session', user.email); 
 
-                    // 1. Look for the "redirect=..." note in the URL
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirectUrl = urlParams.get('redirect');
-                    
-                    if (redirectUrl) {
-                        // 2. If a redirectUrl is found (e.g., "planner.html"), go there
-                        console.log("Redirecting back to:", redirectUrl);
-                        window.location.href = redirectUrl;
-                    } else {
-                        // 3. If no redirectUrl is found, go to the dashboard as usual
-                        console.log("No redirect found, going to dashboard.");
-                        window.location.href = 'schedule.html';
-                    }
-                } else {
-                    // No user, do nothing. The user needs to see the login/signup form.
-                    console.log("No user found, showing auth form.");
-                }
-            });
-        })
+        console.log("User logged in, session key set. Checking for redirect...");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        
+        if (redirectUrl) {
+            console.log("Redirecting back to:", redirectUrl);
+            window.location.href = redirectUrl;
+        } else {
+            console.log("No redirect found, going to schedule.html.");
+            // Make sure this filename matches your planner file exactly
+            window.location.href = 'schedule.html'; 
+        }
+    } else {
+        console.log("No user found, showing auth form.");
+        // If the user is logged out, clear the session key just in case
+        localStorage.removeItem('upschub_session');
+    }
+});
         .catch((error) => {
             console.error("Error setting persistence:", error);
             displayMessage("Error initializing session. Please try again.", "red");
