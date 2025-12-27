@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSChub - Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <div id="auth-view" class="flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md mx-auto">
+            <div class="text-center mb-6">
+                 <a href="index.html" class="text-3xl font-bold text-blue-600">UPSChub</a>
+            </div>
+            <div id="auth-container" class="bg-white p-8 rounded-2xl shadow-xl transition-all duration-500">
+                
+                <div id="signin-form">
+                    <h2 class="text-2xl font-bold text-gray-800 text-center">Welcome Back!</h2>
+                    <p class="text-gray-500 text-center mt-2 mb-8">Sign in to access your Planner</p>
+                    
+                    <form id="loginForm">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="login-email" class="text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" id="login-email" required class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="login-password" class="text-sm font-medium text-gray-700">Password</label>
+                                <input type="password" id="login-password" required class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                        </div>
+                        <button type="submit" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            Sign In
+                        </button>
+                    </form>
+
+                    <p class="text-center text-sm text-gray-500 mt-8">
+                        Don't have an account? 
+                        <a href="#" id="show-signup" class="font-semibold text-blue-600 hover:underline">Sign up now</a>
+                    </p>
+                </div>
+
+                <div id="signup-form" class="hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 text-center">Create an Account</h2>
+                    <p class="text-gray-500 text-center mt-2 mb-8">Get started with your free account.</p>
+                    
+                    <form id="registerForm">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="signup-email" class="text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" id="signup-email" required class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="signup-password" class="text-sm font-medium text-gray-700">Password</label>
+                                <input type="password" id="signup-password" required minlength="6" class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                        </div>
+                        <button type="submit" class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            Create Account
+                        </button>
+                    </form>
+                    
+                    <p class="text-center text-sm text-gray-500 mt-8">
+                        Already have an account? 
+                        <a href="#" id="show-signin" class="font-semibold text-blue-600 hover:underline">Sign in</a>
+                    </p>
+                </div>
+                 <div id="message" class="mt-4 text-center text-sm font-medium"></div>
+            </div>
+        </div>
+    </div>
+    
+<script type="module">
+    // --- Firebase SDK Imports ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    // 1. UPDATED IMPORT: Added setPersistence and browserLocalPersistence
+    import { 
+        getAuth, 
+        createUserWithEmailAndPassword, 
+        signInWithEmailAndPassword, 
+        onAuthStateChanged,
+        setPersistence,
+        browserLocalPersistence
+    } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // --- Firebase Configuration ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+      authDomain: "upscstudyhub-github.firebaseapp.com",
+      projectId: "upscstudyhub-github",
+      storageBucket: "upscstudyhub-github.firebasestorage.app",
+      messagingSenderId: "451692540885",
+      appId: "1:451692540885:web:b425e85128e5de97c7c35c",
+      measurementId: "G-33F0XSLP53"
+    };
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+    
+    // --- Initialize Firebase ---
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // --- 2. UPDATED AUTH LOGIC ---
+    // This now saves the login (persistence) and handles redirects smartly.
+    
+    // Set persistence first
+    setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+            // Now attach the "smart" auth state observer
+            onAuthStateChanged(auth, user => {
+                if (user) {
+                    // User is logged in, check where to redirect
+                    console.log("User logged in, checking for redirect...");
+
+                    // 1. Look for the "redirect=..." note in the URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const redirectUrl = urlParams.get('redirect');
+                    
+                    if (redirectUrl) {
+                        // 2. If a redirectUrl is found (e.g., "planner.html"), go there
+                        console.log("Redirecting back to:", redirectUrl);
+                        window.location.href = redirectUrl;
+                    } else {
+                        // 3. If no redirectUrl is found, go to the dashboard as usual
+                        console.log("No redirect found, going to dashboard.");
+                        window.location.href = 'schedule.html';
+                    }
+                } else {
+                    // No user, do nothing. The user needs to see the login/signup form.
+                    console.log("No user found, showing auth form.");
+                }
+            });
+        })
+        .catch((error) => {
+            console.error("Error setting persistence:", error);
+            displayMessage("Error initializing session. Please try again.", "red");
+        });
+
+    // --- Page Elements ---
+    const signinFormContainer = document.getElementById('signin-form');
+    const signupFormContainer = document.getElementById('signup-form');
+    const showSignupLink = document.getElementById('show-signup');
+    const showSigninLink = document.getElementById('show-signin');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
+    const messageDiv = document.getElementById('message');
+
+    // --- Toggling between Sign In and Sign Up forms ---
+    showSignupLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        signinFormContainer.classList.add('hidden');
+        signupFormContainer.classList.remove('hidden');
+        messageDiv.textContent = '';
+    });
+
+    showSigninLink.addEventListener('click', (e) => {
+        e.preventDefault();
+        signupFormContainer.classList.add('hidden');
+        signinFormContainer.classList.remove('hidden');
+        messageDiv.textContent = '';
+    });
+    
+    // --- Handle Registration ---
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('signup-email').value;
+        const password = document.getElementById('signup-password').value;
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                const user = userCredential.user;
+                const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                
+                return setDoc(userDocRef, {
+                    email: user.email,
+                    isPremium: false,
+                    createdAt: new Date()
+                });
+            })
+            .then(() => {
+                displayMessage('Account created! Please sign in.', 'green');
+                setTimeout(() => {
+                    showSigninLink.click();
+                    document.getElementById('login-email').value = email;
+                    document.getElementById('login-password').focus();
+                }, 1000);
+            })
+            .catch((error) => {
+                displayMessage(error.message, 'red');
+            });
+    });
+
+    // --- Handle Login ---
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        
+        signInWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // On successful login, the onAuthStateChanged observer above will trigger the redirect.
+                displayMessage('Logging in...', 'green');
+            })
+            .catch((error) => {
+                displayMessage('Invalid email or password.', 'red');
+            });
+    });
+
+    // --- Helper Functions ---
+    function displayMessage(msg, color) {
+        messageDiv.textContent = msg;
+        messageDiv.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
+    }
+</script>
+</body>
+</html>
