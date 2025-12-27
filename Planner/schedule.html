@@ -179,21 +179,20 @@
 
     <script>
         // --- AUTH GUARD ---
-        function runAuthCheck() {
-            // Check for session in localStorage
-            const userSession = localStorage.getItem('upschub_session');
-            
-            if (!userSession) {
-                // If not found, redirect to your login/auth page
-                window.location.href = "auth.html";
-            } else {
-                // Success: Show content and load user info
-                document.body.style.display = "block";
-                document.getElementById('userEmail').innerText = userSession;
-                loadPlannerData();
-            }
-        }
-
+       function runAuthCheck() {
+    const userSession = localStorage.getItem('upschub_session');
+    
+    if (!userSession) {
+        // Redirect if the session key isn't found
+        window.location.href = "auth.html";
+    } else {
+        // Reveal the UI only after session is confirmed
+        document.body.style.display = "block";
+        const emailEl = document.getElementById('userEmail');
+        if (emailEl) emailEl.innerText = userSession;
+        loadPlannerData();
+    }
+}
         function logoutUser() {
             localStorage.removeItem('upschub_session');
             window.location.href = "auth.html";
