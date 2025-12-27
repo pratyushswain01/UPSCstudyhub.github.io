@@ -18,6 +18,7 @@
             --text-muted: #64748b;
             --success: #10b981;
             --border: #e2e8f0;
+            --sidebar-width: 350px;
         }
 
         body { 
@@ -27,8 +28,7 @@
             margin: 0; 
             color: var(--text-main);
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            overflow-x: hidden;
         }
 
         /* --- LOADING OVERLAY --- */
@@ -66,206 +66,181 @@
         }
         .logo { font-weight: 800; color: var(--primary); font-size: 1.5rem; letter-spacing: -0.5px; text-decoration: none; }
         
-        .user-nav { display: flex; align-items: center; gap: 20px; }
+        .user-nav { display: flex; align-items: center; gap: 15px; }
+        .icon-btn { 
+            background: var(--primary); color: white; border: none; 
+            width: 40px; height: 40px; border-radius: 10px; 
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.3s;
+        }
         .logout-btn { 
-            background: #fef2f2;
-            color: #ef4444; 
-            border: 1px solid #fee2e2;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.85rem;
-            cursor: pointer;
-            transition: 0.2s;
+            color: #ef4444; font-weight: 600; font-size: 0.85rem; cursor: pointer;
+            padding: 8px 12px; border-radius: 8px; border: 1px solid transparent;
         }
-        .logout-btn:hover { background: #fee2e2; }
+        .logout-btn:hover { background: #fef2f2; border-color: #fee2e2; }
 
-        /* --- LIVE BAR --- */
-        .live-info-bar {
-            background: #fff;
-            padding: 10px 5%;
+        /* --- LAYOUT WRAPPER --- */
+        .app-container {
             display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            gap: 25px;
-            font-size: 0.85rem;
-            font-weight: 700;
-            border-bottom: 1px solid #f1f5f9;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 100%;
+            flex: 1;
         }
 
-        /* --- MAIN LAYOUT --- */
-        .main-wrapper { flex: 1; }
-        .page-heading { text-align: center; padding: 40px 20px 10px; }
-        .page-heading h1 { font-size: 2.2rem; font-weight: 800; margin: 0; color: var(--text-main); }
-        .page-heading p { color: var(--text-muted); margin-top: 5px; }
-
-        .main-container {
-            max-width: 1250px;
-            margin: 20px auto 60px;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 30px;
+        /* --- MAIN CONTENT AREA --- */
+        .main-wrapper {
+            flex: 1;
+            padding: 20px 5%;
+            transition: all 0.4s ease;
+            max-width: 100%;
         }
 
-        /* --- CALENDAR SIDEBAR --- */
+        .page-heading { text-align: left; margin-bottom: 30px; }
+        .page-heading h1 { font-size: 1.8rem; font-weight: 800; margin: 0; }
+
+        /* --- CALENDAR SIDEBAR (RIGHT) --- */
         .calendar-sidebar {
+            width: var(--sidebar-width);
             background: white;
-            border-radius: 20px;
-            padding: 20px;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            height: fit-content;
+            border-left: 1px solid var(--border);
+            padding: 25px;
+            height: calc(100vh - 65px);
+            position: sticky;
+            top: 65px;
+            right: 0;
+            transition: transform 0.4s ease, width 0.4s ease, opacity 0.3s;
+            overflow-y: auto;
         }
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .calendar-header h3 { font-size: 1rem; font-weight: 800; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
-        .weekday { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-align: center; padding-bottom: 10px; }
-        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+
+        .calendar-sidebar.closed {
+            transform: translateX(100%);
+            width: 0;
+            padding: 0;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* --- CALENDAR UI --- */
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+        .weekday { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-align: center; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.2s; }
         .day:hover:not(.empty) { background: var(--bg); color: var(--primary); }
-        .day.today { color: var(--primary); background: var(--primary-glow); }
+        .day.today { color: var(--primary); border: 2px solid var(--primary); }
         .day.selected { background: var(--primary) !important; color: white !important; }
 
-        /* --- PLANNER & WATERMARK --- */
-        .planner-area { position: relative; display: flex; flex-direction: column; gap: 20px; }
-        .card { 
-            background: white; 
-            border-radius: 20px; 
-            border: 1px solid var(--border); 
-            overflow: hidden;
-            position: relative;
-        }
-        
-        /* Watermark */
+        /* --- PLANNER UI --- */
+        .planner-area { display: flex; flex-direction: column; gap: 20px; position: relative; }
+        .card { background: white; border-radius: 20px; border: 1px solid var(--border); overflow: hidden; position: relative; }
         .card::before {
-            content: "UPSChub Official";
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg);
-            font-size: 4rem;
-            font-weight: 900;
-            color: rgba(37, 99, 235, 0.03);
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 0;
+            content: "UPSChub Official"; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg); font-size: 3.5rem;
+            font-weight: 900; color: rgba(37, 99, 235, 0.03); pointer-events: none;
         }
 
         .search-box {
-            background: white; border-radius: 14px; padding: 10px 18px;
-            display: flex; align-items: center; border: 1px solid var(--border);
+            background: white; border-radius: 14px; padding: 12px 20px;
+            display: flex; align-items: center; border: 1px solid var(--border); margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
         }
-        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; font-size: 0.95rem; }
+        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; }
 
         table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
         th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid var(--border); }
-        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
+        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.9rem; }
         .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
         /* --- FOOTER --- */
-        footer {
-            background: var(--white);
-            padding: 40px 5%;
-            border-top: 1px solid var(--border);
-            margin-top: auto;
-        }
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-        .footer-logo { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
-        .copyright { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
-        .footer-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
-        .footer-links a { text-decoration: none; color: inherit; transition: 0.2s; }
-        .footer-links a:hover { color: var(--primary); }
+        footer { background: var(--white); padding: 30px 5%; border-top: 1px solid var(--border); margin-top: auto; }
+        .footer-content { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-muted); }
 
-        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } .footer-content { flex-direction: column; text-align: center; } }
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media (max-width: 768px) {
+            .calendar-sidebar {
+                position: fixed; width: 100%; height: 100%; top: 0; z-index: 1000;
+                transform: translateY(100%); border-left: none;
+            }
+            .calendar-sidebar.closed { transform: translateY(100%); width: 100%; }
+            .calendar-sidebar:not(.closed) { transform: translateY(0); }
+            .main-container { grid-template-columns: 1fr; }
+            .search-box { width: 100%; }
+        }
     </style>
 </head>
 <body>
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <p class="mt-4 font-bold" style="margin-top:15px">Synchronizing Database...</p>
+        <p class="mt-4 font-bold" style="margin-top:15px">Loading your path to LBSNAA...</p>
     </div>
 
     <header>
-        <a href="#" class="logo">UPSChub</a>
+        <div class="logo">UPSChub</div>
         <div class="user-nav">
-            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);" id="userDisplay">Aspirant</span>
-            <button id="logoutBtn" class="logout-btn">Sign Out</button>
+            <div class="icon-btn" onclick="toggleCalendar()" title="Toggle Calendar">
+                <i class="fa-solid fa-calendar-day"></i>
+            </div>
+            <div id="logoutBtn" class="logout-btn">Sign Out</div>
         </div>
     </header>
 
     <div class="live-info-bar">
         <div style="color:var(--primary)"><i class="fa-solid fa-clock"></i> <span id="liveClock">00:00:00</span></div>
-        <div style="color:var(--text-muted)"><i class="fa-solid fa-calendar-day"></i> <span id="liveDate">Loading...</span></div>
+        <div style="color:var(--text-muted); font-size: 0.8rem;" id="liveDate">Loading Date...</div>
     </div>
 
-    <div class="main-wrapper">
-        <div class="page-heading">
-            <h1>1-Year Study Planner</h1>
-            <p><strong>Year 2026</strong></p>
-            <p>Your personalized roadmap to cracking the UPSC CSE.</p>
-        </div>
+    <div class="app-container">
+        <main class="main-wrapper" id="mainWrapper">
+            <div class="page-heading">
+                <h1>Academic Planner</h1>
+                <p id="userDisplay" style="color:var(--text-muted); margin:0;">Welcome, Aspirant</p>
+            </div>
 
-        <div class="main-container">
-            <aside class="calendar-sidebar">
-                <div class="calendar-header">
-                    <i class="fa-solid fa-chevron-left" style="cursor:pointer" onclick="changeMonth(-1)"></i>
-                    <h3 id="monthDisplay">Month Year</h3>
-                    <i class="fa-solid fa-chevron-right" style="cursor:pointer" onclick="changeMonth(1)"></i>
-                </div>
-                <div class="calendar-grid" id="calendarGrid">
-                    <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
-                    <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
-                </div>
-            </aside>
-
-            <main class="planner-area">
+            <div class="planner-area">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
                     <input type="text" id="searchInput" placeholder="Search topics across the year..." onkeyup="filterTasks()">
                 </div>
 
                 <div class="card">
-                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
-                        <h2 style="font-size:1.1rem; margin:0;">Planner for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff;">
+                        <h2 style="font-size:1.1rem; margin:0;">Agenda for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
                     </div>
                     <table>
                         <thead>
-                            <tr><th style="width:25%">Subject</th><th>Learning Objective</th><th style="text-align:center; width:100px;">Status</th></tr>
+                            <tr><th style="width:25%">Subject</th><th>Learning Objective</th><th style="text-align:center; width:80px;">Status</th></tr>
                         </thead>
                         <tbody id="plannerBody"></tbody>
                     </table>
                 </div>
 
                 <div class="card" style="padding:20px;">
-                    <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Daily Notes & Reflection</h3>
-                    <textarea id="dynamicNotes" style="width:100%; min-height:100px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6; background: transparent;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
+                    <h3 style="font-size:0.9rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Day Reflection</h3>
+                    <textarea id="dynamicNotes" style="width:100%; min-height:80px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6; background: transparent;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
                 </div>
-            </main>
-        </div>
+            </div>
+        </main>
+
+        <aside class="calendar-sidebar" id="calendarSidebar">
+            <div class="calendar-header">
+                <i class="fa-solid fa-chevron-left" style="cursor:pointer" onclick="changeMonth(-1)"></i>
+                <h3 id="monthDisplay">Month Year</h3>
+                <i class="fa-solid fa-chevron-right" style="cursor:pointer" onclick="changeMonth(1)"></i>
+            </div>
+            <div class="calendar-grid" id="calendarGrid">
+                <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
+                <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
+            </div>
+            <button onclick="toggleCalendar()" class="icon-btn" style="width:100%; margin-top:20px; background:#f1f5f9; color:var(--text-muted); font-size:0.8rem;">
+                Close Calendar
+            </button>
+        </aside>
     </div>
 
     <footer>
         <div class="footer-content">
-            <div class="footer-logo">
-  <img src="../../images/LOGO.jpg" alt="UPSChub Logo" style="height:40px;width:auto;">
-</div>
-            <div class="copyright">
-                &copy; 2025 UPSChub. All Rights Reserved. <br>
-                <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
-            </div>
-            <div class="footer-links">
-                <a href="#">Privacy Policy</a>
-                <a href="#">Terms of Service</a>
-                <a href="#">Help Center</a>
-            </div>
+            <div>&copy; 2025 UPSChub Academy. All Rights Reserved.</div>
+            <div style="opacity:0.6">Empowering Civil Servants</div>
         </div>
     </footer>
 
@@ -288,13 +263,13 @@
     let currentViewDate = new Date();
     let selectedDateStr = new Date().toISOString().split('T')[0];
     let fullData = [];
-    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; // 🔴 REPLACE THIS
+    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; 
 
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
         else {
-            document.body.style.display = "flex";
-            document.getElementById('userDisplay').innerText = user.email;
+            document.body.style.display = "block";
+            document.getElementById('userDisplay').innerText = `Logged in: ${user.email}`;
             initDashboard();
         }
     });
@@ -305,6 +280,12 @@
             window.location.href = "auth.html";
         });
     });
+
+    // --- SIDEBAR TOGGLE ---
+    window.toggleCalendar = function() {
+        const sidebar = document.getElementById('calendarSidebar');
+        sidebar.classList.toggle('closed');
+    }
 
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
@@ -344,6 +325,7 @@
         renderCalendar();
         filterTasks();
         loadNote();
+        if(window.innerWidth <= 768) toggleCalendar(); // Close on mobile after selection
     }
 
     async function initDashboard() {
