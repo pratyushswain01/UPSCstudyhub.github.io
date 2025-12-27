@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Study Planner - UPSChub</title>
+    <title>Dashboard | UPSChub Official</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -66,7 +66,25 @@
         }
         .logo { font-weight: 800; color: var(--primary); font-size: 1.5rem; letter-spacing: -0.5px; text-decoration: none; }
         
-        .user-nav { display: flex; align-items: center; gap: 15px; }
+        .user-nav { display: flex; align-items: center; gap: 12px; }
+        
+        /* New Complete Planner Button */
+        .btn-full-planner {
+            background: #f1f5f9;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 8px 14px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+        .btn-full-planner:hover { background: #e2e8f0; }
+
         .calendar-toggle-btn { 
             background: var(--primary); color: white; border: none; 
             padding: 8px 15px; border-radius: 10px; 
@@ -83,7 +101,6 @@
             font-weight: 600;
             font-size: 0.85rem;
             cursor: pointer;
-            transition: 0.2s;
         }
 
         /* --- LIVE INFO BAR --- */
@@ -124,9 +141,8 @@
             position: relative;
         }
         
-        /* Official Watermark */
         .card::before {
-            content: "UPSChub";
+            content: "UPSChub Official";
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-15deg);
@@ -149,7 +165,7 @@
         td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
         .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
-        /* --- COLLAPSIBLE CALENDAR SIDEBAR (RIGHT) --- */
+        /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -198,13 +214,14 @@
             gap: 20px;
         }
         .footer-logo img { height: 40px; width: auto; border-radius: 5px; }
-        .copyright { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
 
         @media (max-width: 900px) {
             .app-container { flex-direction: column; }
             .calendar-sidebar { width: 100%; position: static; }
             .calendar-sidebar.closed { display: none; }
             .footer-content { flex-direction: column; text-align: center; }
+            .user-nav { gap: 8px; }
+            .btn-full-planner span { display: none; } /* Hide text on mobile icons */
         }
     </style>
 </head>
@@ -218,6 +235,9 @@
     <header>
         <a href="#" class="logo">UPSChub</a>
         <div class="user-nav">
+            <a href="complete-planner.html" class="btn-full-planner">
+                <i class="fa-solid fa-layer-group"></i> <span>2026 Full Planner</span>
+            </a>
             <button class="calendar-toggle-btn" onclick="toggleCalendar()">
                 <i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
             </button>
@@ -311,7 +331,7 @@
     let currentViewDate = new Date();
     let selectedDateStr = new Date().toISOString().split('T')[0];
     let fullData = [];
-    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; // 🔴 REPLACE THIS
+    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; 
 
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
