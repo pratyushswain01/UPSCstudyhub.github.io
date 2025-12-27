@@ -166,14 +166,11 @@
 
         /* --- 24-HOUR VERTICAL TIMELINE --- */
         .timeline-container { padding: 20px; background: #fff; border-top: 1px solid var(--border); position: relative; z-index: 1; }
-        .timeline-vertical { display: flex; flex-direction: column; gap: 10px; max-height: 600px; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; }
+        .timeline-vertical { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; }
         .timeline-hour { display: flex; align-items: center; padding: 12px 15px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border); transition: 0.3s; }
         .timeline-hour.active { border-left: 6px solid var(--primary); background: #eff6ff; }
-        .timeline-hour.greeting-slot { background: var(--primary); color: white; border: none; }
         .hour-label { min-width: 70px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
-        .greeting-slot .hour-label { color: rgba(255,255,255,0.85); font-style: italic; }
         .hour-subject { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-left: 15px; }
-        .greeting-slot .hour-subject { color: white; font-size: 0.95rem; }
 
         /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
@@ -287,7 +284,8 @@
 
                     <div class="timeline-container">
                         <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px;">Daily 24-Hour Track</div>
-                        <div class="timeline-vertical" id="timelineRow"></div>
+                        <div class="timeline-vertical" id="timelineRow">
+                            </div>
                     </div>
                 </div>
 
@@ -320,10 +318,6 @@
                 &copy; 2025 UPSChub. All Rights Reserved. <br>
                 <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
             </div>
-            <div class="footer-links" style="display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
-                <a href="#" style="text-decoration: none; color: inherit;">Privacy Policy</a>
-                <a href="#" style="text-decoration: none; color: inherit;">Terms of Service</a>
-            </div>
         </div>
     </footer>
 
@@ -345,18 +339,15 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const dateFromUrl = urlParams.get('date');
-
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
     let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
     let fullData = [];
-    let userName = "Aspirant";
     const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; 
 
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
         else {
             document.body.style.display = "flex";
-            userName = user.email.split('@')[0];
             initDashboard();
         }
     });
@@ -413,26 +404,17 @@
     function generateTimeline(dayTasks) {
         const row = document.getElementById('timelineRow');
         let html = "";
-        const nowHour = new Date().getHours();
-
         for(let i=0; i<24; i++) {
             const label = i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i-12} PM`;
             const task = dayTasks.find(t => t[2]?.trim().toUpperCase().includes(label.toUpperCase()));
             const activeClass = task ? "active" : "";
+            const subName = task ? task[3] : "Free Slot / Sleep";
             const style = getSubjectStyle(task ? task[3] : null);
-
-            // TIMELINE GREETING CARD (STAYS IN TRACK)
-            if (i === nowHour) {
-                let msg = "Good Evening";
-                if (i < 12) msg = "Good Morning";
-                else if (i < 17) msg = "Good Afternoon";
-                html += `<div class="timeline-hour greeting-slot"><div class="hour-label">LIVE</div><div class="hour-subject">${msg}, ${userName.charAt(0).toUpperCase() + userName.slice(1)}!</div></div>`;
-            }
 
             html += `
                 <div class="timeline-hour ${activeClass}" style="${task ? 'border-left-color:'+style.border : ''}; background:${task ? style.bg : '#f8fafc'}">
                     <div class="hour-label">${label}</div>
-                    <div class="hour-subject" style="color:${task ? style.color : 'var(--text-muted)'}">${task ? task[3] : "Free Slot / Sleep"}</div>
+                    <div class="hour-subject" style="color:${task ? style.color : 'var(--text-muted)'}">${subName}</div>
                 </div>
             `;
         }
