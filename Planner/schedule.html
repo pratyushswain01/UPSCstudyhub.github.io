@@ -18,7 +18,7 @@
             --text-muted: #64748b;
             --success: #10b981;
             --border: #e2e8f0;
-            --sidebar-width: 350px;
+            --sidebar-width: 320px;
         }
 
         body { 
@@ -28,7 +28,7 @@
             margin: 0; 
             color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
+            flex-direction: column;
         }
 
         /* --- LOADING OVERLAY --- */
@@ -52,7 +52,7 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- HEADER & LIVE BAR --- */
+        /* --- HEADER --- */
         header {
             background: var(--white);
             padding: 0.8rem 5%;
@@ -74,8 +74,19 @@
             font-weight: 600; font-size: 0.85rem;
             transition: 0.3s;
         }
-        .logout-btn { color: #ef4444; font-weight: 600; font-size: 0.85rem; cursor: pointer; padding: 8px 12px; }
+        .logout-btn { 
+            background: #fef2f2;
+            color: #ef4444; 
+            border: 1px solid #fee2e2;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
 
+        /* --- LIVE INFO BAR --- */
         .live-info-bar {
             background: #fff;
             padding: 10px 5%;
@@ -89,76 +100,91 @@
         }
 
         /* --- LAYOUT WRAPPER --- */
-        .app-container {
-            display: flex;
-            width: 100%;
-            min-height: calc(100vh - 120px);
-        }
+        .main-wrapper { flex: 1; position: relative; }
+        .page-heading { text-align: center; padding: 40px 20px 10px; }
+        .page-heading h1 { font-size: 2.2rem; font-weight: 800; margin: 0; }
+        .page-heading p { color: var(--text-muted); margin-top: 5px; }
 
-        .main-wrapper {
-            flex: 1;
-            padding: 30px 5%;
+        .app-container {
+            max-width: 1300px;
+            margin: 20px auto 60px;
+            padding: 0 20px;
+            display: flex;
+            gap: 30px;
             transition: all 0.4s ease;
         }
 
-        /* --- CALENDAR SIDEBAR (RIGHT) --- */
+        /* --- CONTENT AREA & WATERMARK --- */
+        .planner-area { flex: 1; display: flex; flex-direction: column; gap: 20px; transition: all 0.4s ease; }
+        .card { 
+            background: white; 
+            border-radius: 20px; 
+            border: 1px solid var(--border); 
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Official Watermark */
+        .card::before {
+            content: "UPSChub Official";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 4.5rem;
+            font-weight: 900;
+            color: rgba(37, 99, 235, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .search-box {
+            background: white; border-radius: 14px; padding: 12px 20px;
+            display: flex; align-items: center; border: 1px solid var(--border);
+        }
+        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; }
+
+        table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
+        th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid var(--border); }
+        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
+        .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+
+        /* --- COLLAPSIBLE CALENDAR SIDEBAR (RIGHT) --- */
         .calendar-sidebar {
             width: var(--sidebar-width);
             background: white;
-            border-left: 1px solid var(--border);
-            padding: 25px;
-            height: calc(100vh - 110px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            height: fit-content;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: sticky;
             top: 110px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow-y: auto;
         }
 
         .calendar-sidebar.closed {
             width: 0;
             padding: 0;
+            margin-left: -30px;
             opacity: 0;
-            border-left: none;
-            margin-right: calc(var(--sidebar-width) * -1);
+            overflow: hidden;
+            border: none;
+            pointer-events: none;
         }
 
-        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
-        .weekday { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-align: center; }
-        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; border-radius: 10px; cursor: pointer; transition: 0.2s; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .weekday { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-align: center; padding-bottom: 10px; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; }
         .day:hover:not(.empty) { background: var(--bg); color: var(--primary); }
-        .day.today { color: var(--primary); border: 2px solid var(--primary); }
+        .day.today { color: var(--primary); border: 1px solid var(--primary); }
         .day.selected { background: var(--primary) !important; color: white !important; }
-
-        /* --- CONTENT AREA & WATERMARK --- */
-        .page-heading { margin-bottom: 25px; }
-        .page-heading h1 { font-size: 2rem; font-weight: 800; margin: 0; }
-
-        .search-box {
-            background: white; border-radius: 14px; padding: 12px 20px;
-            display: flex; align-items: center; border: 1px solid var(--border); margin-bottom: 20px;
-        }
-        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; }
-
-        .card { 
-            background: white; border-radius: 20px; border: 1px solid var(--border); 
-            overflow: hidden; position: relative; margin-bottom: 25px;
-        }
-        .card::before {
-            content: "UPSChub Official"; position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -50%) rotate(-15deg); font-size: 4rem;
-            font-weight: 900; color: rgba(37, 99, 235, 0.03); pointer-events: none;
-        }
-
-        table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
-        th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid var(--border); }
-        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; font-weight: 500; }
-        .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
         /* --- FOOTER --- */
         footer {
             background: var(--white);
-            padding: 30px 5%;
+            padding: 40px 5%;
             border-top: 1px solid var(--border);
             margin-top: auto;
         }
@@ -168,14 +194,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            flex-wrap: wrap;
+            gap: 20px;
         }
+        .footer-logo img { height: 40px; width: auto; border-radius: 5px; }
+        .copyright { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
 
-        @media (max-width: 768px) {
-            .calendar-sidebar { position: fixed; right: 0; bottom: 0; width: 100%; height: 60vh; z-index: 1000; border-left: none; border-top: 1px solid var(--border); transform: translateY(100%); }
-            .calendar-sidebar:not(.closed) { transform: translateY(0); }
-            .calendar-sidebar.closed { transform: translateY(100%); width: 100%; margin-right: 0; }
+        @media (max-width: 900px) {
+            .app-container { flex-direction: column; }
+            .calendar-sidebar { width: 100%; position: static; }
+            .calendar-sidebar.closed { display: none; }
+            .footer-content { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
@@ -183,76 +212,83 @@
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <p style="margin-top:15px; font-weight:700;">Synchronizing with LBSNAA Goals...</p>
+        <p class="mt-4 font-bold" style="margin-top:15px">Synchronizing Database...</p>
     </div>
 
     <header>
-        <div class="logo">UPSChub</div>
+        <a href="#" class="logo">UPSChub</a>
         <div class="user-nav">
             <button class="calendar-toggle-btn" onclick="toggleCalendar()">
                 <i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
             </button>
-            <div id="logoutBtn" class="logout-btn">Sign Out</div>
+            <button id="logoutBtn" class="logout-btn">Sign Out</button>
         </div>
     </header>
 
     <div class="live-info-bar">
         <div style="color:var(--primary)"><i class="fa-solid fa-clock"></i> <span id="liveClock">00:00:00</span></div>
-        <div style="color:var(--text-muted)"><i class="fa-solid fa-calendar-day"></i> <span id="liveDate">Loading Date...</span></div>
+        <div style="color:var(--text-muted)"><i class="fa-solid fa-calendar-day"></i> <span id="liveDate">Loading...</span></div>
     </div>
 
-    <div class="app-container">
-        <main class="main-wrapper" id="mainWrapper">
-            <div class="page-heading">
-                <h1>1-Year Study Planner</h1>
-                <p id="userDisplay" style="color:var(--text-muted); margin: 5px 0 0;">Welcome back, Aspirant</p>
-            </div>
+    <div class="main-wrapper">
+        <div class="page-heading">
+            <h1>1-Year Study Planner</h1>
+            <p><strong>Year 2026</strong></p>
+            <p>Your personalized roadmap to cracking the UPSC CSE.</p>
+        </div>
 
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
-                <input type="text" id="searchInput" placeholder="Search subjects or topics..." onkeyup="filterTasks()">
-            </div>
-
-            <div class="card">
-                <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
-                    <h2 style="font-size:1.1rem; margin:0;">Planner for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+        <div class="app-container">
+            <main class="planner-area">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
+                    <input type="text" id="searchInput" placeholder="Search topics across the year..." onkeyup="filterTasks()">
                 </div>
-                <table>
-                    <thead>
-                        <tr><th style="width:25%">Subject</th><th>Learning Objective</th><th style="text-align:center; width:100px;">Status</th></tr>
-                    </thead>
-                    <tbody id="plannerBody"></tbody>
-                </table>
-            </div>
 
-            <div class="card" style="padding:25px;">
-                <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Daily Reflection & Notes</h3>
-                <textarea id="dynamicNotes" style="width:100%; min-height:100px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
-            </div>
-        </main>
+                <div class="card">
+                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
+                        <h2 style="font-size:1.1rem; margin:0;">Planner for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th style="width:25%">Subject</th><th>Learning Objective</th><th style="text-align:center; width:100px;">Status</th></tr>
+                        </thead>
+                        <tbody id="plannerBody"></tbody>
+                    </table>
+                </div>
 
-        <aside class="calendar-sidebar closed" id="calendarSidebar">
-            <div class="calendar-header">
-                <i class="fa-solid fa-chevron-left" style="cursor:pointer" onclick="changeMonth(-1)"></i>
-                <h3 id="monthDisplay">Month Year</h3>
-                <i class="fa-solid fa-chevron-right" style="cursor:pointer" onclick="changeMonth(1)"></i>
-            </div>
-            <div class="calendar-grid" id="calendarGrid">
-                <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
-                <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
-            </div>
-            <div style="margin-top:30px; text-align:center;">
-                <button onclick="toggleCalendar()" style="background:none; border:none; color:var(--text-muted); cursor:pointer; font-weight:700; font-size:0.8rem;">
-                    [ Hide Calendar ]
-                </button>
-            </div>
-        </aside>
+                <div class="card" style="padding:20px;">
+                    <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Daily Notes & Reflection</h3>
+                    <textarea id="dynamicNotes" style="width:100%; min-height:100px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6; background: transparent;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
+                </div>
+            </main>
+
+            <aside class="calendar-sidebar" id="calendarSidebar">
+                <div class="calendar-header">
+                    <i class="fa-solid fa-chevron-left" style="cursor:pointer" onclick="changeMonth(-1)"></i>
+                    <h3 id="monthDisplay">Month Year</h3>
+                    <i class="fa-solid fa-chevron-right" style="cursor:pointer" onclick="changeMonth(1)"></i>
+                </div>
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
+                    <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
+                </div>
+            </aside>
+        </div>
     </div>
 
     <footer>
         <div class="footer-content">
-            <div style="font-weight:800; color:var(--primary)">UPSChub</div>
-            <div>&copy; 2025 UPSChub Academy. All Rights Reserved.</div>
+            <div class="footer-logo">
+                <img src="../../images/LOGO.jpg" alt="UPSChub Logo">
+            </div>
+            <div class="copyright">
+                &copy; 2025 UPSChub. All Rights Reserved. <br>
+                <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
+            </div>
+            <div class="footer-links" style="display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
+                <a href="#" style="text-decoration: none; color: inherit;">Privacy Policy</a>
+                <a href="#" style="text-decoration: none; color: inherit;">Terms of Service</a>
+            </div>
         </div>
     </footer>
 
@@ -280,8 +316,7 @@
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
         else {
-            document.body.style.display = "block";
-            document.getElementById('userDisplay').innerText = `Logged in: ${user.email}`;
+            document.body.style.display = "flex";
             initDashboard();
         }
     });
@@ -331,7 +366,7 @@
         selectedDateStr = dateStr;
         document.getElementById('agendaDate').innerText = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
         renderCalendar(); filterTasks(); loadNote();
-        if(window.innerWidth <= 768) toggleCalendar();
+        if(window.innerWidth <= 900) toggleCalendar();
     }
 
     async function initDashboard() {
@@ -358,7 +393,7 @@
         });
         body.innerHTML = filtered.length ? filtered.map(row => `
             <tr><td><span class="subject-tag">${row[3]}</span></td><td>${row[4]}</td><td style="text-align:center;"><i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'var(--success)':'#e2e8f0'}"></i></td></tr>
-        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives.</td></tr>`;
+        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found.</td></tr>`;
     }
 
     function updateClock() {
