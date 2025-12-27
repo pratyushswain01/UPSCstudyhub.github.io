@@ -20,6 +20,7 @@
             --border: #e2e8f0;
         }
 
+        /* Revealed by JS after auth check */
         body { 
             display: none; 
             font-family: 'Inter', sans-serif; 
@@ -61,7 +62,6 @@
         }
         .logo { font-weight: 800; color: var(--primary); font-size: 1.5rem; letter-spacing: -0.5px; }
         
-        /* --- UPDATED LIVE INFO BAR --- */
         .live-info-bar {
             background: #fff;
             padding: 12px 5%;
@@ -82,7 +82,6 @@
             text-align: center;
         }
 
-        /* --- SEARCH & CALENDAR BAR --- */
         .controls-row {
             display: flex;
             justify-content: center;
@@ -132,7 +131,6 @@
             cursor: pointer;
         }
 
-        /* --- CONTENT CARDS --- */
         .main-container {
             max-width: 1100px;
             margin: 0 auto 60px;
@@ -153,7 +151,6 @@
         th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
         td { padding: 20px; border-bottom: 1px solid #f8fafc; font-weight: 500; }
 
-        /* --- NOTES SECTION --- */
         .notes-container {
             background: white;
             border-radius: 20px;
@@ -192,7 +189,7 @@
 
     <header>
         <div class="logo">UPSChub</div>
-        <div onclick="logoutUser()" style="color:#ef4444; cursor:pointer; font-weight:600; font-size: 0.9rem;">
+        <div id="logoutBtn" style="color:#ef4444; cursor:pointer; font-weight:600; font-size: 0.9rem;">
             <i class="fa-solid fa-power-off"></i> Sign Out
         </div>
     </header>
@@ -248,32 +245,24 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+        };
 
-        // Add these imports at the top of your script in schedule.html if they aren't there
-import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-async function logoutUser() {
-    const auth = getAuth();
-    try {
-        // 1. Sign out from Firebase (This stops the auth.html auto-redirect)
-        await signOut(auth);
-        // 2. Clear our local session guard
-        localStorage.removeItem('upschub_session');
-        // 3. Redirect
-        window.location.href = "auth.html";
-    } catch (error) {
-        console.error("Logout failed", error);
-        // Fallback: still clear local storage and redirect
-        localStorage.removeItem('upschub_session');
-        window.location.href = "auth.html";
-    }
-}
-        
-        // 🔴 PASTE YOUR PUBLISHED GOOGLE SHEET CSV LINK HERE
-        const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE";
-
+        // --- GLOBAL VARIABLES ---
+        const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; // 🔴 PASTE LINK HERE
         let fullDataCache = [];
 
         // --- AUTH GUARD ---
@@ -289,31 +278,40 @@ async function logoutUser() {
             }
         }
 
-        // --- NEW LIVE CLOCK AND DATE LOGIC ---
+        // --- LOGOUT LOGIC ---
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                localStorage.removeItem('upschub_session');
+                window.location.href = "auth.html";
+            } catch (e) {
+                localStorage.removeItem('upschub_session');
+                window.location.href = "auth.html";
+            }
+        });
+
+        // --- LIVE CLOCK AND DATE ---
         function updateLiveClock() {
             const now = new Date();
-            
-            // Format Time (HH:MM:SS)
             const timeStr = now.toLocaleTimeString('en-IN', { hour12: true });
             document.getElementById('liveClock').innerHTML = `<i class="fa-solid fa-clock"></i> ${timeStr}`;
             
-            // Format Date (Day, DD Month YYYY)
             const dateStr = now.toLocaleDateString('en-IN', { 
-                weekday: 'long', 
-                day: 'numeric', 
-                month: 'long', 
-                year: 'numeric' 
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' 
             });
             document.getElementById('liveDate').innerHTML = `<i class="fa-solid fa-calendar-day"></i> ${dateStr}`;
         }
-        setInterval(updateLiveClock, 1000); // Update every second
+        setInterval(updateLiveClock, 1000);
 
-        function syncAndLoad() {
-            const d = new Date(document.getElementById('calPicker').value);
+        // --- CALENDAR & SEARCH LOGIC ---
+        window.syncAndLoad = function() {
+            const val = document.getElementById('calPicker').value;
+            if(!val) return;
+            const d = new Date(val);
             document.getElementById('displayDate').innerText = d.toLocaleDateString('en-IN', {day:'numeric', month:'short'});
             loadPlannerData();
             loadNotes();
-        }
+        };
 
         async function loadPlannerData() {
             const body = document.getElementById('plannerBody');
@@ -324,7 +322,8 @@ async function logoutUser() {
                 const csvText = await res.text();
                 fullDataCache = csvText.split('\n').map(row => row.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
                 
-                renderTable(fullDataCache.slice(1).filter(row => row[1] && row[1].trim() === selectedDate));
+                const filtered = fullDataCache.slice(1).filter(row => row[1] && row[1].trim() === selectedDate);
+                renderTable(filtered);
             } catch (e) {
                 body.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:20px; color:red;">Database Sync Failed</td></tr>`;
             }
@@ -350,41 +349,40 @@ async function logoutUser() {
             }).join('');
         }
 
-        function filterBySearch() {
+        window.filterBySearch = function() {
             const term = document.getElementById('searchInput').value.toLowerCase();
             const selectedDate = document.getElementById('calPicker').value;
             const filtered = fullDataCache.slice(1).filter(row => {
-                const text = (row[3] + row[4]).toLowerCase();
+                const text = ((row[3] || '') + (row[4] || '')).toLowerCase();
                 const dateMatch = term === "" ? (row[1] && row[1].trim() === selectedDate) : true;
                 return text.includes(term) && dateMatch;
             });
             renderTable(filtered);
-        }
+        };
 
+        // --- NOTES LOGIC ---
         function loadNotes() {
             const date = document.getElementById('calPicker').value;
-            const savedNote = localStorage.getItem('note_' + date);
-            document.getElementById('dynamicNotes').value = savedNote || "";
+            document.getElementById('dynamicNotes').value = localStorage.getItem('note_' + date) || "";
         }
 
-        function autoSaveNotes() {
+        window.autoSaveNotes = function() {
             const date = document.getElementById('calPicker').value;
             const text = document.getElementById('dynamicNotes').value;
             localStorage.setItem('note_' + date, text);
-            const status = document.getElementById('saveStatus');
-            status.style.display = 'block';
-            setTimeout(() => { status.style.display = 'none'; }, 2000);
-        }
+            document.getElementById('saveStatus').style.display = 'block';
+            setTimeout(() => { document.getElementById('saveStatus').style.display = 'none'; }, 2000);
+        };
 
         function hideLoader() {
             const l = document.getElementById('loading-overlay');
-            l.style.opacity = '0';
-            setTimeout(() => { l.style.display = 'none'; }, 500);
+            if(l) {
+                l.style.opacity = '0';
+                setTimeout(() => { l.style.display = 'none'; }, 500);
+            }
         }
 
-        function logoutUser() { localStorage.removeItem('upschub_session'); window.location.href = "auth.html"; }
-
-        // Initial setup
+        // --- START ---
         document.getElementById('calPicker').value = new Date().toISOString().split('T')[0];
         updateLiveClock();
         runAuthCheck();
