@@ -130,22 +130,25 @@
             transition: all 0.4s ease;
         }
 
-        /* --- CONTENT AREA & WATERMARK --- */
+        /* --- CONTENT AREA & VERTICAL TIMELINE --- */
         .planner-area { flex: 1; display: flex; flex-direction: column; gap: 20px; transition: all 0.4s ease; }
-        .card { 
-            background: white; 
-            border-radius: 20px; 
-            border: 1px solid var(--border); 
-            overflow: hidden;
-            position: relative;
-        }
         
-        .card::before {
+        .timeline-container {
+            background: white;
+            border-radius: 20px;
+            border: 1px solid var(--border);
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Official Watermark */
+        .timeline-container::before {
             content: "UPSChub Official";
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-15deg);
-            font-size: 4.5rem;
+            font-size: 5rem;
             font-weight: 900;
             color: rgba(37, 99, 235, 0.03);
             white-space: nowrap;
@@ -153,16 +156,38 @@
             z-index: 0;
         }
 
-        .search-box {
-            background: white; border-radius: 14px; padding: 12px 20px;
-            display: flex; align-items: center; border: 1px solid var(--border);
-        }
-        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; }
+        .greeting-hero { margin-bottom: 30px; position: relative; z-index: 1; }
+        .greeting-hero h2 { font-size: 1.8rem; font-weight: 800; margin: 0; color: var(--primary); }
+        .greeting-hero p { color: var(--text-muted); font-weight: 600; margin-top: 5px; }
 
-        table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
-        th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid var(--border); }
-        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
-        .subject-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+        .timeline { position: relative; margin-top: 20px; z-index: 1; }
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 2px;
+            background: var(--border);
+            top: 0; bottom: 0;
+            left: 90px;
+        }
+
+        .timeline-item { position: relative; margin-bottom: 25px; display: flex; align-items: flex-start; }
+        .time-label { width: 90px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); padding-top: 10px; }
+        
+        .timeline-content { 
+            flex: 1; margin-left: 30px; padding: 15px 20px; 
+            border-radius: 12px; background: #f8fafc; 
+            border-left: 5px solid #cbd5e1; transition: 0.3s; 
+        }
+        .timeline-content:hover { transform: translateX(10px); }
+
+        /* Subject Specific Timeline Colors */
+        .polity-slot { background: #eff6ff; border-left-color: #2563eb; }
+        .geography-slot { background: #f0fdf4; border-left-color: #16a34a; }
+        .history-slot { background: #fdf2f2; border-left-color: #dc2626; }
+        .economics-slot { background: #fffbeb; border-left-color: #d97706; }
+
+        .slot-title { font-weight: 800; font-size: 0.95rem; margin-bottom: 4px; display: flex; justify-content: space-between; }
+        .slot-desc { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
 
         /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
@@ -196,7 +221,6 @@
         .day.today { color: var(--primary); border: 1px solid var(--primary); }
         .day.selected { background: var(--primary) !important; color: white !important; }
 
-        /* --- FOOTER --- */
         footer {
             background: var(--white);
             padding: 40px 5%;
@@ -218,9 +242,8 @@
             .app-container { flex-direction: column; }
             .calendar-sidebar { width: 100%; position: static; }
             .calendar-sidebar.closed { display: none; }
-            .footer-content { flex-direction: column; text-align: center; }
-            .user-nav { gap: 8px; }
-            .btn-full-planner span { display: none; }
+            .timeline::after { left: 70px; }
+            .time-label { width: 70px; font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -228,7 +251,7 @@
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <p class="mt-4 font-bold" style="margin-top:15px">Synchronizing Database...</p>
+        <p class="mt-4 font-bold" style="margin-top:15px">Setting up your Study Timeline...</p>
     </div>
 
     <header>
@@ -250,33 +273,20 @@
     </div>
 
     <div class="main-wrapper">
-        <div class="page-heading">
-            <h1>1-Year Study Planner</h1>
-            <p><strong>Year 2026</strong></p>
-            <p>Your personalized roadmap to cracking the UPSC CSE.</p>
-        </div>
-
         <div class="app-container">
             <main class="planner-area">
-                <div class="search-box">
-                    <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
-                    <input type="text" id="searchInput" placeholder="Search topics across the year..." onkeyup="filterTasks()">
-                </div>
-
-                <div class="card">
-                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
-                        <h2 style="font-size:1.1rem; margin:0;">Agenda for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+                <div class="timeline-container">
+                    <div class="greeting-hero">
+                        <h2 id="dynamicGreeting">Good Morning, Aspirant!</h2>
+                        <p id="agendaDateTitle">Roadmap for Today</p>
                     </div>
-                    <table>
-                        <thead>
-                            <tr><th style="width:25%">Subject</th><th>Learning Objective</th><th style="text-align:center; width:100px;">Status</th></tr>
-                        </thead>
-                        <tbody id="plannerBody"></tbody>
-                    </table>
+
+                    <div id="verticalTimeline" class="timeline">
+                        </div>
                 </div>
 
-                <div class="card" style="padding:20px;">
-                    <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Daily Notes & Reflection</h3>
+                <div class="card" style="padding:20px; background: white; border-radius: 20px; border: 1px solid var(--border);">
+                    <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Day Reflection & Notes</h3>
                     <textarea id="dynamicNotes" style="width:100%; min-height:100px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6; background: transparent;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
                 </div>
             </main>
@@ -301,7 +311,7 @@
                 <img src="../../images/LOGO.jpg" alt="UPSChub Logo">
             </div>
             <div class="copyright">
-                &copy; 2025 UPSChub. All Rights Reserved. <br>
+                &copy; 2026 UPSChub. All Rights Reserved. <br>
                 <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
             </div>
             <div class="footer-links" style="display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
@@ -327,21 +337,19 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // --- NEW LOGIC: URL Parameter Synchronization ---
     const urlParams = new URLSearchParams(window.location.search);
     const dateFromUrl = urlParams.get('date');
 
-    // Priority to URL date, fallback to current time
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
     let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
-    
     let fullData = [];
-    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE";
+    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; // 🔴 PASTE CSV LINK HERE
 
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
         else {
             document.body.style.display = "flex";
+            updateGreeting(user.email.split('@')[0]);
             initDashboard();
         }
     });
@@ -353,19 +361,68 @@
         });
     });
 
+    function updateGreeting(name) {
+        const hour = new Date().getHours();
+        let greet = "Good Evening";
+        if (hour < 12) greet = "Good Morning";
+        else if (hour < 17) greet = "Good Afternoon";
+        document.getElementById('dynamicGreeting').innerText = `${greet}, ${name.charAt(0).toUpperCase() + name.slice(1)}!`;
+    }
+
     window.toggleCalendar = function() {
         document.getElementById('calendarSidebar').classList.toggle('closed');
     }
 
-    // --- Subject Color Mapper ---
-    function getSubjectStyle(subject) {
-        if (!subject) return "background: #f1f5f9; color: #64748b;";
-        const s = subject.toLowerCase();
-        if (s.includes("polity")) return "background: #eff6ff; color: #2563eb; border-left: 3px solid #2563eb;";
-        if (s.includes("geography")) return "background: #f0fdf4; color: #16a34a; border-left: 3px solid #16a34a;";
-        if (s.includes("econom")) return "background: #fffbeb; color: #d97706; border-left: 3px solid #d97706;";
-        if (s.includes("histor")) return "background: #fdf2f2; color: #dc2626; border-left: 3px solid #dc2626;";
-        return "background: #f1f5f9; color: #64748b;";
+    function getSubjectClass(subject) {
+        const s = (subject || "").toLowerCase();
+        if (s.includes("polity")) return "polity-slot";
+        if (s.includes("geography")) return "geography-slot";
+        if (s.includes("histor")) return "history-slot";
+        if (s.includes("econom")) return "economics-slot";
+        return "";
+    }
+
+    async function initDashboard() {
+        updateClock(); 
+        setInterval(updateClock, 1000);
+        renderCalendar(); 
+        await loadPlannerData();
+        loadNote(); 
+        document.getElementById('agendaDateTitle').innerText = `Roadmap for ${new Date(selectedDateStr).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}`;
+        document.getElementById('loading-overlay').style.display = 'none';
+    }
+
+    async function loadPlannerData() {
+        try {
+            const res = await fetch(SHEET_CSV_URL);
+            const csv = await res.text();
+            fullData = csv.split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
+            renderTimeline();
+        } catch (e) { console.error("Database Error"); }
+    }
+
+    function renderTimeline() {
+        const container = document.getElementById('verticalTimeline');
+        const filtered = fullData.slice(1).filter(row => row[1]?.trim() === selectedDateStr);
+        
+        if (filtered.length === 0) {
+            container.innerHTML = `<div style="padding:40px; text-align:center; color:var(--text-muted); font-weight:600;">No study slots allocated for this date.</div>`;
+            return;
+        }
+
+        container.innerHTML = filtered.map(row => `
+            <div class="timeline-item">
+                <div class="time-label">${row[2] || '---'}</div>
+                <div class="timeline-content ${getSubjectClass(row[3])}">
+                    <div class="slot-title">
+                        <span>${row[3] || 'General Session'}</span>
+                        <i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE' ? 'fa-circle-check' : 'fa-circle-dot'}" 
+                           style="color:${row[5]?.trim().toUpperCase()==='TRUE' ? 'var(--success)' : '#cbd5e1'}"></i>
+                    </div>
+                    <div class="slot-desc">${row[4] || 'Objective details not provided.'}</div>
+                </div>
+            </div>
+        `).join('');
     }
 
     function renderCalendar() {
@@ -391,62 +448,18 @@
             if (dateStr === selectedDateStr) div.classList.add('selected');
             if (dateStr === new Date().toISOString().split('T')[0]) div.classList.add('today');
             div.innerText = i;
-            div.onclick = () => selectDate(dateStr);
+            div.onclick = () => {
+                selectedDateStr = dateStr;
+                renderCalendar();
+                renderTimeline();
+                loadNote();
+                document.getElementById('agendaDateTitle').innerText = `Roadmap for ${new Date(selectedDateStr).toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'})}`;
+            };
             grid.appendChild(div);
         }
     }
 
     window.changeMonth = (dir) => { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); };
-
-    function selectDate(dateStr) {
-        selectedDateStr = dateStr;
-        // Update Title
-        document.getElementById('agendaDate').innerText = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-        renderCalendar(); 
-        filterTasks(); 
-        loadNote();
-        if(window.innerWidth <= 900) toggleCalendar();
-    }
-
-    async function initDashboard() {
-        updateClock(); 
-        setInterval(updateClock, 1000);
-        renderCalendar(); 
-        await loadPlannerData();
-        loadNote(); 
-        // Force the date label to update on initial load
-        document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-        document.getElementById('loading-overlay').style.display = 'none';
-    }
-
-    async function loadPlannerData() {
-        try {
-            const res = await fetch(SHEET_CSV_URL);
-            const csv = await res.text();
-            fullData = csv.split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-            filterTasks();
-        } catch (e) { console.error("Database Connection Failed"); }
-    }
-
-    window.filterTasks = () => {
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        const body = document.getElementById('plannerBody');
-        const filtered = fullData.slice(1).filter(row => {
-            const content = ((row[3] || '') + (row[4] || '')).toLowerCase();
-            return term === "" ? row[1]?.trim() === selectedDateStr : content.includes(term);
-        });
-        
-        body.innerHTML = filtered.length ? filtered.map(row => `
-            <tr>
-                <td><span class="subject-tag" style="${getSubjectStyle(row[3])}">${row[3] || '-'}</span></td>
-                <td style="font-weight:600;">${row[4] || '-'}</td>
-                <td style="text-align:center;">
-                    <i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" 
-                    style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'var(--success)':'#cbd5e1'}"></i>
-                </td>
-            </tr>
-        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
-    }
 
     function updateClock() {
         const now = new Date();
