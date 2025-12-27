@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPSChub | Premium Academic Dashboard</title>
+    <title>Dashboard | UPSChub Official</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -11,7 +11,7 @@
     <style>
         :root {
             --primary: #2563eb;
-            --primary-glow: rgba(37, 99, 235, 0.2);
+            --primary-glow: rgba(37, 99, 235, 0.15);
             --bg: #f8fafc;
             --white: #ffffff;
             --text-main: #0f172a;
@@ -26,6 +26,9 @@
             background-color: var(--bg); 
             margin: 0; 
             color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
         /* --- LOADING OVERLAY --- */
@@ -39,7 +42,6 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease;
         }
         .spinner {
             width: 50px; height: 50px;
@@ -50,115 +52,153 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* --- HEADER & LIVE BAR --- */
+        /* --- HEADER --- */
         header {
             background: var(--white);
-            padding: 1rem 5%;
+            padding: 0.8rem 5%;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
-        .logo { font-weight: 800; color: var(--primary); font-size: 1.5rem; letter-spacing: -0.5px; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.5rem; letter-spacing: -0.5px; text-decoration: none; }
         
+        .user-nav { display: flex; align-items: center; gap: 20px; }
+        .logout-btn { 
+            background: #fef2f2;
+            color: #ef4444; 
+            border: 1px solid #fee2e2;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: #fee2e2; }
+
+        /* --- LIVE BAR --- */
         .live-info-bar {
             background: #fff;
-            padding: 12px 5%;
+            padding: 10px 5%;
             display: flex;
             justify-content: flex-end;
             align-items: center;
-            gap: 30px;
-            font-size: 0.9rem;
+            gap: 25px;
+            font-size: 0.85rem;
             font-weight: 700;
             border-bottom: 1px solid #f1f5f9;
         }
 
-        /* --- DASHBOARD LAYOUT --- */
+        /* --- MAIN LAYOUT --- */
+        .main-wrapper { flex: 1; }
+        .page-heading { text-align: center; padding: 40px 20px 10px; }
+        .page-heading h1 { font-size: 2.2rem; font-weight: 800; margin: 0; color: var(--text-main); }
+        .page-heading p { color: var(--text-muted); margin-top: 5px; }
+
         .main-container {
             max-width: 1250px;
-            margin: 30px auto;
+            margin: 20px auto 60px;
             padding: 0 20px;
             display: grid;
-            grid-template-columns: 350px 1fr; /* Sidebar for Calendar */
+            grid-template-columns: 320px 1fr;
             gap: 30px;
         }
 
-        /* --- ADVANCED CALENDAR DESIGN --- */
+        /* --- CALENDAR SIDEBAR --- */
         .calendar-sidebar {
             background: white;
-            border-radius: 24px;
-            padding: 25px;
+            border-radius: 20px;
+            padding: 20px;
             border: 1px solid var(--border);
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             height: fit-content;
         }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        .calendar-header h3 { font-size: 1rem; font-weight: 800; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+        .weekday { font-size: 0.7rem; font-weight: 700; color: var(--text-muted); text-align: center; padding-bottom: 10px; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .day:hover:not(.empty) { background: var(--bg); color: var(--primary); }
+        .day.today { color: var(--primary); background: var(--primary-glow); }
+        .day.selected { background: var(--primary) !important; color: white !important; }
 
-        .calendar-header {
+        /* --- PLANNER & WATERMARK --- */
+        .planner-area { position: relative; display: flex; flex-direction: column; gap: 20px; }
+        .card { 
+            background: white; 
+            border-radius: 20px; 
+            border: 1px solid var(--border); 
+            overflow: hidden;
+            position: relative;
+        }
+        
+        /* Watermark */
+        .card::before {
+            content: "UPSChub Official";
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 4rem;
+            font-weight: 900;
+            color: rgba(37, 99, 235, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .search-box {
+            background: white; border-radius: 14px; padding: 10px 18px;
+            display: flex; align-items: center; border: 1px solid var(--border);
+        }
+        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; font-size: 0.95rem; }
+
+        table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
+        th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid var(--border); }
+        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
+        .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--white);
+            padding: 40px 5%;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+        }
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 20px;
         }
+        .footer-logo { font-weight: 800; color: var(--primary); font-size: 1.2rem; }
+        .copyright { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+        .footer-links { display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted); }
+        .footer-links a { text-decoration: none; color: inherit; transition: 0.2s; }
+        .footer-links a:hover { color: var(--primary); }
 
-        .calendar-header h3 { font-size: 1.1rem; font-weight: 800; margin: 0; }
-        .nav-btn { cursor: pointer; color: var(--primary); font-size: 1.1rem; padding: 5px; }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            text-align: center;
-            gap: 5px;
-        }
-
-        .weekday { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 10px; }
-        
-        .day {
-            aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: 0.2s;
-            position: relative;
-        }
-
-        .day:hover:not(.empty) { background: var(--bg); color: var(--primary); }
-        .day.today { color: var(--primary); background: var(--primary-glow); }
-        .day.selected { background: var(--primary) !important; color: white !important; box-shadow: 0 4px 12px var(--primary-glow); }
-        .day.has-task::after {
-            content: ''; position: absolute; bottom: 4px; width: 4px; height: 4px; background: var(--success); border-radius: 50%;
-        }
-
-        /* --- CONTENT AREA --- */
-        .planner-area { display: flex; flex-direction: column; gap: 20px; }
-        .card { background: white; border-radius: 24px; border: 1px solid var(--border); overflow: hidden; }
-        .search-box {
-            background: white; border-radius: 16px; padding: 12px 20px;
-            display: flex; align-items: center; border: 1px solid var(--border); margin-bottom: 10px;
-        }
-        .search-box input { border: none; outline: none; width: 100%; padding-left: 10px; font-family: inherit; }
-
-        table { width: 100%; border-collapse: collapse; }
-        th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
-        td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; }
-        .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
-        
-        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { .main-container { grid-template-columns: 1fr; } .footer-content { flex-direction: column; text-align: center; } }
     </style>
 </head>
 <body>
 
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <p class="mt-4 font-bold">Initializing UPSChub AI...</p>
+        <p class="mt-4 font-bold" style="margin-top:15px">Synchronizing Database...</p>
     </div>
 
     <header>
-        <div class="logo">UPSChub</div>
-        <div id="logoutBtn" style="color:#ef4444; cursor:pointer; font-weight:600;"><i class="fa-solid fa-power-off"></i> Sign Out</div>
+        <a href="#" class="logo">UPSChub</a>
+        <div class="user-nav">
+            <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-muted);" id="userDisplay">Aspirant</span>
+            <button id="logoutBtn" class="logout-btn">Sign Out</button>
+        </div>
     </header>
 
     <div class="live-info-bar">
@@ -166,46 +206,65 @@
         <div style="color:var(--text-muted)"><i class="fa-solid fa-calendar-day"></i> <span id="liveDate">Loading...</span></div>
     </div>
 
-    <div class="main-container">
-        <aside class="calendar-sidebar">
-            <div class="calendar-header">
-                <i class="fa-solid fa-chevron-left nav-btn" onclick="changeMonth(-1)"></i>
-                <h3 id="monthDisplay">Month Year</h3>
-                <i class="fa-solid fa-chevron-right nav-btn" onclick="changeMonth(1)"></i>
-            </div>
-            <div class="calendar-grid" id="calendarGrid">
-                <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
-                <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
+    <div class="main-wrapper">
+        <div class="page-heading">
+            <h1>1-Year Study Planner</h1>
+            <p>Your personalized roadmap to cracking the UPSC CSE.</p>
+        </div>
+
+        <div class="main-container">
+            <aside class="calendar-sidebar">
+                <div class="calendar-header">
+                    <i class="fa-solid fa-chevron-left" style="cursor:pointer" onclick="changeMonth(-1)"></i>
+                    <h3 id="monthDisplay">Month Year</h3>
+                    <i class="fa-solid fa-chevron-right" style="cursor:pointer" onclick="changeMonth(1)"></i>
                 </div>
-            <div style="margin-top:20px; border-top: 1px solid var(--border); padding-top:15px;">
-                <p style="font-size:0.8rem; color:var(--text-muted); font-weight:600;"><i class="fa-solid fa-info-circle"></i> Tasks highlighted with green dots.</p>
-            </div>
-        </aside>
-
-        <main class="planner-area">
-            <div class="search-box">
-                <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
-                <input type="text" id="searchInput" placeholder="Search across your 1-year plan..." onkeyup="filterTasks()">
-            </div>
-
-            <div class="card">
-                <div style="padding:20px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
-                    <h2 style="font-size:1.2rem; margin:0;">Agenda for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+                <div class="calendar-grid" id="calendarGrid">
+                    <div class="weekday">Su</div><div class="weekday">Mo</div><div class="weekday">Tu</div>
+                    <div class="weekday">We</div><div class="weekday">Th</div><div class="weekday">Fr</div><div class="weekday">Sa</div>
                 </div>
-                <table>
-                    <thead>
-                        <tr><th style="width:30%">Subject</th><th>Learning Objective</th><th style="text-align:center">Status</th></tr>
-                    </thead>
-                    <tbody id="plannerBody"></tbody>
-                </table>
-            </div>
+            </aside>
 
-            <div class="card" style="padding:25px;">
-                <h3 style="font-size:1rem; margin-top:0; color:var(--primary)"><i class="fa-solid fa-pen-to-square"></i> Day Reflection & Notes</h3>
-                <textarea id="dynamicNotes" style="width:100%; min-height:120px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6;" placeholder="Add notes for this date..." oninput="saveNote()"></textarea>
-            </div>
-        </main>
+            <main class="planner-area">
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
+                    <input type="text" id="searchInput" placeholder="Search topics across the year..." onkeyup="filterTasks()">
+                </div>
+
+                <div class="card">
+                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
+                        <h2 style="font-size:1.1rem; margin:0;">Planner for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+                    </div>
+                    <table>
+                        <thead>
+                            <tr><th style="width:25%">Subject</th><th>Learning Objective</th><th style="text-align:center; width:100px;">Status</th></tr>
+                        </thead>
+                        <tbody id="plannerBody"></tbody>
+                    </table>
+                </div>
+
+                <div class="card" style="padding:20px;">
+                    <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Daily Notes & Reflection</h3>
+                    <textarea id="dynamicNotes" style="width:100%; min-height:100px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6; background: transparent;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
+                </div>
+            </main>
+        </div>
     </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-logo">UPSChub</div>
+            <div class="copyright">
+                &copy; 2025 UPSChub Academy. All Rights Reserved. <br>
+                <span style="font-size: 0.7rem; opacity: 0.7;">Empowering the next generation of Civil Servants.</span>
+            </div>
+            <div class="footer-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms of Service</a>
+                <a href="#">Help Center</a>
+            </div>
+        </div>
+    </footer>
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -223,75 +282,67 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // --- GLOBAL STATE ---
     let currentViewDate = new Date();
     let selectedDateStr = new Date().toISOString().split('T')[0];
     let fullData = [];
     const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; // 🔴 REPLACE THIS
 
-    // --- AUTH LOGIC ---
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
         else {
-            document.body.style.display = "block";
+            document.body.style.display = "flex";
+            document.getElementById('userDisplay').innerText = user.email;
             initDashboard();
         }
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => {
+            localStorage.removeItem('upschub_session');
+            window.location.href = "auth.html";
+        });
+    });
 
-    // --- CALENDAR LOGIC ---
     function renderCalendar() {
         const grid = document.getElementById('calendarGrid');
         const monthYear = document.getElementById('monthDisplay');
-        
-        // Clear previous days
-        const days = grid.querySelectorAll('.day');
-        days.forEach(d => d.remove());
+        grid.querySelectorAll('.day').forEach(d => d.remove());
 
         const year = currentViewDate.getFullYear();
         const month = currentViewDate.getMonth();
-        
         monthYear.innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentViewDate);
 
         const firstDay = new Date(year, month, 1).getDay();
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-        // Empty slots for alignment
         for (let i = 0; i < firstDay; i++) {
             const div = document.createElement('div');
             div.className = 'day empty';
             grid.appendChild(div);
         }
 
-        // Generate Days
         for (let i = 1; i <= daysInMonth; i++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
             const div = document.createElement('div');
             div.className = 'day';
             if (dateStr === selectedDateStr) div.classList.add('selected');
             if (dateStr === new Date().toISOString().split('T')[0]) div.classList.add('today');
-            
             div.innerText = i;
             div.onclick = () => selectDate(dateStr);
             grid.appendChild(div);
         }
     }
 
-    window.changeMonth = (dir) => {
-        currentViewDate.setMonth(currentViewDate.getMonth() + dir);
-        renderCalendar();
-    };
+    window.changeMonth = (dir) => { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); };
 
     function selectDate(dateStr) {
         selectedDateStr = dateStr;
         document.getElementById('agendaDate').innerText = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
         renderCalendar();
-        loadPlannerData();
+        filterTasks();
         loadNote();
     }
 
-    // --- DATA HANDLING ---
     async function initDashboard() {
         updateClock();
         setInterval(updateClock, 1000);
@@ -307,29 +358,26 @@
             const csv = await res.text();
             fullData = csv.split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
             filterTasks();
-        } catch (e) { console.error("CSV Load Error"); }
+        } catch (e) { console.error("Database connection error"); }
     }
 
     window.filterTasks = () => {
         const term = document.getElementById('searchInput').value.toLowerCase();
         const body = document.getElementById('plannerBody');
-        
         const filtered = fullData.slice(1).filter(row => {
-            const content = (row[3] + row[4]).toLowerCase();
-            const dateMatch = term === "" ? row[1]?.trim() === selectedDateStr : content.includes(term);
-            return dateMatch;
+            const content = ((row[3] || '') + (row[4] || '')).toLowerCase();
+            return term === "" ? row[1]?.trim() === selectedDateStr : content.includes(term);
         });
 
         body.innerHTML = filtered.length ? filtered.map(row => `
             <tr>
-                <td><span class="subject-tag">${row[3]}</span></td>
-                <td style="font-weight:600;">${row[4]}</td>
+                <td><span class="subject-tag">${row[3] || '-'}</span></td>
+                <td style="font-weight:600;">${row[4] || '-'}</td>
                 <td style="text-align:center;"><i class="fa-solid fa-circle-check" style="color:${row[5]?.trim().toUpperCase()==='TRUE' ? 'var(--success)' : '#e2e8f0'}"></i></td>
             </tr>
-        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No records found.</td></tr>`;
+        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found.</td></tr>`;
     }
 
-    // --- UTILS ---
     function updateClock() {
         const now = new Date();
         document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-IN', { hour12: true });
@@ -338,7 +386,6 @@
 
     window.saveNote = () => localStorage.setItem('note_'+selectedDateStr, document.getElementById('dynamicNotes').value);
     function loadNote() { document.getElementById('dynamicNotes').value = localStorage.getItem('note_'+selectedDateStr) || ""; }
-
 </script>
 </body>
 </html>
