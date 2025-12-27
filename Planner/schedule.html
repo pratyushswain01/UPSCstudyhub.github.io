@@ -1,1 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSChub | Premium Secure Planner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.2);
+            --bg: #f8fafc;
+            --white: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+        }
 
+        /* Essential: Hide body content until auth check is passed */
+        body { 
+            display: none; 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg); 
+            margin: 0; 
+            color: var(--text-main);
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--white);
+            padding: 1rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .logo { font-weight: 800; color: var(--primary); font-size: 1.4rem; }
+        .logout-btn { 
+            color: #ef4444; 
+            cursor: pointer; 
+            font-weight: 600; 
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+        .logout-btn:hover { background: #fef2f2; }
+
+        /* --- LIVE TIME BAR --- */
+        .live-info-bar {
+            background: #fff;
+            padding: 10px 5%;
+            display: flex;
+            justify-content: flex-end;
+            gap: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid #f1f5f9;
+        }
+        .live-info-bar i { color: var(--primary); margin-right: 5px; }
+
+        /* --- CALENDAR WIDGET --- */
+        .dashboard-hero {
+            padding: 50px 5% 30px;
+            text-align: center;
+        }
+
+        .calendar-card {
+            background: var(--white);
+            border-radius: 24px;
+            padding: 20px 35px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .date-label-group {
+            text-align: left;
+            border-right: 1px solid #e2e8f0;
+            padding-right: 30px;
+        }
+        .date-label-group span:first-child { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
+        .date-label-group span:last-child { font-size: 1.15rem; font-weight: 800; color: var(--primary); display: block; }
+
+        .date-picker-input {
+            background: #f1f5f9;
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: 2px solid transparent;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+            outline: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .date-picker-input:hover { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 4px var(--primary-glow); }
+
+        .btn-apply {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: 0.3s;
+        }
+        .btn-apply:hover { transform: translateY(-2px); background: #1d4ed8; }
+
+        /* --- TABLE --- */
+        .planner-container {
+            max-width: 1100px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+        }
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 20px; background: #fafbff; text-align: left; font-size: 0.75rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid #f1f5f9; }
+        td { padding: 20px; border-bottom: 1px solid #f8fafc; font-weight: 500; }
+        .time-tag { color: var(--primary); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">UPSChub</div>
+        <div onclick="logoutUser()" class="logout-btn">
+            <i class="fa-solid fa-power-off"></i> Sign Out
+        </div>
+    </header>
+
+    <div class="live-info-bar">
+        <div id="clock"><i class="fa-regular fa-clock"></i> --:--:--</div>
+        <div id="fullDate"><i class="fa-regular fa-calendar-check"></i> Loading Date...</div>
+    </div>
+
+    <div class="dashboard-hero">
+        <h1 style="margin:0; font-weight:800;">Academic Dashboard</h1>
+        <p style="color:var(--text-muted); margin: 8px 0 25px;">Logged in as: <span id="userEmail">Aspirant</span></p>
+
+        <div class="calendar-card">
+            <div class="date-label-group">
+                <span>Active Planner</span>
+                <span id="displayDate">Today</span>
+            </div>
+            <input type="date" id="calPicker" class="date-picker-input" onchange="syncLabel()">
+            <button class="btn-apply" onclick="loadPlannerData()">
+                <i class="fa-solid fa-rotate"></i> Load Schedule
+            </button>
+        </div>
+    </div>
+
+    <div class="planner-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time Slot</th>
+                    <th>Subject</th>
+                    <th>Plan / Objective</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="plannerBody">
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        // --- AUTH GUARD ---
+        function runAuthCheck() {
+            // Check for session in localStorage
+            const userSession = localStorage.getItem('upschub_session');
+            
+            if (!userSession) {
+                // If not found, redirect to your login/auth page
+                window.location.href = "auth.html";
+            } else {
+                // Success: Show content and load user info
+                document.body.style.display = "block";
+                document.getElementById('userEmail').innerText = userSession;
+                loadPlannerData();
+            }
+        }
+
+        function logoutUser() {
+            localStorage.removeItem('upschub_session');
+            window.location.href = "auth.html";
+        }
+
+        // --- LIVE CLOCK ---
+        function startClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock').innerHTML = `<i class="fa-regular fa-clock"></i> ${now.toLocaleTimeString('en-IN')}`;
+                document.getElementById('fullDate').innerHTML = `<i class="fa-regular fa-calendar-check"></i> ${now.toLocaleDateString('en-IN', {weekday:'long', day:'numeric', month:'long', year:'numeric'})}`;
+            }, 1000);
+        }
+
+        // --- CALENDAR LOGIC ---
+        const picker = document.getElementById('calPicker');
+        picker.value = new Date().toISOString().split('T')[0];
+
+        function syncLabel() {
+            const d = new Date(picker.value);
+            document.getElementById('displayDate').innerText = d.toLocaleDateString('en-IN', {day:'numeric', month:'long', year:'numeric'});
+        }
+        
+        function loadPlannerData() {
+            const body = document.getElementById('plannerBody');
+            // Mock data representing what will pull from your Excel/Google Sheet
+            body.innerHTML = `
+                <tr>
+                    <td class="time-tag">08:35 AM</td>
+                    <td><strong>Polity</strong></td>
+                    <td>Fundamental Rights: Laxmikanth Chapter 7</td>
+                    <td><span style="color:#10b981"><i class="fa-solid fa-circle-check"></i> Ready</span></td>
+                </tr>
+                <tr>
+                    <td class="time-tag">10:15 AM</td>
+                    <td><strong>History</strong></td>
+                    <td>Socio-Religious Reform Movements</td>
+                    <td><span style="color:#10b981"><i class="fa-solid fa-circle-check"></i> Ready</span></td>
+                </tr>
+            `;
+        }
+
+        // Initialize
+        runAuthCheck();
+        startClock();
+        syncLabel();
+    </script>
+</body>
+</html>
