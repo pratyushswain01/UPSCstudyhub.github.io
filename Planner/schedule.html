@@ -164,13 +164,13 @@
         td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
         .subject-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
-        /* --- 24-HOUR TIMELINE STYLE --- */
+        /* --- 24-HOUR VERTICAL TIMELINE --- */
         .timeline-container { padding: 20px; background: #fff; border-top: 1px solid var(--border); position: relative; z-index: 1; }
-        .timeline-scroll { display: flex; overflow-x: auto; gap: 15px; padding: 15px 5px; scrollbar-width: thin; }
-        .timeline-hour { min-width: 120px; padding: 15px; border-radius: 15px; background: #f8fafc; border: 1px solid var(--border); text-align: center; flex-shrink: 0; transition: 0.3s; }
-        .timeline-hour.active { border-top: 4px solid var(--primary); background: #eff6ff; }
-        .hour-label { font-size: 0.7rem; font-weight: 800; color: var(--text-muted); margin-bottom: 5px; }
-        .hour-subject { font-size: 0.8rem; font-weight: 700; color: var(--text-main); }
+        .timeline-vertical { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; }
+        .timeline-hour { display: flex; align-items: center; padding: 12px 15px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border); transition: 0.3s; }
+        .timeline-hour.active { border-left: 6px solid var(--primary); background: #eff6ff; }
+        .hour-label { min-width: 70px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
+        .hour-subject { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-left: 15px; }
 
         /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
@@ -284,8 +284,8 @@
                     </table>
 
                     <div class="timeline-container">
-                        <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:10px;">24-Hour Daily Track</div>
-                        <div class="timeline-scroll" id="timelineRow">
+                        <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px;">Daily 24-Hour Track</div>
+                        <div class="timeline-vertical" id="timelineRow">
                             </div>
                     </div>
                 </div>
@@ -311,17 +311,13 @@
     </div>
 
     <footer>
-        <div class="footer-content">
+        <div class="footer-content" style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center;">
             <div class="footer-logo">
-                <img src="../../images/LOGO.jpg" alt="UPSChub Logo">
+                <img src="../../images/LOGO.jpg" alt="UPSChub Logo" style="height:40px; width:auto; border-radius:5px;">
             </div>
             <div class="copyright">
                 &copy; 2025 UPSChub. All Rights Reserved. <br>
                 <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
-            </div>
-            <div class="footer-links" style="display: flex; gap: 20px; font-size: 0.85rem; font-weight: 600; color: var(--text-muted);">
-                <a href="#" style="text-decoration: none; color: inherit;">Privacy Policy</a>
-                <a href="#" style="text-decoration: none; color: inherit;">Terms of Service</a>
             </div>
         </div>
     </footer>
@@ -344,12 +340,10 @@
 
     const urlParams = new URLSearchParams(window.location.search);
     const dateFromUrl = urlParams.get('date');
-
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
     let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
-    
     let fullData = [];
-    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; // 🔴 PASTE CSV LINK HERE
+    const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE"; 
 
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
@@ -364,69 +358,25 @@
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth).then(() => {
-            localStorage.removeItem('upschub_session');
-            window.location.href = "auth.html";
-        });
+        signOut(auth).then(() => { localStorage.removeItem('upschub_session'); window.location.href = "auth.html"; });
     });
 
-    window.toggleCalendar = function() {
-        document.getElementById('calendarSidebar').classList.toggle('closed');
-    }
+    window.toggleCalendar = function() { document.getElementById('calendarSidebar').classList.toggle('closed'); }
 
     function getSubjectStyle(subject) {
-        if (!subject) return "background: #f1f5f9; color: #64748b;";
+        if (!subject) return { bg: "#f8fafc", color: "#64748b", border: "#e2e8f0" };
         const s = subject.toLowerCase();
-        if (s.includes("polity")) return "background: #eff6ff; color: #2563eb; border-left: 3px solid #2563eb;";
-        if (s.includes("geography")) return "background: #f0fdf4; color: #16a34a; border-left: 3px solid #16a34a;";
-        if (s.includes("econom")) return "background: #fffbeb; color: #d97706; border-left: 3px solid #d97706;";
-        if (s.includes("histor")) return "background: #fdf2f2; color: #dc2626; border-left: 3px solid #dc2626;";
-        return "background: #f1f5f9; color: #64748b;";
+        if (s.includes("polity")) return { bg: "#eff6ff", color: "#2563eb", border: "#2563eb" };
+        if (s.includes("geography")) return { bg: "#f0fdf4", color: "#16a34a", border: "#16a34a" };
+        if (s.includes("econom")) return { bg: "#fffbeb", color: "#d97706", border: "#d97706" };
+        if (s.includes("histor")) return { bg: "#fdf2f2", color: "#dc2626", border: "#dc2626" };
+        return { bg: "#f1f5f9", color: "#64748b", border: "#cbd5e1" };
     }
-
-    function renderCalendar() {
-        const grid = document.getElementById('calendarGrid');
-        grid.querySelectorAll('.day').forEach(d => d.remove());
-        const year = currentViewDate.getFullYear();
-        const month = currentViewDate.getMonth();
-        document.getElementById('monthDisplay').innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentViewDate);
-
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-
-        for (let i = 0; i < firstDay; i++) {
-            const div = document.createElement('div');
-            div.className = 'day empty';
-            grid.appendChild(div);
-        }
-
-        for (let i = 1; i <= daysInMonth; i++) {
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-            const div = document.createElement('div');
-            div.className = 'day';
-            if (dateStr === selectedDateStr) div.classList.add('selected');
-            if (dateStr === new Date().toISOString().split('T')[0]) div.classList.add('today');
-            div.innerText = i;
-            div.onclick = () => {
-                selectedDateStr = dateStr;
-                renderCalendar();
-                filterTasks();
-                loadNote();
-            };
-            grid.appendChild(div);
-        }
-    }
-
-    window.changeMonth = (dir) => { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); };
 
     async function initDashboard() {
-        updateClock(); 
-        setInterval(updateClock, 1000);
-        renderCalendar(); 
-        await loadPlannerData();
-        loadNote(); 
-        document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-        document.getElementById('loading-overlay').style.display = 'none';
+        updateClock(); setInterval(updateClock, 1000);
+        renderCalendar(); await loadPlannerData();
+        loadNote(); document.getElementById('loading-overlay').style.display = 'none';
     }
 
     async function loadPlannerData() {
@@ -439,23 +389,18 @@
     }
 
     window.filterTasks = () => {
-        const term = document.getElementById('searchInput').value.toLowerCase();
         const body = document.getElementById('plannerBody');
-        const filtered = fullData.slice(1).filter(row => {
-            const content = ((row[3] || '') + (row[4] || '')).toLowerCase();
-            return term === "" ? row[1]?.trim() === selectedDateStr : content.includes(term);
-        });
-        
-        body.innerHTML = filtered.length ? filtered.map(row => `
-            <tr>
-                <td><span class="subject-tag" style="${getSubjectStyle(row[3])}">${row[3] || '-'}</span></td>
-                <td style="font-weight:600;">${row[4] || '-'}</td>
-                <td style="text-align:center;">
-                    <i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" 
-                    style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'var(--success)':'#cbd5e1'}"></i>
-                </td>
-            </tr>
-        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
+        const filtered = fullData.slice(1).filter(row => row[1]?.trim() === selectedDateStr);
+
+        body.innerHTML = filtered.length ? filtered.map(row => {
+            const style = getSubjectStyle(row[3]);
+            return `
+                <tr>
+                    <td><span class="subject-tag" style="background:${style.bg}; color:${style.color}; border-left: 3px solid ${style.border};">${row[3]}</span></td>
+                    <td style="font-weight:600;">${row[4]}</td>
+                    <td style="text-align:center;"><i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'#10b981':'#cbd5e1'}"></i></td>
+                </tr>`;
+        }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
         
         document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
         generateTimeline(filtered);
@@ -468,18 +413,33 @@
             const label = i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i-12} PM`;
             const task = dayTasks.find(t => t[2]?.trim().toUpperCase().includes(label.toUpperCase()));
             const activeClass = task ? "active" : "";
-            const subName = task ? task[3] : "Free Slot";
-            const subStyle = task ? getSubjectStyle(task[3]) : "";
-            const accentColor = task ? subStyle.match(/color: (#[a-zA-Z0-9]+)/)[1] : "#cbd5e1";
+            const subName = task ? task[3] : "Free Slot / Sleep";
+            const style = getSubjectStyle(task ? task[3] : null);
 
             html += `
-                <div class="timeline-hour ${activeClass}" style="${task ? 'border-top-color:'+accentColor : ''}">
+                <div class="timeline-hour ${activeClass}" style="${task ? 'border-left-color:'+style.border : ''}; background:${task ? style.bg : '#f8fafc'}">
                     <div class="hour-label">${label}</div>
-                    <div class="hour-subject" style="color:${accentColor}">${subName}</div>
+                    <div class="hour-subject" style="color:${task ? style.color : 'var(--text-muted)'}">${subName}</div>
                 </div>
             `;
         }
         row.innerHTML = html;
+    }
+
+    function renderCalendar() {
+        const grid = document.getElementById('calendarGrid');
+        grid.querySelectorAll('.day').forEach(d => d.remove());
+        const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
+        document.getElementById('monthDisplay').innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentViewDate);
+        const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
+        for (let i = 0; i < firstDay; i++) grid.appendChild(Object.assign(document.createElement('div'), {className:'day empty'}));
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const div = document.createElement('div'); div.className = 'day';
+            if (dateStr === selectedDateStr) div.classList.add('selected');
+            div.innerText = d; div.onclick = () => { selectedDateStr = dateStr; renderCalendar(); filterTasks(); loadNote(); };
+            grid.appendChild(div);
+        }
     }
 
     function updateClock() {
@@ -488,6 +448,7 @@
         document.getElementById('liveDate').innerText = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
     }
 
+    window.changeMonth = (dir) => { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); };
     window.saveNote = () => localStorage.setItem('note_'+selectedDateStr, document.getElementById('dynamicNotes').value);
     function loadNote() { document.getElementById('dynamicNotes').value = localStorage.getItem('note_'+selectedDateStr) || ""; }
 </script>
