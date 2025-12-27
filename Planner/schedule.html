@@ -68,7 +68,6 @@
         
         .user-nav { display: flex; align-items: center; gap: 12px; }
         
-        /* New Complete Planner Button */
         .btn-full-planner {
             background: #f1f5f9;
             color: var(--text-main);
@@ -163,7 +162,7 @@
         table { width: 100%; border-collapse: collapse; position: relative; z-index: 1; }
         th { padding: 15px 20px; background: #fafbff; text-align: left; font-size: 0.7rem; text-transform: uppercase; color: #94a3b8; border-bottom: 1px solid var(--border); }
         td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
-        .subject-tag { background: #eff6ff; color: var(--primary); padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
+        .subject-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
         /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
@@ -221,7 +220,7 @@
             .calendar-sidebar.closed { display: none; }
             .footer-content { flex-direction: column; text-align: center; }
             .user-nav { gap: 8px; }
-            .btn-full-planner span { display: none; } /* Hide text on mobile icons */
+            .btn-full-planner span { display: none; }
         }
     </style>
 </head>
@@ -266,7 +265,7 @@
 
                 <div class="card">
                     <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
-                        <h2 style="font-size:1.1rem; margin:0;">Planner for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
+                        <h2 style="font-size:1.1rem; margin:0;">Agenda for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
                     </div>
                     <table>
                         <thead>
@@ -328,15 +327,13 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // --- NEW LOGIC: Check URL for a specific date (from Complete Planner) ---
+    // --- NEW LOGIC: URL Parameter Synchronization ---
     const urlParams = new URLSearchParams(window.location.search);
     const dateFromUrl = urlParams.get('date');
 
-    // If a date exists in the URL, the calendar will open at that month
-    let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
-    
-    // If a date exists in the URL, that specific day will be highlighted and loaded
+    // Priority to URL date, fallback to current time
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
+    let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
     
     let fullData = [];
     const SHEET_CSV_URL = "YOUR_PUBLISHED_CSV_LINK_HERE";
@@ -358,6 +355,17 @@
 
     window.toggleCalendar = function() {
         document.getElementById('calendarSidebar').classList.toggle('closed');
+    }
+
+    // --- Subject Color Mapper ---
+    function getSubjectStyle(subject) {
+        if (!subject) return "background: #f1f5f9; color: #64748b;";
+        const s = subject.toLowerCase();
+        if (s.includes("polity")) return "background: #eff6ff; color: #2563eb; border-left: 3px solid #2563eb;";
+        if (s.includes("geography")) return "background: #f0fdf4; color: #16a34a; border-left: 3px solid #16a34a;";
+        if (s.includes("econom")) return "background: #fffbeb; color: #d97706; border-left: 3px solid #d97706;";
+        if (s.includes("histor")) return "background: #fdf2f2; color: #dc2626; border-left: 3px solid #dc2626;";
+        return "background: #f1f5f9; color: #64748b;";
     }
 
     function renderCalendar() {
@@ -392,15 +400,23 @@
 
     function selectDate(dateStr) {
         selectedDateStr = dateStr;
+        // Update Title
         document.getElementById('agendaDate').innerText = new Date(dateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-        renderCalendar(); filterTasks(); loadNote();
+        renderCalendar(); 
+        filterTasks(); 
+        loadNote();
         if(window.innerWidth <= 900) toggleCalendar();
     }
 
     async function initDashboard() {
-        updateClock(); setInterval(updateClock, 1000);
-        renderCalendar(); await loadPlannerData();
-        loadNote(); document.getElementById('loading-overlay').style.display = 'none';
+        updateClock(); 
+        setInterval(updateClock, 1000);
+        renderCalendar(); 
+        await loadPlannerData();
+        loadNote(); 
+        // Force the date label to update on initial load
+        document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
+        document.getElementById('loading-overlay').style.display = 'none';
     }
 
     async function loadPlannerData() {
@@ -409,7 +425,7 @@
             const csv = await res.text();
             fullData = csv.split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
             filterTasks();
-        } catch (e) { console.error("Database Error"); }
+        } catch (e) { console.error("Database Connection Failed"); }
     }
 
     window.filterTasks = () => {
@@ -419,9 +435,17 @@
             const content = ((row[3] || '') + (row[4] || '')).toLowerCase();
             return term === "" ? row[1]?.trim() === selectedDateStr : content.includes(term);
         });
+        
         body.innerHTML = filtered.length ? filtered.map(row => `
-            <tr><td><span class="subject-tag">${row[3]}</span></td><td>${row[4]}</td><td style="text-align:center;"><i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'var(--success)':'#e2e8f0'}"></i></td></tr>
-        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found.</td></tr>`;
+            <tr>
+                <td><span class="subject-tag" style="${getSubjectStyle(row[3])}">${row[3] || '-'}</span></td>
+                <td style="font-weight:600;">${row[4] || '-'}</td>
+                <td style="text-align:center;">
+                    <i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" 
+                    style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'var(--success)':'#cbd5e1'}"></i>
+                </td>
+            </tr>
+        `).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
     }
 
     function updateClock() {
