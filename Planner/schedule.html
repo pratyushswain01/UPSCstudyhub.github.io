@@ -78,29 +78,30 @@
         /* --- SYLLABUS PROGRESS BAR --- */
         .progress-container {
             background: var(--white);
-            padding: 10px 5%;
+            padding: 15px 5%;
             border-bottom: 1px solid var(--border);
         }
         .progress-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-bottom: 8px;
             color: var(--text-muted);
         }
         .progress-bg {
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: #e2e8f0;
-            border-radius: 10px;
+            border-radius: 20px;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
         .progress-fill {
             height: 100%;
             width: 0%;
             background: var(--success);
-            transition: width 0.5s ease-in-out;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* --- HEADER --- */
@@ -295,7 +296,7 @@
     </div>
 
     <div id="backlogBanner" class="backlog-alert-banner">
-        <span><i class="fa-solid fa-triangle-exclamation"></i> ALERT: You have incomplete backlogs!</span>
+        <span><i class="fa-solid fa-triangle-exclamation"></i> ALERT: You have incomplete backlogs from previous days!</span>
         <a href="backlog.html" class="btn-go-backlog">Clear Now</a>
     </div>
 
@@ -317,7 +318,7 @@
 
     <div class="progress-container">
         <div class="progress-label">
-            <span>Syllabus Completion Progress</span>
+            <span>Overall Syllabus Completion Progress</span>
             <span id="progressText">0%</span>
         </div>
         <div class="progress-bg">
@@ -424,19 +425,29 @@
         if (!user) {
             window.location.href = "auth.html";
         } else {
+            // Correct UID based path for your private folders
             currentUserPath = `users/${user.uid}/tasks`;
+            
             document.body.style.display = "flex";
             initDashboard();
         }
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+        signOut(auth).then(() => { 
+            localStorage.removeItem('upschub_session'); 
+            window.location.href = "auth.html"; 
+        });
+    });
 
-    window.toggleCalendar = function() { document.getElementById('calendarSidebar').classList.toggle('closed'); }
+    window.toggleCalendar = function() { 
+        document.getElementById('calendarSidebar').classList.toggle('closed'); 
+    }
 
     window.toggleStatus = (taskId, currentStatus) => {
         if (!currentUserPath) return;
-        update(ref(db, `${currentUserPath}/${taskId}`), { status: !currentStatus }); 
+        const taskRef = ref(db, `${currentUserPath}/${taskId}`);
+        update(taskRef, { status: !currentStatus }); 
     };
 
     function getSubjectStyle(subject) {
@@ -459,14 +470,18 @@
 
     function syncTasks() {
         if (!currentUserPath) return;
-        onValue(ref(db, currentUserPath), (snapshot) => {
+        const tasksRef = ref(db, currentUserPath);
+        
+        onValue(tasksRef, (snapshot) => {
             currentTasks = snapshot.val() || {};
             const todayStr = new Date().toISOString().split('T')[0];
             
-            const taskList = Object.values(currentTasks);
-            const hasBacklogs = taskList.some(t => t.date < todayStr && t.status === false);
+            // Backlog Banner Logic
+            const hasBacklogs = Object.values(currentTasks).some(t => t.date < todayStr && t.status === false);
             document.getElementById('backlogBanner').style.display = hasBacklogs ? "flex" : "none";
 
+            // Progress Bar Calculation
+            const taskList = Object.values(currentTasks);
             const total = taskList.length || 1;
             const completed = taskList.filter(t => t.status === true).length;
             const percentage = Math.round((completed / total) * 100);
@@ -477,6 +492,7 @@
             filterTasks(); 
             document.getElementById('loading-overlay').style.display = 'none';
         }, (error) => {
+            console.error("Database error:", error);
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
@@ -484,6 +500,7 @@
     window.filterTasks = () => {
         const body = document.getElementById('plannerBody');
         const term = document.getElementById('searchInput').value.toLowerCase();
+        
         const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => {
             const matchesDate = task.date === selectedDateStr;
             const matchesSearch = term === "" || (task.subject.toLowerCase().includes(term) || task.objective.toLowerCase().includes(term));
@@ -518,6 +535,7 @@
             const activeClass = task ? "active" : "";
             const subName = task ? task.subject : "Free Slot / Sleep";
             const style = getSubjectStyle(task ? task.subject : null);
+
             html += `
                 <div class="timeline-hour ${activeClass}" style="${task ? 'border-left-color:'+style.border : ''}; background:${task ? style.bg : '#f8fafc'}">
                     <div class="hour-label">${label}</div>
