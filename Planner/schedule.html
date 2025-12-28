@@ -78,29 +78,30 @@
         /* --- SYLLABUS PROGRESS BAR --- */
         .progress-container {
             background: var(--white);
-            padding: 10px 5%;
+            padding: 15px 5%;
             border-bottom: 1px solid var(--border);
         }
         .progress-label {
             display: flex;
             justify-content: space-between;
-            font-size: 0.8rem;
-            font-weight: 700;
-            margin-bottom: 5px;
+            font-size: 0.85rem;
+            font-weight: 800;
+            margin-bottom: 8px;
             color: var(--text-muted);
         }
         .progress-bg {
             width: 100%;
-            height: 8px;
+            height: 12px;
             background: #e2e8f0;
-            border-radius: 10px;
+            border-radius: 20px;
             overflow: hidden;
+            border: 1px solid var(--border);
         }
         .progress-fill {
             height: 100%;
             width: 0%;
             background: var(--success);
-            transition: width 0.5s ease-in-out;
+            transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* --- HEADER --- */
@@ -119,7 +120,7 @@
         
         .user-nav { display: flex; align-items: center; gap: 12px; }
         
-        .btn-full-planner {
+        .btn-nav-item {
             background: #f1f5f9;
             color: var(--text-main);
             border: 1px solid var(--border);
@@ -133,7 +134,7 @@
             gap: 8px;
             transition: 0.2s;
         }
-        .btn-full-planner:hover { background: #e2e8f0; }
+        .btn-nav-item:hover { background: #e2e8f0; }
 
         .calendar-toggle-btn { 
             background: var(--primary); color: white; border: none; 
@@ -181,7 +182,7 @@
             transition: all 0.4s ease;
         }
 
-        /* --- CONTENT AREA & WATERMARK --- */
+        /* --- CONTENT AREA --- */
         .planner-area { flex: 1; display: flex; flex-direction: column; gap: 20px; transition: all 0.4s ease; }
         .card { 
             background: white; 
@@ -215,6 +216,7 @@
         td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
         .subject-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
+        /* --- TIMELINE --- */
         .timeline-container { padding: 20px; background: #fff; border-top: 1px solid var(--border); position: relative; z-index: 1; }
         .timeline-vertical { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; }
         .timeline-hour { display: flex; align-items: center; padding: 12px 15px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border); transition: 0.3s; }
@@ -222,6 +224,7 @@
         .hour-label { min-width: 70px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
         .hour-subject { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-left: 15px; }
 
+        /* --- SIDEBAR --- */
         .calendar-sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -256,7 +259,7 @@
         .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .footer-logo img { height: 40px; width: auto; border-radius: 5px; }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1100px) {
             .app-container { flex-direction: column; }
             .calendar-sidebar { width: 100%; position: static; }
             .calendar-sidebar.closed { display: none; }
@@ -274,14 +277,17 @@
     </div>
 
     <div id="backlogBanner" class="backlog-alert-banner">
-        <span><i class="fa-solid fa-triangle-exclamation"></i> ALERT: You have incomplete backlogs!</span>
-        <a href="backlog.html" class="btn-go-backlog">Clear Now</a>
+        <span><i class="fa-solid fa-triangle-exclamation"></i> IMPORTANT: You have unclicked tasks from previous days!</span>
+        <a href="backlog.html" class="btn-go-backlog">Clear Backlogs</a>
     </div>
 
     <header>
         <a href="#" class="logo">UPSChub</a>
         <div class="user-nav">
-            <a href="backlog.html" class="btn-full-planner">
+            <a href="2026.html" class="btn-nav-item">
+                <i class="fa-solid fa-layer-group"></i> <span>2026 Full Planner</span>
+            </a>
+            <a href="backlog.html" class="btn-nav-item">
                 <i class="fa-solid fa-clock-rotate-left"></i> <span>Backlogs</span>
             </a>
             <button class="calendar-toggle-btn" onclick="toggleCalendar()">
@@ -293,7 +299,7 @@
 
     <div class="progress-container">
         <div class="progress-label">
-            <span>Syllabus Completion Progress</span>
+            <span>Course Completion Status</span>
             <span id="progressText">0%</span>
         </div>
         <div class="progress-bg">
@@ -316,7 +322,7 @@
             <main class="planner-area">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
-                    <input type="text" id="searchInput" placeholder="Search topics..." onkeyup="filterTasks()">
+                    <input type="text" id="searchInput" placeholder="Search objectives..." onkeyup="filterTasks()">
                 </div>
 
                 <div class="card">
@@ -353,9 +359,9 @@
 
     <footer>
         <div class="footer-content">
-            <div class="footer-logo"><img src="../../images/LOGO.jpg" alt="Logo"></div>
+            <div class="footer-logo"><img src="../../images/LOGO.jpg" alt="UPSChub Logo"></div>
             <div class="copyright">
-                &copy; 2025 UPSChub. All Rights Reserved.
+                &copy; 2025 UPSChub Official. All Rights Reserved.
             </div>
         </div>
     </footer>
@@ -385,6 +391,7 @@
         if (!user) {
             window.location.href = "auth.html";
         } else {
+            // Using user.uid to access private user folder
             currentUserPath = `users/${user.uid}/tasks`;
             document.body.style.display = "flex";
             initDashboard();
@@ -407,23 +414,23 @@
         syncTasks();
     }
 
+    // SYNC LOGIC: Handles Banner, Progress Bar, and Data fetch
     function syncTasks() {
         if (!currentUserPath) return;
         onValue(ref(db, currentUserPath), (snapshot) => {
             currentTasks = snapshot.val() || {};
             const todayStr = new Date().toISOString().split('T')[0];
             
-            // 1. Backlog Banner Logic
+            // 1. Backlog Detection
             const hasBacklogs = Object.values(currentTasks).some(t => t.date < todayStr && t.status === false);
             document.getElementById('backlogBanner').style.display = hasBacklogs ? "flex" : "none";
 
             // 2. Syllabus Progress Calculation
             const taskList = Object.values(currentTasks);
-            const totalTasks = taskList.length || 1;
-            const completedTasks = taskList.filter(t => t.status === true).length;
-            const percentage = Math.round((completedTasks / totalTasks) * 100);
+            const total = taskList.length || 1;
+            const completed = taskList.filter(t => t.status === true).length;
+            const percentage = Math.round((completed / total) * 100);
 
-            // Update Progress UI
             document.getElementById('progressBar').style.width = percentage + "%";
             document.getElementById('progressText').innerText = percentage + "%";
 
@@ -436,19 +443,24 @@
 
     window.filterTasks = () => {
         const body = document.getElementById('plannerBody');
-        const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => task.date === selectedDateStr);
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => {
+            const matchesDate = task.date === selectedDateStr;
+            const matchesSearch = term === "" || (task.subject.toLowerCase().includes(term) || task.objective.toLowerCase().includes(term));
+            return matchesDate && matchesSearch;
+        });
 
         body.innerHTML = filteredEntries.length ? filteredEntries.map(([id, task]) => {
             const isDone = task.status === true;
             return `<tr>
-                <td>${task.subject}</td>
+                <td><span class="subject-tag" style="background:#eff6ff; color:#2563eb; border-left:3px solid #2563eb;">${task.subject}</span></td>
                 <td style="font-weight:600;">${task.objective}</td>
                 <td style="text-align:center;">
                     <i class="fa-solid ${isDone ? 'fa-circle-check' : 'fa-circle-dot'} sts-toggle" 
                        style="color:${isDone ? '#10b981' : '#cbd5e1'}" onclick="toggleStatus('${id}', ${isDone})"></i>
                 </td>
             </tr>`;
-        }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px;">No objectives for this date.</td></tr>`;
+        }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
         
         document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
         generateTimeline(filteredEntries.map(e => e[1]));
