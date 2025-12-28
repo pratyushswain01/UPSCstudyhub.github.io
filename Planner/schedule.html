@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -350,15 +349,14 @@
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
     let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
     let currentTasks = {}; 
-    let currentUserPath = ""; // To store the specific user's folder path
+    let currentUserPath = ""; 
 
     onAuthStateChanged(auth, user => {
         if (!user) {
             window.location.href = "auth.html";
         } else {
-            // Create a sanitized ID from email (replacing . with ,) to match your Apps Script
-            const userId = user.email.replace(/\./g, ','); 
-            currentUserPath = `users/${userId}/tasks`;
+            // FIX: Use user.uid to match your database private folders
+            currentUserPath = `users/${user.uid}/tasks`;
             
             document.body.style.display = "flex";
             initDashboard();
@@ -376,7 +374,6 @@
         document.getElementById('calendarSidebar').classList.toggle('closed'); 
     }
 
-    // DYNAMIC STATUS UPDATE FUNCTION - Updated to use Personalized Path
     window.toggleStatus = (taskId, currentStatus) => {
         if (!currentUserPath) return;
         const taskRef = ref(db, `${currentUserPath}/${taskId}`);
@@ -397,17 +394,22 @@
         updateClock(); 
         setInterval(updateClock, 1000);
         renderCalendar(); 
-        syncTasksFromDB();
+        syncTasks(); // Updated function name
         loadNote(); 
     }
 
-    // LIVE DATABASE LISTENER - Updated to use Personalized Path
-    function syncTasksFromDB() {
+    // UPDATED: LIVE DATABASE LISTENER (Stops infinite loop if no data)
+    function syncTasks() {
         if (!currentUserPath) return;
         const tasksRef = ref(db, currentUserPath);
+        
         onValue(tasksRef, (snapshot) => {
-            currentTasks = snapshot.val() || {};
+            currentTasks = snapshot.val() || {}; // Set empty if null
             filterTasks(); 
+            // Hide the "Synchronizing" spinner immediately
+            document.getElementById('loading-overlay').style.display = 'none';
+        }, (error) => {
+            console.error("Database error:", error);
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
