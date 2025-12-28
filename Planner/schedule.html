@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -231,6 +230,10 @@
             .user-nav { gap: 8px; }
             .btn-full-planner span { display: none; }
         }
+
+        /* Database Interaction Styles */
+        .sts-toggle { cursor: pointer; transition: transform 0.2s; }
+        .sts-toggle:hover { transform: scale(1.2); }
     </style>
 </head>
 <body>
@@ -325,6 +328,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
 
     const firebaseConfig = {
         apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
@@ -332,18 +336,19 @@
         projectId: "upscstudyhub-github",
         storageBucket: "upscstudyhub-github.firebasestorage.app",
         messagingSenderId: "451692540885",
-        appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+        appId: "1:451692540885:web:b425e85128e5de97c7c35c",
+        databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com/" // Found on Database tab
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
+    const db = getDatabase(app);
 
     const urlParams = new URLSearchParams(window.location.search);
     const dateFromUrl = urlParams.get('date');
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
     let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
-    let fullData = [];
-    const SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwab583ctkytdkLLaCk15c2bfmMxH510iQ41ANNbxOBJXcNDiAyGUbKCLaIo46fVzvt2WebLOnLgwF/pub?gid=0&single=true&output=csv"; 
+    let currentTasks = {}; // Store tasks locally from live database sync
 
     onAuthStateChanged(auth, user => {
         if (!user) window.location.href = "auth.html";
@@ -359,6 +364,12 @@
 
     window.toggleCalendar = function() { document.getElementById('calendarSidebar').classList.toggle('closed'); }
 
+    // DYNAMIC STATUS UPDATE FUNCTION
+    window.toggleStatus = (taskId, currentStatus) => {
+        const taskRef = ref(db, `planner/tasks/${taskId}`);
+        update(taskRef, { status: !currentStatus }); // Cloud update
+    };
+
     function getSubjectStyle(subject) {
         if (!subject) return { bg: "#f8fafc", color: "#64748b", border: "#e2e8f0" };
         const s = subject.toLowerCase();
@@ -371,35 +382,49 @@
 
     async function initDashboard() {
         updateClock(); setInterval(updateClock, 1000);
-        renderCalendar(); await loadPlannerData();
-        loadNote(); document.getElementById('loading-overlay').style.display = 'none';
+        renderCalendar(); 
+        syncTasksFromDB();
+        loadNote(); 
     }
 
-    async function loadPlannerData() {
-        try {
-            const res = await fetch(SHEET_CSV_URL);
-            const csv = await res.text();
-            fullData = csv.split('\n').map(r => r.split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/));
-            filterTasks();
-        } catch (e) { console.error("Database Connection Failed"); }
+    // LIVE DATABASE LISTENER
+    function syncTasksFromDB() {
+        const tasksRef = ref(db, 'planner/tasks');
+        onValue(tasksRef, (snapshot) => {
+            currentTasks = snapshot.val() || {};
+            filterTasks(); // Re-render table on data change
+            document.getElementById('loading-overlay').style.display = 'none';
+        });
     }
 
     window.filterTasks = () => {
         const body = document.getElementById('plannerBody');
-        const filtered = fullData.slice(1).filter(row => row[1]?.trim() === selectedDateStr);
+        const term = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Filter tasks for selected date
+        const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => {
+            const matchesDate = task.date === selectedDateStr;
+            const matchesSearch = term === "" || (task.subject.toLowerCase().includes(term) || task.objective.toLowerCase().includes(term));
+            return matchesDate && matchesSearch;
+        });
 
-        body.innerHTML = filtered.length ? filtered.map(row => {
-            const style = getSubjectStyle(row[3]);
+        body.innerHTML = filteredEntries.length ? filteredEntries.map(([id, task]) => {
+            const style = getSubjectStyle(task.subject);
+            const isDone = task.status === true;
             return `
                 <tr>
-                    <td><span class="subject-tag" style="background:${style.bg}; color:${style.color}; border-left: 3px solid ${style.border};">${row[3]}</span></td>
-                    <td style="font-weight:600;">${row[4]}</td>
-                    <td style="text-align:center;"><i class="fa-solid ${row[5]?.trim().toUpperCase()==='TRUE'?'fa-circle-check':'fa-circle-dot'}" style="color:${row[5]?.trim().toUpperCase()==='TRUE'?'#10b981':'#cbd5e1'}"></i></td>
+                    <td><span class="subject-tag" style="background:${style.bg}; color:${style.color}; border-left: 3px solid ${style.border};">${task.subject}</span></td>
+                    <td style="font-weight:600;">${task.objective}</td>
+                    <td style="text-align:center;">
+                        <i class="fa-solid ${isDone ? 'fa-circle-check' : 'fa-circle-dot'} sts-toggle" 
+                           style="color:${isDone ? '#10b981' : '#cbd5e1'}"
+                           onclick="toggleStatus('${id}', ${isDone})"></i>
+                    </td>
                 </tr>`;
         }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
         
         document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-        generateTimeline(filtered);
+        generateTimeline(filteredEntries.map(e => e[1]));
     }
 
     function generateTimeline(dayTasks) {
@@ -407,10 +432,10 @@
         let html = "";
         for(let i=0; i<24; i++) {
             const label = i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i-12} PM`;
-            const task = dayTasks.find(t => t[2]?.trim().toUpperCase().includes(label.toUpperCase()));
+            const task = dayTasks.find(t => t.time?.trim().toUpperCase().includes(label.toUpperCase()));
             const activeClass = task ? "active" : "";
-            const subName = task ? task[3] : "Free Slot / Sleep";
-            const style = getSubjectStyle(task ? task[3] : null);
+            const subName = task ? task.subject : "Free Slot / Sleep";
+            const style = getSubjectStyle(task ? task.subject : null);
 
             html += `
                 <div class="timeline-hour ${activeClass}" style="${task ? 'border-left-color:'+style.border : ''}; background:${task ? style.bg : '#f8fafc'}">
