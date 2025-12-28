@@ -52,6 +52,57 @@
         }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
+        /* --- BACKLOG BANNER --- */
+        .backlog-alert-banner {
+            background: #fff1f2;
+            border: 1px solid #fecaca;
+            color: #be123c;
+            padding: 12px 5%;
+            display: none; 
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            animation: slideDown 0.5s ease;
+        }
+        @keyframes slideDown { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .btn-go-backlog {
+            background: #be123c;
+            color: white;
+            text-decoration: none;
+            padding: 6px 15px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+        }
+
+        /* --- SYLLABUS PROGRESS BAR --- */
+        .progress-container {
+            background: var(--white);
+            padding: 10px 5%;
+            border-bottom: 1px solid var(--border);
+        }
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: var(--text-muted);
+        }
+        .progress-bg {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--success);
+            transition: width 0.5s ease-in-out;
+        }
+
         /* --- HEADER --- */
         header {
             background: var(--white);
@@ -164,7 +215,6 @@
         td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
         .subject-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
-        /* --- 24-HOUR VERTICAL TIMELINE --- */
         .timeline-container { padding: 20px; background: #fff; border-top: 1px solid var(--border); position: relative; z-index: 1; }
         .timeline-vertical { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; }
         .timeline-hour { display: flex; align-items: center; padding: 12px 15px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border); transition: 0.3s; }
@@ -172,7 +222,6 @@
         .hour-label { min-width: 70px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
         .hour-subject { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-left: 15px; }
 
-        /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -187,13 +236,7 @@
         }
 
         .calendar-sidebar.closed {
-            width: 0;
-            padding: 0;
-            margin-left: -30px;
-            opacity: 0;
-            overflow: hidden;
-            border: none;
-            pointer-events: none;
+            width: 0; padding: 0; margin-left: -30px; opacity: 0; overflow: hidden; border: none; pointer-events: none;
         }
 
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -204,34 +247,21 @@
         .day.today { color: var(--primary); border: 1px solid var(--primary); }
         .day.selected { background: var(--primary) !important; color: white !important; }
 
-        /* --- FOOTER --- */
         footer {
             background: var(--white);
             padding: 40px 5%;
             border-top: 1px solid var(--border);
             margin-top: auto;
         }
-        .footer-content {
-            max-width: 1200px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
+        .footer-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; }
         .footer-logo img { height: 40px; width: auto; border-radius: 5px; }
 
         @media (max-width: 900px) {
             .app-container { flex-direction: column; }
             .calendar-sidebar { width: 100%; position: static; }
             .calendar-sidebar.closed { display: none; }
-            .footer-content { flex-direction: column; text-align: center; }
-            .user-nav { gap: 8px; }
-            .btn-full-planner span { display: none; }
         }
 
-        /* Database Interaction Styles */
         .sts-toggle { cursor: pointer; transition: transform 0.2s; }
         .sts-toggle:hover { transform: scale(1.2); }
     </style>
@@ -243,23 +273,33 @@
         <p class="mt-4 font-bold" style="margin-top:15px">Synchronizing Database...</p>
     </div>
 
+    <div id="backlogBanner" class="backlog-alert-banner">
+        <span><i class="fa-solid fa-triangle-exclamation"></i> ALERT: You have incomplete backlogs!</span>
+        <a href="backlog.html" class="btn-go-backlog">Clear Now</a>
+    </div>
+
     <header>
         <a href="#" class="logo">UPSChub</a>
         <div class="user-nav">
-            <a href="2026.html" class="btn-full-planner">
-                <i class="fa-solid fa-layer-group"></i> <span>2026 Full Planner</span>
-            </a>
-
             <a href="backlog.html" class="btn-full-planner">
-                <i class="fa-solid fa-layer-group"></i> <span>Backlog Section</span>
+                <i class="fa-solid fa-clock-rotate-left"></i> <span>Backlogs</span>
             </a>
-
             <button class="calendar-toggle-btn" onclick="toggleCalendar()">
                 <i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
             </button>
             <button id="logoutBtn" class="logout-btn">Sign Out</button>
         </div>
     </header>
+
+    <div class="progress-container">
+        <div class="progress-label">
+            <span>Syllabus Completion Progress</span>
+            <span id="progressText">0%</span>
+        </div>
+        <div class="progress-bg">
+            <div id="progressBar" class="progress-fill"></div>
+        </div>
+    </div>
 
     <div class="live-info-bar">
         <div style="color:var(--primary)"><i class="fa-solid fa-clock"></i> <span id="liveClock">00:00:00</span></div>
@@ -270,18 +310,17 @@
         <div class="page-heading">
             <h1>1-Year Study Planner</h1>
             <p><strong>Year 2026</strong></p>
-            <p>Your personalized roadmap to cracking the UPSC CSE.</p>
         </div>
 
         <div class="app-container">
             <main class="planner-area">
                 <div class="search-box">
                     <i class="fa-solid fa-magnifying-glass" style="color:#94a3b8"></i>
-                    <input type="text" id="searchInput" placeholder="Search topics across the year..." onkeyup="filterTasks()">
+                    <input type="text" id="searchInput" placeholder="Search topics..." onkeyup="filterTasks()">
                 </div>
 
                 <div class="card">
-                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff; position:relative; z-index:2;">
+                    <div style="padding:15px 20px; border-bottom:1px solid var(--border); background:#fff;">
                         <h2 style="font-size:1.1rem; margin:0;">Agenda for <span id="agendaDate" style="color:var(--primary)">Today</span></h2>
                     </div>
                     <table>
@@ -293,14 +332,8 @@
 
                     <div class="timeline-container">
                         <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px;">Daily 24-Hour Track</div>
-                        <div class="timeline-vertical" id="timelineRow">
-                            </div>
+                        <div class="timeline-vertical" id="timelineRow"></div>
                     </div>
-                </div>
-
-                <div class="card" style="padding:20px;">
-                    <h3 style="font-size:0.95rem; margin-top:0; color:var(--primary); font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Daily Notes & Reflection</h3>
-                    <textarea id="dynamicNotes" style="width:100%; min-height:100px; border:none; outline:none; resize:none; font-family:inherit; font-size:0.95rem; line-height:1.6; background: transparent;" placeholder="Write specific notes for this date..." oninput="saveNote()"></textarea>
                 </div>
             </main>
 
@@ -319,13 +352,10 @@
     </div>
 
     <footer>
-        <div class="footer-content" style="max-width:1200px; margin:0 auto; display:flex; justify-content:space-between; align-items:center;">
-            <div class="footer-logo">
-                <img src="../../images/LOGO.jpg" alt="UPSChub Logo" style="height:40px; width:auto; border-radius:5px;">
-            </div>
+        <div class="footer-content">
+            <div class="footer-logo"><img src="../../images/LOGO.jpg" alt="Logo"></div>
             <div class="copyright">
-                &copy; 2025 UPSChub. All Rights Reserved. <br>
-                <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
+                &copy; 2025 UPSChub. All Rights Reserved.
             </div>
         </div>
     </footer>
@@ -339,9 +369,6 @@
         apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
         authDomain: "upscstudyhub-github.firebaseapp.com",
         projectId: "upscstudyhub-github",
-        storageBucket: "upscstudyhub-github.firebasestorage.app",
-        messagingSenderId: "451692540885",
-        appId: "1:451692540885:web:b425e85128e5de97c7c35c",
         databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com/" 
     };
 
@@ -349,10 +376,8 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const dateFromUrl = urlParams.get('date');
-    let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
-    let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
+    let selectedDateStr = new Date().toISOString().split('T')[0];
+    let currentViewDate = new Date();
     let currentTasks = {}; 
     let currentUserPath = ""; 
 
@@ -360,89 +385,70 @@
         if (!user) {
             window.location.href = "auth.html";
         } else {
-            // FIX: Use user.uid to match your database private folders
             currentUserPath = `users/${user.uid}/tasks`;
-            
             document.body.style.display = "flex";
             initDashboard();
         }
     });
 
-    document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth).then(() => { 
-            localStorage.removeItem('upschub_session'); 
-            window.location.href = "auth.html"; 
-        });
-    });
+    document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
 
-    window.toggleCalendar = function() { 
-        document.getElementById('calendarSidebar').classList.toggle('closed'); 
-    }
+    window.toggleCalendar = function() { document.getElementById('calendarSidebar').classList.toggle('closed'); }
 
     window.toggleStatus = (taskId, currentStatus) => {
         if (!currentUserPath) return;
-        const taskRef = ref(db, `${currentUserPath}/${taskId}`);
-        update(taskRef, { status: !currentStatus }); 
+        update(ref(db, `${currentUserPath}/${taskId}`), { status: !currentStatus }); 
     };
-
-    function getSubjectStyle(subject) {
-        if (!subject) return { bg: "#f8fafc", color: "#64748b", border: "#e2e8f0" };
-        const s = subject.toLowerCase();
-        if (s.includes("polity")) return { bg: "#eff6ff", color: "#2563eb", border: "#2563eb" };
-        if (s.includes("geography")) return { bg: "#f0fdf4", color: "#16a34a", border: "#16a34a" };
-        if (s.includes("econom")) return { bg: "#fffbeb", color: "#d97706", border: "#d97706" };
-        if (s.includes("histor")) return { bg: "#fdf2f2", color: "#dc2626", border: "#dc2626" };
-        return { bg: "#f1f5f9", color: "#64748b", border: "#cbd5e1" };
-    }
 
     async function initDashboard() {
         updateClock(); 
         setInterval(updateClock, 1000);
         renderCalendar(); 
-        syncTasks(); // Updated function name
-        loadNote(); 
+        syncTasks();
     }
 
-    // UPDATED: LIVE DATABASE LISTENER (Stops infinite loop if no data)
     function syncTasks() {
         if (!currentUserPath) return;
-        const tasksRef = ref(db, currentUserPath);
-        
-        onValue(tasksRef, (snapshot) => {
-            currentTasks = snapshot.val() || {}; // Set empty if null
+        onValue(ref(db, currentUserPath), (snapshot) => {
+            currentTasks = snapshot.val() || {};
+            const todayStr = new Date().toISOString().split('T')[0];
+            
+            // 1. Backlog Banner Logic
+            const hasBacklogs = Object.values(currentTasks).some(t => t.date < todayStr && t.status === false);
+            document.getElementById('backlogBanner').style.display = hasBacklogs ? "flex" : "none";
+
+            // 2. Syllabus Progress Calculation
+            const taskList = Object.values(currentTasks);
+            const totalTasks = taskList.length || 1;
+            const completedTasks = taskList.filter(t => t.status === true).length;
+            const percentage = Math.round((completedTasks / totalTasks) * 100);
+
+            // Update Progress UI
+            document.getElementById('progressBar').style.width = percentage + "%";
+            document.getElementById('progressText').innerText = percentage + "%";
+
             filterTasks(); 
-            // Hide the "Synchronizing" spinner immediately
             document.getElementById('loading-overlay').style.display = 'none';
         }, (error) => {
-            console.error("Database error:", error);
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
 
     window.filterTasks = () => {
         const body = document.getElementById('plannerBody');
-        const term = document.getElementById('searchInput').value.toLowerCase();
-        
-        const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => {
-            const matchesDate = task.date === selectedDateStr;
-            const matchesSearch = term === "" || (task.subject.toLowerCase().includes(term) || task.objective.toLowerCase().includes(term));
-            return matchesDate && matchesSearch;
-        });
+        const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => task.date === selectedDateStr);
 
         body.innerHTML = filteredEntries.length ? filteredEntries.map(([id, task]) => {
-            const style = getSubjectStyle(task.subject);
             const isDone = task.status === true;
-            return `
-                <tr>
-                    <td><span class="subject-tag" style="background:${style.bg}; color:${style.color}; border-left: 3px solid ${style.border};">${task.subject}</span></td>
-                    <td style="font-weight:600;">${task.objective}</td>
-                    <td style="text-align:center;">
-                        <i class="fa-solid ${isDone ? 'fa-circle-check' : 'fa-circle-dot'} sts-toggle" 
-                           style="color:${isDone ? '#10b981' : '#cbd5e1'}"
-                           onclick="toggleStatus('${id}', ${isDone})"></i>
-                    </td>
-                </tr>`;
-        }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
+            return `<tr>
+                <td>${task.subject}</td>
+                <td style="font-weight:600;">${task.objective}</td>
+                <td style="text-align:center;">
+                    <i class="fa-solid ${isDone ? 'fa-circle-check' : 'fa-circle-dot'} sts-toggle" 
+                       style="color:${isDone ? '#10b981' : '#cbd5e1'}" onclick="toggleStatus('${id}', ${isDone})"></i>
+                </td>
+            </tr>`;
+        }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px;">No objectives for this date.</td></tr>`;
         
         document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
         generateTimeline(filteredEntries.map(e => e[1]));
@@ -454,16 +460,10 @@
         for(let i=0; i<24; i++) {
             const label = i === 0 ? "12 AM" : i < 12 ? `${i} AM` : i === 12 ? "12 PM" : `${i-12} PM`;
             const task = dayTasks.find(t => t.time?.trim().toUpperCase().includes(label.toUpperCase()));
-            const activeClass = task ? "active" : "";
-            const subName = task ? task.subject : "Free Slot / Sleep";
-            const style = getSubjectStyle(task ? task.subject : null);
-
-            html += `
-                <div class="timeline-hour ${activeClass}" style="${task ? 'border-left-color:'+style.border : ''}; background:${task ? style.bg : '#f8fafc'}">
-                    <div class="hour-label">${label}</div>
-                    <div class="hour-subject" style="color:${task ? style.color : 'var(--text-muted)'}">${subName}</div>
-                </div>
-            `;
+            html += `<div class="timeline-hour ${task ? 'active' : ''}" style="background:${task ? '#eff6ff' : '#f8fafc'}">
+                <div class="hour-label">${label}</div>
+                <div class="hour-subject">${task ? task.subject : "Free Slot"}</div>
+            </div>`;
         }
         row.innerHTML = html;
     }
@@ -473,26 +473,23 @@
         grid.querySelectorAll('.day').forEach(d => d.remove());
         const year = currentViewDate.getFullYear(); const month = currentViewDate.getMonth();
         document.getElementById('monthDisplay').innerText = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(currentViewDate);
-        const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-        for (let i = 0; i < firstDay; i++) grid.appendChild(Object.assign(document.createElement('div'), {className:'day empty'}));
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
         for (let d = 1; d <= daysInMonth; d++) {
             const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             const div = document.createElement('div'); div.className = 'day';
             if (dateStr === selectedDateStr) div.classList.add('selected');
-            div.innerText = d; div.onclick = () => { selectedDateStr = dateStr; renderCalendar(); filterTasks(); loadNote(); };
+            div.innerText = d; div.onclick = () => { selectedDateStr = dateStr; renderCalendar(); filterTasks(); };
             grid.appendChild(div);
         }
     }
 
     function updateClock() {
         const now = new Date();
-        document.getElementById('liveClock').innerText = now.toLocaleTimeString('en-IN', { hour12: true });
-        document.getElementById('liveDate').innerText = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+        document.getElementById('liveClock').innerText = now.toLocaleTimeString();
+        document.getElementById('liveDate').innerText = now.toDateString();
     }
 
     window.changeMonth = (dir) => { currentViewDate.setMonth(currentViewDate.getMonth() + dir); renderCalendar(); };
-    window.saveNote = () => localStorage.setItem('note_'+selectedDateStr, document.getElementById('dynamicNotes').value);
-    function loadNote() { document.getElementById('dynamicNotes').value = localStorage.getItem('note_'+selectedDateStr) || ""; }
 </script>
 </body>
 </html>
