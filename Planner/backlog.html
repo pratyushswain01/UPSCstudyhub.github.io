@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Backlog Hub | UPSChub Official</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root { 
+            --primary: #ef4444; 
+            --success: #10b981; 
+            --bg: #f8fafc; 
+            --white: #ffffff; 
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0; 
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            display: none; 
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* --- HEADER --- */
+        header {
+            background: var(--white);
+            padding: 0.8rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .logo { font-weight: 800; color: #2563eb; font-size: 1.5rem; text-decoration: none; }
+        .nav-links { display: flex; gap: 15px; }
+        .btn-nav { text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .btn-dashboard { background: #eff6ff; color: #2563eb; }
+        .btn-logout { background: #fef2f2; color: #ef4444; }
+
+        /* --- WATERMARK --- */
+        .main-content { 
+            flex: 1; 
+            padding: 40px 5%; 
+            position: relative; 
+            z-index: 1;
+        }
+        .main-content::before {
+            content: "UPSChub Official";
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-15deg);
+            font-size: 5rem;
+            font-weight: 900;
+            color: rgba(0, 0, 0, 0.03);
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        /* --- PROGRESS & BLINKER --- */
+        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: white; padding: 25px; border-radius: 20px; border: 1px solid var(--border); text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        
+        .progress-circle { 
+            width: 110px; height: 110px; border-radius: 50%; 
+            background: conic-gradient(var(--success) 0deg, #f1f5f9 0deg); 
+            margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; position: relative; 
+        }
+        .progress-circle::after { 
+            content: attr(data-percent); position: absolute; background: white; 
+            width: 90px; height: 90px; border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; 
+            font-weight: 800; font-size: 1.3rem; 
+        }
+
+        .blinker { 
+            background: #fef2f2; color: var(--primary); padding: 15px; 
+            border-radius: 12px; border: 2px solid var(--primary); 
+            font-weight: 800; text-align: center; margin-bottom: 25px; 
+            animation: pulse 1.5s infinite; display: none; 
+        }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
+
+        /* --- TABLE --- */
+        .table-wrapper { background: white; border-radius: 20px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #fafbff; padding: 18px; text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+        td { padding: 18px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
+        .status-btn { cursor: pointer; padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; background: #f1f5f9; color: var(--text-main); transition: 0.2s; }
+        .status-btn:hover { background: var(--success); color: white; }
+
+        /* --- FOOTER --- */
+        footer {
+            background: var(--white);
+            padding: 30px 5%;
+            border-top: 1px solid var(--border);
+            margin-top: auto;
+            text-align: center;
+        }
+        .footer-logo img { height: 35px; border-radius: 5px; margin-bottom: 10px; }
+        .copyright { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <a href="schedule.html" class="logo">UPSChub</a>
+        <div class="nav-links">
+            <a href="schedule.html" class="btn-nav btn-dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <button id="logoutBtn" class="btn-nav btn-logout">Sign Out</button>
+        </div>
+    </header>
+
+    <main class="main-content">
+        <div id="blinker" class="blinker">
+            <i class="fa-solid fa-triangle-exclamation"></i> CRITICAL BACKLOG: YOUR SYLLABUS IS SLIPPING!
+        </div>
+
+        <div class="stats-container">
+            <div class="stat-card">
+                <div class="progress-circle" id="progressRing" data-percent="0%"></div>
+                <div style="font-weight: 700; color: var(--text-muted);">Course Completion</div>
+            </div>
+            <div class="stat-card">
+                <div id="backlogCount" style="font-size: 3rem; font-weight: 800; color: var(--primary);">0</div>
+                <div style="font-weight: 700; color: var(--text-muted);">Incomplete Backlogs</div>
+            </div>
+        </div>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date of Missed Task</th>
+                        <th>Subject</th>
+                        <th>Objective</th>
+                        <th style="text-align:center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="backlogList"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-logo">
+            <img src="../../images/LOGO.jpg" alt="UPSChub Logo">
+        </div>
+        <div class="copyright">
+            &copy; 2025 <strong>UPSChub Official</strong>. All Rights Reserved.<br>
+            <span style="font-size: 0.75rem; opacity: 0.8;">Empowering UPSC Aspirants through Structured Learning.</span>
+        </div>
+    </footer>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+        authDomain: "upscstudyhub-github.firebaseapp.com",
+        projectId: "upscstudyhub-github",
+        databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    onAuthStateChanged(auth, user => {
+        if (!user) window.location.href = "auth.html";
+        else {
+            document.body.style.display = "flex";
+            loadData(user.uid);
+        }
+    });
+
+    document.getElementById('logoutBtn').onclick = () => signOut(auth);
+
+    function loadData(uid) {
+        const tasksRef = ref(db, `users/${uid}/tasks`);
+        onValue(tasksRef, (snapshot) => {
+            const data = snapshot.val() || {};
+            const today = new Date().toISOString().split('T')[0];
+            const entries = Object.entries(data);
+            
+            // Logic for Backlogs (Date past + status false)
+            const backlogs = entries.filter(([id, t]) => t.date < today && t.status === false);
+            
+            // Logic for Completion Progress
+            const completed = entries.filter(([id, t]) => t.status === true).length;
+            const total = entries.length || 1;
+            const percent = Math.round((completed / total) * 100);
+
+            updateUI(backlogs, percent);
+        });
+    }
+
+    function updateUI(backlogs, percent) {
+        // Progress Ring Update
+        const ring = document.getElementById('progressRing');
+        ring.style.background = `conic-gradient(#10b981 ${percent * 3.6}deg, #f1f5f9 0deg)`;
+        ring.setAttribute('data-percent', percent + '%');
+
+        // Stats Update
+        document.getElementById('backlogCount').innerText = backlogs.length;
+        document.getElementById('blinker').style.display = backlogs.length > 0 ? "block" : "none";
+
+        // Table Update
+        const list = document.getElementById('backlogList');
+        list.innerHTML = backlogs.map(([id, t]) => `
+            <tr>
+                <td style="font-weight: 800; color: var(--primary);">${t.date}</td>
+                <td style="font-weight: 600;">${t.subject}</td>
+                <td>${t.objective}</td>
+                <td style="text-align:center;">
+                    <button class="status-btn" onclick="recoverTask('${id}')">Recover Task</button>
+                </td>
+            </tr>
+        `).join('') || '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--success); font-weight:700;">No Backlogs Found! You are on track.</td></tr>';
+    }
+
+    window.recoverTask = (taskId) => {
+        const uid = auth.currentUser.uid;
+        update(ref(db, `users/${uid}/tasks/${taskId}`), { status: true });
+    };
+</script>
+</body>
+</html>
