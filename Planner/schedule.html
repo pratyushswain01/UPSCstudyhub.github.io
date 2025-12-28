@@ -337,7 +337,7 @@
         storageBucket: "upscstudyhub-github.firebasestorage.app",
         messagingSenderId: "451692540885",
         appId: "1:451692540885:web:b425e85128e5de97c7c35c",
-        databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com/" // Found on Database tab
+        databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com/" 
     };
 
     const app = initializeApp(firebaseConfig);
@@ -348,26 +348,38 @@
     const dateFromUrl = urlParams.get('date');
     let selectedDateStr = dateFromUrl || new Date().toISOString().split('T')[0];
     let currentViewDate = dateFromUrl ? new Date(dateFromUrl) : new Date();
-    let currentTasks = {}; // Store tasks locally from live database sync
+    let currentTasks = {}; 
+    let currentUserPath = ""; // To store the specific user's folder path
 
     onAuthStateChanged(auth, user => {
-        if (!user) window.location.href = "auth.html";
-        else {
+        if (!user) {
+            window.location.href = "auth.html";
+        } else {
+            // Create a sanitized ID from email (replacing . with ,) to match your Apps Script
+            const userId = user.email.replace(/\./g, ','); 
+            currentUserPath = `users/${userId}/tasks`;
+            
             document.body.style.display = "flex";
             initDashboard();
         }
     });
 
     document.getElementById('logoutBtn').addEventListener('click', () => {
-        signOut(auth).then(() => { localStorage.removeItem('upschub_session'); window.location.href = "auth.html"; });
+        signOut(auth).then(() => { 
+            localStorage.removeItem('upschub_session'); 
+            window.location.href = "auth.html"; 
+        });
     });
 
-    window.toggleCalendar = function() { document.getElementById('calendarSidebar').classList.toggle('closed'); }
+    window.toggleCalendar = function() { 
+        document.getElementById('calendarSidebar').classList.toggle('closed'); 
+    }
 
-    // DYNAMIC STATUS UPDATE FUNCTION
+    // DYNAMIC STATUS UPDATE FUNCTION - Updated to use Personalized Path
     window.toggleStatus = (taskId, currentStatus) => {
-        const taskRef = ref(db, `planner/tasks/${taskId}`);
-        update(taskRef, { status: !currentStatus }); // Cloud update
+        if (!currentUserPath) return;
+        const taskRef = ref(db, `${currentUserPath}/${taskId}`);
+        update(taskRef, { status: !currentStatus }); 
     };
 
     function getSubjectStyle(subject) {
@@ -381,18 +393,20 @@
     }
 
     async function initDashboard() {
-        updateClock(); setInterval(updateClock, 1000);
+        updateClock(); 
+        setInterval(updateClock, 1000);
         renderCalendar(); 
         syncTasksFromDB();
         loadNote(); 
     }
 
-    // LIVE DATABASE LISTENER
+    // LIVE DATABASE LISTENER - Updated to use Personalized Path
     function syncTasksFromDB() {
-        const tasksRef = ref(db, 'planner/tasks');
+        if (!currentUserPath) return;
+        const tasksRef = ref(db, currentUserPath);
         onValue(tasksRef, (snapshot) => {
             currentTasks = snapshot.val() || {};
-            filterTasks(); // Re-render table on data change
+            filterTasks(); 
             document.getElementById('loading-overlay').style.display = 'none';
         });
     }
@@ -401,7 +415,6 @@
         const body = document.getElementById('plannerBody');
         const term = document.getElementById('searchInput').value.toLowerCase();
         
-        // Filter tasks for selected date
         const filteredEntries = Object.entries(currentTasks).filter(([id, task]) => {
             const matchesDate = task.date === selectedDateStr;
             const matchesSearch = term === "" || (task.subject.toLowerCase().includes(term) || task.objective.toLowerCase().includes(term));
