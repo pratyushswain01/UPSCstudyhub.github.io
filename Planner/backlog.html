@@ -41,7 +41,7 @@
             z-index: 100;
         }
         .logo { font-weight: 800; color: #2563eb; font-size: 1.5rem; text-decoration: none; }
-        .nav-links { display: flex; align-items: center; gap: 15px; }
+        .nav-links { display: flex; gap: 15px; }
         .btn-nav { text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; border: none; cursor: pointer; }
         .btn-dashboard { background: #eff6ff; color: #2563eb; }
         .btn-logout { background: #fef2f2; color: #ef4444; }
@@ -90,7 +90,7 @@
         }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        /* --- BACKLOG TABLE --- */
+        /* --- TABLE --- */
         .table-wrapper { background: white; border-radius: 20px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
         th { background: #fafbff; padding: 18px; text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
@@ -155,7 +155,7 @@
             <img src="../../images/LOGO.jpg" alt="Logo">
         </div>
         <div style="font-size: 0.85rem; color: var(--text-muted);">
-            &copy; 2025 <strong>UPSChub </strong>. All Rights Reserved.
+            &copy; 2025 <strong>UPSChub Official</strong>. All Rights Reserved.
         </div>
     </footer>
 
@@ -198,19 +198,24 @@
             const todayStr = new Date().toISOString().split('T')[0];
             const entries = Object.entries(allTasks);
             
-            // --- FIX: IGNORE INVALID/EMPTY DATABASE ENTRIES ---
-            // This prevents "1970-01-01" from showing up
-            const validEntries = entries.filter(([id, task]) => task.date && task.subject);
+            // --- CRITICAL FIX: REJECT INVALID/STUB DATA ---
+            // We only keep rows that have a REAL date and a REAL subject
+            const validEntries = entries.filter(([id, task]) => {
+                return task.date && 
+                       task.date !== "" && 
+                       task.subject && 
+                       task.subject !== "Subject"; // Rejects placeholder text from sheet headers
+            });
 
-            // LOGIC: Filter only tasks where Date < Today AND status is false
+            // Logic: Filter only valid tasks where Date < Today AND status is false
             const backlogs = validEntries.filter(([id, task]) => {
                 return task.date < todayStr && task.status === false;
             });
 
-            // LOGIC: Calculate Overall Course Progress based on valid tasks only
-            const total = validEntries.length || 1;
+            // Logic: Calculate Overall Progress using only valid total tasks
+            const totalValid = validEntries.length || 1;
             const completed = validEntries.filter(([id, t]) => t.status === true).length;
-            const percent = Math.round((completed / total) * 100);
+            const percent = Math.round((completed / totalValid) * 100);
 
             updateUI(backlogs, percent);
         });
@@ -249,7 +254,6 @@
         }
     }
 
-    // FUNCTION: Push recovery update to private user path
     window.recoverTask = (taskId) => {
         const taskRef = ref(db, `users/${currentUserUID}/tasks/${taskId}`);
         update(taskRef, { status: true });
