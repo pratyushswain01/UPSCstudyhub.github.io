@@ -41,10 +41,10 @@
             z-index: 100;
         }
         .logo { font-weight: 800; color: #2563eb; font-size: 1.5rem; text-decoration: none; }
-        .nav-links { display: flex; gap: 15px; }
-        .btn-nav { text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
+        .nav-links { display: flex; align-items: center; gap: 15px; }
+        .btn-nav { text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; border: none; cursor: pointer; }
         .btn-dashboard { background: #eff6ff; color: #2563eb; }
-        .btn-logout { background: #fef2f2; color: #ef4444; border: none; cursor: pointer; }
+        .btn-logout { background: #fef2f2; color: #ef4444; }
 
         /* --- WATERMARK --- */
         .main-content { 
@@ -66,7 +66,7 @@
             z-index: -1;
         }
 
-        /* --- PROGRESS & BLINKER --- */
+        /* --- STATS & BLINKER --- */
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: white; padding: 25px; border-radius: 20px; border: 1px solid var(--border); text-align: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         
@@ -90,15 +90,15 @@
         }
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.6; } 100% { opacity: 1; } }
 
-        /* --- TABLE --- */
+        /* --- BACKLOG TABLE --- */
         .table-wrapper { background: white; border-radius: 20px; border: 1px solid var(--border); overflow-x: auto; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         table { width: 100%; border-collapse: collapse; }
-        th { background: #fafbff; padding: 18px; text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--border); }
+        th { background: #fafbff; padding: 18px; text-align: left; color: var(--text-muted); font-size: 0.75rem; text-transform: uppercase; border-bottom: 1px solid var(--border); }
         td { padding: 18px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
-        .status-btn { cursor: pointer; padding: 8px 16px; border-radius: 8px; border: none; font-weight: 700; background: #f1f5f9; color: var(--text-main); transition: 0.2s; }
-        .status-btn:hover { background: var(--success); color: white; }
+        
+        .status-btn { cursor: pointer; padding: 10px 20px; border-radius: 10px; border: none; font-weight: 700; background: #eff6ff; color: #2563eb; transition: 0.3s; display: flex; align-items: center; gap: 8px; margin: 0 auto; }
+        .status-btn:hover { background: var(--success); color: white; transform: translateY(-2px); }
 
-        /* --- FOOTER --- */
         footer {
             background: var(--white);
             padding: 30px 5%;
@@ -107,7 +107,6 @@
             text-align: center;
         }
         .footer-logo img { height: 35px; border-radius: 5px; margin-bottom: 10px; }
-        .copyright { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; }
     </style>
 </head>
 <body>
@@ -115,14 +114,14 @@
     <header>
         <a href="schedule.html" class="logo">UPSChub</a>
         <div class="nav-links">
-            <a href="schedule.html" class="btn-nav btn-dashboard"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <a href="schedule.html" class="btn-nav btn-dashboard"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
             <button id="logoutBtn" class="btn-nav btn-logout">Sign Out</button>
         </div>
     </header>
 
     <main class="main-content">
         <div id="blinker" class="blinker">
-            <i class="fa-solid fa-triangle-exclamation"></i> CRITICAL BACKLOG: YOUR SYLLABUS IS SLIPPING!
+            <i class="fa-solid fa-triangle-exclamation"></i> UNFINISHED TASKS COLLECTED: PLEASE CLEAR THEM TO STAY ON TRACK
         </div>
 
         <div class="stats-container">
@@ -131,8 +130,8 @@
                 <div style="font-weight: 700; color: var(--text-muted);">Course Completion</div>
             </div>
             <div class="stat-card">
-                <div id="backlogCount" style="font-size: 3rem; font-weight: 800; color: var(--primary);">0</div>
-                <div style="font-weight: 700; color: var(--text-muted);">Incomplete Backlogs</div>
+                <div id="backlogCount" style="font-size: 3.5rem; font-weight: 800; color: var(--primary);">0</div>
+                <div style="font-weight: 700; color: var(--text-muted);">Total Backlog Items</div>
             </div>
         </div>
 
@@ -153,11 +152,10 @@
 
     <footer>
         <div class="footer-logo">
-            <img src="../../images/LOGO.jpg" alt="UPSChub Logo">
+            <img src="../../images/LOGO.jpg" alt="Logo">
         </div>
-        <div class="copyright">
-            &copy; 2025 <strong>UPSChub Official</strong>. All Rights Reserved.<br>
-            <span style="font-size: 0.75rem; opacity: 0.8;">Empowering UPSC Aspirants through Structured Learning.</span>
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+            &copy; 2025 <strong>UPSChub Official</strong>. All Rights Reserved.
         </div>
     </footer>
 
@@ -177,35 +175,37 @@
     const auth = getAuth(app);
     const db = getDatabase(app);
 
+    let currentUserUID = "";
+
     onAuthStateChanged(auth, user => {
-        if (!user) window.location.href = "auth.html";
-        else {
+        if (!user) {
+            window.location.href = "auth.html";
+        } else {
+            currentUserUID = user.uid;
             document.body.style.display = "flex";
-            loadData(user.uid);
+            syncBacklogData();
         }
     });
 
     document.getElementById('logoutBtn').onclick = () => {
-        signOut(auth).then(() => {
-            localStorage.removeItem('upschub_session');
-            window.location.href = "auth.html";
-        });
+        signOut(auth).then(() => window.location.href = "auth.html");
     };
 
-    function loadData(uid) {
-        // Collects live unclicked data from the private user path
-        const tasksRef = ref(db, `users/${uid}/tasks`);
+    function syncBacklogData() {
+        const tasksRef = ref(db, `users/${currentUserUID}/tasks`);
         onValue(tasksRef, (snapshot) => {
-            const data = snapshot.val() || {};
-            const today = new Date().toISOString().split('T')[0];
-            const entries = Object.entries(data);
+            const allTasks = snapshot.val() || {};
+            const todayStr = new Date().toISOString().split('T')[0];
+            const entries = Object.entries(allTasks);
             
-            // Logic: Collect items where the date has passed but status is false
-            const backlogs = entries.filter(([id, t]) => t.date < today && t.status === false);
-            
-            // Percentage Calculation based on total course data
-            const completed = entries.filter(([id, t]) => t.status === true).length;
+            // LOGIC: Filter only tasks where Date < Today AND status is false
+            const backlogs = entries.filter(([id, task]) => {
+                return task.date < todayStr && task.status === false;
+            });
+
+            // LOGIC: Calculate Overall Course Progress
             const total = entries.length || 1;
+            const completed = entries.filter(([id, t]) => t.status === true).length;
             const percent = Math.round((completed / total) * 100);
 
             updateUI(backlogs, percent);
@@ -213,30 +213,44 @@
     }
 
     function updateUI(backlogs, percent) {
+        // Update Ring
         const ring = document.getElementById('progressRing');
         ring.style.background = `conic-gradient(#10b981 ${percent * 3.6}deg, #f1f5f9 0deg)`;
         ring.setAttribute('data-percent', percent + '%');
 
+        // Update Stats
         document.getElementById('backlogCount').innerText = backlogs.length;
         document.getElementById('blinker').style.display = backlogs.length > 0 ? "block" : "none";
 
+        // Update Table
         const list = document.getElementById('backlogList');
-        list.innerHTML = backlogs.map(([id, t]) => `
-            <tr>
-                <td style="font-weight: 800; color: var(--primary);">${t.date}</td>
-                <td style="font-weight: 600;">${t.subject}</td>
-                <td>${t.objective}</td>
-                <td style="text-align:center;">
-                    <button class="status-btn" onclick="recoverTask('${id}')">Recover Task</button>
-                </td>
-            </tr>
-        `).join('') || '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--success); font-weight:700;">No Backlogs Found! You are on track.</td></tr>';
+        if (backlogs.length === 0) {
+            list.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:50px; color:var(--success); font-weight:700;">
+                <i class="fa-solid fa-circle-check" style="font-size:2rem; margin-bottom:10px; display:block;"></i>
+                No backlogs found! You are perfectly on schedule.
+            </td></tr>`;
+        } else {
+            list.innerHTML = backlogs.map(([id, task]) => `
+                <tr>
+                    <td style="font-weight: 800; color: var(--primary);">${task.date}</td>
+                    <td style="font-weight: 600;">${task.subject}</td>
+                    <td>${task.objective}</td>
+                    <td style="text-align:center;">
+                        <button class="status-btn" onclick="recoverTask('${id}')">
+                            <i class="fa-solid fa-rotate-left"></i> Mark Done
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
     }
 
-    // Global function to update status back to the private folder
+    // FUNCTION: Push recovery update to Firebase
     window.recoverTask = (taskId) => {
-        const uid = auth.currentUser.uid;
-        update(ref(db, `users/${uid}/tasks/${taskId}`), { status: true });
+        const taskRef = ref(db, `users/${currentUserUID}/tasks/${taskId}`);
+        update(taskRef, { status: true }).then(() => {
+            console.log("Backlog cleared successfully");
+        });
     };
 </script>
 </body>
