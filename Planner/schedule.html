@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -76,7 +75,7 @@
             font-size: 0.8rem;
         }
 
-        /* --- SYLLABUS PROGRESS BAR --- */
+        /* --- PROGRESS BAR --- */
         .progress-container {
             background: var(--white);
             padding: 15px 5%;
@@ -105,7 +104,6 @@
             transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- HEADER --- */
         header {
             background: var(--white);
             padding: 0.8rem 5%;
@@ -118,7 +116,6 @@
             z-index: 100;
         }
         .logo { font-weight: 800; color: var(--primary); font-size: 1.5rem; letter-spacing: -0.5px; text-decoration: none; }
-        
         .user-nav { display: flex; align-items: center; gap: 12px; }
         
         .btn-full-planner {
@@ -155,7 +152,6 @@
             cursor: pointer;
         }
 
-        /* --- LIVE INFO BAR --- */
         .live-info-bar {
             background: #fff;
             padding: 10px 5%;
@@ -168,7 +164,6 @@
             border-bottom: 1px solid #f1f5f9;
         }
 
-        /* --- LAYOUT WRAPPER --- */
         .main-wrapper { flex: 1; position: relative; }
         .page-heading { text-align: center; padding: 40px 20px 10px; }
         .page-heading h1 { font-size: 2.2rem; font-weight: 800; margin: 0; }
@@ -183,7 +178,6 @@
             transition: all 0.4s ease;
         }
 
-        /* --- CONTENT AREA & WATERMARK --- */
         .planner-area { flex: 1; display: flex; flex-direction: column; gap: 20px; transition: all 0.4s ease; }
         .card { 
             background: white; 
@@ -217,7 +211,6 @@
         td { padding: 18px 20px; border-bottom: 1px solid #f8fafc; font-size: 0.95rem; }
         .subject-tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 700; }
 
-        /* --- 24-HOUR VERTICAL TIMELINE --- */
         .timeline-container { padding: 20px; background: #fff; border-top: 1px solid var(--border); position: relative; z-index: 1; }
         .timeline-vertical { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 10px; scrollbar-width: thin; }
         .timeline-hour { display: flex; align-items: center; padding: 12px 15px; border-radius: 12px; background: #f8fafc; border: 1px solid var(--border); transition: 0.3s; }
@@ -225,7 +218,6 @@
         .hour-label { min-width: 70px; font-size: 0.75rem; font-weight: 800; color: var(--text-muted); }
         .hour-subject { font-size: 0.85rem; font-weight: 700; color: var(--text-main); margin-left: 15px; }
 
-        /* --- COLLAPSIBLE CALENDAR SIDEBAR --- */
         .calendar-sidebar {
             width: var(--sidebar-width);
             background: white;
@@ -240,13 +232,7 @@
         }
 
         .calendar-sidebar.closed {
-            width: 0;
-            padding: 0;
-            margin-left: -30px;
-            opacity: 0;
-            overflow: hidden;
-            border: none;
-            pointer-events: none;
+            width: 0; padding: 0; margin-left: -30px; opacity: 0; overflow: hidden; border: none; pointer-events: none;
         }
 
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
@@ -257,7 +243,6 @@
         .day.today { color: var(--primary); border: 1px solid var(--primary); }
         .day.selected { background: var(--primary) !important; color: white !important; }
 
-        /* --- FOOTER --- */
         footer {
             background: var(--white);
             padding: 40px 5%;
@@ -284,7 +269,6 @@
             .btn-full-planner span { display: none; }
         }
 
-        /* Database Interaction Styles */
         .sts-toggle { cursor: pointer; transition: transform 0.2s; }
         .sts-toggle:hover { transform: scale(1.2); }
     </style>
@@ -310,7 +294,7 @@
             <a href="backlog.html" class="btn-full-planner">
                 <i class="fa-solid fa-clock-rotate-left"></i> <span>Backlog Section</span>
             </a>
-            <button class="calendar-toggle-btn" onclick="toggleCalendar()">
+            <button class="calendar-toggle-btn" onclick="toggleCalendar()"><br>
                 <i class="fa-solid fa-calendar-days"></i> <span>Calendar</span>
             </button>
             <button id="logoutBtn" class="logout-btn">Sign Out</button>
@@ -359,8 +343,7 @@
 
                     <div class="timeline-container">
                         <div style="font-size:0.75rem; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:12px;">Daily 24-Hour Track</div>
-                        <div class="timeline-vertical" id="timelineRow">
-                            </div>
+                        <div class="timeline-vertical" id="timelineRow"></div>
                     </div>
                 </div>
 
@@ -390,8 +373,8 @@
                 <img src="../../images/LOGO.jpg" alt="UPSChub Logo" style="height:40px; width:auto; border-radius:5px;">
             </div>
             <div class="copyright">
-                &copy; 2025 UPSChub. All Rights Reserved. <br><br>
-                <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span>
+                &copy; 2025 UPSChub. All Rights Reserved. <br><br><br>
+                <span style="font-size: 0.7rem; opacity: 0.7;">A Unique Way Of Learning </span><br>
             </div>
         </div>
     </footer>
@@ -426,9 +409,7 @@
         if (!user) {
             window.location.href = "auth.html";
         } else {
-            // Correct UID based path for your private folders
             currentUserPath = `users/${user.uid}/tasks`;
-            
             document.body.style.display = "flex";
             initDashboard();
         }
@@ -474,18 +455,26 @@
         const tasksRef = ref(db, currentUserPath);
         
         onValue(tasksRef, (snapshot) => {
-            currentTasks = snapshot.val() || {};
+            const allData = snapshot.val() || {};
             const todayStr = new Date().toISOString().split('T')[0];
+            const entries = Object.entries(allData);
+
+            // --- REJECT INVALID/EMPTY DATABASE ENTRIES ---
+            // Filter to only include rows with a real date and subject
+            currentTasks = Object.fromEntries(entries.filter(([id, task]) => {
+                return task.date && task.date !== "" && task.subject && task.subject !== "Subject";
+            }));
             
-            // Backlog Banner Logic
-            const hasBacklogs = Object.values(currentTasks).some(t => t.date < todayStr && t.status === false);
+            const taskValues = Object.values(currentTasks);
+
+            // 1. Backlog Alert Banner (Date < Today AND status is false)
+            const hasBacklogs = taskValues.some(t => t.date < todayStr && t.status === false);
             document.getElementById('backlogBanner').style.display = hasBacklogs ? "flex" : "none";
 
-            // Progress Bar Calculation
-            const taskList = Object.values(currentTasks);
-            const total = taskList.length || 1;
-            const completed = taskList.filter(t => t.status === true).length;
-            const percentage = Math.round((completed / total) * 100);
+            // 2. Syllabus Progress Calculation
+            const totalTasks = taskValues.length || 1;
+            const completedCount = taskValues.filter(t => t.status === true).length;
+            const percentage = Math.round((completedCount / totalTasks) * 100);
 
             document.getElementById('progressBar').style.width = percentage + "%";
             document.getElementById('progressText').innerText = percentage + "%";
@@ -524,7 +513,9 @@
         }).join('') : `<tr><td colspan="3" style="text-align:center; padding:40px; color:var(--text-muted);">No objectives found for this date.</td></tr>`;
         
         document.getElementById('agendaDate').innerText = new Date(selectedDateStr).toLocaleDateString('en-IN', { day: 'numeric', month: 'long' });
-        generateTimeline(filteredEntries.map(e => e[1]));
+        
+        // Generate timeline based on valid tasks for current date
+        generateTimeline(Object.values(currentTasks).filter(t => t.date === selectedDateStr));
     }
 
     function generateTimeline(dayTasks) {
