@@ -44,7 +44,7 @@
         .nav-links { display: flex; gap: 15px; }
         .btn-nav { text-decoration: none; padding: 8px 15px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; transition: 0.2s; }
         .btn-dashboard { background: #eff6ff; color: #2563eb; }
-        .btn-logout { background: #fef2f2; color: #ef4444; }
+        .btn-logout { background: #fef2f2; color: #ef4444; border: none; cursor: pointer; }
 
         /* --- WATERMARK --- */
         .main-content { 
@@ -185,19 +185,25 @@
         }
     });
 
-    document.getElementById('logoutBtn').onclick = () => signOut(auth);
+    document.getElementById('logoutBtn').onclick = () => {
+        signOut(auth).then(() => {
+            localStorage.removeItem('upschub_session');
+            window.location.href = "auth.html";
+        });
+    };
 
     function loadData(uid) {
+        // Collects live unclicked data from the private user path
         const tasksRef = ref(db, `users/${uid}/tasks`);
         onValue(tasksRef, (snapshot) => {
             const data = snapshot.val() || {};
             const today = new Date().toISOString().split('T')[0];
             const entries = Object.entries(data);
             
-            // Logic for Backlogs (Date past + status false)
+            // Logic: Collect items where the date has passed but status is false
             const backlogs = entries.filter(([id, t]) => t.date < today && t.status === false);
             
-            // Logic for Completion Progress
+            // Percentage Calculation based on total course data
             const completed = entries.filter(([id, t]) => t.status === true).length;
             const total = entries.length || 1;
             const percent = Math.round((completed / total) * 100);
@@ -207,16 +213,13 @@
     }
 
     function updateUI(backlogs, percent) {
-        // Progress Ring Update
         const ring = document.getElementById('progressRing');
         ring.style.background = `conic-gradient(#10b981 ${percent * 3.6}deg, #f1f5f9 0deg)`;
         ring.setAttribute('data-percent', percent + '%');
 
-        // Stats Update
         document.getElementById('backlogCount').innerText = backlogs.length;
         document.getElementById('blinker').style.display = backlogs.length > 0 ? "block" : "none";
 
-        // Table Update
         const list = document.getElementById('backlogList');
         list.innerHTML = backlogs.map(([id, t]) => `
             <tr>
@@ -230,6 +233,7 @@
         `).join('') || '<tr><td colspan="4" style="text-align:center; padding:40px; color:var(--success); font-weight:700;">No Backlogs Found! You are on track.</td></tr>';
     }
 
+    // Global function to update status back to the private folder
     window.recoverTask = (taskId) => {
         const uid = auth.currentUser.uid;
         update(ref(db, `users/${uid}/tasks/${taskId}`), { status: true });
