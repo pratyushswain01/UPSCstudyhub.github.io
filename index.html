@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
   <style>
-    /* --- Clean White Reset --- */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -20,48 +19,50 @@
       height: 100%;
       width: 100%;
       font-family: 'Poppins', sans-serif;
-      background-color: #ffffff; 
-      color: #000; 
+      background-color: #fff; /* Fallback color */
       overflow: hidden;
-      transition: opacity 0.8s ease-in-out; /* Smooth transition for redirect */
+      transition: opacity 0.8s ease-in-out;
     }
 
-    /* --- Video Background --- */
+    /* --- Fixed Video Container --- */
     .video-container {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      z-index: -1;
-      background-color: #fff;
+      z-index: 0; /* Behind everything */
+      background: #fff; /* Ensures no flicker before video loads */
     }
 
     .video-background {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      opacity: 1; 
+      display: block;
     }
 
     /* --- Hero Section --- */
     .hero-section {
+      position: relative;
       height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
+      z-index: 1; /* Above the video */
+      /* This makes the section background transparent so video shows through */
+      background: transparent; 
     }
 
-    /* --- Refined Typography --- */
     .brand-name {
       font-size: 0.9rem;
       font-weight: 300;
       letter-spacing: 0.6rem;
       text-transform: uppercase;
       margin-bottom: 1.5rem;
-      color: #555; 
+      color: #000;
       opacity: 0;
       animation: fadeInDown 1.5s ease forwards 0.5s;
     }
@@ -79,7 +80,7 @@
     .subtitle {
       font-size: 1rem;
       font-weight: 300;
-      color: #666;
+      color: #333;
       max-width: 600px;
       line-height: 1.6;
       opacity: 0;
@@ -94,17 +95,14 @@
       font-size: 0.75rem;
       letter-spacing: 2px;
       text-transform: uppercase;
-      color: #999;
+      color: #666;
+      z-index: 1;
       opacity: 0;
       animation: fadeIn 2s ease forwards 3s;
     }
 
-    /* --- Page Fade Out Class --- */
-    .fade-out {
-      opacity: 0;
-    }
+    .fade-out { opacity: 0; }
 
-    /* --- Animations --- */
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-15px); }
       to { opacity: 1; transform: translateY(0); }
@@ -113,14 +111,10 @@
       from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes fadeIn {
-      to { opacity: 1; }
-    }
+    @keyframes fadeIn { to { opacity: 1; } }
 
     @media (max-width: 768px) {
-      .main-title { font-size: 2.2rem; letter-spacing: -1px; }
-      .brand-name { font-size: 0.7rem; letter-spacing: 0.4rem; }
-      .subtitle { font-size: 0.85rem; padding: 0 30px; }
+      .main-title { font-size: 2.2rem; }
     }
   </style>
 </head>
@@ -128,7 +122,7 @@
 
   <div class="video-container">
     <video id="introVideo" autoplay muted playsinline class="video-background">
-      <source src="images/intro.mp4" type="video/mp4" />
+      <source src="images/intro.mp4" type="video/mp4">
     </video>
   </div>
 
@@ -145,12 +139,13 @@
   <script>
     const video = document.getElementById('introVideo');
     
-    // Redirect function
+    // Troubleshooting: Log to console if video fails to load
+    video.addEventListener('error', function() {
+      console.error("Video failed to load. Check path: images/intro.mp4");
+    });
+
     video.onended = function() {
-      // Start the fade out animation
       document.body.classList.add('fade-out');
-      
-      // Navigate to the home page after 800ms (matching the CSS transition)
       setTimeout(() => {
         window.location.href = "homeUPSChub.html";
       }, 800);
