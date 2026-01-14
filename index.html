@@ -3,189 +3,145 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Welcome to UPSChub</title>
+  <title>UPSChub | Welcome</title>
   <link rel="icon" type="image/jpg" href="images/LOGO.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
   <style>
-    /* --- Base & Reset --- */
-    html, body {
+    /* --- Clean White Reset --- */
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+    }
+
+    body, html {
       height: 100%;
       width: 100%;
       font-family: 'Poppins', sans-serif;
-      background-color: #000;
-      color: #fff;
-      overflow: hidden; /* Prevent scrollbars */
+      background-color: #ffffff; /* Pure White Background */
+      color: #000; /* Contrast Black Text */
+      overflow: hidden;
     }
 
-    /* --- Full-Screen Video Background --- */
-    .video-background {
+    /* --- Video Background --- */
+    .video-container {
       position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 100vw;
-      height: 100vh;
-      min-width: 100%;
-      min-height: 100%;
-      transform: translate(-50%, -50%);
-      object-fit: cover; /* Crucial for covering the screen without distortion */
-      z-index: -1; /* Place it behind all other content */
-    }
-
-    /* --- Content Overlay --- */
-    .overlay {
-      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.4)); /* Enhances text readability */
+      z-index: -1;
+      background-color: #fff;
+    }
+
+    .video-background {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      /* Adjust opacity if you want the video to look more subtle/faded */
+      opacity: 1; 
+    }
+
+    /* --- Hero Section --- */
+    .hero-section {
+      height: 100vh;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       text-align: center;
-      padding: 20px;
-      box-sizing: border-box;
-      /* Added transition for the fade-out effect */
-      transition: opacity 0.5s ease-out;
+      /* No overlay/gradients for a flat white look */
     }
 
-    /* --- Animated Content Elements --- */
-    .welcome-content {
+    /* --- Refined Typography --- */
+    .brand-name {
+      font-size: 0.9rem;
+      font-weight: 300;
+      letter-spacing: 0.6rem;
+      text-transform: uppercase;
+      margin-bottom: 1.5rem;
+      color: #555; /* Subtle grey for the brand */
       opacity: 0;
-      animation: fadeIn 1s ease-in forwards;
-      animation-delay: 0.5s;
+      animation: fadeInDown 1.5s ease forwards 0.5s;
     }
 
-    .logo {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      margin-bottom: 20px;
+    .main-title {
+      font-size: 3.5rem;
+      font-weight: 600;
+      letter-spacing: -2px;
+      margin-bottom: 0.5rem;
+      color: #000;
       opacity: 0;
-      transform: translateY(-20px);
-      animation: slideDown 1s ease-out 1s forwards;
+      animation: fadeInUp 1.5s ease forwards 1s;
     }
 
-    .tagline {
-      font-size: 3rem;
-      font-weight: 700;
-      white-space: nowrap;
-      overflow: hidden;
-      border-right: 3px solid rgba(255, 255, 255, 0.75);
-      width: 0;
-      /* Animation Sequence: Typing starts after logo slides in */
-      animation: typing 2.5s steps(17) 2s forwards, blink 0.7s step-end infinite;
-    }
-
-    .description {
-      margin-top: 15px;
-      font-size: 1.2rem;
-      opacity: 0;
-      transform: translateY(20px);
-      /* Animation: Fades in after typing is complete */
-      animation: slideUp 1s ease-out 4.5s forwards;
-    }
-
-    /* --- Visual "Button" Element --- */
-    .cta-button {
-      display: inline-block;
-      margin-top: 40px;
-      padding: 12px 30px;
-      border: 2px solid white;
-      border-radius: 50px;
-      color: white;
-      text-decoration: none;
-      font-weight: 700;
+    .subtitle {
       font-size: 1rem;
-      letter-spacing: 1px;
+      font-weight: 300;
+      color: #666;
+      max-width: 600px;
+      line-height: 1.6;
       opacity: 0;
-      transform: scale(0.8);
-      /* Animation: Appears after the description */
-      animation: scaleIn 0.8s ease-out 5.5s forwards;
-      /* This element is now for visuals only, so pointer events are not needed */
-      pointer-events: none; 
+      animation: fadeIn 2s ease forwards 2s;
     }
 
-    /* --- Footer --- */
+    /* --- Minimalist Footer --- */
     footer {
-      position: fixed;
-      bottom: 20px;
+      position: absolute;
+      bottom: 40px;
       width: 100%;
       text-align: center;
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #999;
       opacity: 0;
-      animation: fadeIn 1.5s ease-in 6s forwards;
-    }
-    
-    /* --- Page Transition Class (added to body via JS) --- */
-    body.fade-out .overlay {
-        opacity: 0;
+      animation: fadeIn 2s ease forwards 3s;
     }
 
-    /* --- Keyframe Animations (Unchanged) --- */
-    @keyframes typing {
-      from { width: 0; }
-      to { width: 17ch; } /* Character count of "Welcome to UPSChub" */
+    /* --- Animations --- */
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-15px); }
+      to { opacity: 1; transform: translateY(0); }
     }
-    @keyframes blink { 50% { border-color: transparent; } }
-    @keyframes fadeIn { to { opacity: 1; } }
-    @keyframes slideDown { to { opacity: 1; transform: translateY(0); } }
-    @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
-    @keyframes scaleIn { to { opacity: 1; transform: scale(1); } }
 
-    /* --- Responsive Design (Unchanged) --- */
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      to { opacity: 1; }
+    }
+
+    /* --- Mobile Optimization --- */
     @media (max-width: 768px) {
-      .tagline { font-size: 2rem; }
-      .description { font-size: 1rem; }
-      .logo { font-size: 1.2rem; }
+      .main-title { font-size: 2.2rem; letter-spacing: -1px; }
+      .brand-name { font-size: 0.7rem; letter-spacing: 0.4rem; }
+      .subtitle { font-size: 0.85rem; padding: 0 30px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- CHANGE 1: Added id="introVideo" and removed the 'loop' attribute -->
-  <video id="introVideo" class="video-background" autoplay muted playsinline>
-    <source src="images/intro.mp4" type="video/mp4" />
-    Your browser does not support the video tag.
-  </video>
-
-  <div class="overlay">
-    <div class="welcome-content">
-      <div class="logo">UPSC Hub</div>
-      <h1 class="tagline">Welcome to UPSCHub</h1>
-      <p class="description">Your Companion in the UPSC Journey</p>
-      
-      <!-- CHANGE 2: The <a> tag is now a <div>. It's just for looks. -->
-      <div class="cta-button">ENTER THE HUB</div>
-    </div>
-    
-    <footer>
-      UPSCHub | Pratyush Swain
-    </footer>
+  <div class="video-container">
+    <video autoplay muted playsinline loop class="video-background">
+      <source src="images/intro.mp4" type="video/mp4" />
+     
+    </video>
   </div>
 
-  <!-- CHANGE 3: The script is now updated to listen for the video 'ended' event -->
-  <script>
-    const video = document.getElementById('introVideo');
-    const destinationUrl = 'homeUPSChub.html'; // Make sure this is your correct homepage URL
+  <main class="hero-section">
+    <div class="brand-name">UPSC Hub</div>
+    <h1 class="main-title">The Standard of Learning</h1>
+    <p class="subtitle">A dedicated space for serious UPSC aspirants.</p>
+  </main>
 
-    // Listen for when the video has finished playing
-    video.addEventListener('ended', () => {
-      // Add the fade-out class to the body to trigger the CSS transition
-      document.body.classList.add('fade-out');
-
-      // Wait for the fade-out animation to finish (500ms) before changing the page
-      setTimeout(() => {
-        window.location.href = destinationUrl;
-      }, 500); // This duration must match the 'transition' time in the .overlay CSS
-    });
-  </script>
+  <footer>
+    Pratyush Swain &bull; 2026
+  </footer>
 
 </body>
 </html>
