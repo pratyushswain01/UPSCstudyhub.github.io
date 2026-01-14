@@ -7,8 +7,9 @@
   <link rel="icon" type="image/jpg" href="images/LOGO.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
+    /* --- Clean Canvas --- */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -20,121 +21,156 @@
       width: 100%;
       font-family: 'Poppins', sans-serif;
       background-color: #ffffff;
-      color: #000;
+      color: #1a1a1a;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      transition: opacity 0.8s ease-in-out;
     }
 
-    /* --- The Large Box for Video/Image --- */
-    .media-container {
+    /* --- Cinematic Media Box --- */
+    .media-window {
       width: 100%;
-      height: 65vh; /* Occupies the top 65% of the screen */
+      height: 60vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      padding: 20px 20px 0 20px;
+      opacity: 0;
+      animation: scaleReveal 1.2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    }
+
+    .video-wrapper {
+      width: 100%;
+      max-width: 900px;
+      height: 100%;
+      position: relative;
+      border-radius: 24px;
       overflow: hidden;
-      background-color: #fff;
+      /* Soft depth shadow */
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
-    .video-frame {
-      width: 90%; /* Creates a nice margin around the "box" */
-      height: 90%;
-      border-radius: 12px; /* Optional: adds a modern rounded look */
-      object-fit: contain;
-      /* Subtle shadow to make the "box" pop from the white background */
-      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    .video-content {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background-color: #f9f9f9;
     }
 
-    /* --- The Text Section Below --- */
-    .text-container {
-      flex: 1; /* Takes up the remaining space */
+    /* --- Elegant Text Section --- */
+    .content-footer {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
+      justify-content: center;
       align-items: center;
       text-align: center;
-      padding-top: 20px;
+      padding: 40px 20px;
     }
 
-    .brand-label {
-      font-size: 0.8rem;
-      font-weight: 300;
-      letter-spacing: 0.5rem;
+    .brand-tag {
+      font-size: 0.75rem;
+      font-weight: 400;
+      letter-spacing: 0.4rem;
       text-transform: uppercase;
-      color: #888;
-      margin-bottom: 10px;
+      color: #999;
+      margin-bottom: 12px;
       opacity: 0;
-      animation: fadeIn 1s forwards 0.5s;
+      animation: fadeInUp 0.8s ease forwards 0.8s;
     }
 
-    .main-title {
-      font-size: 2.5rem;
+    .headline {
+      font-size: clamp(1.8rem, 5vw, 2.8rem);
       font-weight: 600;
-      letter-spacing: -1px;
-      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+      color: #000;
+      margin-bottom: 12px;
       opacity: 0;
-      animation: fadeIn 1s forwards 1s;
+      animation: fadeInUp 0.8s ease forwards 1s;
     }
 
-    .subtitle {
+    .description {
       font-size: 1rem;
       font-weight: 300;
       color: #666;
+      max-width: 500px;
+      line-height: 1.5;
       opacity: 0;
-      animation: fadeIn 1s forwards 1.5s;
+      animation: fadeInUp 0.8s ease forwards 1.2s;
     }
 
-    footer {
-      padding-bottom: 30px;
-      font-size: 0.7rem;
+    /* --- Footer Detail --- */
+    .legal-footer {
+      position: absolute;
+      bottom: 30px;
+      font-size: 0.65rem;
       letter-spacing: 2px;
-      color: #bbb;
+      color: #ccc;
       text-transform: uppercase;
+      opacity: 0;
+      animation: fadeIn 1s forwards 2s;
     }
 
-    /* --- Utility --- */
-    .fade-out { opacity: 0; }
+    /* --- Animations --- */
+    @keyframes scaleReveal {
+      from { opacity: 0; transform: scale(0.95) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
     @keyframes fadeIn {
-      to { opacity: 1; transform: translateY(0); }
-      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; }
     }
 
-    @media (max-width: 768px) {
-      .media-container { height: 50vh; }
-      .main-title { font-size: 1.8rem; }
+    /* Global Page Exit */
+    .page-exit {
+      opacity: 0;
+      transition: opacity 0.6s ease-in-out;
+    }
+
+    /* Mobile Tweaks */
+    @media (max-width: 600px) {
+      .media-window { height: 45vh; }
+      .headline { font-size: 1.6rem; }
+      .video-wrapper { border-radius: 16px; }
     }
   </style>
 </head>
-<body>
+<body id="introBody">
 
-  <div class="media-container">
-    <video id="introVideo" autoplay muted playsinline class="video-frame">
-      <source src="images/intro.mp4" type="video/mp4">
-    </video>
+  <div class="media-window">
+    <div class="video-wrapper">
+      <video id="introVideo" autoplay muted playsinline class="video-content">
+        <source src="images/intro.mp4" type="video/mp4">
+      </video>
+    </div>
   </div>
 
-  <main class="text-container">
-    <div class="brand-label">UPSC Hub</div>
-    <h1 class="main-title">The Standard of Learning</h1>
-    <p class="subtitle">A dedicated space for serious UPSC aspirants.</p>
+  <main class="content-footer">
+    <div class="brand-tag">UPSC Hub</div>
+    <h1 class="headline">The Standard of Learning</h1>
+    <p class="description">Elevating your preparation with a refined, modern approach to the UPSC journey.</p>
+    
+    <div class="legal-footer">
+      Pratyush Swain &bull; 2026
+    </div>
   </main>
-
-  <footer>
-    Pratyush Swain &bull; 2026
-  </footer>
 
   <script>
     const video = document.getElementById('introVideo');
-    
-    // Auto-redirect to home page when video ends
+    const body = document.getElementById('introBody');
+
+    // Auto-redirection when video ends
     video.onended = function() {
-      document.body.classList.add('fade-out');
+      body.classList.add('page-exit');
       setTimeout(() => {
         window.location.href = "homeUPSChub.html";
-      }, 800);
+      }, 600);
     };
   </script>
 
