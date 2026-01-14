@@ -20,9 +20,10 @@
       height: 100%;
       width: 100%;
       font-family: 'Poppins', sans-serif;
-      background-color: #ffffff; /* Pure White Background */
-      color: #000; /* Contrast Black Text */
+      background-color: #ffffff; 
+      color: #000; 
       overflow: hidden;
+      transition: opacity 0.8s ease-in-out; /* Smooth transition for redirect */
     }
 
     /* --- Video Background --- */
@@ -40,7 +41,6 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      /* Adjust opacity if you want the video to look more subtle/faded */
       opacity: 1; 
     }
 
@@ -52,7 +52,6 @@
       justify-content: center;
       align-items: center;
       text-align: center;
-      /* No overlay/gradients for a flat white look */
     }
 
     /* --- Refined Typography --- */
@@ -62,7 +61,7 @@
       letter-spacing: 0.6rem;
       text-transform: uppercase;
       margin-bottom: 1.5rem;
-      color: #555; /* Subtle grey for the brand */
+      color: #555; 
       opacity: 0;
       animation: fadeInDown 1.5s ease forwards 0.5s;
     }
@@ -87,7 +86,6 @@
       animation: fadeIn 2s ease forwards 2s;
     }
 
-    /* --- Minimalist Footer --- */
     footer {
       position: absolute;
       bottom: 40px;
@@ -101,22 +99,24 @@
       animation: fadeIn 2s ease forwards 3s;
     }
 
+    /* --- Page Fade Out Class --- */
+    .fade-out {
+      opacity: 0;
+    }
+
     /* --- Animations --- */
     @keyframes fadeInDown {
       from { opacity: 0; transform: translateY(-15px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeInUp {
       from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
     }
-
     @keyframes fadeIn {
       to { opacity: 1; }
     }
 
-    /* --- Mobile Optimization --- */
     @media (max-width: 768px) {
       .main-title { font-size: 2.2rem; letter-spacing: -1px; }
       .brand-name { font-size: 0.7rem; letter-spacing: 0.4rem; }
@@ -127,9 +127,8 @@
 <body>
 
   <div class="video-container">
-    <video autoplay muted playsinline loop class="video-background">
+    <video id="introVideo" autoplay muted playsinline class="video-background">
       <source src="images/intro.mp4" type="video/mp4" />
-     
     </video>
   </div>
 
@@ -142,6 +141,21 @@
   <footer>
     Pratyush Swain &bull; 2026
   </footer>
+
+  <script>
+    const video = document.getElementById('introVideo');
+    
+    // Redirect function
+    video.onended = function() {
+      // Start the fade out animation
+      document.body.classList.add('fade-out');
+      
+      // Navigate to the home page after 800ms (matching the CSS transition)
+      setTimeout(() => {
+        window.location.href = "homeUPSChub.html";
+      }, 800);
+    };
+  </script>
 
 </body>
 </html>
