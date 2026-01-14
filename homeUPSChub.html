@@ -1239,20 +1239,32 @@
 
     async function setupNotifications() {
         try {
+            // Check for service worker registration first to prevent 'no active Service Worker' error
+            if ('serviceWorker' in navigator) {
+                const registration = await navigator.serviceWorker.getRegistration();
+                if (!registration) {
+                    console.log("Registering Service Worker...");
+                    await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+                }
+            }
+
             console.log("Requesting notification permission...");
             const permission = await Notification.requestPermission();
             
             if (permission === 'granted') {
+                // Wait for service worker to be ready
+                const registration = await navigator.serviceWorker.ready;
+                
                 const token = await getToken(messaging, { 
+                    serviceWorkerRegistration: registration,
                     vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
                 });
 
                 if (token) {
                     console.log("Device Token Success:", token);
-                    // This token is what you will use to send notifications
                 }
             } else {
-                console.warn("Permission for notifications was denied by user.");
+                console.warn("Permission for notifications was denied.");
             }
         } catch (error) {
             console.error("Firebase Notification Error:", error);
