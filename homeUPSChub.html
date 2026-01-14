@@ -1161,17 +1161,16 @@
                 applyTheme(newTheme);
             });
 
-          <script type="module">
-  // 1. Use full CDN URLs for the browser
+         <script type="module">
+  // 2. Use full HTTPS URLs for the imports
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
 
-  // 2. Add your Firebase Config (Copy this from your Project Settings)
+  // 3. Your specific project config
   const firebaseConfig = {
     apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
     authDomain: "upscstudyhub-github.firebaseapp.com",
     projectId: "upscstudyhub-github",
-    storageBucket: "upscstudyhub-github.appspot.com",
     messagingSenderId: "451692540885",
     appId: "1:451692540885:web:b425e85128e5de97c7c35c"
   };
@@ -1181,29 +1180,23 @@
 
   async function setupNotifications() {
     try {
-      console.log("Requesting permission...");
       const permission = await Notification.requestPermission();
-      
       if (permission === 'granted') {
+        // Use your VAPID key from Step 1
         const token = await getToken(messaging, { 
           vapidKey: 'BGkEpaujSsPlAOnayTs--9Ko5ge5RrlckfeYXunCD54fNNHl1RKk8x9eXIlDWLRp8djIIRfCtVuX9LcTYQ0V6Fo' 
         });
 
         if (token) {
-          console.log("Device Token Generated:", token);
-          // You can now see this token in your browser console!
+          console.log("Success! Device Token:", token);
         }
-      } else {
-        console.warn("Permission denied for notifications.");
       }
     } catch (error) {
-      console.error("Error setting up notifications:", error);
+      console.error("Notification setup failed:", error);
     }
   }
 
-  // Call the function
   setupNotifications();
-        
 </script>
 
             // Sidebar toggle
