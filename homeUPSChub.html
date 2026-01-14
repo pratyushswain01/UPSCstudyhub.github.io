@@ -1223,52 +1223,66 @@
 </script>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
+  import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4", // Ensure this matches your cloud console
-        authDomain: "upscstudyhub-github.firebaseapp.com",
-        projectId: "upscstudyhub-github",
-        messagingSenderId: "451692540885",
-        appId: "1:451692540885:web:b425e85128e5de97c7c35c"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
+    authDomain: "upscstudyhub-github.firebaseapp.com",
+    projectId: "upscstudyhub-github",
+    messagingSenderId: "451692540885",
+    appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const messaging = getMessaging(app);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const messaging = getMessaging(app);
 
-    async function setupNotifications() {
-        try {
-            const permission = await Notification.requestPermission();
-            if (permission === 'granted') {
-                const registration = await navigator.serviceWorker.ready;
-                const token = await getToken(messaging, { 
-                    serviceWorkerRegistration: registration,
-                    vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
-                });
+  async function setupNotifications() {
+    try {
+      // 🔹 STEP 1: Ask permission
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") return;
 
-                if (token) {
-                    console.log("Device Token Success:", token);
-                    
-                    let visitorId = localStorage.getItem('visitorId') || 'visitor_' + Date.now();
-                    localStorage.setItem('visitorId', visitorId);
+      // 🔹 STEP 2: Register Service Worker (THIS WAS MISSING)
+      if ("serviceWorker" in navigator) {
+        await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+      }
 
-                    await setDoc(doc(db, "artifacts", "default-app-id", "users", visitorId), { 
-                        fcmToken: token,
-                        subscribedAt: serverTimestamp()
-                    }, { merge: true });
-                    
-                    console.log("Success! Data saved to Firestore.");
-                }
-            }
-        } catch (error) {
-            console.error("Firebase Notification Error:", error);
-        }
+      // 🔹 STEP 3: Wait until SW is ready
+      const registration = await navigator.serviceWorker.ready;
+
+      // 🔹 STEP 4: Get FCM token
+      const token = await getToken(messaging, {
+        serviceWorkerRegistration: registration,
+        vapidKey: "BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo"
+      });
+
+      if (token) {
+        console.log("✅ Device Token:", token);
+
+        let visitorId = localStorage.getItem("visitorId") || "visitor_" + Date.now();
+        localStorage.setItem("visitorId", visitorId);
+
+        await setDoc(
+          doc(db, "artifacts", "default-app-id", "users", visitorId),
+          {
+            fcmToken: token,
+            subscribedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+
+        console.log("✅ Token saved to Firestore");
+      }
+    } catch (error) {
+      console.error("❌ Firebase Notification Error:", error);
     }
+  }
 
-    setupNotifications(); 
+  setupNotifications();
 </script>
+
 </body>
 </html>
