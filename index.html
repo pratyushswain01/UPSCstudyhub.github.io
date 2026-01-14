@@ -19,106 +19,107 @@
       height: 100%;
       width: 100%;
       font-family: 'Poppins', sans-serif;
-      background-color: #fff;
-      overflow: hidden;
-    }
-
-    /* --- Layer 1: The Video Background --- */
-    .video-wrapper {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: -1; /* Keeps video behind everything */
-      overflow: hidden;
-    }
-
-    .video-background {
-      width: 100%;
-      height: 100%;
-      object-fit: contain; /* Changed to contain to avoid the cropping seen in your image */
-      background-color: #fff;
-    }
-
-    /* --- Layer 2: The Content Overlay --- */
-    .content-overlay {
-      position: relative;
-      height: 100vh;
-      width: 100%;
+      background-color: #ffffff;
+      color: #000;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      z-index: 1;
-      /* Subtle fade-in for the whole interface */
-      animation: pageFadeIn 1s ease-in;
-    }
-
-    /* --- Text Styling (Balanced to not intersect) --- */
-    .brand-label {
-      font-size: 0.9rem;
-      font-weight: 300;
-      letter-spacing: 0.5rem;
-      text-transform: uppercase;
-      color: #555;
-      margin-bottom: 1rem;
-    }
-
-    .hero-title {
-      font-size: clamp(2rem, 8vw, 3.5rem); /* Responsive sizing */
-      font-weight: 600;
-      color: #000;
-      line-height: 1.2;
-      margin-bottom: 1rem;
-      /* Adds a tiny white glow to lift text off the video image */
-      text-shadow: 0 0 20px rgba(255,255,255,0.8); 
-    }
-
-    .hero-subtitle {
-      font-size: 1rem;
-      font-weight: 300;
-      color: #444;
-      max-width: 80% ;
-    }
-
-    footer {
-      position: absolute;
-      bottom: 30px;
-      width: 100%;
-      text-align: center;
-      font-size: 0.7rem;
-      letter-spacing: 2px;
-      color: #888;
-      text-transform: uppercase;
-    }
-
-    /* Smooth transition for redirect */
-    .fade-out-page {
-      opacity: 0;
+      overflow: hidden;
       transition: opacity 0.8s ease-in-out;
     }
 
-    @keyframes pageFadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    /* --- The Large Box for Video/Image --- */
+    .media-container {
+      width: 100%;
+      height: 65vh; /* Occupies the top 65% of the screen */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+      background-color: #fff;
     }
 
+    .video-frame {
+      width: 90%; /* Creates a nice margin around the "box" */
+      height: 90%;
+      border-radius: 12px; /* Optional: adds a modern rounded look */
+      object-fit: contain;
+      /* Subtle shadow to make the "box" pop from the white background */
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    }
+
+    /* --- The Text Section Below --- */
+    .text-container {
+      flex: 1; /* Takes up the remaining space */
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      text-align: center;
+      padding-top: 20px;
+    }
+
+    .brand-label {
+      font-size: 0.8rem;
+      font-weight: 300;
+      letter-spacing: 0.5rem;
+      text-transform: uppercase;
+      color: #888;
+      margin-bottom: 10px;
+      opacity: 0;
+      animation: fadeIn 1s forwards 0.5s;
+    }
+
+    .main-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+      opacity: 0;
+      animation: fadeIn 1s forwards 1s;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      font-weight: 300;
+      color: #666;
+      opacity: 0;
+      animation: fadeIn 1s forwards 1.5s;
+    }
+
+    footer {
+      padding-bottom: 30px;
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      color: #bbb;
+      text-transform: uppercase;
+    }
+
+    /* --- Utility --- */
+    .fade-out { opacity: 0; }
+
+    @keyframes fadeIn {
+      to { opacity: 1; transform: translateY(0); }
+      from { opacity: 0; transform: translateY(10px); }
+    }
+
+    @media (max-width: 768px) {
+      .media-container { height: 50vh; }
+      .main-title { font-size: 1.8rem; }
+    }
   </style>
 </head>
-<body id="mainBody">
+<body>
 
-  <div class="video-wrapper">
-    <video id="introVideo" autoplay muted playsinline class="video-background">
+  <div class="media-container">
+    <video id="introVideo" autoplay muted playsinline class="video-frame">
       <source src="images/intro.mp4" type="video/mp4">
     </video>
   </div>
 
-  <main class="content-overlay">
+  <main class="text-container">
     <div class="brand-label">UPSC Hub</div>
-    <h1 class="hero-title">The Standard of Learning</h1>
-    <p class="hero-subtitle">A dedicated space for serious UPSC aspirants.</p>
+    <h1 class="main-title">The Standard of Learning</h1>
+    <p class="subtitle">A dedicated space for serious UPSC aspirants.</p>
   </main>
 
   <footer>
@@ -127,11 +128,10 @@
 
   <script>
     const video = document.getElementById('introVideo');
-    const body = document.getElementById('mainBody');
-
-    // Auto-redirection when video ends
+    
+    // Auto-redirect to home page when video ends
     video.onended = function() {
-      body.classList.add('fade-out-page');
+      document.body.classList.add('fade-out');
       setTimeout(() => {
         window.location.href = "homeUPSChub.html";
       }, 800);
