@@ -1223,11 +1223,11 @@
 </script>
 
 <script type="module">
-    // 1. Import necessary Firebase modules
+    // 1. Import necessary Firebase modules from the web CDN
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
     import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
 
-    // 2. Define the configuration first
+    // 2. Define the configuration with your specific credentials
     const firebaseConfig = {
         apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
         authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -1236,13 +1236,13 @@
         appId: "1:451692540885:web:b425e85128e5de97c7c35c"
     };
 
-    // 3. Initialize Firebase correctly for Modular style
+    // 3. Initialize Firebase correctly for the main page
     const app = initializeApp(firebaseConfig);
     const messaging = getMessaging(app);
 
     async function setupNotifications() {
         try {
-            // Check for service worker registration
+            // Check for service worker registration to ensure the background listener is ready
             if ('serviceWorker' in navigator) {
                 console.log("Checking Service Worker...");
                 let registration = await navigator.serviceWorker.getRegistration();
@@ -1257,10 +1257,10 @@
             const permission = await Notification.requestPermission();
             
             if (permission === 'granted') {
-                // Wait for service worker to be fully ready
+                // Wait for service worker to be fully ready to avoid 'pushManager' errors
                 const registration = await navigator.serviceWorker.ready;
                 
-                // Get the token
+                // Retrieve the unique device token
                 const token = await getToken(messaging, { 
                     serviceWorkerRegistration: registration,
                     vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
@@ -1268,7 +1268,7 @@
 
                 if (token) {
                     console.log("Device Token Success:", token);
-                    // You can now use this token to send notifications or save to Firestore
+                    // You can now use this token to send push notifications
                 }
             } else {
                 console.warn("Permission for notifications was denied.");
@@ -1278,7 +1278,7 @@
         }
     }
 
-    // Run the setup
+    // Automatically trigger the setup on page load
     setupNotifications();
 </script>
 </body>
