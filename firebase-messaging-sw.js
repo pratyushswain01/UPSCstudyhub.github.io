@@ -1,6 +1,7 @@
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging-compat.js');
 
+// Initialize with your project config
 firebase.initializeApp({
   apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
   projectId: "upscstudyhub-github",
@@ -10,11 +11,12 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging();
 
+// Handle background notifications
 messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification.title;
   const notificationOptions = {
     body: payload.notification.body,
-    icon: 'images/LOGO.jpg'
+    icon: 'images/LOGO.jpg' 
   };
   self.registration.showNotification(notificationTitle, notificationOptions);
 });
