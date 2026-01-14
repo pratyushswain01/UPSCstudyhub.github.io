@@ -1162,11 +1162,11 @@
             });
 
          <script type="module">
-  // 2. Use full HTTPS URLs for the imports
+  // Use full CDN URLs for the browser
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
   import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
 
-  // 3. Your specific project config
+  // Your specific project config (matches your screenshot)
   const firebaseConfig = {
     apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
     authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -1180,24 +1180,29 @@
 
   async function setupNotifications() {
     try {
+      console.log("Requesting permission...");
       const permission = await Notification.requestPermission();
+      
       if (permission === 'granted') {
-        // Use your VAPID key from Step 1
         const token = await getToken(messaging, { 
-          vapidKey: 'BGkEpaujSsPlAOnayTs--9Ko5ge5RrlckfeYXunCD54fNNHl1RKk8x9eXIlDWLRp8djIIRfCtVuX9LcTYQ0V6Fo' 
+          vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
         });
 
         if (token) {
-          console.log("Success! Device Token:", token);
+          console.log("Device Token:", token);
+          // Soon we will save this to your Firestore 'users' collection
         }
+      } else {
+        console.warn("Permission for notifications was denied.");
       }
     } catch (error) {
-      console.error("Notification setup failed:", error);
+      console.error("Error setting up notifications:", error);
     }
   }
 
+  // Automatically try to setup when page loads
   setupNotifications();
-</script>
+
 
             // Sidebar toggle
             const menuBtn = document.querySelector('#menu-btn');
