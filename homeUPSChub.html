@@ -1223,13 +1223,10 @@
 </script>
 
 <script type="module">
-    // 1. Import necessary modules including Auth
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js";
     import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
     import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
 
-    // 2. Your project configuration
     const firebaseConfig = {
         apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
         authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -1239,22 +1236,10 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
     const db = getFirestore(app);
     const messaging = getMessaging(app);
 
-    // 3. Listen for the logged-in user
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("Logged in user UID:", user.uid);
-            // Run notification setup only after we have the real user UID
-            setupNotifications(user.uid);
-        } else {
-            console.log("No user is logged in. Please sign in to enable notifications.");
-        }
-    });
-
-    async function setupNotifications(userId) {
+    async function setupNotifications() {
         try {
             const permission = await Notification.requestPermission();
             
@@ -1269,21 +1254,30 @@
                 if (token) {
                     console.log("Device Token Success:", token);
                     
-                    // 4. DYNAMICALLY SAVE: Replaces "TEST_USER" with the actual userId
-                    // Path: artifacts > default-app-id > users > [user.uid]
-                    const userRef = doc(db, "artifacts", "default-app-id", "users", userId);
+                    // Create a unique ID for this visitor if they don't have one
+                    let visitorId = localStorage.getItem('visitorId');
+                    if (!visitorId) {
+                        visitorId = 'visitor_' + Date.now();
+                        localStorage.setItem('visitorId', visitorId);
+                    }
+
+                    // Save to Firestore: artifacts > default-app-id > users > [visitorId]
+                    const userRef = doc(db, "artifacts", "default-app-id", "users", visitorId);
                     await setDoc(userRef, { 
                         fcmToken: token,
-                        tokenLastUpdated: serverTimestamp()
+                        type: "anonymous_visitor",
+                        subscribedAt: serverTimestamp()
                     }, { merge: true });
                     
-                    console.log(`Token successfully saved for user: ${userId}`);
+                    console.log("Visitor token saved to database!");
                 }
             }
         } catch (error) {
             console.error("Firebase Notification Error:", error);
         }
     }
+
+    setupNotifications();
 </script>
 </body>
 </html>
