@@ -1143,116 +1143,72 @@
         <div id="menu-btn" class="nav-item"> <i class="fas fa-bars"></i> <span>Menu</span> </div>
     </nav>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Theme toggle
-            const toggleBtn = document.querySelector('#toggle-btn');
-            const body = document.body;
-            const applyTheme = (theme) => {
-                body.classList.toggle('dark-mode', theme === 'dark');
+   <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Theme toggle logic
+        const toggleBtn = document.querySelector('#toggle-btn');
+        const body = document.body;
+        const applyTheme = (theme) => {
+            body.classList.toggle('dark-mode', theme === 'dark');
+            if (toggleBtn) {
                 toggleBtn.classList.toggle('fa-moon', theme === 'dark');
                 toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
-            };
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
+            }
+        };
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(savedTheme);
+
+        if (toggleBtn) {
             toggleBtn.addEventListener('click', () => {
                 const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
                 localStorage.setItem('theme', newTheme);
                 applyTheme(newTheme);
             });
-
-         <script type="module">
-  // Use full CDN URLs for the browser
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
-
-  // Your specific project config (matches your screenshot)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
-    authDomain: "upscstudyhub-github.firebaseapp.com",
-    projectId: "upscstudyhub-github",
-    messagingSenderId: "451692540885",
-    appId: "1:451692540885:web:b425e85128e5de97c7c35c"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const messaging = getMessaging(app);
-
-  async function setupNotifications() {
-    try {
-      console.log("Requesting permission...");
-      const permission = await Notification.requestPermission();
-      
-      if (permission === 'granted') {
-        const token = await getToken(messaging, { 
-          vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
-        });
-
-        if (token) {
-          console.log("Device Token:", token);
-          // Soon we will save this to your Firestore 'users' collection
         }
-      } else {
-        console.warn("Permission for notifications was denied.");
-      }
-    } catch (error) {
-      console.error("Error setting up notifications:", error);
-    }
-  }
 
-  // Automatically try to setup when page loads
-  setupNotifications();
+        // Sidebar toggle logic
+        const menuBtn = document.querySelector('#menu-btn');
+        const closeBtn = document.querySelector('#close-btn');
+        const sideBar = document.querySelector('.side-bar');
+        const sidebarOverlay = document.querySelector('.sidebar-overlay');
+        
+        const closeSidebar = () => {
+            if (sideBar) sideBar.classList.remove('active');
+            if (sidebarOverlay) sidebarOverlay.classList.remove('active');
+        };
 
-
-            // Sidebar toggle
-            const menuBtn = document.querySelector('#menu-btn');
-            const closeBtn = document.querySelector('#close-btn');
-            const sideBar = document.querySelector('.side-bar');
-            const sidebarOverlay = document.querySelector('.sidebar-overlay');
-            if (menuBtn && sideBar && sidebarOverlay) {
-                menuBtn.addEventListener('click', () => {
-                    sideBar.classList.add('active');
-                    sidebarOverlay.classList.add('active');
-                });
-            }
-            if (closeBtn && sideBar && sidebarOverlay) {
-                closeBtn.addEventListener('click', () => {
-                    sideBar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                });
-            }
-            if (sidebarOverlay && sideBar) {
-                sidebarOverlay.addEventListener('click', () => {
-                    sideBar.classList.remove('active');
-                    sidebarOverlay.classList.remove('active');
-                });
-            }
-
-            // Staggered card animation on DOM load
-            const cards = document.querySelectorAll('.card');
-            cards.forEach((card, index) => {
-                card.style.animationDelay = `${index * 0.05 + 0.5}s`; // Delay after AI section
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => {
+                if (sideBar) sideBar.classList.add('active');
+                if (sidebarOverlay) sidebarOverlay.classList.add('active');
             });
-            
-            // Live date and time display
-            const datetimeContainer = document.getElementById('datetime-container');
-            const updateDateTime = () => {
-                const now = new Date();
-                const dateOptions = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
-                const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-                const dateStr = now.toLocaleDateString('en-US', dateOptions);
-                const timeStr = now.toLocaleTimeString('en-US', timeOptions);
-                if (datetimeContainer) {
-                   datetimeContainer.textContent = `${dateStr} | ${timeStr}`;
-                }
-            };
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
-            
-            // Auto-hide bottom navigation on scroll
-            const bottomNav = document.querySelector('.bottom-nav');
-            let lastScrollY = window.scrollY;
-            
+        }
+        if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+        if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Staggered card animation
+        const cards = document.querySelectorAll('.card');
+        cards.forEach((card, index) => {
+            card.style.animationDelay = `${index * 0.05 + 0.5}s`;
+        });
+        
+        // Live date and time display
+        const datetimeContainer = document.getElementById('datetime-container');
+        const updateDateTime = () => {
+            const now = new Date();
+            const dateOptions = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
+            const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
+            if (datetimeContainer) {
+               datetimeContainer.textContent = `${now.toLocaleDateString('en-US', dateOptions)} | ${now.toLocaleTimeString('en-US', timeOptions)}`;
+            }
+        };
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+        
+        // Auto-hide bottom navigation on scroll
+        const bottomNav = document.querySelector('.bottom-nav');
+        let lastScrollY = window.scrollY;
+        if (bottomNav) {
             window.addEventListener('scroll', () => {
                 const currentScrollY = window.scrollY;
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
@@ -1262,7 +1218,49 @@
                 }
                 lastScrollY = Math.max(0, currentScrollY);
             });
-        });
-    </script>
+        }
+    });
+</script>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
+        authDomain: "upscstudyhub-github.firebaseapp.com",
+        projectId: "upscstudyhub-github",
+        messagingSenderId: "451692540885",
+        appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const messaging = getMessaging(app);
+
+    async function setupNotifications() {
+        try {
+            console.log("Requesting notification permission...");
+            const permission = await Notification.requestPermission();
+            
+            if (permission === 'granted') {
+                const token = await getToken(messaging, { 
+                    vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
+                });
+
+                if (token) {
+                    console.log("Device Token Success:", token);
+                    // This token is what you will use to send notifications
+                }
+            } else {
+                console.warn("Permission for notifications was denied by user.");
+            }
+        } catch (error) {
+            console.error("Firebase Notification Error:", error);
+        }
+    }
+
+    // Initialize notifications
+    setupNotifications();
+</script>
 </body>
 </html>
