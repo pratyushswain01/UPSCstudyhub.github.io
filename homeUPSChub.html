@@ -1161,33 +1161,50 @@
                 applyTheme(newTheme);
             });
 
-            import { getMessaging, getToken } from "firebase/messaging";
+          <script type="module">
+  // 1. Use full CDN URLs for the browser
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
 
-const messaging = getMessaging();
+  // 2. Add your Firebase Config (Copy this from your Project Settings)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBoPtr3d8se-fcGxkzixG8OE7dfVyjPcs4",
+    authDomain: "upscstudyhub-github.firebaseapp.com",
+    projectId: "upscstudyhub-github",
+    storageBucket: "upscstudyhub-github.appspot.com",
+    messagingSenderId: "451692540885",
+    appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+  };
 
-async function setupNotifications() {
-  try {
-    // 1. Request permission from the user
-    const permission = await Notification.requestPermission();
-    
-    if (permission === 'granted') {
-      // 2. Get the unique token for this specific user/browser
-      const token = await getToken(messaging, { 
-        vapidKey: 'BGkEpaujSsPlAOnayTs--9Ko5ge5RrlckfeYXunCD54fNNHl1RKk8x9eXIlDWLRp8djIIRfCtVuX9LcTYQ0V6Fo' 
-      });
+  const app = initializeApp(firebaseConfig);
+  const messaging = getMessaging(app);
 
-      if (token) {
-        console.log("Device Token:", token);
-        // Step 4: You will save this token to your 'users' collection in Firestore
+  async function setupNotifications() {
+    try {
+      console.log("Requesting permission...");
+      const permission = await Notification.requestPermission();
+      
+      if (permission === 'granted') {
+        const token = await getToken(messaging, { 
+          vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo' 
+        });
+
+        if (token) {
+          console.log("Device Token Generated:", token);
+          // You can now see this token in your browser console!
+        }
+      } else {
+        console.warn("Permission denied for notifications.");
       }
+    } catch (error) {
+      console.error("Error setting up notifications:", error);
     }
-  } catch (error) {
-    console.error("Error setting up notifications:", error);
   }
-}
 
-// Call this when the user clicks a "Notify Me" button or logs in
-setupNotifications();
+  // Call the function
+  setupNotifications();
+        
+</script>
 
             // Sidebar toggle
             const menuBtn = document.querySelector('#menu-btn');
