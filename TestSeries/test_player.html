@@ -1,225 +1,1916 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Exam Portal | UPSChub</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>UPSChub - Exam Portal</title>
+    <link rel="icon" type="image/jpg" href="images/LOGO.jpg">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background: radial-gradient(circle at top right, #eff6ff, #ffffff);
-            min-height: 100vh;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body { font-family: 'Poppins', sans-serif; background: #f0f0f5; color: #333; transition: background-color 0.3s ease, color 0.3s ease; position: relative; }
+        .dark { background: #1e1e2f; color: #eee; }
+        body.exam-active::after {
+            content: "UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A     UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub UPSChub \A";
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; font-size: 8vw; font-weight: 700; color: rgba(0, 0, 0, 0.05); text-align: center; line-height: 2; transform-origin: center; transform: rotate(-30deg); z-index: 9999; pointer-events: none; white-space: pre-wrap; overflow: hidden;
         }
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+       .dark.exam-active::after { color: rgba(255, 255, 255, 0.04); }
+       .site-header { position: relative; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; padding: 10px 15px; }
+       .site-logo { max-height: 40px; }
+       .site-copyright { font-family: "Trebuchet MS", "Segoe UI", Arial, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.8px; white-space: nowrap; transition: color 0.3s ease; }
+        body.light-mode.site-copyright { color: rgba(0, 0, 0, 0.6); }
+        body.dark-mode.site-copyright { color: rgba(255, 255, 255, 0.7); }
+        @media (max-width: 600px) {
+         .site-header { flex-direction: column; align-items: center; text-align: center; }
+         .site-copyright { margin-top: 5px; position: static; }
         }
-        .option-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      .pre-exam-screen {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100%;
+        padding: 20px;
+        z-index: 5000;
+        position: relative;
+        background: #f0f0f5;
+        overflow-y: auto;
+      }
+       .dark.pre-exam-screen { background: #1e1e2f; }
+       .login-card,.instructions-container,.submitting-card { background: #ffffff; padding: 30px 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); width: 100%; text-align: center; }
+       .dark.login-card,.dark.instructions-container,.dark.submitting-card { background: #2a2a3a; box-shadow: 0 4px 20px rgba(0,0,0,0.4); }
+       .login-card { max-width: 450px; }
+       .submitting-card { max-width: 500px; }
+       .login-card h2 { margin-bottom: 25px; color: #3f51b5; font-size: 1.8em; }
+       .dark.login-card h2 { color: #8ab4f8; }
+       .input-group { margin-bottom: 20px; text-align: left; }
+       .input-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+       .input-group input { width: 100%; padding: 12px 15px; border: 1px solid #ccc; border-radius: 6px; font-size: 1em; }
+       .dark.input-group input { background: #1e1e2f; border-color: #555; color: #eee; }
+       .btn-primary { width: 100%; padding: 12px; border: none; border-radius: 6px; background: #3f51b5; color: white; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+       .btn-primary:hover:not(:disabled) { opacity: 0.9; }
+        #loginError { color: #f44336; height: 1.2em; margin-top: 15px; font-weight: 500; }
+        #instructionsScreen { display: none; }
+        .instructions-container { max-width: 800px; text-align: left; }
+       #instructionsScreen h2 { color: #3f51b5; border-bottom: 2px solid #3f51b5; padding-bottom: 5px; margin-bottom: 15px; margin-top: 25px; }
+       #instructionsScreen h2:first-of-type { margin-top: 0; }
+        .dark #instructionsScreen h2 { color: #8ab4f8; border-bottom-color: #8ab4f8; }
+        .instructions-content {flex-grow: 1;overflow-y: auto;padding-right: 15px;min-height: 0;}
+       .instructions-content ul { list-style: none; padding-left: 0; line-height: 1.8; }
+       .instructions-content li { display: flex; align-items: flex-start; margin-bottom: 12px; }
+       .instructions-content li i { color: #3f51b5; margin-right: 15px; font-size: 1.2em; margin-top: 5px; min-width: 20px; text-align: center; }
+       .dark.instructions-content li i { color: #8ab4f8; }
+       .instructions-content strong { color: #c62828; }
+       .dark.instructions-content strong { color: #ef9a9a; }
+       .instructions-footer { padding-top: 20px; border-top: 1px solid #eee; }
+       .dark.instructions-footer { border-top-color: #444; }
+        #offlineStatus { font-weight: 600; text-align: center; padding: 10px; border-radius: 6px; margin-bottom: 15px; }
+       .status-waiting { background: #ffebee; color: #c62828; border: 1px solid #ef9a9a; }
+       .status-ready { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
+       .agreement-group { display: flex; align-items: center; margin-bottom: 15px; }
+        #agreementCheckbox { width: 18px; height: 18px; margin-right: 10px; cursor: pointer; }
+        #agreementCheckbox + label { font-size: 0.9em; cursor: pointer; }
+       .btn-start-exam:disabled { background: #9fa8da; cursor: not-allowed; }
+       .dark.btn-start-exam:disabled { background: #2c3a7a; }
+        #startError { color: #d32f2f; text-align: center; height: 1.2em; font-weight: 500; }
+        #examUIWrapper { display: none; flex-direction: column; height: 100%; position: relative; }
+       .site-header { background: #ffffff; padding: 10px 20px; display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #e0e0e0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); z-index: 101; position: relative; }
+       .site-logo { height: 40px; width: auto; }
+       .site-branding.site-title { font-size: 1.4em; font-weight: 700; color: #3f51b5; line-height: 1.1; }
+       .site-branding.site-tagline { font-size: 0.8em; color: #666; margin: 0; }
+       .topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 20px; background: #3f51b5; color: white; gap: 10px; z-index: 100; position: relative; }
+       .topbar-left-group,.topbar-right-group { display: flex; align-items: center; gap: 15px; }
+       .navigation-tabs { display: flex; gap: 5px; background: rgba(0,0,0,0.15); border-radius: 6px; padding: 3px; position: absolute; left: 50%; transform: translateX(-50%); }
+       .nav-tab { background: transparent; border: none; color: white; padding: 5px 10px; border-radius: 4px; cursor: pointer; font-weight: 500; transition: all 0.3s; font-size: 0.85em; }
+       .nav-tab:hover:not(.locked) { background: rgba(255,255,255,0.2); }
+       .nav-tab.active { background: white; color: #3f51b5; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+       .nav-tab.locked { cursor: not-allowed; opacity: 0.6; position: relative; pointer-events: none; }
+       .nav-tab.locked::after { content: '\f023'; font-family: "Font Awesome 6 Free"; font-weight: 900; margin-left: 8px; font-size: 0.9em; }
+       .timer { font-size: 0.95em; font-weight: bold; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; }
+        #stopwatchWrapper { display: none; align-items: center; gap: 10px; }
+        #stopwatchDisplay { font-size: 0.95em; font-weight: bold; white-space: nowrap; background: rgba(0,0,0,0.2); padding: 4px 8px; border-radius: 4px; }
+       .stopwatch-controls button { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; cursor: pointer; font-size: 0.8em; padding: 5px; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; margin-left: 5px; }
+       .stopwatch-controls button:hover { background-color: rgba(255,255,255,0.2); }
+       .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
+       .toggle-switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+       .toggle-switch input { opacity: 0; width: 0; height: 0; }
+       .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition:.4s; border-radius: 34px; }
+       .toggle-slider:before { position: absolute; content: ""; height: 20px; width: 20px; left: 3px; bottom: 3px; background-color: white; transition:.4s; border-radius: 50%; }
+        input:checked +.toggle-slider { background-color: #4caf50; }
+        input:checked +.toggle-slider:before { transform: translateX(24px); }
+       .toggle-label { font-size: 0.9em; white-space: nowrap; }
+       .topbar #btnSubmitTest { background: #f44336; color: white; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85em; padding: 8px 15px; }
+       .topbar #btnSubmitTest:hover { opacity: 0.85; }
+       .main-content { flex: 1; display: flex; overflow: hidden; position: relative; z-index: 5; }
+       .question-area { width: 100%; padding: 20px; overflow-y: auto; padding-bottom: 100px; transition: padding-right 0.3s ease, filter 0.3s ease; position: relative; z-index: 5; }
+       .sidebar-open .question-area { filter: blur(4px); pointer-events: none; }
+       .question-header { font-size: 1.2em; margin-bottom: 15px; font-weight: 600; }
+       .question-timer-bar-container { width: 100%; height: 8px; background-color: #e0e0e0; border-radius: 4px; margin-bottom: 20px; overflow: hidden; }
+       .question-timer-bar { height: 100%; width: 100%; background-color: #3f51b5; border-radius: 4px; }
+       .dark.question-timer-bar-container { background-color: #3d3d4a; }
+       .dark.question-timer-bar { background-color: #8ab4f8; }
+       .question-content { margin-bottom: 20px; line-height: 1.6; font-size: 1em; }
+       .options-list { list-style: none; display: grid; grid-template-columns: 1fr; gap: 10px; padding: 0; }
+       .option { padding: 12px 15px; border: 1px solid #ddd; border-radius: 8px; cursor: pointer; transition: all 0.2s; background: white; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); font-size: 0.95em; position: relative; }
+       .option:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+       .option.selected { background: #4caf50; color: white; border-color: #4caf50; box-shadow: 0 2px 5px rgba(76,175,80,0.3); }
+       .option-radio { margin-right: 12px; min-width: 18px; height: 18px; border: 2px solid #ccc; border-radius: 50%; display: inline-block; position: relative; }
+       .option.selected .option-radio { border-color: white; background: white; box-shadow: inset 0 0 0 4px #4caf50; }
+       .sidebar { position: fixed; top: 111px; right: -300px; width: 300px; height: calc(100% - 111px); background: #f8f9fa; border-left: 1px solid #ccc; display: flex; flex-direction: column; transition: right 0.3s ease-in-out; z-index: 200; box-shadow: -5px 0 15px rgba(0,0,0,0.1); }
+       .sidebar-open .sidebar { right: 0; }
+       .sidebar-content { padding: 15px; overflow-y: auto; flex-grow: 1;}
+       .palette-title { font-weight: 600; margin-bottom: 10px; color: #3f51b5; font-size: 1.1em; text-align: center; }
+       .question-palette { display: grid; grid-template-columns: repeat(auto-fill, minmax(35px, 1fr)); gap: 8px; margin-bottom: 20px; }
+       .question-number { width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; border-radius: 50%; border: 1px solid transparent; cursor: pointer; font-weight: 500; transition: all 0.2s; font-size: 13px; margin: 0 auto; }
+       .question-number:hover { transform: scale(1.1); box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+       .answered { background: #4caf50; color: white; border: 1px solid #388e3c;}
+       .not-answered { background: #f44336; color: white; border: 1px solid #d32f2f;}
+       .marked { background: #ff9800; color: white; border: 1px solid #f57c00;}
+       .marked-answered { background: linear-gradient(135deg, #4caf50 50%, #ff9800 50%); color: white; border: 1px solid #f57c00; }
+       .not-visited { background: #e9ecef; color: #333; border: 1px solid #ddd;}
+       .current { border: 2px solid #3f51b5; transform: scale(1.1); }
+       .palette-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; padding: 12px; background: #e0e0e0; border-radius: 6px; font-size: 0.8em; }
+       .summary-item { display: flex; align-items: center; gap: 8px; color: #333; }
+       .summary-item span { font-weight: 700; background-color: #fff; border-radius: 50%; min-width: 24px; height: 24px; display: inline-flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+       .legend { margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd;}
+       .legend-title { font-weight: 600; margin-bottom: 12px; color: #3f51b5; font-size: 1em; }
+       .legend-item { display: flex; align-items: center; margin-bottom: 8px; font-size: 0.85em; padding: 6px 8px; border-radius: 4px; }
+       .legend-color { width: 16px; height: 16px; border-radius: 3px; margin-right: 10px; flex-shrink: 0; }
+       .legend-answered { background: #4caf50; }
+       .legend-not-answered { background: #f44336; }
+       .legend-marked { background: #ff9800; }
+       .legend-marked-answered { background: linear-gradient(135deg, #4caf50 50%, #ff9800 50%); }
+       .legend-not-visited { background: #e9ecef; border: 1px solid #ccc; }
+       .sidebar-toggle { background: transparent; border: 1px solid rgba(255,255,255,0.3); color: white; cursor: pointer; font-size: 0.9em; padding: 5px; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+       .sidebar-toggle:hover { background-color: rgba(255,255,255,0.2); }
+       .sidebar-open .sidebar-toggle { transform: rotate(180deg); }
+       .fixed-action-area { position: fixed; bottom: 0; left: 0; width: 100%; background: #fff; border-top: 1px solid #ccc; padding: 10px 15px; z-index: 100; box-shadow: 0 -2px 5px rgba(0,0,0,0.05); }
+       .action-buttons { display: flex; justify-content: center; align-items: center; gap: 8px; }
+       .btn-action { padding: 8px; border: none; border-radius: 6px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 0.85em; flex-grow: 1; flex-basis: 0; }
+       .btn-action:hover { opacity: 0.85; }
+        #btnPrevQuestion { background: #6c757d; color: white; }
+        #btnSaveNext { background: #4caf50; color: white; }
+        #btnMarkReview { background: #ff9800; color: white; }
+        #btnClearResponse { background: #f44336; color: white; }
+       .submit-button.btn-action { background: #3f51b5; color: white; padding: 10px 25px; flex-grow: 0; }
+        #resultScreenWrapper { display: none; text-align: center; padding: 20px; flex-direction: column; align-items: center; justify-content: flex-start; flex: 1; overflow-y: auto; position: relative;}
+        #resultScreenWrapper h2 { font-size: 2.5em; color: #3f51b5; margin-bottom: 5px; }
+        #resultScreenWrapper p { font-size: 1.2em; margin-bottom: 20px; }
+       .scorecard-details { width: 100%; max-width: 500px; margin: 25px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+       .scorecard-table { width: 100%; border-collapse: collapse; font-size: 1.1em; }
+       .scorecard-table td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; }
+       .scorecard-table tr:last-child td { border-bottom: none; }
+       .scorecard-table td:first-child { text-align: left; font-weight: 500; color: #555; }
+       .scorecard-table td:last-child { text-align: right; font-weight: 700; }
+       .scorecard-table .correct-val { color: #4caf50; }
+       .scorecard-table .incorrect-val { color: #f44336; }
+       .scorecard-table .unattempted-val { color: #ff9800; }
+       .scorecard-table .total-row td { font-size: 1.2em; border-top: 2px solid #e0e0e0; padding-top: 15px; margin-top: 5px; }
+       .scorecard-table .total-val { color: #3f51b5; }
+       .dark .scorecard-details { background: #2a2a3a; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+       .dark .scorecard-table td { border-bottom-color: #3a3a4a; }
+       .dark .scorecard-table td:first-child { color: #ccc; }
+       .dark .scorecard-table .correct-val { color: #81c784; }
+       .dark .scorecard-table .incorrect-val { color: #ef9a9a; }
+       .dark .scorecard-table .unattempted-val { color: #ffd54f; }
+       .dark .scorecard-table .total-row td { border-top-color: #555; }
+       .dark .scorecard-table .total-val { color: #8ab4f8; }
+       .result-buttons { display: flex; gap: 15px; margin-top: 30px; margin-bottom: 30px; }
+        #syncStatus { margin-top: 10px; font-weight: 500; font-size: 0.95em; padding: 8px 12px; border-radius: 6px; }
+        #syncStatus.syncing { color: #1565c0; background-color: #e3f2fd; }
+        #syncStatus.synced { color: #2e7d32; background-color: #e8f5e9; }
+        #syncStatus.error { color: #c62828; background-color: #ffebee; }
+       .performance-analysis-container { width: 100%; max-width: 800px; margin: 30px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+       .chart-container { width: 100%; max-width: 800px; margin: 30px auto; background: #ffffff; padding: 25px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+       .performance-analysis-container h3 { text-align: center; margin-bottom: 20px; font-size: 1.5em; color: #3f51b5; }
+       .table-wrapper { overflow-x: auto; }
+       .performance-table { width: 100%; border-collapse: collapse; }
+       .performance-table th,.performance-table td { padding: 14px 10px; text-align: center; border-bottom: 1px solid #e0e0e0; font-size: 0.95em; white-space: nowrap; }
+       .performance-table th { background-color: #f8f9fa; font-weight: 600; color: #444; }
+       .performance-table td:first-child { text-align: left; font-weight: 500; width: 40%; white-space: normal; }
+       .accuracy-bar-container { background-color: #e9ecef; border-radius: 10px; position: relative; height: 22px; overflow: hidden; min-width: 100px; }
+       .accuracy-bar { height: 100%; border-radius: 10px; transition: width 0.8s ease-in-out; }
+       .accuracy-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-weight: 600; font-size: 0.9em; color: #333; text-shadow: 0 0 2px rgba(255,255,255,0.7); }
+        #performanceChart { width: 100%!important; height: 350px!important; }
+        #reviewScreenWrapper { display: none; width: 100%; flex-direction: column; position: relative;}
+       .review-header { padding: 15px 20px; background: #fff; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
+        #reviewContainer { padding: 20px; overflow-y: auto; flex-grow: 1; background-color: #f0f0f5; }
+       .review-question { background: #fff; border: 1px solid #ddd; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+       .review-option-list { list-style: none; padding: 0; margin-top: 15px; }
+       .review-option { padding: 10px 15px; margin-bottom: 8px; border-radius: 6px; border: 1px solid #e0e0e0; display: flex; align-items: center; gap: 12px; }
+       .review-option i { min-width: 1.2em; text-align: center; }
+       .review-option.review-correct { background-color: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; font-weight: 500; }
+       .review-option.review-incorrect { background-color: #ffebee; border-color: #ef9a9a; color: #b71c1c; }
+       .review-status { margin-top: 15px; padding: 8px 12px; border-radius: 6px; font-weight: 500; text-align: center; border: 1px solid transparent; }
+       .review-status.correct { background-color: #e8f5e9; border-color: #a5d6a7; color: #1b5e20; }
+       .review-status.incorrect { background-color: #ffebee; border-color: #ef9a9a; color: #c62828; }
+       .review-status.unanswered { background-color: #fff3e0; border-color: #ffcc80; color: #e65100; }
+       .review-explanation { margin-top: 20px; padding: 15px; background: #eef2ff; border-left: 4px solid #3f51b5; border-radius: 4px; font-size: 0.9em; line-height: 1.6; }
+       .review-explanation strong { color: #3f51b5; }
+       .password-modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.6); align-items: center; justify-content: center;}
+       .modal-content { background-color: #fefefe; padding: 25px 35px; border: 1px solid #888; width: 90%; max-width: 420px; border-radius: 12px; text-align: center; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+       .close-modal { position: absolute; top: 10px; right: 20px; font-size: 1.8em; color: #aaa; cursor: pointer; transition: color 0.2s; }
+       .close-modal:hover { color: #333; }
+        #passwordRetestInput { width: 100%; padding: 10px; margin: 15px 0; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
+        #passwordError { color: #f44336; font-size: 0.9em; height: 1.2em; margin-bottom: 10px;}
+       .contact-admin-text { margin-top: 20px; font-size: 0.9em; color: #666; }
+       .contact-admin-text a { color: #3f51b5; text-decoration: none; font-weight: 500; }
+       .contact-admin-text a:hover { text-decoration: underline; }
+        #answerWritingWrapper { display: none; flex: 1; flex-direction: column; align-items: center; justify-content: flex-start; padding: 40px 20px; position: relative; overflow-y: auto; }
+        #answerWritingWrapper h2 { color: #3f51b5; font-size: 1.8em; margin-bottom: 10px; }
+        #answerWritingWrapper h3 { color: #4a4a4a; font-size: 1.4em; margin-top: 30px; margin-bottom: 15px; border-bottom: 2px solid #ccc; padding-bottom: 5px; }
+        #answerWritingWrapper p { color: #555; font-size: 1.1em; line-height: 1.6; }
+        #answerWritingWrapper ul, #answerWritingWrapper ol { max-width: 800px; width: 100%; margin: 20px auto; text-align: left; padding-left: 20px; }
+        #answerWritingWrapper li { margin-bottom: 15px; line-height: 1.6; font-size: 1em; }
+        #answerWritingWrapper strong { color: #3f51b5; }
+       .dark .site-header { background: #2a2a3a; border-bottom-color: #3a3a4a; }
+       .dark .site-branding.site-title { color: #8ab4f8; }
+       .dark .site-branding.site-tagline { color: #aaa; }
+       .dark .option { background: #2c2c3c; border-color: #444; color: #eee; }
+       .dark .option:hover { background: #3d3d4a; }
+       .dark .option.selected { background: #1b5e20; color: #c8e6c9; border-color: #81c784; }
+       .dark .option.selected .option-radio { border-color: #c8e6c9; background: #c8e6c9; box-shadow: inset 0 0 0 4px #1b5e20; }
+       .dark .option-radio { border-color: #555; }
+       .dark .fixed-action-area { background: #1e1e2f; border-top-color: #444;}
+       .dark .sidebar { background: #2a2a3a; border-left: 1px solid #444;}
+       .dark .not-visited { background: #3d3d4a; color: #eee; border: 1px solid #555; }
+       .dark .palette-summary { background: #1e1e2f; border: 1px solid #444;}
+       .dark .summary-item { color: #ccc; }
+       .dark .summary-item span { background-color: #3d3d4a; color: #eee; }
+       .dark .legend,.dark .fixed-action-area { border-top-color: #444; }
+       .dark .legend-item { background: rgba(255,255,255,0.05); }
+       .dark .palette-title,.dark .legend-title { color: #8ab4f8; }
+       .dark #resultScreenWrapper h2,.dark .performance-analysis-container h3,.dark .review-title,.dark #answerWritingWrapper h2,.dark #answerWritingWrapper h3 { color: #8ab4f8; }
+       .dark #answerWritingWrapper p { color: #aaa; }
+       .dark #answerWritingWrapper li strong { color: #8ab4f8; }
+       .dark .performance-analysis-container,.dark .chart-container { background: #2a2a3a; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+       .dark .performance-table th { background-color: #1e1e2f; color: #ccc; }
+       .dark .performance-table td { border-bottom: 1px solid #444; }
+       .dark .accuracy-bar-container { background-color: #3d3d4a; }
+       .dark .accuracy-text { color: #fff; text-shadow: none; }
+       .dark .review-header { background: #2a2a3a; border-color: #444; }
+       .dark #reviewContainer { background-color: #1e1e2f; }
+       .dark .review-question { background: #2c2c3c; border-color: #444; }
+       .dark .review-option { border-color: #555; }
+       .dark .review-option.review-correct { background-color: #1a311b; border-color: #81c784; color: #c8e6c9; }
+       .dark .review-option.review-incorrect { background-color: #3e1c1f; border-color: #ef9a9a; color: #ffcdd2; }
+       .dark .review-status.correct { background-color: #1a311b; border-color: #4caf50; color: #c8e6c9; }
+       .dark .review-status.incorrect { background-color: #3e1c1f; border-color: #f44336; color: #ffcdd2; }
+       .dark .review-status.unanswered { background-color: #4a2c0f; border-color: #ff9800; color: #ffe0b2; }
+       .dark .review-explanation { background: #262a42; border-left-color: #8ab4f8; color: #ccc; }
+       .dark .review-explanation strong { color: #8ab4f8; }
+       .dark .modal-content { background: #2c2c3c; border-color: #555; }
+       .dark .close-modal:hover { color: #fff; }
+       .dark .contact-admin-text { color: #aaa; }
+       .dark .contact-admin-text a { color: #8ab4f8; }
+        
+        /* --- NEW STYLES FOR CHAPTER SELECTION (MERGED) --- */
+        #chapterSelectionWrapper {
+            display: none; /* Hidden by default */
+            padding: 20px;
+            max-width: 1000px;
+            margin: 20px auto;
         }
-        .option-card:hover { transform: translateX(10px); background: white; }
-        .selected-option { 
-            background: #2563eb !important; 
-            color: white !important;
-            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+        .chapter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        .chapter-button {
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 12px;
+            padding: 20px 25px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 120px;
+        }
+        .chapter-button:hover:not(:disabled) {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+        .chapter-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background-color: #f9f9f9;
+        }
+        .chapter-button h3 {
+            font-size: 1.15em;
+            font-weight: 600;
+            color: #3f51b5;
+        }
+        .chapter-button .status-completed {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #4caf50;
+            margin-top: 10px;
+        }
+        .dark .chapter-button {
+            background: #2a2a3a;
+            border-color: #444;
+        }
+        .dark .chapter-button h3 {
+            color: #8ab4f8;
+        }
+        .dark .chapter-button:disabled {
+            background-color: #242434;
+        }
+        .dark .chapter-button .status-completed {
+            color: #81c784;
+        }
+
+        /* --- NEW: Submitting Screen Styles --- */
+        #submittingScreen {
+            display: none; /* Hidden by default */
+        }
+        #submittingScreen h2 {
+            font-size: 1.8em;
+            color: #3f51b5;
+            margin-bottom: 15px;
+        }
+        .dark #submittingScreen h2 {
+            color: #8ab4f8;
+        }
+        #submittingScreen p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 25px;
+        }
+        .dark #submittingScreen p {
+            color: #aaa;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f0f0f5;
+            border-top: 5px solid #3f51b5;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto; /* Center the spinner */
+        }
+        .dark .spinner {
+            border-color: #1e1e2f;
+            border-top-color: #8ab4f8;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success-icon {
+            font-size: 50px;
+            color: #4caf50;
+            display: none; /* Hidden by default */
+        }
+        /* --- END: Submitting Screen Styles --- */
+
+        @media (max-width: 768px) {
+         .site-header { flex-direction: column; text-align: center; gap: 5px; }
+         .topbar { flex-wrap: wrap; justify-content: center; }
+         .navigation-tabs { position: static; transform: none; order: 3; width: 100%; justify-content: center; margin-top: 10px; }
+         .sidebar-open .question-area { padding-right: 20px; }
+        }
+        @media (max-width: 480px) {
+         .btn-action span { display: none; }
         }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-    <div id="exam-container" class="max-w-5xl mx-auto hidden">
-        <div class="glass-panel rounded-[2rem] p-6 mb-8 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" class="h-12 w-12 rounded-2xl shadow-lg">
-                <div>
-                    <h1 id="test-title" class="font-extrabold text-slate-800">Loading Test...</h1>
-                    <p id="q-progress" class="text-[10px] font-black text-blue-500 uppercase tracking-widest">Question 1 of 50</p>
-                </div>
+    <div id="loginScreen" class="pre-exam-screen" style="display: flex;">
+        <div class="login-card">
+            <h2>Exam Portal Login</h2>
+            <div class="input-group">
+                <label for="emailInput">Email Address</label>
+                <input type="email" id="emailInput" placeholder="Enter your email" autocomplete="email">
             </div>
-            <div class="text-right">
-                <div id="timer" class="text-2xl font-black text-slate-900">00:00</div>
-                <p class="text-[10px] font-bold text-slate-400 uppercase">Time Remaining</p>
+            <div class="input-group">
+                <label for="passwordInput">Password</label>
+                <input type="password" id="passwordInput" placeholder="Enter your password" autocomplete="current-password">
+            </div>
+            <button id="loginBtn" class="btn-primary">Login</button>
+            <p id="loginError"></p>
+        </div>
+    </div>
+
+    <div id="instructionsScreen" class="pre-exam-screen">
+        <div class="instructions-container">
+            <div class="instructions-content">
+                <h2 id="instructions-title">General Instructions:</h2>
+                <ul>
+                    <li><i class="fas fa-list-ol"></i><div>Total Questions: <strong id="totalQuestionsEl">--</strong>.</div></li>
+                    <li><i class="fas fa-clock"></i><div id="durationEl">Total Duration: <strong>-- Minutes</strong>.</div></li>
+                    <li><i class="fas fa-stopwatch-20"></i><div>Each question has a <strong>15-second timer</strong>. The test will automatically move to the next question when this timer ends.</div></li>
+                    <li><i class="fas fa-calculator"></i><div>Marking Scheme: <strong>+1</strong> for a correct answer, <strong>-1</strong> for an incorrect answer, and <strong>0</strong> for an unattempted question.</div></li>
+                </ul>
+                <h2>Security & Environment:</h2>
+                <ul>
+                    <li><i class="fas fa-plane-departure"></i><div>You must take this exam in an offline environment. Please <strong>Enable Aeroplane/Flight Mode</strong> before starting.</div></li>
+                    <li><i class="fas fa-wifi-slash"></i><div>If an internet connection is detected after starting, your test will be <strong>auto-submitted</strong>. This action is final.</div></li>
+                    <li><i class="fas fa-window-close"></i><div>Do not close or refresh the browser window, as this will end your test.</div></li>
+                </ul>
+                <h2>Navigation Instructions:</h2>
+                <ul>
+                    <li><i class="fas fa-check" style="color:#4caf50;"></i><div>Click <strong>Save & Next</strong> to save your answer and move to the next question.</div></li>
+                    <li><i class="fas fa-flag" style="color:#ff9800;"></i><div>Click <strong>Mark</strong> to mark a question for review.</div></li>
+                    <li><i class="fas fa-square" style="color:#f44336;"></i><div>A <strong>Red</strong> number in the palette means you have visited but not answered the question.</div></li>
+                </ul>
+            </div>
+            <div class="instructions-footer">
+                <div id="offlineStatus" class="status-waiting"><i class="fas fa-wifi"></i> Please enable Aeroplane Mode.</div>
+                <div class="agreement-group">
+                    <input type="checkbox" id="agreementCheckbox">
+                    <label for="agreementCheckbox">I have read all the instructions and I am ready to begin.</label>
+                </div>
+                <button id="startExamBtn" class="btn-primary btn-start-exam" disabled>Start Exam</button>
+                <div id="startError"></div>
             </div>
         </div>
+    </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            <div class="lg:col-span-2 space-y-6">
-                <div class="glass-panel rounded-[3rem] p-8 md:p-12 min-h-[400px]">
-                    <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-snug mb-10">
-                        Please wait while the AI environment prepares your questions...
-                    </h2>
-                    <div id="options-container" class="space-y-4">
-                        </div>
-                </div>
+    <!-- This is the container for the chapter selection screen -->
+    <div id="chapterSelectionWrapper">
+        <!-- Chapters will be loaded here by JavaScript -->
+    </div>
 
-                <div class="flex gap-4">
-                    <button id="prev-btn" class="flex-1 py-4 glass-panel rounded-2xl font-bold text-slate-400 hover:text-blue-600 transition-all">Previous</button>
-                    <button id="next-btn" class="flex-[2] py-4 bg-slate-900 text-white rounded-2xl font-bold shadow-xl hover:bg-blue-600 transition-all">Save & Next</button>
-                </div>
+    <!-- *** NEW: Submitting Screen *** -->
+    <div id="submittingScreen" class="pre-exam-screen">
+        <div class="submitting-card">
+            <h2 id="submittingTitle">Submitting Test...</h2>
+            <p id="submittingTestName">Polity Ch. 23 : Parliament</p>
+            <div id="submittingSpinner" class="spinner"></div>
+            <i id="submittingSuccess" class="fas fa-check-circle success-icon"></i>
+            <p id="submittingMessage" style="margin-top: 20px; font-weight: 500;"></p>
+        </div>
+    </div>
+    <!-- *** END: Submitting Screen *** -->
+
+    <!-- This is the main wrapper for the test UI and results -->
+    <div id="examUIWrapper">
+        <header class="site-header" id="siteHeader">
+            <img src="../images/LOGO.jpg" alt="UPSChub Logo" class="site-logo">
+            <div class="site-branding">
+                <div class="site-title">UPSChub</div>
+                <p class="site-tagline">Civil Services Exam Preparation</p>
             </div>
-
-            <div class="glass-panel rounded-[2.5rem] p-6 h-fit">
-                <h3 class="font-black text-slate-400 text-[10px] uppercase tracking-widest mb-6">Question Palette</h3>
-                <div id="palette" class="grid grid-cols-5 gap-3">
+             <div class="site-copyright">Copyright © 2025 Pratyush Swain</div>
+        </header>
+        <header class="topbar" id="topbar">
+            <div class="topbar-left-group">
+                <button id="btnToggleSidebar" class="sidebar-toggle" title="Toggle Palette"><i class="fas fa-chevron-left"></i></button>
+                <div class="timer" id="timer">02:30:00</div>
+                <div id="stopwatchWrapper">
+                    <span id="stopwatchDisplay">00:00:00</span>
+                    <div class="stopwatch-controls">
+                        <button id="stopwatchPlayPause" title="Play/Pause"><i class="fas fa-play"></i></button>
+                        <button id="stopwatchReset" title="Reset"><i class="fas fa-rotate-left"></i></button>
                     </div>
-                <div class="mt-10 pt-6 border-t border-slate-100">
-                    <button id="submit-btn" class="w-full py-4 bg-red-50 text-red-600 border border-red-100 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">End Session</button>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id="result-modal" class="fixed inset-0 z-[200] hidden flex items-center justify-center p-6 bg-slate-900/40 backdrop-blur-xl">
-        <div class="glass-panel rounded-[3rem] p-10 max-w-md w-full text-center">
-            <div class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-blue-200">
-                <svg class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3"><path d="M5 13l4 4L19 7"/></svg>
+            <div class="navigation-tabs">
+                <button id="showMockTestTab" class="nav-tab active">Mock Test</button>
+                <button id="showAnswerWritingTab" class="nav-tab locked">Answer Writing</button>
             </div>
-            <h2 class="text-3xl font-black text-slate-800 mb-2">Analysis Complete</h2>
-            <p class="text-slate-500 mb-8 font-medium">Your data has been synced to your dashboard.</p>
-            <div class="grid grid-cols-2 gap-4 mb-8">
-                <div class="bg-slate-50 p-4 rounded-2xl">
-                    <p class="text-3xl font-black text-slate-900" id="res-score">0</p>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Correct</p>
+            <div class="topbar-right-group">
+                <div class="dark-mode-toggle">
+                    <span class="toggle-label" id="toggleLabel">Dark</span>
+                    <label class="toggle-switch"><input type="checkbox" id="darkModeToggle"><span class="toggle-slider"></span></label>
                 </div>
-                <div class="bg-slate-50 p-4 rounded-2xl">
-                    <p class="text-3xl font-black text-slate-900" id="res-percent">0%</p>
-                    <p class="text-[10px] font-bold text-slate-400 uppercase">Accuracy</p>
-                </div>
+                <button id="btnSubmitTest" style="display: none;"><i class="fas fa-paper-plane"></i> Submit</button>
             </div>
-            <a href="daily_test.html" class="block w-full py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-300 hover:bg-blue-600 transition-all">Back to Dashboard</a>
-        </div>
-    </div>
-
-    <script>
-        const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-
-        let questions = [];
-        let userAnswers = [];
-        let currentIndex = 0;
-        let timer;
-        let testData = {};
-
-        // 1. Load Data from URL and Firestore
-        auth.onAuthStateChanged(async (user) => {
-            if (!user) { window.location.href = 'auth.html'; return; }
+        </header>
+        
+        <!-- This main-content div holds the test, results, review, etc. -->
+        <div class="main-content" id="main-content"> 
             
-            const params = new URLSearchParams(window.location.search);
-            const testId = params.get('testId'); // e.g., polity_ch1_set1
+            <div id="mockTestWrapper" style="display: flex; width: 100%;">
+                <section class="question-area">
+                    <h2 class="question-header" id="questionNumber"></h2>
+                    <div class="question-timer-bar-container"><div id="questionTimerBar" class="question-timer-bar"></div></div>
+                    <div class="question-content" id="questionText"></div>
+                    <ul class="options-list" id="optionsList"></ul>
+                </section>
+                <aside class="sidebar" id="sidebar">
+                    <div class="sidebar-content">
+                        <div class="palette-title">Question Palette</div>
+                        <div class="question-palette" id="questionPalette"></div>
+                        <div class="palette-summary">
+                            <div class="summary-item"><span id="summaryAnswered">0</span> Answered</div>
+                            <div class="summary-item"><span id="summaryNotAnswered">0</span> Not Answered</div>
+                            <div class="summary-item"><span id="summaryMarked">0</span> Marked Review</div>
+                            <div class="summary-item"><span id="summaryNotVisited">0</span> Not Visited</div>
+                        </div>
+                        <div class="legend">
+                            <div class="legend-title">Legend</div>
+                            <div class="legend-item"><div class="legend-color answered"></div><span>Answered</span></div>
+                            <div class="legend-item"><div class="legend-color not-answered"></div><span>Not Answered</span></div>
+                            <div class="legend-item"><div class="legend-color marked"></div><span>Marked</span></div>
+                            <div class="legend-item"><div class="legend-color marked-answered"></div><span>Marked & Answered</span></div>
+                            <div class="legend-item"><div class="legend-color not-visited"></div><span>Not Visited</span></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+            
+            <div id="resultScreenWrapper">
+                <h2 id="resultScreenTitle">Test Completed!</h2>
+                <p id="resultScreenSubtitle">Here is your score summary:</p>
+                
+                <div id="syncStatus"></div>
 
-            try {
-                // Fetching from root collection 'dailytests'
-                const doc = await db.collection('dailytests').doc(testId).get();
-                if (!doc.exists) throw new Error("Test not found");
-                
-                testData = doc.data();
-                document.getElementById('test-title').textContent = testData.testName;
-                
-                // Load questions from subcollection 'questions'
-                const qSnap = await db.collection('dailytests').doc(testId).collection('questions').get();
-                questions = qSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-                
-                if (questions.length === 0 && testData.questions) questions = testData.questions;
+                <div class="scorecard-details">
+                    <table class="scorecard-table">
+                        <tbody>
+                            <tr>
+                                <td><i class="fas fa-check-circle" style="color: #4caf50; margin-right: 8px;"></i>Correct Answers</td>
+                                <td class="correct-val"><span id="correctCount">0</span> (<span id="correctMarks">0</span> Marks)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-times-circle" style="color: #f44336; margin-right: 8px;"></i>Incorrect Answers</td>
+                                <td class="incorrect-val"><span id="incorrectCount">0</span> (<span id="incorrectMarks">0</span> Marks)</td>
+                            </tr>
+                            <tr>
+                                <td><i class="fas fa-minus-circle" style="color: #ff9800; margin-right: 8px;"></i>Unattempted</td>
+                                <td class="unattempted-val"><span id="unattemptedCount">0</span></td>
+                            </tr>
+                            <tr class="total-row">
+                                <td><strong>Final Score</strong></td>
+                                <td class="total-val"><strong><span id="finalScoreAnimated">0</span> / <span id="totalPossibleScore">0</span></strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
 
-                userAnswers = new Array(questions.length).fill(null);
-                initExam();
-            } catch (e) { alert(e.message); }
+                <div class="result-buttons" id="resultButtonsContainer">
+                    <!-- Buttons are dynamically added here -->
+                </div>
+
+                <div class="performance-analysis-container">
+                    <h3>Topic-wise Performance</h3>
+                    <div class="table-wrapper"><table class="performance-table"><thead><tr><th>Topic</th><th>Correct</th><th>Attempted</th><th>Accuracy</th></tr></thead><tbody id="performanceTableBody"></tbody></table></div>
+                </div>
+                <div class="chart-container"><canvas id="performanceChart"></canvas></div>
+            </div>
+            
+            <div id="reviewScreenWrapper">
+                <div class="review-header"><h2 class="review-title">Review Your Answers</h2><button id="backToResultsBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Score</button></div>
+                <div id="reviewContainer"></div>
+            </div>
+            
+            <div id="answerWritingWrapper">
+                <h2>Answer Writing Practice</h2>
+                <div class="answer-writing-questions">
+                    <h3>✍️ Practice Questions</h3>
+                    <p><em>📢 Today, no answer writing practice questions are available. The section will be updated soon. Stay tuned!</em></p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="fixed-action-area" id="mcqFooter">
+            <div class="action-buttons">
+                <button class="btn-action" id="btnPrevQuestion"><i class="fas fa-arrow-left"></i><span>Previous</span></button>
+                <button class="btn-action" id="btnClearResponse"><i class="fas fa-ban"></i><span>Clear</span></button>
+                <button class="btn-action" id="btnMarkReview"><i class="fas fa-flag"></i><span>Mark</span></button>
+                <button class="btn-action" id="btnSaveNext"><i class="fas fa-check"></i><span>Save & Next</span></button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="passwordModal" class="password-modal">
+        <div class="modal-content">
+            <span id="closeModal" class="close-modal">×</span>
+            <h3>Enter Password to Retest</h3>
+            <input type="password" id="passwordRetestInput" placeholder="Enter password...">
+            <div id="passwordError"></div>
+            <button id="verifyPasswordButton" class="submit-button btn-action">Verify</button>
+            <p class="contact-admin-text">Don't have a password? <a id="whatsappLink" href="#" target="_blank">Contact Admin</a></p>
+        </div>
+    </div>
+
+<script>
+// ### CONFIGURATION ###
+const RETEST_PASSWORD = "UPSChub";
+const PER_QUESTION_TIME = 15;
+
+// =====================================================================
+// ============ START: FIREBASE CONFIGURATION ==========================
+// =====================================================================
+const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.appspot.com", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
+const appId = 'default-app-id';
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+try {
+    db.enablePersistence()
+   .then(() => console.log("Firebase offline persistence enabled."))
+   .catch((err) => {
+        if (err.code == 'failed-precondition') {
+            console.warn("Persistence failed: multiple tabs open?");
+        } else if (err.code == 'unimplemented') {
+            console.warn("Persistence is not available in this browser.");
+        }
+    });
+} catch (e) {
+    console.error("Error enabling persistence:", e);
+}
+// =====================================================================
+// ============= END: FIREBASE CONFIGURATION ===========================
+// =====================================================================
+
+// ### GLOBAL STATE & DOM ELEMENTS ###
+let questions = [];
+let testMetadata = {};
+let state = {};
+let timerInterval, onTimerEnd, stopwatchInterval, animationInterval;
+let timeLeft;
+let isTestCompleted = false;
+let performanceChart = null;
+let stopwatchTime = 0;
+let isStopwatchRunning = false;
+let currentUser = null;
+
+let isWeeklyTest = false;
+let weeklySubTests = [];
+let completedSubTests = new Set();
+let currentSubQuizId = null;
+let weeklyTestTitle = '';
+
+let weeklyTestAttemptRef = null;
+let weeklyProgressKey = null; // Key for localStorage
+let weeklyProgress = {
+    completedSubTests: [],
+    subTestResults: [],
+    totalScore: 0,
+    totalCorrect: 0,
+    totalIncorrect: 0,
+    totalQuestions: 0,
+    status: 'in-progress'
+};
+let mainTestId = null;
+    
+const dom = {
+    body: document.body,
+    loginScreen: document.getElementById('loginScreen'),
+    loginBtn: document.getElementById('loginBtn'),
+    emailInput: document.getElementById('emailInput'),
+    passwordInput: document.getElementById('passwordInput'),
+    loginError: document.getElementById('loginError'),
+    instructionsScreen: document.getElementById('instructionsScreen'),
+    startExamBtn: document.getElementById('startExamBtn'),
+    offlineStatus: document.getElementById('offlineStatus'),
+    agreementCheckbox: document.getElementById('agreementCheckbox'),
+    startError: document.getElementById('startError'),
+    totalQuestionsEl: document.getElementById('totalQuestionsEl'),
+    durationEl: document.getElementById('durationEl'),
+    instructionsTitle: document.getElementById('instructions-title'),
+    examUIWrapper: document.getElementById('examUIWrapper'),
+    siteHeader: document.getElementById('siteHeader'),
+    topbar: document.getElementById('topbar'),
+    mainContent: document.getElementById('main-content'),
+    sidebar: document.getElementById('sidebar'),
+    mockTestWrapper: document.getElementById('mockTestWrapper'),
+    mcqFooter: document.getElementById('mcqFooter'),
+    questionArea: document.querySelector('.question-area'),
+    questionText: document.getElementById('questionText'),
+    questionNumber: document.getElementById('questionNumber'),
+    questionTimerBar: document.getElementById('questionTimerBar'),
+    optionsList: document.getElementById('optionsList'),
+    questionPalette: document.getElementById('questionPalette'),
+    btnSubmitTest: document.getElementById('btnSubmitTest'),
+    btnPrevQuestion: document.getElementById('btnPrevQuestion'),
+    btnSaveNext: document.getElementById('btnSaveNext'),
+    btnMarkReview: document.getElementById('btnMarkReview'),
+    btnClearResponse: document.getElementById('btnClearResponse'),
+    timer: document.getElementById('timer'),
+    darkModeToggle: document.getElementById('darkModeToggle'),
+    toggleLabel: document.getElementById('toggleLabel'),
+    sidebarToggle: document.getElementById('btnToggleSidebar'),
+    summaryAnswered: document.getElementById('summaryAnswered'),
+    summaryNotAnswered: document.getElementById('summaryNotAnswered'),
+    summaryMarked: document.getElementById('summaryMarked'),
+    summaryNotVisited: document.getElementById('summaryNotVisited'),
+    resultScreenWrapper: document.getElementById('resultScreenWrapper'),
+    resultScreenTitle: document.getElementById('resultScreenTitle'),
+    resultScreenSubtitle: document.getElementById('resultScreenSubtitle'),
+    resultButtonsContainer: document.getElementById('resultButtonsContainer'),
+    reviewScreenWrapper: document.getElementById('reviewScreenWrapper'),
+    performanceTableBody: document.getElementById('performanceTableBody'),
+    reviewContainer: document.getElementById('reviewContainer'),
+    backToResultsBtn: document.getElementById('backToResultsBtn'),
+    passwordModal: document.getElementById('passwordModal'),
+    closeModal: document.getElementById('closeModal'),
+    verifyPasswordButton: document.getElementById('verifyPasswordButton'),
+    passwordRetestInput: document.getElementById('passwordRetestInput'),
+    passwordError: document.getElementById('passwordError'),
+    whatsappLink: document.getElementById('whatsappLink'),
+    showMockTestTab: document.getElementById('showMockTestTab'),
+    showAnswerWritingTab: document.getElementById('showAnswerWritingTab'),
+    answerWritingWrapper: document.getElementById('answerWritingWrapper'),
+    stopwatchWrapper: document.getElementById('stopwatchWrapper'),
+    stopwatchDisplay: document.getElementById('stopwatchDisplay'),
+    stopwatchPlayPause: document.getElementById('stopwatchPlayPause'),
+    stopwatchReset: document.getElementById('stopwatchReset'),
+    correctCount: document.getElementById('correctCount'),
+    correctMarks: document.getElementById('correctMarks'),
+    incorrectCount: document.getElementById('incorrectCount'),
+    incorrectMarks: document.getElementById('incorrectMarks'),
+    unattemptedCount: document.getElementById('unattemptedCount'),
+    finalScoreAnimated: document.getElementById('finalScoreAnimated'),
+    totalPossibleScore: document.getElementById('totalPossibleScore'),
+    syncStatus: document.getElementById('syncStatus'),
+    chapterSelectionWrapper: document.getElementById('chapterSelectionWrapper'),
+    submittingScreen: document.getElementById('submittingScreen'),
+    submittingTitle: document.getElementById('submittingTitle'),
+    submittingTestName: document.getElementById('submittingTestName'),
+    submittingSpinner: document.getElementById('submittingSpinner'),
+    submittingSuccess: document.getElementById('submittingSuccess'),
+    submittingMessage: document.getElementById('submittingMessage'),
+};
+
+// ### STAGE 1 & 2: PRE-EXAM LOGIC ###
+
+function handleLogin() {
+    const email = dom.emailInput.value;
+    const password = dom.passwordInput.value;
+    dom.loginError.textContent = '';
+    dom.loginBtn.disabled = true;
+    dom.loginBtn.textContent = 'Logging in...';
+
+    firebase.auth().signInWithEmailAndPassword(email, password)
+   .catch((error) => {
+        dom.loginError.textContent = error.message;
+        dom.loginBtn.disabled = false;
+        dom.loginBtn.textContent = 'Login';
+    });
+}
+    
+// *** MODIFIED: Restored offline check for ALL tests ***
+function validateStartConditions() {
+    const isOffline = !navigator.onLine;
+    const isAgreed = dom.agreementCheckbox.checked;
+
+    dom.startExamBtn.disabled = !(isOffline && isAgreed);
+    let errorMsg = '';
+    if (!isOffline && !isAgreed) errorMsg = 'Please agree to terms and enable Aeroplane Mode.';
+    else if (!isOffline) errorMsg = 'Please enable Aeroplane Mode to continue.';
+    else if (!isAgreed) errorMsg = 'Please agree to the instructions to start.';
+    dom.startError.textContent = errorMsg;
+    
+    if (isOffline) {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-check-circle"></i> You are offline. Ready to begin.';
+        dom.offlineStatus.className = 'status-ready';
+    } else {
+        dom.offlineStatus.innerHTML = '<i class="fas fa-wifi"></i> Please enable Aeroplane Mode.';
+        dom.offlineStatus.className = 'status-waiting';
+    }
+    
+    // Ensure the offline status message is always visible on the instructions screen
+    dom.offlineStatus.style.display = 'block';
+}
+
+function startExam() {
+    if (dom.startExamBtn.disabled) return;
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'flex';
+    dom.body.classList.add('exam-active');
+    updateSidebarPosition();
+    
+    // *** MODIFIED: Add online listener for ALL tests ***
+    window.removeEventListener('online', validateStartConditions);
+    window.removeEventListener('offline', validateStartConditions);
+    window.addEventListener('online', forceSubmitOnReconnect);
+    
+    initTest();
+}
+
+function forceSubmitOnReconnect() {
+    // *** MODIFIED: This applies to ALL active tests ***
+    if (!isTestCompleted) {
+        alert("Internet connection detected. Submitting the test as per rules.");
+        submitTest(true);
+    }
+}
+
+// *** MODIFIED: This function now handles loading from localStorage and Firestore ***
+async function loadTestFromURL(testId, user) {
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'none';
+    dom.chapterSelectionWrapper.style.display = 'none';
+    dom.submittingScreen.style.display = 'none'; 
+
+    try {
+        // *** FIX: Changed to 'weeklyTests' ***
+        const weeklyTestRef = db.collection('weeklyTests').doc(testId);
+        const weeklyTestDoc = await weeklyTestRef.get();
+
+        if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
+            console.log("Loading as Weekly Test Container");
+            isWeeklyTest = true;
+            mainTestId = testId;
+            weeklyTestTitle = weeklyTestDoc.data().title;
+            weeklySubTests = weeklyTestDoc.data().subTests;
+            
+            if (user) {
+                weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
+                weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(user.uid).collection("weeklyTestAttempts").doc(mainTestId);
+                
+                const attemptDoc = await weeklyTestAttemptRef.get();
+                if (attemptDoc.exists && (attemptDoc.data().status === 'completed' || attemptDoc.data().status === 'completed-synced')) {
+                    console.log("Loaded COMPLETED progress from Firestore.");
+                    weeklyProgress = attemptDoc.data();
+                    if(weeklyProgress.status === 'completed') {
+                        weeklyProgress.status = 'completed-synced';
+                        weeklyTestAttemptRef.set(weeklyProgress, {merge: true}).catch(e => console.warn("Sync on load failed", e));
+                    }
+                    completedSubTests = new Set(weeklyProgress.completedSubTests || []);
+                    // *** FIX: Call the ASYNC version ***
+                    await showWeeklyTestFinalResult(weeklyProgress); 
+                    return;
+                }
+
+                const localProgress = localStorage.getItem(weeklyProgressKey);
+                if (localProgress) {
+                    console.log("Loaded IN-PROGRESS from localStorage.");
+                    weeklyProgress = JSON.parse(localProgress);
+                } else if (attemptDoc.exists) {
+                    console.log("Loaded IN-PROGRESS from Firestore (no local data).");
+                    weeklyProgress = attemptDoc.data();
+                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+                } else {
+                    console.log("No progress found anywhere, starting fresh.");
+                    weeklyProgress = { completedSubTests: [], subTestResults: [], totalScore: 0, totalCorrect: 0, totalIncorrect: 0, totalQuestions: 0, status: 'in-progress' };
+                    completedSubTests = new Set();
+                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+                }
+
+                completedSubTests = new Set(weeklyProgress.completedSubTests || []);
+                showChapterSelectionScreen();
+
+            } else {
+                 completedSubTests = new Set();
+                 showChapterSelectionScreen();
+            }
+            
+        } else {
+            console.log("Loading as Single Test");
+            isWeeklyTest = false;
+            await loadSingleTest(testId);
+        }
+    } catch (error) {
+        console.error("Failed to load test:", error);
+        handleLoadError(error);
+    }
+}
+
+// *** MODIFIED: This function now checks 'weeklyTestsdocs' first, then 'quizzes' ***
+async function loadSingleTest(testId) {
+    dom.instructionsScreen.style.display = 'flex';
+    dom.instructionsTitle.textContent = 'Loading Test Details...';
+    dom.offlineStatus.style.display = 'block';
+
+    let testDocRef = db.collection('weeklyTestsdocs').doc(testId);
+    let testDoc = await testDocRef.get();
+    let questionsSnapshot;
+
+    if (!testDoc.exists) {
+        console.warn(`Test not found in 'weeklyTestsdocs'. Trying 'quizzes'...`);
+        testDocRef = db.collection('quizzes').doc(testId);
+        testDoc = await testDocRef.get();
+        if (!testDoc.exists) {
+            throw new Error("Test not found in 'weeklyTestsdocs' or 'quizzes'.");
+        }
+    }
+    
+    console.log(`Loading test from: ${testDocRef.path}`);
+    testMetadata = testDoc.data();
+
+    questionsSnapshot = await testDocRef.collection('questions').get();
+    questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    if (questions.length === 0) throw new Error("This test has no questions.");
+
+    dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
+    dom.totalQuestionsEl.textContent = testMetadata.totalQuestions || questions.length;
+    dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
+    
+    timeLeft = testMetadata.durationMinutes * 60;
+    dom.timer.textContent = formatTime(timeLeft);
+    
+    window.addEventListener('online', validateStartConditions);
+    window.addEventListener('offline', validateStartConditions);
+    validateStartConditions();
+}
+
+function showChapterSelectionScreen() {
+    const chapterWrapper = dom.chapterSelectionWrapper;
+    
+    let html = `<h2 style="font-size: 1.8em; color: #3f51b5; margin-bottom: 25px; text-align: center;">${weeklyTestTitle || 'Test Sections'}</h2>`;
+    html += `<div class="chapter-grid">`;
+    
+    weeklySubTests.forEach(subTest => {
+        const isCompleted = completedSubTests.has(subTest.quizId);
+        html += `
+            <button ${isCompleted ? 'disabled' : ''} onclick="startSubTest('${subTest.quizId}', '${subTest.name}')" class="chapter-button">
+                <div>
+                    <h3>${subTest.name}</h3>
+                </div>
+                ${isCompleted ? '<span class="status-completed"><i class="fas fa-check-circle"></i> Completed</span>' : ''}
+            </button>
+        `;
+    });
+
+    html += `</div>`;
+    chapterWrapper.innerHTML = html;
+    
+    chapterWrapper.style.display = 'block';
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'none';
+    dom.submittingScreen.style.display = 'none';
+}
+
+// *** MODIFIED: This function now checks 'weeklyTestsdocs' first, then 'quizzes' ***
+async function startSubTest(subQuizId, subQuizName) {
+    currentSubQuizId = subQuizId;
+    
+    dom.chapterSelectionWrapper.style.display = 'none';
+    dom.instructionsScreen.style.display = 'flex';
+    dom.instructionsTitle.textContent = `Loading ${subQuizName}...`;
+    dom.offlineStatus.style.display = 'block'; 
+
+    try {
+        let testDocRef = db.collection('weeklyTestsdocs').doc(subQuizId);
+        let testDoc = await testDocRef.get();
+        let questionsSnapshot;
+
+        if (!testDoc.exists) {
+            console.warn(`Test not found in 'weeklyTestsdocs'. Trying 'quizzes'...`);
+            testDocRef = db.collection('quizzes').doc(subQuizId);
+            testDoc = await testDocRef.get();
+            if (!testDoc.exists) {
+                throw new Error(`Test not found: ${subQuizId}`);
+            }
+        }
+
+        console.log(`Loading sub-test from: ${testDocRef.path}`);
+        testMetadata = testDoc.data();
+
+        questionsSnapshot = await testDocRef.collection('questions').get();
+        questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        if (questions.length === 0) throw new Error("This test has no questions.");
+
+        dom.instructionsTitle.textContent = `${subQuizName} - Instructions`;
+        dom.totalQuestionsEl.textContent = testMetadata.totalQuestions || questions.length;
+        dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes} Minutes</strong>.`;
+        
+        timeLeft = testMetadata.durationMinutes * 60;
+        dom.timer.textContent = formatTime(timeLeft);
+        
+        window.addEventListener('online', validateStartConditions);
+        window.addEventListener('offline', validateStartConditions);
+        validateStartConditions(); 
+
+    } catch (error) {
+        console.error("Failed to load sub-test:", error);
+        handleLoadError(error);
+    }
+}
+
+function handleLoadError(error) {
+     document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>Could not load question data. Missing or insufficient permissions.</p><p style="font-size:0.8em; color:#666; margin-top:10px;">${error.message}</p><a href="#" onclick="window.location.reload()" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Try Again</a></div></div>`;
+}
+
+// =====================================================================
+// ============ START: RESULT SAVING LOGIC =============================
+// =====================================================================
+
+async function saveResultToFirestore(scoreData) {
+    const syncStatusEl = dom.syncStatus;
+    if (!currentUser) {
+        console.error("User not logged in. Cannot save result.");
+        syncStatusEl.textContent = 'Error: User not logged in.';
+        syncStatusEl.className = 'error';
+        return;
+    }
+    const userId = currentUser.uid;
+    syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
+    syncStatusEl.className = 'syncing';
+    const historyCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testHistory");
+    const testId = new URLSearchParams(window.location.search).get('testId');
+    const docId = `${testId}_history_${Date.now()}`;
+    const percentage = scoreData.totalQuestions > 0 ? (scoreData.correctCount / scoreData.totalQuestions) * 100 : 0;
+    try {
+        await historyCollectionRef.doc(docId).set({
+            testId: testId,
+            testName: testMetadata.testName,
+            subject: testMetadata.subject,
+            testSet: testMetadata.testSet || 'A',
+            score: scoreData.totalScore,
+            correctAnswers: scoreData.correctCount,
+            totalQuestions: scoreData.totalQuestions,
+            percentage: percentage,
+            userAnswers: state.answers,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
+        console.log("Result saved to 'testHistory' collection.");
+        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. View on your dashboard.`;
+        syncStatusEl.className = 'synced';
+    } catch (error) {
+        console.error("Error writing result to Firestore: ", error);
+        syncStatusEl.textContent = 'Error saving result.';
+        syncStatusEl.className = 'error';
+    }
+}
 
-        function initExam() {
-            document.getElementById('exam-container').classList.remove('hidden');
-            startTimer(testData.durationMinutes || 50);
-            renderQuestion();
-            renderPalette();
-        }
+async function saveWeeklyTestProgress(scoreBreakdown) {
+    console.log("Saving weekly test progress...");
 
-        function renderQuestion() {
-            const q = questions[currentIndex];
-            document.getElementById('q-progress').textContent = `Question ${currentIndex + 1} of ${questions.length}`;
-            document.getElementById('question-text').textContent = q.text;
+    // 1. Update the global progress object
+    completedSubTests.add(currentSubQuizId);
+    weeklyProgress.completedSubTests = Array.from(completedSubTests);
+    
+    const existingResultIndex = weeklyProgress.subTestResults.findIndex(r => r.quizId === currentSubQuizId);
+    if (existingResultIndex > -1) {
+        console.warn("Result for this sub-test already exists. Overwriting.");
+        weeklyProgress.subTestResults[existingResultIndex] = { quizId: currentSubQuizId, testName: testMetadata.testName, ...scoreBreakdown };
+    } else {
+        weeklyProgress.subTestResults.push({ quizId: currentSubQuizId, testName: testMetadata.testName, ...scoreBreakdown });
+    }
+
+    // 2. Recalculate totals
+    weeklyProgress.totalScore = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.totalScore, 0);
+    weeklyProgress.totalCorrect = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.correctCount, 0);
+    weeklyProgress.totalIncorrect = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.incorrectCount, 0);
+    weeklyProgress.totalQuestions = weeklyProgress.subTestResults.reduce((acc, r) => acc + r.totalQuestions, 0);
+
+    // 3. Save to localStorage (This is the critical OFFLINE save)
+    try {
+        localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+        console.log("Progress saved to localStorage.");
+    } catch (e) {
+        console.error("Failed to save to localStorage!", e);
+        dom.submittingTitle.textContent = "Error!";
+        dom.submittingSpinner.style.display = 'none';
+        dom.submittingMessage.textContent = "Could not save progress locally. Storage may be full.";
+        return;
+    }
+
+    // 4. Check if all tests are now done
+    if (completedSubTests.size === weeklySubTests.length) {
+        console.log("All sub-tests completed!");
+        weeklyProgress.status = 'completed';
+        localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
+        
+        dom.submittingTitle.textContent = "Weekly Test Complete!";
+        dom.submittingTestName.textContent = weeklyTestTitle;
+        dom.submittingSpinner.style.display = 'none';
+        dom.submittingSuccess.style.display = 'block';
+        dom.submittingMessage.textContent = "Calculating your final score...";
+
+        setTimeout(async () => {
+            dom.submittingScreen.style.display = 'none';
+            // *** FIX: Call ASYNC function ***
+            await showWeeklyTestFinalResult(weeklyProgress);
+        }, 2500);
+
+    } else {
+        // Not finished yet
+        dom.submittingTitle.textContent = "Section Submitted!";
+        dom.submittingSpinner.style.display = 'none';
+        dom.submittingSuccess.style.display = 'block';
+        dom.submittingMessage.textContent = "Returning to sections...";
+        
+        setTimeout(() => {
+            isTestCompleted = false;
+            currentSubQuizId = null;
+            state = {};
+            questions = [];
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('currentSubQuizId');
             
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-            q.options.forEach((opt, i) => {
-                const btn = document.createElement('div');
-                btn.className = `option-card glass-panel p-5 rounded-2xl cursor-pointer font-semibold text-slate-700 ${userAnswers[currentIndex] === i ? 'selected-option' : ''}`;
-                btn.innerHTML = `<span class="mr-4 opacity-50 font-black">${String.fromCharCode(65 + i)}.</span> ${opt}`;
-                btn.onclick = () => {
-                    userAnswers[currentIndex] = i;
-                    renderQuestion();
-                    renderPalette();
-                };
-                container.appendChild(btn);
+            dom.submittingScreen.style.display = 'none';
+            showChapterSelectionScreen();
+        }, 2500);
+    }
+    
+    // 5. (In Background) Try to sync to Firestore
+    if (weeklyTestAttemptRef && navigator.onLine) {
+        weeklyTestAttemptRef.set(weeklyProgress, { merge: true })
+            .then(() => console.log("Progress successfully synced to Firestore in background."))
+            .catch(err => console.warn("Failed to sync progress to Firestore in background:", err.message));
+    } else {
+        console.log("User is offline. Progress saved locally. Will sync when 'Save & Finish' is clicked.");
+    }
+}
+// =====================================================================
+// ============ END: RESULT SAVING LOGIC ===============================
+// =====================================================================
+
+
+// ### STAGE 3: MAIN TEST LOGIC ###
+function initTest() {
+    resetState();
+    isTestCompleted = false;
+    dom.showAnswerWritingTab.classList.add('locked');
+    if (state.visited.length > 0) state.visited[0] = true;
+    resetStopwatch();
+    setView('mockTest');
+    loadQuestion(0);
+    startTimer();
+}
+function resetState() {
+    state = { current: 0, answers: Array(questions.length).fill(null), marked: Array(questions.length).fill(false), visited: Array(questions.length).fill(false) };
+}
+function setView(viewName) {
+    dom.mockTestWrapper.style.display = 'none';
+    dom.resultScreenWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.answerWritingWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.timer.style.display = 'none';
+    dom.stopwatchWrapper.style.display = 'none';
+    dom.mainContent.style.display = 'none'; 
+
+    dom.showMockTestTab.classList.remove('active');
+    dom.showAnswerWritingTab.classList.remove('active');
+    clearInterval(animationInterval);
+
+    if (viewName === 'mockTest') {
+        dom.showMockTestTab.classList.add('active');
+        dom.mainContent.style.display = 'flex';
+        
+        if (isTestCompleted) {
+            const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+            const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+            showResultScreen(breakdown, topicStats);
+        } else {
+            dom.timer.style.display = 'block';
+            dom.mockTestWrapper.style.display = 'flex';
+            dom.mcqFooter.style.display = 'block';
+            dom.sidebar.style.display = 'flex';
+        }
+    } else if (viewName === 'answerWriting') {
+        if (dom.showAnswerWritingTab.classList.contains('locked')) {
+            setView('mockTest');
+            return;
+        }
+        dom.showAnswerWritingTab.classList.add('active');
+        dom.stopwatchWrapper.style.display = 'flex';
+        dom.answerWritingWrapper.style.display = 'flex';
+        dom.mainContent.style.display = 'flex';
+    }
+}
+function loadQuestion(index) {
+    state.current = index;
+    if (!state.visited[index]) { state.visited[index] = true; }
+    startQuestionTimer();
+    const q = questions[index];
+    dom.questionNumber.textContent = `Question ${index + 1}`;
+    dom.questionText.textContent = q.text;
+    dom.optionsList.innerHTML = '';
+    q.options.forEach((opt, i) => {
+        const li = document.createElement('li');
+        li.className = 'option';
+        if (state.answers[index] === i) li.classList.add('selected');
+        li.innerHTML = `<span class="option-radio"></span><span class="option-text">${opt}</span>`;
+        li.onclick = () => selectOption(i);
+        dom.optionsList.appendChild(li);
+    });
+    dom.btnSubmitTest.style.display = (state.current === questions.length - 1) ? 'flex' : 'none';
+    updatePalette();
+    updateNavigationButtons();
+}
+function selectOption(optIndex) {
+    state.answers[state.current] = optIndex;
+    dom.optionsList.querySelectorAll('.option').forEach((opt, i) => opt.classList.toggle('selected', i === optIndex));
+    updatePalette();
+}
+function handleSaveAndNext() {
+    if (isTestCompleted) return;
+    if (state.current < questions.length - 1) {
+        loadQuestion(state.current + 1);
+    } else {
+        submitTest(false); 
+    }
+}
+function handleMarkAndNext() {
+    if (isTestCompleted) return;
+    state.marked[state.current] = !state.marked[state.current];
+    updatePalette();
+}
+function handleClearResponse() {
+    state.answers[state.current] = null;
+    dom.optionsList.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected'));
+    updatePalette();
+}
+
+async function submitTest(isForced = false) {
+    if (isTestCompleted) return;
+    if (!isForced) {
+        let confirmMsg = isWeeklyTest ? "Are you sure you want to submit this section?" : "Are you sure you want to submit the test?";
+        if (!confirm(confirmMsg)) return;
+    }
+    stopTimer();
+    isTestCompleted = true; 
+    window.removeEventListener('online', forceSubmitOnReconnect);
+    dom.showAnswerWritingTab.classList.remove('locked');
+    
+    const scoreBreakdown = calculateScoreBreakdown();
+    const topicStats = calculateTopicStats();
+    
+    localStorage.setItem('testTaken', 'true'); 
+    localStorage.setItem('lastAnswers', JSON.stringify(state.answers));
+    localStorage.setItem('scoreBreakdown', JSON.stringify(scoreBreakdown));
+    localStorage.setItem('topicStats', JSON.stringify(topicStats));
+
+    if (isWeeklyTest) {
+        completedSubTests.add(currentSubQuizId);
+        localStorage.setItem('currentSubQuizId', currentSubQuizId);
+        
+        dom.examUIWrapper.style.display = 'none';
+        dom.submittingScreen.style.display = 'flex';
+        dom.submittingTitle.textContent = "Submitting Section...";
+        dom.submittingTestName.textContent = testMetadata.testName;
+        dom.submittingSpinner.style.display = 'block';
+        dom.submittingSuccess.style.display = 'none';
+        dom.submittingMessage.textContent = "Saving your progress...";
+
+        // The save function now handles showing the next screen
+        await saveWeeklyTestProgress(scoreBreakdown); 
+        
+    } else {
+        // This is for single tests, logic is unchanged
+        saveResultToFirestore(scoreBreakdown);
+        showResultScreen(scoreBreakdown, topicStats);
+    }
+}
+
+function calculateScoreBreakdown() {
+    let correctCount = 0, incorrectCount = 0;
+    state.answers.forEach((ans, i) => {
+        if (!questions[i]) return; 
+        if (ans !== null) {
+            if (ans === questions[i].answer) correctCount++;
+            else incorrectCount++;
+        }
+    });
+    const unattemptedCount = questions.length - correctCount - incorrectCount;
+    const totalScore = correctCount - incorrectCount;
+    return {
+        correctCount, incorrectCount, unattemptedCount,
+        totalScore, totalQuestions: questions.length,
+        correctMarks: correctCount * 1, incorrectMarks: incorrectCount * -1,
+    };
+}
+function updatePalette() {
+    dom.questionPalette.innerHTML = '';
+    let answered = 0, notAnswered = 0, marked = 0, notVisited = 0;
+    questions.forEach((_, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'question-number';
+        const isAnswered = state.answers[i] !== null;
+        const isMarked = state.marked[i];
+        if(isAnswered && isMarked) btn.classList.add('marked-answered');
+        else if(isAnswered) btn.classList.add('answered');
+        else if(isMarked) btn.classList.add('marked');
+        else if(state.visited[i]) btn.classList.add('not-answered');
+        else btn.classList.add('not-visited');
+        if (i === state.current) btn.classList.add('current');
+        
+        if (isAnswered) answered++;
+        if (isMarked) marked++;
+        if (!state.visited[i]) notVisited++;
+        
+        btn.textContent = i + 1;
+        btn.onclick = () => { if (!isTestCompleted) loadQuestion(i); };
+        dom.questionPalette.appendChild(btn);
+    });
+    notAnswered = state.visited.filter(v => v).length - answered;
+    dom.summaryAnswered.textContent = answered;
+    dom.summaryMarked.textContent = marked;
+    dom.summaryNotAnswered.textContent = notAnswered;
+    dom.summaryNotVisited.textContent = notVisited;
+}
+function updateNavigationButtons() {
+    dom.btnPrevQuestion.disabled = state.current === 0;
+    dom.btnSaveNext.querySelector('span').textContent = (state.current === questions.length - 1) ? "Save & Finish" : "Save & Next";
+}
+function formatTime(totalSeconds) {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const seconds = totalSeconds % 60;
+    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+function startTimer() {
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            alert("Time's up! The test will be submitted automatically.");
+            submitTest(true);
+            return;
+        }
+        timeLeft--;
+        dom.timer.textContent = formatTime(timeLeft);
+    }, 1000);
+}
+function startQuestionTimer() {
+    if (onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+    onTimerEnd = () => handleSaveAndNext();
+    dom.questionTimerBar.style.transition = 'none';
+    dom.questionTimerBar.style.width = '100%';
+    void dom.questionTimerBar.offsetWidth;
+    dom.questionTimerBar.style.transition = `width ${PER_QUESTION_TIME}s linear`;
+    dom.questionTimerBar.style.width = '0%';
+    dom.questionTimerBar.addEventListener('transitionend', onTimerEnd, { once: true });
+}
+function stopTimer() {
+    clearInterval(timerInterval);
+    if(onTimerEnd) dom.questionTimerBar.removeEventListener('transitionend', onTimerEnd);
+    dom.questionTimerBar.style.transition = 'none';
+}
+function toggleStopwatch() {
+    const icon = dom.stopwatchPlayPause.querySelector('i');
+    if (isStopwatchRunning) {
+        clearInterval(stopwatchInterval);
+        icon.classList.replace('fa-pause', 'fa-play');
+    } else {
+        stopwatchInterval = setInterval(() => {
+            stopwatchTime++;
+            dom.stopwatchDisplay.textContent = formatTime(stopwatchTime);
+        }, 1000);
+        icon.classList.replace('fa-play', 'fa-pause');
+    }
+    isStopwatchRunning = !isStopwatchRunning;
+}
+function resetStopwatch() {
+    clearInterval(stopwatchInterval);
+    isStopwatchRunning = false;
+    stopwatchTime = 0;
+    dom.stopwatchDisplay.textContent = formatTime(0);
+    const icon = dom.stopwatchPlayPause.querySelector('i');
+    if(icon) {
+       icon.classList.replace('fa-pause', 'fa-play');
+    }
+}
+function toggleDarkMode(isDark) {
+    dom.body.classList.toggle('dark', isDark);
+    dom.toggleLabel.textContent = isDark ? 'Light' : 'Dark';
+    if (isTestCompleted && performanceChart) {
+        // *** FIX: Re-pass the correct data ***
+        const topicStats = JSON.parse(localStorage.getItem('topicStats')) || calculateAggregatedTopicStats();
+        renderPerformanceChart(topicStats);
+    }
+}
+function updateSidebarPosition() {
+    const headerHeight = dom.siteHeader.offsetHeight;
+    const topbarHeight = dom.topbar.offsetHeight;
+    const totalHeaderHeight = headerHeight + topbarHeight;
+    dom.sidebar.style.top = `${totalHeaderHeight}px`;
+    dom.sidebar.style.height = `calc(100% - ${totalHeaderHeight}px)`;
+}
+
+function showResultScreen(breakdown, topicStats) {
+    dom.mockTestWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.btnSubmitTest.style.display = 'none';
+    dom.resultScreenWrapper.style.display = 'flex';
+    
+    dom.resultScreenTitle.textContent = "Test Completed!";
+    dom.resultScreenSubtitle.textContent = "Here is your score summary:";
+
+    if (breakdown) {
+         dom.totalPossibleScore.textContent = breakdown.totalQuestions;
+         animateScorecard(breakdown);
+    }
+    
+    const resultButtons = dom.resultButtonsContainer;
+    resultButtons.innerHTML = ''; 
+
+    if (isWeeklyTest) {
+        resultButtons.innerHTML += `<button id="backToChaptersBtn" class="submit-button btn-action"><i class="fas fa-arrow-left"></i> Back to Sections</button>`;
+    }
+    
+    resultButtons.innerHTML += `<button id="retestButton" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest</button>`;
+    resultButtons.innerHTML += `<button id="reviewAnswersButton" class="submit-button btn-action"><i class="fas fa-search"></i> Review Answers</button>`;
+    
+    populatePerformanceTable(topicStats);
+    setTimeout(() => renderPerformanceChart(topicStats), 100);
+}
+
+// *** MODIFIED: This function is now ASYNC and fetches question data ***
+async function showWeeklyTestFinalResult(finalProgress) {
+    console.log("Showing final weekly test results:", finalProgress);
+    dom.mockTestWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'none';
+    dom.mcqFooter.style.display = 'none';
+    dom.sidebar.style.display = 'none';
+    dom.btnSubmitTest.style.display = 'none';
+    dom.chapterSelectionWrapper.style.display = 'none';
+    dom.examUIWrapper.style.display = 'flex';
+    dom.mainContent.style.display = 'flex';
+    dom.resultScreenWrapper.style.display = 'flex';
+
+    dom.resultScreenTitle.textContent = `${weeklyTestTitle} Completed!`;
+    dom.resultScreenSubtitle.textContent = "Here is your final consolidated score:";
+
+    const finalScoreBreakdown = {
+      correctCount: finalProgress.totalCorrect,
+      incorrectCount: finalProgress.totalIncorrect,
+      unattemptedCount: finalProgress.totalQuestions - (finalProgress.totalCorrect + finalProgress.totalIncorrect),
+      totalScore: finalProgress.totalScore,
+      totalQuestions: finalProgress.totalQuestions,
+      correctMarks: finalProgress.totalCorrect * 1,
+      incorrectMarks: finalProgress.totalIncorrect * -1,
+    };
+
+    // --- NEW: Aggregate topic stats ---
+    let topicStats = {};
+    try {
+        topicStats = await calculateAggregatedTopicStats();
+        localStorage.setItem('topicStats', JSON.stringify(topicStats)); // Save for dark mode toggle
+    } catch (error) {
+        console.error("Failed to aggregate topic stats:", error);
+    }
+    // --- END NEW ---
+
+    dom.totalPossibleScore.textContent = finalScoreBreakdown.totalQuestions;
+    animateScorecard(finalScoreBreakdown);
+
+    const resultButtons = dom.resultButtonsContainer;
+    resultButtons.innerHTML = '';
+    
+    const retestButtonHtml = `<button id="retestWeeklyTestBtn" class="submit-button btn-action"><i class="fas fa-redo"></i> Retest Full Test</button>`;
+    const saveButtonHtml = `<button id="saveAndFinishBtn" class="submit-button btn-action"><i class="fas fa-save"></i> Save & Finish Test</button>`;
+
+    if (finalProgress.status === 'completed-synced') {
+        dom.syncStatus.innerHTML = `<i class="fas fa-check-circle"></i> Your final results are saved.`;
+        dom.syncStatus.className = 'synced';
+        resultButtons.innerHTML += retestButtonHtml;
+    } else {
+        dom.syncStatus.innerHTML = `<i class="fas fa-exclamation-triangle"></i> Your final results are saved locally. Connect to the internet and click 'Save' to sync to your account.`;
+        dom.syncStatus.className = 'error'; 
+        resultButtons.innerHTML += saveButtonHtml;
+        resultButtons.innerHTML += retestButtonHtml;
+        const retestBtn = document.getElementById('retestWeeklyTestBtn');
+        if(retestBtn) retestBtn.style.display = 'none';
+    }
+
+    populatePerformanceTable(topicStats); 
+    renderPerformanceChart(topicStats);
+}
+
+function animateScorecard(data) {
+    let current = { correctCount: 0, incorrectCount: 0, unattemptedCount: 0, correctMarks: 0, incorrectMarks: 0, totalScore: 0 };
+    const animationSpeed = 20;
+    const duration = 1200;
+    const steps = duration / animationSpeed;
+    const stepValues = {};
+    for (const key in current) {
+        if(data[key] === undefined) data[key] = 0;
+        stepValues[key] = (data[key] - current[key]) / steps;
+    }
+    clearInterval(animationInterval);
+    animationInterval = setInterval(() => {
+        let finished = true;
+        for (const key in current) {
+            if (Math.abs(current[key] - data[key]) > Math.abs(stepValues[key])) {
+                current[key] += stepValues[key];
+                finished = false;
+            } else {
+                current[key] = data[key];
+            }
+        }
+        dom.correctCount.textContent = Math.round(current.correctCount);
+        dom.correctMarks.textContent = `${Math.round(current.correctMarks) > 0 ? '+' : ''}${Math.round(current.correctMarks)}`;
+        dom.incorrectCount.textContent = Math.round(current.incorrectCount);
+        dom.incorrectMarks.textContent = Math.round(current.incorrectMarks);
+        dom.unattemptedCount.textContent = Math.round(current.unattemptedCount);
+        dom.finalScoreAnimated.textContent = Math.round(current.totalScore);
+        if(finished) clearInterval(animationInterval);
+    }, animationSpeed);
+}
+function calculateTopicStats() {
+    const topicStats = {};
+    const localAnswers = state.answers.length > 0 ? state.answers : JSON.parse(localStorage.getItem('lastAnswers'));
+    if (!localAnswers || !questions || questions.length === 0) return {};
+    
+    questions.forEach((q, i) => {
+        if (!q) return; 
+        const topic = q.topic || 'Uncategorized';
+        if (!topicStats[topic]) { topicStats[topic] = { correct: 0, attempted: 0 }; }
+        if (localAnswers[i] !== null) {
+            topicStats[topic].attempted++;
+            if (localAnswers[i] === q.answer) { topicStats[topic].correct++; }
+        }
+    });
+    return topicStats;
+}
+
+// *** NEW FUNCTION: Aggregates stats for the FINAL weekly result ***
+async function calculateAggregatedTopicStats() {
+    const allTopicStats = {};
+    if (!weeklyProgress || !weeklyProgress.subTestResults) return {};
+
+    for (const subtest of weeklyProgress.subTestResults) {
+        const userAnswers = subtest.userAnswers;
+        
+        // Fetch the questions for this subtest
+        let testDocRef = db.collection('weeklyTestsdocs').doc(subtest.quizId);
+        let testDoc = await testDocRef.get();
+        if (!testDoc.exists) {
+            testDocRef = db.collection('quizzes').doc(subtest.quizId);
+            testDoc = await testDocRef.get();
+        }
+        
+        if (testDoc.exists) {
+            const questionsSnapshot = await testDocRef.collection('questions').get();
+            const subtestQuestions = questionsSnapshot.docs.map(doc => doc.data());
+            
+            subtestQuestions.forEach((q, i) => {
+                const topic = q.topic || 'Uncategorized';
+                if (!allTopicStats[topic]) {
+                    allTopicStats[topic] = { correct: 0, attempted: 0 };
+                }
+                if (userAnswers[i] !== null) {
+                    allTopicStats[topic].attempted++;
+                    if (userAnswers[i] === q.answer) {
+                        allTopicStats[topic].correct++;
+                    }
+                }
             });
+        }
+    }
+    return allTopicStats;
+}
+
+function populatePerformanceTable(topicStats) {
+    dom.performanceTableBody.innerHTML = '';
+    if (!topicStats || Object.keys(topicStats).length === 0) {
+        dom.performanceTableBody.innerHTML = '<tr><td colspan="4">Topic analysis not available for this test.</td></tr>';
+        return;
+    };
+    Object.keys(topicStats).sort().forEach(topicName => {
+        const stats = topicStats[topicName];
+        const accuracy = stats.attempted > 0 ? Math.round((stats.correct / stats.attempted) * 100) : 0;
+        const barColor = accuracy > 75 ? '#4caf50' : accuracy >= 40 ? '#ff9800' : '#f44336';
+        const row = `<tr><td>${topicName}</td><td>${stats.correct}</td><td>${stats.attempted}</td><td><div class="accuracy-bar-container"><div class="accuracy-bar" style="width: ${accuracy}%; background-color: ${barColor};"></div><span class="accuracy-text">${accuracy}%</span></div></td></tr>`;
+        dom.performanceTableBody.innerHTML += row;
+    });
+}
+function renderPerformanceChart(topicStats) {
+    if (performanceChart) performanceChart.destroy();
+    if (!topicStats || Object.keys(topicStats).length === 0) return;
+    const isDark = dom.body.classList.contains('dark');
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+    const textColor = isDark ? 'rgba(255, 255, 255, 0.7)' : '#666';
+    const labels = Object.keys(topicStats).sort();
+    const correctData = labels.map(label => topicStats[label].correct);
+    const attemptedData = labels.map(label => topicStats[label].attempted);
+    
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    performanceChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Correct',
+                    data: correctData,
+                    backgroundColor: isDark ? 'rgba(75, 192, 192, 0.5)' : 'rgba(75, 192, 192, 0.8)',
+                    borderColor: isDark ? 'rgb(75, 192, 192)' : 'rgb(75, 192, 192)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Attempted',
+                    data: attemptedData,
+                    backgroundColor: isDark ? 'rgba(255, 159, 64, 0.5)' : 'rgba(255, 159, 64, 0.8)',
+                    borderColor: isDark ? 'rgb(255, 159, 64)' : 'rgb(255, 159, 64)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { ticks: { color: textColor }, grid: { color: gridColor } },
+                y: { type: 'linear', position: 'left', title: { display: true, text: 'Number of Questions', color: textColor }, ticks: { color: textColor, precision: 0 }, grid: { color: gridColor }, beginAtZero: true },
+            },
+            plugins: { legend: { labels: { color: textColor } } }
+        }
+    });
+}
+function showReviewScreen() {
+    dom.resultScreenWrapper.style.display = 'none';
+    dom.reviewScreenWrapper.style.display = 'flex';
+    populateReviewScreen();
+}
+function populateReviewScreen() {
+    dom.reviewContainer.innerHTML = '';
+    const userAnswers = JSON.parse(localStorage.getItem('lastAnswers'));
+    if (!userAnswers || !questions || questions.length === 0) {
+        dom.reviewContainer.innerHTML = '<p>Could not load review data. Please try again.</p>';
+        return;
+    }
+    questions.forEach((q, index) => {
+        const userAnswer = userAnswers[index];
+        const correctAnswer = q.answer;
+        const isCorrect = userAnswer === correctAnswer;
+        let optionsHTML = '';
+        q.options.forEach((opt, optIndex) => {
+            let classes = 'review-option';
+            let icon = '<i class="far fa-circle"></i>';
+            if (optIndex === correctAnswer) { classes += ' review-correct'; icon = '<i class="fas fa-check-circle"></i>'; }
+            if (optIndex === userAnswer && !isCorrect) { classes += ' review-incorrect'; icon = '<i class="fas fa-times-circle"></i>'; }
+            optionsHTML += `<li class="${classes}">${icon}<span>${opt}</span></li>`;
+        });
+        let statusHTML = '';
+        if (userAnswer === null) { statusHTML = '<div class="review-status unanswered">Status: Unanswered</div>'; } 
+        else if (isCorrect) { statusHTML = '<div class="review-status correct">Status: Correct</div>'; } 
+        else { statusHTML = '<div class="review-status incorrect">Status: Incorrect</div>'; }
+        const explanationHTML = q.explanation ? `<div class="review-explanation"><strong>Explanation:</strong> ${q.explanation}</div>` : '';
+        const questionDiv = document.createElement('div');
+        questionDiv.className = 'review-question';
+        questionDiv.innerHTML = `<h4>Q${index + 1}: ${q.text}</h4><ul class="review-option-list">${optionsHTML}</ul>${statusHTML}${explanationHTML}`;
+        dom.reviewContainer.appendChild(questionDiv);
+    });
+}
+
+// *** MODIFIED: Restore offline check for retest ***
+function handleRetest() {
+    if (navigator.onLine) {
+        dom.passwordError.textContent = 'Please enable Aeroplane Mode to retest.';
+        return;
+    }
+    if (dom.passwordRetestInput.value === RETEST_PASSWORD) {
+        localStorage.removeItem('testTaken');
+        localStorage.removeItem('lastAnswers');
+        localStorage.removeItem('scoreBreakdown');
+        localStorage.removeItem('topicStats');
+        localStorage.removeItem('currentSubQuizId');
+        
+        // Clear weekly progress ONLY if it's a single test
+        if (!isWeeklyTest && weeklyProgressKey) {
+             localStorage.removeItem(weeklyProgressKey);
+        }
+        
+        location.reload(); 
+    } else {
+        dom.passwordError.textContent = 'Incorrect password.';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const storedTheme = localStorage.getItem('theme');
+    if (storedTheme === 'dark') {
+        dom.darkModeToggle.checked = true;
+        toggleDarkMode(true);
+    }
+    const phone = "918658567727";
+    const message = "I need the password for the mock test.";
+    dom.whatsappLink.href = `https://api.whatsapp.com/send?phone=${phone}&text=${encodeURIComponent(message)}`;
+    
+    dom.loginBtn.addEventListener('click', handleLogin);
+    dom.startExamBtn.addEventListener('click', startExam);
+    dom.agreementCheckbox.addEventListener('change', validateStartConditions);
+    dom.btnSaveNext.addEventListener('click', handleSaveAndNext);
+    dom.btnPrevQuestion.addEventListener('click', () => { if (state.current > 0 && !isTestCompleted) loadQuestion(state.current - 1); });
+    dom.btnMarkReview.addEventListener('click', handleMarkAndNext);
+    dom.btnClearResponse.addEventListener('click', handleClearResponse);
+    dom.btnSubmitTest.addEventListener('click', () => submitTest(false));
+    dom.sidebarToggle.addEventListener('click', () => document.body.classList.toggle('sidebar-open'));
+    dom.darkModeToggle.addEventListener('change', (e) => {
+        toggleDarkMode(e.target.checked);
+        localStorage.setItem('theme', e.target.checked ? 'dark' : 'light');
+    });
+    
+    document.addEventListener('click', (e) => {
+        const target = e.target;
+        
+        if (target.id === 'retestButton' || target.closest('#retestButton')) {
+            dom.passwordModal.style.display = 'flex';
+        }
+        
+        if (target.id === 'reviewAnswersButton' || target.closest('#reviewAnswersButton')) {
+            showReviewScreen();
+        }
+        
+        if (target.id === 'backToChaptersBtn' || target.closest('#backToChaptersBtn')) {
+            isTestCompleted = false;
+            currentSubQuizId = null;
+            state = {};
+            questions = [];
             
-            document.getElementById('prev-btn').disabled = currentIndex === 0;
-            document.getElementById('next-btn').textContent = currentIndex === questions.length - 1 ? 'Finish' : 'Save & Next';
-        }
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('lastAnswers');
+            localStorage.removeItem('scoreBreakdown');
+            localStorage.removeItem('topicStats');
+            localStorage.removeItem('currentSubQuizId');
 
-        function renderPalette() {
-            const palette = document.getElementById('palette');
-            palette.innerHTML = '';
-            questions.forEach((_, i) => {
-                const dot = document.createElement('div');
-                dot.className = `h-10 w-10 flex items-center justify-center rounded-xl text-[10px] font-black cursor-pointer transition-all ${currentIndex === i ? 'ring-2 ring-blue-600 ring-offset-2' : ''} ${userAnswers[i] !== null ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400'}`;
-                dot.textContent = i + 1;
-                dot.onclick = () => { currentIndex = i; renderQuestion(); renderPalette(); };
-                palette.appendChild(dot);
-            });
+            dom.resultScreenWrapper.style.display = 'none';
+            dom.examUIWrapper.style.display = 'none'; 
+            showChapterSelectionScreen(); 
         }
-
-        async function submitExam() {
-            clearInterval(timer);
-            let score = 0;
-            questions.forEach((q, i) => { if (userAnswers[i] === q.answer) score++; });
+        
+        if (target.id === 'saveAndFinishBtn' || target.closest('#saveAndFinishBtn')) {
+            if (!navigator.onLine) {
+                alert("Please connect to the internet to save your final results.");
+                return;
+            }
+            if (!weeklyTestAttemptRef) {
+                if (currentUser && mainTestId) {
+                    weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
+                } else {
+                    alert("Error: Cannot find test progress reference. Please refresh.");
+                    return;
+                }
+            }
             
-            const percent = Math.round((score / questions.length) * 100);
+            target.disabled = true;
+            target.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving...`;
             
-            // 2. Save Results to Firestore
-            const userId = auth.currentUser.uid;
-            await db.collection('users').doc(userId).collection('testHistory').add({
-                testId: testData.id || new URLSearchParams(window.location.search).get('testId'),
-                testName: testData.testName,
-                subject: testData.subject || "Polity",
-                score: score,
-                totalScore: questions.length,
-                percentage: percent,
-                timestamp: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            weeklyProgress.status = 'completed-synced'; 
+            
+            weeklyTestAttemptRef.set(weeklyProgress)
+                .then(() => {
+                    console.log("Weekly test progress SAVED to Firestore.");
+                    dom.syncStatus.textContent = "Your results are saved to your account.";
+                    dom.syncStatus.className = 'synced';
+                    target.textContent = "Saved!";
+                    localStorage.removeItem(weeklyProgressKey); 
+                    target.style.display = 'none';
+                    
+                    const retestBtn = document.getElementById('retestWeeklyTestBtn');
+                    if(retestBtn) retestBtn.style.display = 'flex';
+                })
+                .catch(err => {
+                    console.error("Error saving final progress: ", err);
+                    alert("Error saving progress. Please try again.");
+                    target.disabled = false;
+                    target.innerHTML = `<i class="fas fa-save"></i> Save & Finish Test`;
+                    weeklyProgress.status = 'completed'; // Revert status
+                });
+        }
+        
+        if (target.id === 'retestWeeklyTestBtn' || target.closest('#retestWeeklyTestBtn')) {
+             if (confirm("Are you sure you want to retest this entire weekly test? All your progress will be deleted.")) {
+                if (weeklyTestAttemptRef && navigator.onLine) {
+                    weeklyTestAttemptRef.delete().then(() => {
+                        console.log("Weekly test progress deleted from Firestore.");
+                        localStorage.removeItem(weeklyProgressKey);
+                        location.reload();
+                    }).catch(err => {
+                        console.error("Error deleting progress: ", err);
+                        alert("Could not delete progress. Check connection.");
+                    });
+                } else if (!navigator.onLine) {
+                    alert("Please connect to the internet to clear your test progress from your account.");
+                } else {
+                     localStorage.removeItem(weeklyProgressKey);
+                     location.reload();
+                }
+             }
+        }
+    });
 
-            document.getElementById('res-score').textContent = score;
-            document.getElementById('res-percent').textContent = `${percent}%`;
-            document.getElementById('result-modal').classList.remove('hidden');
+    dom.backToResultsBtn.addEventListener('click', () => {
+        const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+        const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+        showResultScreen(breakdown, topicStats);
+    });
+    dom.closeModal.addEventListener('click', () => { dom.passwordModal.style.display = 'none'; });
+    dom.verifyPasswordButton.addEventListener('click', handleRetest);
+    dom.stopwatchPlayPause.addEventListener('click', toggleStopwatch);
+    dom.stopwatchReset.addEventListener('click', resetStopwatch);
+    dom.showMockTestTab.addEventListener('click', () => setView('mockTest'));
+    dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
+    window.addEventListener('resize', updateSidebarPosition);
+
+    firebase.auth().onAuthStateChanged(async (user) => {
+        currentUser = user;
+        const params = new URLSearchParams(window.location.search);
+        mainTestId = params.get('testId');
+        
+        if (!mainTestId) {
+            document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
+            return;
         }
 
-        // Timer Logic
-        function startTimer(mins) {
-            let time = mins * 60;
-            timer = setInterval(() => {
-                let m = Math.floor(time / 60);
-                let s = time % 60;
-                document.getElementById('timer').textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-                if (time <= 0) submitExam();
-                time--;
-            }, 1000);
+        if (user) {
+            console.log("Auth state changed: User is signed in.", user.uid);
+            
+            weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
+            
+            const localProgress = JSON.parse(localStorage.getItem(weeklyProgressKey));
+            const isWeeklyCompleted = localProgress && (localProgress.status === 'completed' || localProgress.status === 'completed-synced');
+
+            if (localStorage.getItem('testTaken') === 'true' && !isWeeklyCompleted) {
+                await resumeResultSession();
+            } else {
+                await loadTestFromURL(mainTestId, user);
+            }
+        } else {
+            console.log("Auth state changed: User is signed out.");
+            dom.loginScreen.style.display = 'flex';
+            dom.instructionsScreen.style.display = 'none';
+            dom.chapterSelectionWrapper.style.display = 'none';
+            dom.examUIWrapper.style.display = 'none';
+        }
+    });
+});
+
+async function resumeResultSession() {
+    console.log("Resuming result session...");
+    isTestCompleted = true;
+    dom.showAnswerWritingTab.classList.remove('locked');
+    dom.loginScreen.style.display = 'none';
+    dom.instructionsScreen.style.display = 'none';
+    dom.examUIWrapper.style.display = 'flex'; 
+    dom.body.classList.add('exam-active');
+    updateSidebarPosition();
+    
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get('testId');
+    let testIdToReview = testId; 
+
+    if (currentUser) {
+        weeklyProgressKey = `weeklyProgress_${testId}_${currentUser.uid}`;
+    }
+
+    // *** FIX: Check 'weeklyTests' ***
+    const weeklyTestRef = db.collection('weeklyTests').doc(testId); 
+    const weeklyTestDoc = await weeklyTestRef.get();
+
+    if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
+        console.log("Resuming a weekly test sub-test");
+        isWeeklyTest = true; 
+        mainTestId = testId;
+        weeklyTestTitle = weeklyTestDoc.data().title;
+        weeklySubTests = weeklyTestDoc.data().subTests; 
+        currentSubQuizId = localStorage.getItem('currentSubQuizId'); 
+        
+        if (currentSubQuizId) {
+            completedSubTests.add(currentSubQuizId); 
+            testIdToReview = currentSubQuizId; 
+            
+            weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
+            const localProgress = localStorage.getItem(weeklyProgressKey);
+            if (localProgress) {
+                weeklyProgress = JSON.parse(localProgress);
+            }
+        } else {
+             console.error("Resuming weekly test but no currentSubQuizId found in localStorage.");
+        }
+    } else {
+        console.log("Resuming a single test");
+        isWeeklyTest = false;
+    }
+    
+    const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
+    const topicStats = JSON.parse(localStorage.getItem('topicStats'));
+    
+    setView('mockTest'); 
+    showResultScreen(breakdown, topicStats);
+
+    try {
+        // *** FIX: Check 'weeklyTestsdocs' first, then 'quizzes' ***
+        let testDocRef = db.collection('weeklyTestsdocs').doc(testIdToReview); 
+        let testDoc = await testDocRef.get();
+        let questionsSnapshot;
+        
+        if (!testDoc.exists) {
+            console.warn("Test not in 'weeklyTestsdocs', checking 'quizzes'");
+            testDocRef = db.collection('quizzes').doc(testIdToReview);
+            testDoc = await testDocRef.get();
         }
 
-        document.getElementById('next-btn').onclick = () => {
-            if (currentIndex < questions.length - 1) { currentIndex++; renderQuestion(); renderPalette(); } 
-            else { if(confirm("Submit your session?")) submitExam(); }
-        };
-        document.getElementById('prev-btn').onclick = () => { if (currentIndex > 0) { currentIndex--; renderQuestion(); renderPalette(); } };
-        document.getElementById('submit-btn').onclick = () => { if(confirm("Quit exam?")) submitExam(); };
-    </script>
+        if(testDoc.exists) {
+            testMetadata = testDoc.data(); 
+            questionsSnapshot = await testDocRef.collection('questions').get();
+            questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
+            console.log(`Loaded ${questions.length} questions for review from ${testDocRef.path}.`);
+        } else {
+            console.error("Could not find test document for review:", testIdToReview);
+        }
+    } catch (error) {
+        console.error("Failed to load question data for review:", error);
+    }
+}
+</script>
 </body>
 </html>
