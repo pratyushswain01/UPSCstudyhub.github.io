@@ -803,72 +803,59 @@ function forceSubmitOnReconnect() {
 
 // *** MODIFIED: This function now handles loading from localStorage and Firestore ***
 async function loadTestFromURL(testId, user) {
+    // 1. Reset UI visibility
     dom.loginScreen.style.display = 'none';
-    dom.instructionsScreen.style.display = 'none';
     dom.examUIWrapper.style.display = 'none';
     dom.chapterSelectionWrapper.style.display = 'none';
-    dom.submittingScreen.style.display = 'none'; 
+    dom.submittingScreen.style.display = 'none';
+    
+    // Show the instruction screen as the base for Daily Tests
+    dom.instructionsScreen.style.display = 'flex';
+    dom.instructionsTitle.textContent = 'Loading Test Data...';
 
     try {
-        // *** FIX: Changed to 'weeklyTests' ***
-        const weeklyTestRef = db.collection('weeklyTests').doc(testId);
-        const weeklyTestDoc = await weeklyTestRef.get();
+        console.log(`Loading Daily Test: ${testId}`);
+        
+        // 2. Pointing directly to your root collection 'dailytests'
+        const testDocRef = db.collection('dailytests').doc(testId);
+        const testDoc = await testDocRef.get();
 
-        if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
-            console.log("Loading as Weekly Test Container");
-            isWeeklyTest = true;
-            mainTestId = testId;
-            weeklyTestTitle = weeklyTestDoc.data().title;
-            weeklySubTests = weeklyTestDoc.data().subTests;
-            
-            if (user) {
-                weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
-                weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(user.uid).collection("weeklyTestAttempts").doc(mainTestId);
-                
-                const attemptDoc = await weeklyTestAttemptRef.get();
-                if (attemptDoc.exists && (attemptDoc.data().status === 'completed' || attemptDoc.data().status === 'completed-synced')) {
-                    console.log("Loaded COMPLETED progress from Firestore.");
-                    weeklyProgress = attemptDoc.data();
-                    if(weeklyProgress.status === 'completed') {
-                        weeklyProgress.status = 'completed-synced';
-                        weeklyTestAttemptRef.set(weeklyProgress, {merge: true}).catch(e => console.warn("Sync on load failed", e));
-                    }
-                    completedSubTests = new Set(weeklyProgress.completedSubTests || []);
-                    // *** FIX: Call the ASYNC version ***
-                    await showWeeklyTestFinalResult(weeklyProgress); 
-                    return;
-                }
-
-                const localProgress = localStorage.getItem(weeklyProgressKey);
-                if (localProgress) {
-                    console.log("Loaded IN-PROGRESS from localStorage.");
-                    weeklyProgress = JSON.parse(localProgress);
-                } else if (attemptDoc.exists) {
-                    console.log("Loaded IN-PROGRESS from Firestore (no local data).");
-                    weeklyProgress = attemptDoc.data();
-                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
-                } else {
-                    console.log("No progress found anywhere, starting fresh.");
-                    weeklyProgress = { completedSubTests: [], subTestResults: [], totalScore: 0, totalCorrect: 0, totalIncorrect: 0, totalQuestions: 0, status: 'in-progress' };
-                    completedSubTests = new Set();
-                    localStorage.setItem(weeklyProgressKey, JSON.stringify(weeklyProgress));
-                }
-
-                completedSubTests = new Set(weeklyProgress.completedSubTests || []);
-                showChapterSelectionScreen();
-
-            } else {
-                 completedSubTests = new Set();
-                 showChapterSelectionScreen();
-            }
-            
-        } else {
-            console.log("Loading as Single Test");
-            isWeeklyTest = false;
-            await loadSingleTest(testId);
+        if (!testDoc.exists) {
+            throw new Error("Test not found in the 'dailytests' database.");
         }
+
+        // 3. Set global test metadata
+        testMetadata = { id: testDoc.id, ...testDoc.data() };
+        isWeeklyTest = false; // Ensure weekly logic is disabled
+        mainTestId = testId;
+
+        // 4. Load questions from the sub-collection 'questions'
+        const questionsSnapshot = await testDocRef.collection('questions').get();
+        questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Fallback: If questions are stored as an array in the main document
+        if (questions.length === 0 && testMetadata.questions) {
+            questions = testMetadata.questions;
+        }
+
+        if (questions.length === 0) {
+            throw new Error("This test set contains no questions yet.");
+        }
+
+        // 5. Update the Instructions Screen with actual data
+        dom.instructionsTitle.textContent = `${testMetadata.testName} - Instructions`;
+        dom.totalQuestionsEl.textContent = questions.length;
+        dom.durationEl.innerHTML = `Total Duration: <strong>${testMetadata.durationMinutes || 50} Minutes</strong>.`;
+        
+        // Initialize timer value
+        timeLeft = (testMetadata.durationMinutes || 50) * 60;
+        dom.timer.textContent = formatTime(timeLeft);
+        
+        // 6. Final readiness check
+        validateStartConditions();
+
     } catch (error) {
-        console.error("Failed to load test:", error);
+        console.error("Failed to load Daily Test:", error);
         handleLoadError(error);
     }
 }
@@ -1002,32 +989,47 @@ async function saveResultToFirestore(scoreData) {
         syncStatusEl.className = 'error';
         return;
     }
+
     const userId = currentUser.uid;
-    syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
+    syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Finalizing Analytics...`;
     syncStatusEl.className = 'syncing';
-    const historyCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testHistory");
+
+    // UPDATED PATH: Points to the root 'users' collection as seen in your database
+    const historyCollectionRef = db.collection("users").doc(userId).collection("testHistory");
+    
     const testId = new URLSearchParams(window.location.search).get('testId');
-    const docId = `${testId}_history_${Date.now()}`;
-    const percentage = scoreData.totalQuestions > 0 ? (scoreData.correctCount / scoreData.totalQuestions) * 100 : 0;
+    const docId = `${testId}_${Date.now()}`;
+    
+    // Ensure accurate integer percentage for the dashboard progress bars
+    const percentage = scoreData.totalQuestions > 0 
+        ? Math.round((scoreData.correctCount / scoreData.totalQuestions) * 100) 
+        : 0;
+
     try {
         await historyCollectionRef.doc(docId).set({
             testId: testId,
-            testName: testMetadata.testName,
-            subject: testMetadata.subject,
-            testSet: testMetadata.testSet || 'A',
-            score: scoreData.totalScore,
-            correctAnswers: scoreData.correctCount,
-            totalQuestions: scoreData.totalQuestions,
-            percentage: percentage,
-            userAnswers: state.answers,
+            testName: testMetadata.testName || "Daily Test",
+            subject: testMetadata.subject || "Indian Polity",
+            
+            // Field mapping specifically for your 'Modern AI' Dashboard
+            score: scoreData.correctCount,           // Raw correct count
+            totalScore: scoreData.totalQuestions,   // Total questions available
+            percentage: percentage,                 // Integer for the progress bar
+            
+            // Detailed breakdown for review
+            incorrectCount: scoreData.incorrectCount,
+            unattemptedCount: scoreData.unattemptedCount,
+            userAnswers: state.answers,             // Stores the choices made
             timestamp: firebase.firestore.FieldValue.serverTimestamp()
         });
-        console.log("Result saved to 'testHistory' collection.");
-        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Result saved. View on your dashboard.`;
+
+        console.log("Analytics successfully synced to root 'users' collection.");
+        syncStatusEl.innerHTML = `<i class="fas fa-check-circle"></i> Analytics Synced to Dashboard.`;
         syncStatusEl.className = 'synced';
+        
     } catch (error) {
-        console.error("Error writing result to Firestore: ", error);
-        syncStatusEl.textContent = 'Error saving result.';
+        console.error("Critical Sync Error: ", error);
+        syncStatusEl.textContent = 'Sync Failed. Checking local cache...';
         syncStatusEl.className = 'error';
     }
 }
@@ -1801,41 +1803,50 @@ document.addEventListener('DOMContentLoaded', () => {
     dom.showAnswerWritingTab.addEventListener('click', () => setView('answerWriting'));
     window.addEventListener('resize', updateSidebarPosition);
 
+  // --- UPDATED AUTH LISTENER (AT THE BOTTOM OF YOUR SCRIPT) ---
     firebase.auth().onAuthStateChanged(async (user) => {
         currentUser = user;
         const params = new URLSearchParams(window.location.search);
-        mainTestId = params.get('testId');
+        mainTestId = params.get('testId'); // Extracts 'polity_ch1_set1'
         
         if (!mainTestId) {
-            document.body.innerHTML = `<div class="pre-exam-screen" style="display:flex;"><div class="login-card"><h2>Error</h2><p>No Test ID was found in the URL. The exam cannot start.</p><a href="test-series.html" class="btn-primary" style="text-decoration: none; margin-top: 20px;">Go to Test Series</a></div></div>`;
+            document.body.innerHTML = `
+                <div class="pre-exam-screen" style="display:flex;">
+                    <div class="login-card">
+                        <h2 style="color:#ef4444;">Access Error</h2>
+                        <p>No Test ID was found. Please return to the Daily Test dashboard.</p>
+                        <a href="daily_test.html" class="btn-primary" style="display:block; margin-top:20px; text-decoration:none; text-align:center;">Return to Dashboard</a>
+                    </div>
+                </div>`;
             return;
         }
 
         if (user) {
-            console.log("Auth state changed: User is signed in.", user.uid);
+            console.log("Aspirant Mode: Fresh Session Started", user.uid);
             
-            weeklyProgressKey = `weeklyProgress_${mainTestId}_${user.uid}`;
-            
-            const localProgress = JSON.parse(localStorage.getItem(weeklyProgressKey));
-            const isWeeklyCompleted = localProgress && (localProgress.status === 'completed' || localProgress.status === 'completed-synced');
+            // Daily tests always start fresh - remove any stuck previous session data
+            localStorage.removeItem('testTaken');
+            localStorage.removeItem('lastAnswers');
+            localStorage.removeItem('scoreBreakdown');
+            localStorage.removeItem('topicStats');
 
-            if (localStorage.getItem('testTaken') === 'true' && !isWeeklyCompleted) {
-                await resumeResultSession();
-            } else {
-                await loadTestFromURL(mainTestId, user);
-            }
+            // Directly trigger the loader for the Daily Test collection
+            await loadTestFromURL(mainTestId, user);
         } else {
-            console.log("Auth state changed: User is signed out.");
+            console.log("User not logged in. Showing login screen.");
             dom.loginScreen.style.display = 'flex';
             dom.instructionsScreen.style.display = 'none';
             dom.chapterSelectionWrapper.style.display = 'none';
             dom.examUIWrapper.style.display = 'none';
         }
     });
-});
+}); // End of DOMContentLoaded
 
+// --- UPDATED RESUME LOGIC (SIMPLIFIED FOR DAILY TESTS) ---
 async function resumeResultSession() {
-    console.log("Resuming result session...");
+    // For Daily Tests, we simplify this to just showing the results 
+    // if the user refreshes after finishing.
+    console.log("Viewing existing result analytics...");
     isTestCompleted = true;
     dom.showAnswerWritingTab.classList.remove('locked');
     dom.loginScreen.style.display = 'none';
@@ -1844,43 +1855,6 @@ async function resumeResultSession() {
     dom.body.classList.add('exam-active');
     updateSidebarPosition();
     
-    const params = new URLSearchParams(window.location.search);
-    const testId = params.get('testId');
-    let testIdToReview = testId; 
-
-    if (currentUser) {
-        weeklyProgressKey = `weeklyProgress_${testId}_${currentUser.uid}`;
-    }
-
-    // *** FIX: Check 'weeklyTests' ***
-    const weeklyTestRef = db.collection('weeklyTests').doc(testId); 
-    const weeklyTestDoc = await weeklyTestRef.get();
-
-    if (weeklyTestDoc.exists && weeklyTestDoc.data().subTests) {
-        console.log("Resuming a weekly test sub-test");
-        isWeeklyTest = true; 
-        mainTestId = testId;
-        weeklyTestTitle = weeklyTestDoc.data().title;
-        weeklySubTests = weeklyTestDoc.data().subTests; 
-        currentSubQuizId = localStorage.getItem('currentSubQuizId'); 
-        
-        if (currentSubQuizId) {
-            completedSubTests.add(currentSubQuizId); 
-            testIdToReview = currentSubQuizId; 
-            
-            weeklyTestAttemptRef = db.collection("artifacts").doc(appId).collection("users").doc(currentUser.uid).collection("weeklyTestAttempts").doc(mainTestId);
-            const localProgress = localStorage.getItem(weeklyProgressKey);
-            if (localProgress) {
-                weeklyProgress = JSON.parse(localProgress);
-            }
-        } else {
-             console.error("Resuming weekly test but no currentSubQuizId found in localStorage.");
-        }
-    } else {
-        console.log("Resuming a single test");
-        isWeeklyTest = false;
-    }
-    
     const breakdown = JSON.parse(localStorage.getItem('scoreBreakdown'));
     const topicStats = JSON.parse(localStorage.getItem('topicStats'));
     
@@ -1888,29 +1862,25 @@ async function resumeResultSession() {
     showResultScreen(breakdown, topicStats);
 
     try {
-        // *** FIX: Check 'weeklyTestsdocs' first, then 'quizzes' ***
-        let testDocRef = db.collection('weeklyTestsdocs').doc(testIdToReview); 
+        // Fetch question data from root 'dailytests' for the review screen
+        let testDocRef = db.collection('dailytests').doc(mainTestId); 
         let testDoc = await testDocRef.get();
-        let questionsSnapshot;
         
-        if (!testDoc.exists) {
-            console.warn("Test not in 'weeklyTestsdocs', checking 'quizzes'");
-            testDocRef = db.collection('quizzes').doc(testIdToReview);
-            testDoc = await testDocRef.get();
-        }
-
         if(testDoc.exists) {
             testMetadata = testDoc.data(); 
-            questionsSnapshot = await testDocRef.collection('questions').get();
-            questions = questionsSnapshot.docs.map(doc => ({ id: doc.id,...doc.data() }));
-            console.log(`Loaded ${questions.length} questions for review from ${testDocRef.path}.`);
-        } else {
-            console.error("Could not find test document for review:", testIdToReview);
+            const questionsSnapshot = await testDocRef.collection('questions').get();
+            questions = questionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Fallback for array-style questions
+            if(questions.length === 0 && testMetadata.questions) questions = testMetadata.questions;
+            
+            console.log(`Loaded ${questions.length} questions for analysis review.`);
         }
     } catch (error) {
-        console.error("Failed to load question data for review:", error);
+        console.error("Failed to load review data:", error);
     }
 }
+    
 </script>
 </body>
 </html>
