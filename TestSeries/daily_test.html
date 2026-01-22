@@ -18,7 +18,7 @@
     <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
         <div class="text-center">
             <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-            <p id="loader-text" class="mt-4 text-slate-500 font-semibold tracking-wide">Connecting to UPSChub Database...</p>
+            <p id="loader-text" class="mt-4 text-slate-500 font-semibold tracking-wide">Connecting to UPSChub...</p>
         </div>
     </div>
 
@@ -30,7 +30,7 @@
                     <span>UPSChub</span>
                 </div>
                 <div class="flex items-center gap-4">
-                    <span id="user-status" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-600 border border-slate-200 uppercase tracking-tighter">Student</span>
+                    <span id="user-status" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-500 uppercase tracking-widest border border-slate-200">Aspirant</span>
                     <a href="dashboard.html" class="px-5 py-2 text-sm font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-md">Dashboard</a>
                 </div>
             </div>
@@ -39,20 +39,20 @@
         <main class="container mx-auto p-4 sm:p-8 flex-grow">
             <div class="text-center mb-12">
                  <h1 class="text-4xl sm:text-6xl font-black tracking-tight gradient-text mb-4">Daily Test Series</h1>
-                 <p class="text-slate-500 text-lg max-w-xl mx-auto">Master the UPSC syllabus with chapter-wise sets and instant results.</p>
+                 <p class="text-slate-500 text-lg max-w-xl mx-auto">Master UPSC Topics chapter-by-chapter with expert practice sets.</p>
             </div>
 
             <div id="recent-results-container" class="mb-16 hidden">
                 <div class="flex items-center gap-2 mb-6">
                     <div class="h-8 w-1.5 bg-yellow-500 rounded-full"></div>
-                    <h3 class="text-xl font-bold text-slate-800">Your Recent Scores</h3>
+                    <h3 class="text-xl font-bold text-slate-800">Your Progress</h3>
                 </div>
                 <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
             </div>
             
-            <div class="mb-10 flex flex-col sm:flex-row gap-6 justify-between items-center">
-                 <div class="relative w-full sm:max-w-md">
-                    <input type="text" id="search-input" placeholder="Search by chapter name (e.g. Historical Background)" class="w-full pl-12 pr-5 py-3.5 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition shadow-sm outline-none font-medium">
+            <div class="mb-10">
+                 <div class="relative w-full sm:max-w-md mx-auto">
+                    <input type="text" id="search-input" placeholder="Search chapter names..." class="w-full pl-12 pr-5 py-3.5 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition shadow-sm outline-none font-medium">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                     </div>
@@ -64,7 +64,7 @@
         </main>
 
         <footer class="bg-white border-t border-slate-200 py-10 text-center">
-            <p class="text-slate-400 font-bold text-sm tracking-widest">&copy; 2026 UPSCHUB • MADE FOR SUCCESS</p>
+            <p class="text-slate-400 font-bold text-sm tracking-widest">&copy; 2026 UPSCHUB • SUCCEED WITH US</p>
         </footer>
     </div>
 
@@ -91,72 +91,66 @@
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 try {
-                    // Try to fetch user data but don't stop the page if it fails
-                    try {
-                        const userDoc = await getDoc(doc(db, "users", user.uid));
-                        if (userDoc.exists()) {
-                            const isPremium = userDoc.data().isPremium || false;
-                            const status = document.getElementById('user-status');
-                            status.textContent = isPremium ? 'Premium User' : 'Free Learner';
-                            status.classList.remove('hidden');
+                    // SILENT FETCH: Premium status
+                    getDoc(doc(db, "users", user.uid)).then(uDoc => {
+                        if (uDoc.exists() && uDoc.data().isPremium) {
+                            const s = document.getElementById('user-status');
+                            s.textContent = 'Premium Member';
+                            s.classList.replace('text-slate-500', 'text-blue-600');
+                            s.classList.replace('bg-slate-100', 'bg-blue-50');
                         }
-                    } catch (e) { console.warn("User profile check skipped."); }
-                    
-                    // Fetch tests - THIS IS THE CRITICAL COLLECTION
-                    await fetchDailyTests();
-                    
-                    // Fetch results history
-                    try { await fetchUserHistory(user.uid); } catch (e) { console.warn("History empty."); }
+                        document.getElementById('user-status').classList.remove('hidden');
+                    }).catch(() => console.log("User doc not created yet."));
+
+                    // CRITICAL FETCH: Test List
+                    const snap = await getDocs(collection(db, "dailytests"));
+                    allTests = [];
+                    snap.forEach(d => allTests.push({ id: d.id, ...d.data() }));
+
+                    // SILENT FETCH: Recent Results
+                    fetchUserHistory(user.uid);
 
                     renderUI();
 
-                    // Hide loader
                     document.getElementById('page-loader').classList.add('hidden');
                     document.getElementById('main-content').classList.remove('hidden');
-                    
                     document.getElementById('search-input').addEventListener('input', renderUI);
 
                 } catch (error) { 
-                    console.error("Database Connection Failure:", error);
+                    console.error("Critical Sync Error:", error);
                     document.getElementById('loader-text').innerHTML = `
-                        <div class="text-red-600 font-black text-xl mb-1">Sync Error</div>
-                        <div class="text-slate-400 text-sm">Please check your Firestore rules or verify if the 'dailytests' collection exists.</div>`;
+                        <div class="text-red-600 font-black text-xl mb-1">Database Error</div>
+                        <div class="text-slate-400 text-sm">Verify the 'dailytests' collection exists in Firestore root.</div>`;
                 }
             } else {
                 window.location.href = 'auth.html';
             }
         });
 
-        async function fetchDailyTests() {
-            // Path: Root level collection 'dailytests' as seen in screenshot
-            const snap = await getDocs(collection(db, "dailytests"));
-            allTests = [];
-            snap.forEach((d) => allTests.push({ id: d.id, ...d.data() }));
-        }
-
         async function fetchUserHistory(uid) {
-            // Path: Root users -> UID -> testHistory
-            const resultsRef = collection(db, "users", uid, "testHistory");
-            const q = query(resultsRef, orderBy("timestamp", "desc"), limit(4));
-            const snap = await getDocs(q);
-            
-            const grid = document.getElementById('results-grid');
-            if (!snap.empty) {
-                document.getElementById('recent-results-container').classList.remove('hidden');
-                grid.innerHTML = ''; 
-                snap.forEach(d => {
-                    const r = d.data();
-                    grid.innerHTML += `
-                        <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm animate-scale">
-                            <p class="text-[10px] text-blue-600 font-black uppercase tracking-widest mb-1">${r.subject || 'Polity'}</p>
-                            <h4 class="font-extrabold text-slate-800 truncate text-base mb-3">${r.testName}</h4>
-                            <div class="flex justify-between items-center">
-                                <span class="text-2xl font-black text-slate-900">${r.score}/${r.totalScore}</span>
-                                <span class="text-[11px] px-3 py-1 rounded-full bg-green-50 text-green-700 font-bold border border-green-100">${r.percentage}%</span>
-                            </div>
-                        </div>`;
-                });
-            }
+            try {
+                const resultsRef = collection(db, "users", uid, "testHistory");
+                const q = query(resultsRef, orderBy("timestamp", "desc"), limit(4));
+                const snap = await getDocs(q);
+                
+                if (!snap.empty) {
+                    const grid = document.getElementById('results-grid');
+                    document.getElementById('recent-results-container').classList.remove('hidden');
+                    grid.innerHTML = ''; 
+                    snap.forEach(d => {
+                        const r = d.data();
+                        grid.innerHTML += `
+                            <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm animate-scale">
+                                <p class="text-[10px] text-blue-600 font-black uppercase mb-1">${r.subject || 'Polity'}</p>
+                                <h4 class="font-extrabold text-slate-800 truncate text-sm mb-3">${r.testName}</h4>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xl font-black">${r.score}/${r.totalScore}</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-bold border border-green-100">${r.percentage}%</span>
+                                </div>
+                            </div>`;
+                    });
+                }
+            } catch (e) { console.warn("History fetch failed - likely no results yet."); }
         }
 
         function renderUI() {
@@ -164,11 +158,10 @@
             const search = document.getElementById('search-input').value.toLowerCase();
             
             if (allTests.length === 0) {
-                container.innerHTML = `<div class="text-center py-24 bg-white rounded-3xl border-2 border-dashed border-slate-200"><p class="text-slate-400 font-bold">Waiting for content in 'dailytests' collection...</p></div>`;
+                container.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200"><p class="text-slate-400 font-bold">No tests found in 'dailytests' root collection.</p></div>`;
                 return;
             }
 
-            // Grouping: Subject -> Chapter -> Multiple Sets
             const grouped = allTests.reduce((acc, t) => {
                 const sub = t.subject || 'Indian Polity';
                 const ch = t.chapterName || `Chapter ${t.chapter || '1'}`;
@@ -181,7 +174,7 @@
             container.innerHTML = '';
             for (const sub in grouped) {
                 const subDiv = document.createElement('div');
-                subDiv.innerHTML = `<h2 class="text-3xl font-black text-slate-900 mb-8 border-l-8 border-blue-600 pl-6 uppercase tracking-tighter">${sub}</h2>`;
+                subDiv.innerHTML = `<h2 class="text-3xl font-black text-slate-900 mb-8 border-l-8 border-blue-600 pl-6 uppercase tracking-tight">${sub}</h2>`;
                 
                 for (const ch in grouped[sub]) {
                     if (ch.toLowerCase().includes(search)) {
@@ -194,17 +187,17 @@
                         
                         grouped[sub][ch].sort((a,b) => (a.set || 0) - (b.set || 0)).forEach(test => {
                             const card = document.createElement('div');
-                            card.className = "group bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 hover:border-blue-400 hover:bg-white hover:shadow-2xl transition-all duration-500 cursor-pointer";
+                            card.className = "group bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 hover:border-blue-400 hover:bg-white hover:shadow-2xl transition-all duration-500";
                             card.innerHTML = `
                                 <div class="flex justify-between items-start mb-6">
-                                    <span class="text-[11px] font-black text-white bg-blue-600 px-4 py-1.5 rounded-full shadow-lg shadow-blue-200 uppercase">Set ${test.set || '1'}</span>
-                                    <div class="text-right">
-                                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${test.totalQuestions || 0} Qs</p>
-                                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">${test.durationMinutes || 0} Mins</p>
+                                    <span class="text-[11px] font-black text-white bg-blue-600 px-4 py-1.5 rounded-full uppercase">Set ${test.set || '1'}</span>
+                                    <div class="text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        <p>${test.totalQuestions || 50} Qs</p>
+                                        <p>${test.durationMinutes || 50} Mins</p>
                                     </div>
                                 </div>
-                                <h4 class="font-bold text-slate-800 text-lg mb-8 min-h-[56px] line-clamp-2">${test.testName}</h4>
-                                <a href="test_player.html?testId=${test.id}" class="block w-full text-center py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl text-xs font-black group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all shadow-sm">LAUNCH TEST</a>
+                                <h4 class="font-bold text-slate-800 text-lg mb-8 line-clamp-2">${test.testName}</h4>
+                                <a href="test_player.html?testId=${test.id}" class="block w-full text-center py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl text-xs font-black group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all shadow-sm">START PRACTICE</a>
                             `;
                             grid.appendChild(card);
                         });
