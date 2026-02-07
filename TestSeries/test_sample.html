@@ -1005,12 +1005,13 @@ async function saveResultToFirestore(scoreData) {
     const userId = currentUser.uid;
     syncStatusEl.innerHTML = `<i class="fas fa-sync-alt fa-spin"></i> Saving result... (Will sync when online)`;
     syncStatusEl.className = 'syncing';
-    const historyCollectionRef = db.collection("artifacts").doc(appId).collection("users").doc(userId).collection("testHistory");
+    const historyCollectionRef = db.collection("users").doc(userId).collection("testHistory");
     const testId = new URLSearchParams(window.location.search).get('testId');
     const docId = `${testId}_history_${Date.now()}`;
     const percentage = scoreData.totalQuestions > 0 ? (scoreData.correctCount / scoreData.totalQuestions) * 100 : 0;
     try {
         await historyCollectionRef.doc(docId).set({
+            userId: userId, // CRITICAL: This must match your security rules
             testId: testId,
             testName: testMetadata.testName,
             subject: testMetadata.subject,
