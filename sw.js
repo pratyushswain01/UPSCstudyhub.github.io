@@ -1,10 +1,11 @@
-const cacheName = 'upschub-v2'; // Increment this (v4, v5...) whenever you make big changes
+const cacheName = 'upschub-v3'; // Increment this (v4, v5...) whenever you push a manual update
 
-// Files that must work even if the user has NEVER opened the app before
+// Essential files to cache for offline start
 const staticAssets = [
   './',
   './index.html',
   './manifest.json',
+  './version.json',
   './images/logo_192.png',
   './images/logo_512.png'
 ];
@@ -17,7 +18,8 @@ self.addEventListener('install', e => {
       return cache.addAll(staticAssets);
     })
   );
-  self.skipWaiting(); // Forces the new service worker to become active immediately
+  // Important: We don't call skipWaiting() here automatically anymore
+  // so that our manual "Update Now" button has full control.
 });
 
 // 2. ACTIVATE: Clean up OLD caches (v1, v2, etc.)
@@ -39,7 +41,7 @@ self.addEventListener('activate', e => {
 // 3. FETCH: Network-First Strategy
 // This ensures students see the latest notes if online, but works offline too.
 self.addEventListener('fetch', e => {
-  // Skip cross-origin requests (like Google Analytics or external APIs)
+  // Skip cross-origin requests
   if (!e.request.url.startsWith(self.location.origin)) return;
 
   e.respondWith(
@@ -57,4 +59,11 @@ self.addEventListener('fetch', e => {
         return caches.match(e.request);
       })
   );
+});
+
+// 4. MANUAL UPDATE SIGNAL: Listen for the "Update Now" click from index.html
+self.addEventListener('message', (event) => {
+  if (event.data === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
