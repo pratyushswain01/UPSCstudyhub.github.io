@@ -175,24 +175,67 @@
   </main>
 
   <script>
-    // 1. Service Worker Registration
+    // --- 1. Manual Version Control ---
+    const CURRENT_VERSION = '3.0.0'; 
+
+    async function checkForUpdate() {
+      try {
+        // Fetch version from GitHub with cache-busting
+        const response = await fetch('version.json?nocache=' + new Date().getTime());
+        const data = await response.json();
+
+        if (data.version !== CURRENT_VERSION) {
+          showUpdatePrompt();
+        }
+      } catch (err) {
+        console.log("Update check failed", err);
+      }
+    }
+
+    function showUpdatePrompt() {
+      const banner = document.createElement('div');
+      banner.id = 'update-banner';
+      banner.style = "position:fixed; bottom:0; left:0; width:100%; background:#007bff; color:white; padding:20px; text-align:center; z-index:9999; font-family:'Poppins', sans-serif; box-shadow:0 -5px 15px rgba(0,0,0,0.2);";
+      banner.innerHTML = `
+        <p style="margin-bottom:10px; font-size: 0.9rem;">A new version of UPSChub is available!</p>
+        <button onclick="forceUpdateApp()" style="background:white; color:#007bff; border:none; padding:10px 20px; border-radius:50px; font-weight:600; cursor:pointer; font-size:0.8rem;">
+          Update Now 🚀
+        </button>
+      `;
+      document.body.appendChild(banner);
+    }
+
+    function forceUpdateApp() {
+      if ('serviceWorker' in navigator) {
+        caches.keys().then(names => {
+          for (let name of names) caches.delete(name);
+        });
+      }
+      // Force reload from server bypassing cache
+      window.location.reload(true);
+    }
+
+    // --- 2. Service Worker Registration ---
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('UPSChub: Service Worker Registered'))
-          .catch(err => console.log('UPSChub: Service Worker Registration Failed', err));
+          .then(reg => {
+             console.log('UPSChub: SW Registered');
+             checkForUpdate(); // Check for updates once SW is ready
+          })
+          .catch(err => console.log('UPSChub: SW Registration Failed', err));
       });
     }
 
-    // 2. Video End Redirect Logic
+    // --- 3. Video End Redirect Logic ---
     const video = document.getElementById('introVideo');
     const body = document.getElementById('introBody');
 
     video.onended = function() {
       body.classList.add('page-exit');
       setTimeout(() => {
-        // Adding ?v=2 forces the app to load the new dashboard instead of the old home page
-        window.location.href = "homeUPSChub.html?v=2";
+        // Carry over version query to prevent loading old home page
+        window.location.href = "homeUPSChub.html?v=" + CURRENT_VERSION;
       }, 600);
     };
   </script>
