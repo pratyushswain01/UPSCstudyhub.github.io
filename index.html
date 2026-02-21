@@ -1,26 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Basic Meta -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#007bff">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="apple-touch-icon" href="images/logo_192.png">
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <!-- SEO Title & Description -->
   <title>UPSChub | Complete UPSC Learning Ecosystem</title>
   <meta name="description" content="UPSChub is a complete UPSC learning ecosystem offering daily current affairs, smart notes, tests, strategy videos, and focused preparation tools for aspirants.">
-  <meta name="keywords" content="UPSC preparation, UPSC current affairs, UPSC notes, UPSC tests, UPSChub, IAS preparation">
   <meta name="author" content="Pratyush Swain">
 
-  <!-- Open Graph (Search & Social Preview) -->
   <meta property="og:title" content="UPSChub | Complete UPSC Learning Ecosystem">
   <meta property="og:description" content="Daily UPSC current affairs, smart notes, tests, and strategy videos — all in one place.">
   <meta property="og:url" content="https://upschub.online">
   <meta property="og:type" content="website">
 
-  <!-- Favicon -->
   <link rel="icon" type="image/jpg" href="images/LOGO.jpg">
 
-  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
@@ -169,21 +169,30 @@
       and a refined, modern learning experience.
     </p>
 
-    <a href="about.html">About the Founder</a>
-
     <div class="legal-footer">
       Pratyush Swain &bull; 2026
     </div>
   </main>
 
   <script>
+    // 1. Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('UPSChub: Service Worker Registered'))
+          .catch(err => console.log('UPSChub: Service Worker Registration Failed', err));
+      });
+    }
+
+    // 2. Video End Redirect Logic
     const video = document.getElementById('introVideo');
     const body = document.getElementById('introBody');
 
     video.onended = function() {
       body.classList.add('page-exit');
       setTimeout(() => {
-        window.location.href = "homeUPSChub.html";
+        // Adding ?v=3 forces the app to load the new dashboard instead of the old home page
+        window.location.href = "homeUPSChub.html?v=3";
       }, 600);
     };
   </script>
