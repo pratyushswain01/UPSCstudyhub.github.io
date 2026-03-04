@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,7 +30,7 @@ z-index:99999;
 overflow:hidden;
 }
 
-/* CONTENT */
+/* TEXT CONTENT */
 
 .holiBox{
 text-align:center;
@@ -103,15 +102,8 @@ top:50px;
 }
 
 @keyframes balloonFloat{
-
-0%{
-transform:translateY(0);
-}
-
-100%{
-transform:translateY(-120vh);
-}
-
+0%{transform:translateY(0)}
+100%{transform:translateY(-120vh)}
 }
 
 </style>
@@ -139,7 +131,7 @@ transform:translateY(-120vh);
 
 <button onclick="shareHoli()">Share Wishes 📲</button>
 
-<button onclick="closeHoli()">Enter UPSChub 🚀</button>
+<button onclick="enterUPSChub()">Enter UPSChub 🚀</button>
 
 </div>
 
@@ -171,7 +163,7 @@ const colors=[
 "#ff00ff"
 ];
 
-/* SPLASH */
+/* SPLASH EFFECT */
 
 function createSplash(x,y){
 
@@ -188,8 +180,6 @@ life:90
 });
 
 }
-
-/* CONFETTI */
 
 for(let i=0;i<15;i++){
 
@@ -215,7 +205,9 @@ ctx.clearRect(0,0,canvas.width,canvas.height);
 
 /* PARTICLES */
 
-particles.forEach((p,i)=>{
+for(let i=particles.length-1;i>=0;i--){
+
+let p=particles[i];
 
 ctx.beginPath();
 ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
@@ -224,32 +216,32 @@ ctx.fill();
 
 p.x+=p.speedX;
 p.y+=p.speedY;
-
 p.life--;
 
 if(p.life<=0){
 particles.splice(i,1);
 }
 
-});
+}
 
 /* CONFETTI */
 
-confetti.forEach((c,i)=>{
+for(let i=confetti.length-1;i>=0;i--){
+
+let c=confetti[i];
 
 ctx.fillStyle=c.color;
 ctx.fillRect(c.x,c.y,c.size,c.size);
 
 c.x+=c.speedX;
 c.y+=c.speedY;
-
 c.life--;
 
 if(c.life<=0){
 confetti.splice(i,1);
 }
 
-});
+}
 
 requestAnimationFrame(animate);
 
@@ -257,9 +249,11 @@ requestAnimationFrame(animate);
 
 animate();
 
-/* CLICK SPLASH */
+/* SPLASH ON CLICK */
 
 function triggerSplash(e){
+
+if(e.target.tagName==="BUTTON") return;
 
 let x=e.clientX || e.touches[0].clientX;
 let y=e.clientY || e.touches[0].clientY;
@@ -278,7 +272,7 @@ let lastX,lastY,lastZ;
 window.addEventListener("devicemotion",(event)=>{
 
 let acc=event.accelerationIncludingGravity;
-if(!acc)return;
+if(!acc) return;
 
 if(lastX!==undefined){
 
@@ -306,25 +300,27 @@ lastZ=acc.z;
 function shareHoli(){
 
 let message=
-"🌸 Happy Holi from UPSChub 🎨\n\n" +
-"Prepare smarter for UPSC with UPSChub.\n" +
+"🌸 Happy Holi from UPSChub 🎨\n\n"+
+"Prepare smarter for UPSC with UPSChub.\n"+
 "https://upschub.online";
 
 let url="https://api.whatsapp.com/send?text="+encodeURIComponent(message);
 
-window.location.href=upschub.online;
+window.open(url,"_blank");
 
 }
 
-/* CLOSE */
+/* ENTER SITE */
 
-function closeHoli(){
-document.getElementById("holiFestival").style.display="none";
+function enterUPSChub(){
+
+window.location.href="https://upschub.online";
+
 }
 
-/* AUTO CLOSE */
+/* AUTO CLOSE AFTER 1 MINUTE */
 
-setTimeout(closeHoli,60000);
+setTimeout(enterUPSChub,60000);
 
 </script>
 
