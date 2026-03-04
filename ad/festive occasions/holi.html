@@ -1,0 +1,332 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Happy Holi - UPSChub</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+overflow:hidden;
+}
+
+/* FESTIVAL SCREEN */
+
+#holiFestival{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:radial-gradient(circle,#ff0080,#ffcc00,#00e5ff);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:99999;
+overflow:hidden;
+}
+
+/* CONTENT */
+
+.holiBox{
+text-align:center;
+color:white;
+z-index:3;
+animation:zoomHoli 3s infinite alternate;
+padding:20px;
+}
+
+.holiBox h1{
+font-size:40px;
+margin-bottom:10px;
+}
+
+.holiBox p{
+font-size:18px;
+margin-bottom:15px;
+}
+
+.holiBox button{
+margin:6px;
+padding:12px 24px;
+border:none;
+border-radius:10px;
+background:white;
+color:#ff0080;
+font-weight:bold;
+cursor:pointer;
+font-size:15px;
+}
+
+/* ZOOM EFFECT */
+
+@keyframes zoomHoli{
+0%{transform:scale(1)}
+100%{transform:scale(1.08)}
+}
+
+/* CANVAS */
+
+#gulalCanvas{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:1;
+}
+
+/* BALLOONS */
+
+.balloon{
+position:absolute;
+bottom:-120px;
+width:40px;
+height:50px;
+border-radius:50%;
+animation:balloonFloat linear infinite;
+}
+
+.balloon:after{
+content:'';
+position:absolute;
+width:2px;
+height:30px;
+background:white;
+left:50%;
+top:50px;
+}
+
+@keyframes balloonFloat{
+
+0%{
+transform:translateY(0);
+}
+
+100%{
+transform:translateY(-120vh);
+}
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="holiFestival">
+
+<canvas id="gulalCanvas"></canvas>
+
+<!-- BALLOONS -->
+
+<div class="balloon" style="left:10%;background:#ff0080;animation-duration:10s"></div>
+<div class="balloon" style="left:25%;background:#ffcc00;animation-duration:12s"></div>
+<div class="balloon" style="left:45%;background:#00e5ff;animation-duration:11s"></div>
+<div class="balloon" style="left:65%;background:#00ff66;animation-duration:13s"></div>
+<div class="balloon" style="left:85%;background:#ff00ff;animation-duration:9s"></div>
+
+<div class="holiBox">
+
+<h1>🌸 Happy Holi</h1>
+
+<p>UPSChub wishes you success and colorful UPSC preparation 🎨</p>
+
+<button onclick="shareHoli()">Share Wishes 📲</button>
+
+<button onclick="closeHoli()">Enter UPSChub 🚀</button>
+
+</div>
+
+</div>
+
+<script>
+
+/* CANVAS */
+
+const canvas=document.getElementById("gulalCanvas");
+const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+}
+
+resizeCanvas();
+window.addEventListener("resize",resizeCanvas);
+
+let particles=[];
+let confetti=[];
+
+const colors=[
+"#ff0033",
+"#ffcc00",
+"#00e5ff",
+"#00ff66",
+"#ff00ff"
+];
+
+/* SPLASH */
+
+function createSplash(x,y){
+
+for(let i=0;i<35;i++){
+
+particles.push({
+x:x,
+y:y,
+size:Math.random()*8+3,
+color:colors[Math.floor(Math.random()*colors.length)],
+speedX:(Math.random()-0.5)*8,
+speedY:(Math.random()-0.5)*8,
+life:90
+});
+
+}
+
+/* CONFETTI */
+
+for(let i=0;i<15;i++){
+
+confetti.push({
+x:x,
+y:y,
+size:4,
+speedX:(Math.random()-0.5)*6,
+speedY:(Math.random()-0.5)*6,
+color:colors[Math.floor(Math.random()*colors.length)],
+life:80
+});
+
+}
+
+}
+
+/* ANIMATION */
+
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+/* PARTICLES */
+
+particles.forEach((p,i)=>{
+
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+ctx.fillStyle=p.color;
+ctx.fill();
+
+p.x+=p.speedX;
+p.y+=p.speedY;
+
+p.life--;
+
+if(p.life<=0){
+particles.splice(i,1);
+}
+
+});
+
+/* CONFETTI */
+
+confetti.forEach((c,i)=>{
+
+ctx.fillStyle=c.color;
+ctx.fillRect(c.x,c.y,c.size,c.size);
+
+c.x+=c.speedX;
+c.y+=c.speedY;
+
+c.life--;
+
+if(c.life<=0){
+confetti.splice(i,1);
+}
+
+});
+
+requestAnimationFrame(animate);
+
+}
+
+animate();
+
+/* CLICK SPLASH */
+
+function triggerSplash(e){
+
+let x=e.clientX || e.touches[0].clientX;
+let y=e.clientY || e.touches[0].clientY;
+
+createSplash(x,y);
+
+}
+
+document.addEventListener("click",triggerSplash);
+document.addEventListener("touchstart",triggerSplash);
+
+/* SHAKE EFFECT */
+
+let lastX,lastY,lastZ;
+
+window.addEventListener("devicemotion",(event)=>{
+
+let acc=event.accelerationIncludingGravity;
+if(!acc)return;
+
+if(lastX!==undefined){
+
+let diff=Math.abs(acc.x-lastX)+Math.abs(acc.y-lastY)+Math.abs(acc.z-lastZ);
+
+if(diff>25){
+
+createSplash(
+Math.random()*canvas.width,
+Math.random()*canvas.height
+);
+
+}
+
+}
+
+lastX=acc.x;
+lastY=acc.y;
+lastZ=acc.z;
+
+});
+
+/* WHATSAPP SHARE */
+
+function shareHoli(){
+
+let message=
+"🌸 Happy Holi from UPSChub 🎨\n\n" +
+"Prepare smarter for UPSC with UPSChub.\n" +
+"https://upschub.online";
+
+let url="https://api.whatsapp.com/send?text="+encodeURIComponent(message);
+
+window.location.href=upschub.online;
+
+}
+
+/* CLOSE */
+
+function closeHoli(){
+document.getElementById("holiFestival").style.display="none";
+}
+
+/* AUTO CLOSE */
+
+setTimeout(closeHoli,60000);
+
+</script>
+
+</body>
+</html>
