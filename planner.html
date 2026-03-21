@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UPSC Ascent Planner | Interactive Study Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Lora:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #F4F7FC;
+            --card-light: #FFFFFF;
+            --text-light: #4A5568;
+            --heading-light: #1A202C;
+            --border-light: #E2E8F0;
+            --primary-light: #4299E1;
+            --primary-dark-light: #2B6CB0;
+            --accent-light: #38B2AC;
+
+            --bg-dark: #1A202C;
+            --card-dark: #2D3748;
+            --text-dark: #A0AEC0;
+            --heading-dark: #E2E8F0;
+            --border-dark: #4A5568;
+            --primary-dark: #63B3ED;
+            --primary-dark-dark: #4299E1;
+            --accent-dark: #4FD1C5;
+
+            --bg-color: var(--bg-light);
+            --card-color: var(--card-light);
+            --text-color: var(--text-light);
+            --heading-color: var(--heading-light);
+            --border-color: var(--border-light);
+            --primary-color: var(--primary-light);
+            --primary-dark-color: var(--primary-dark-light);
+            --accent-color: var(--accent-light);
+
+            --polity-color: #3182CE;
+            --geography-color: #38A169;
+            --history-color: #DD6B20;
+            --current-affairs-color: #E53E3E;
+            --mcq-practice-color: #805AD5;
+            --revision-color: #D69E2E;
+            --answer-writing-color: #319795;
+            --test-color: #C53030;
+        }
+
+        body.dark-mode {
+            --bg-color: var(--bg-dark);
+            --card-color: var(--card-dark);
+            --text-color: var(--text-dark);
+            --heading-color: var(--heading-dark);
+            --border-color: var(--border-dark);
+            --primary-color: var(--primary-dark);
+            --primary-dark-color: var(--primary-dark-dark);
+            --accent-color: var(--accent-dark);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .planner-container { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
+
+        /* --- Header --- */
+        .planner-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+            border-radius: 12px;
+            color: white;
+        }
+        .planner-header h1 { font-family: 'Lora', serif; font-size: 2.8rem; margin-bottom: 0.5rem; }
+        .planner-header p { font-size: 1.1rem; opacity: 0.9; }
+
+        /* --- Dashboard & Navigation --- */
+        .sticky-nav-wrapper { position: sticky; top: 1rem; z-index: 1000; }
+        .dashboard-nav {
+            background-color: var(--card-color);
+            border-radius: 12px;
+            padding: 1rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+        .dashboard-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: center; }
+        .stat-card { text-align: center; }
+        .stat-card h4 { font-size: 0.85rem; font-weight: 500; color: var(--text-color); margin-bottom: 0.25rem; }
+        .stat-card .stat-value { font-size: 1.5rem; font-weight: 700; color: var(--heading-color); }
+        .progress-bar-container { width: 100%; background-color: var(--border-color); border-radius: 20px; overflow: hidden; height: 10px; margin-top: 4px; }
+        .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-color), var(--primary-color)); border-radius: 20px; transition: width 0.5s ease-in-out; }
+        
+        .navigation { display: flex; flex-wrap: wrap; gap: 1rem; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .navigation > * { flex: 1 1 200px; }
+        .nav-button, #month-select {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background-color: var(--bg-color);
+            color: var(--heading-color);
+            font-size: 0.95rem; font-weight: 500; cursor: pointer; text-align: center;
+        }
+        .nav-button { background-color: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .nav-button:hover { background-color: var(--primary-dark-color); }
+        
+        /* --- Theme Toggle --- */
+        .theme-switch-wrapper { display: flex; align-items: center; justify-content: center; margin-top: 1rem; gap: 0.5rem; }
+        .theme-switch { display: inline-block; height: 24px; position: relative; width: 48px; }
+        .theme-switch input { display: none; }
+        .slider { background-color: #ccc; bottom: 0; cursor: pointer; left: 0; position: absolute; right: 0; top: 0; transition: .4s; border-radius: 34px; }
+        .slider:before { content: ""; height: 16px; width: 16px; left: 4px; bottom: 4px; position: absolute; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary-color); }
+        input:checked + .slider:before { transform: translateX(24px); }
+        .theme-switch-wrapper i { font-size: 1.1rem; }
+
+        /* --- Month Section --- */
+        .month-section { margin-bottom: 2.5rem; padding-top: 5rem; margin-top: -5rem; }
+        .month-header {
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: var(--heading-color); color: var(--bg-color);
+            padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;
+        }
+        .month-header h2 { font-family: 'Lora', serif; font-size: 1.8rem; }
+        .month-progress { width: 150px; text-align: right; }
+        .month-progress p { font-size: 0.9rem; margin-bottom: 4px; }
+
+        /* --- Week Section (Accordion) --- */
+        .week-section { margin-bottom: 1.5rem; border: 1px solid var(--border-color); border-radius: 10px; overflow: hidden; }
+        .week-header {
+            display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
+            padding: 1rem 1.5rem; background-color: var(--card-color); cursor: pointer; transition: background-color 0.2s;
+        }
+        .week-header:hover { background-color: var(--bg-color); }
+        .week-title h3 { font-size: 1.2rem; color: var(--heading-color); margin-bottom: 4px; }
+        .week-title .book-ref { font-size: 0.85rem; color: var(--text-color); font-weight: 500; }
+        .week-header .fa-chevron-down { transition: transform 0.3s; }
+        .week-section.expanded .week-header .fa-chevron-down { transform: rotate(180deg); }
+        .week-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; background-color: var(--bg-color); }
+        .week-section.expanded .week-content { max-height: 5000px; }
+        .daily-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; padding: 1.5rem; }
+
+        /* --- Day Card --- */
+        .day-card {
+            background-color: var(--card-color); border-radius: 8px;
+            border-top: 4px solid var(--primary-color);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05); padding: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .day-card.current-day {
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 30px -5px var(--accent-light);
+            transform: translateY(-5px);
+        }
+        .day-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 0.75rem; border-bottom: 1px dashed var(--border-color); }
+        .day-header h4 { font-size: 1rem; font-weight: 600; color: var(--heading-color); }
+        .day-header .date-span { font-size: 0.85rem; color: var(--text-color); font-weight: 500; }
+        
+        /* --- Task Item --- */
+        .task-list { list-style: none; }
+        .task-item { margin-bottom: 0.75rem; padding: 0.5rem; border-left: 4px solid var(--text-color); background-color: var(--bg-color); border-radius: 4px; }
+        .task-item.polity { border-left-color: var(--polity-color); }
+        .task-item.geography { border-left-color: var(--geography-color); }
+        .task-item.history { border-left-color: var(--history-color); }
+        .task-item.current-affairs { border-left-color: var(--current-affairs-color); }
+        .task-item.mcq-practice { border-left-color: var(--mcq-practice-color); }
+        .task-item.revision { border-left-color: var(--revision-color); }
+        .task-item.answer-writing { border-left-color: var(--answer-writing-color); }
+        .task-item.test { border-left-color: var(--test-color); }
+        .task-item.map-work { border-left-color: var(--geography-color); opacity: 0.9; }
+
+        .task-item-content { display: flex; align-items: flex-start; }
+        .task-item input[type="checkbox"] { margin-top: 4px; margin-right: 12px; accent-color: var(--primary-color); flex-shrink: 0; width: 16px; height: 16px; cursor: pointer; }
+        .task-item label { cursor: pointer; font-weight: 500; font-size: 0.9rem; color: var(--heading-color); }
+        .task-item input:checked + label { text-decoration: line-through; color: var(--text-color); opacity: 0.7; }
+        .task-details { display: block; font-size: 0.8rem; color: var(--text-color); margin-left: 28px; margin-top: 2px; }
+        
+        /* --- Notes Section --- */
+        .week-notes { padding: 0 1.5rem 1.5rem; }
+        .week-notes textarea {
+            width: 100%; height: 80px; padding: 0.75rem; border-radius: 8px;
+            border: 1px solid var(--border-color); background-color: var(--card-color);
+            color: var(--text-color); font-family: 'Poppins', sans-serif; resize: vertical;
+        }
+
+        /* --- Footer --- */
+        .planner-footer { text-align: center; padding: 2rem 1rem; margin-top: 2rem; border-top: 1px solid var(--border-color); font-size: 0.9rem; }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 768px) {
+            .planner-header h1 { font-size: 2.2rem; }
+            .navigation { grid-template-columns: 1fr; }
+            .month-header { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+            .month-header h2 { font-size: 1.5rem; }
+            .month-progress { width: 100%; text-align: left; }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-grid { grid-template-columns: 1fr 1fr; }
+            .stat-card .stat-value { font-size: 1.3rem; }
+            .theme-switch-wrapper { margin-top: 0; }
+            .planner-header h1 { font-size: 2rem; }
+        }
+    </style>
+</head><body>
+  
+
+    <header class="app-header">
+    <div class="planner-container">
+        <header class="planner-header">
+            <h1>UPSC Ascent Planner</h1>
+            <p>Your Interactive Dashboard for CSE 2027 Success</p>
+        </header>
+
+        <div class="sticky-nav-wrapper">
+            <div class="dashboard-nav">
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <h4>Overall Progress</h4>
+                        <div class="progress-bar-container"><div id="overall-progress-bar" class="progress-bar"></div></div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Tasks Completed</h4>
+                        <p class="stat-value"><span id="tasks-completed-count">0</span> / <span id="total-tasks-count">0</span></p>
+                    </div>
+                     <div class="stat-card">
+                        <h4>Today is</h4>
+                        <p class="stat-value" id="current-date-header">Loading...</p>
+                    </div>
+                    <div class="stat-card">
+                         <h4>Theme</h4>
+                        <div class="theme-switch-wrapper">
+                            <i class="fas fa-sun"></i>
+                            <label class="theme-switch"><input type="checkbox" id="theme-toggle"><span class="slider"></span></label>
+                            <i class="fas fa-moon"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="navigation">
+                    <button id="jump-to-today-btn" class="nav-button"><i class="fas fa-calendar-day"></i> Jump to Today</button>
+                    <select id="month-select">
+                        <option value="">-- Jump to Month --</option>
+                        <option value="june-2025">June 2025</option>
+                        <option value="july-2025">July 2025</option>
+                        <option value="august-2025">August 2025</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <main>
+            <!-- ==================== JUNE 2025 ==================== -->
+            <section id="june-2025" class="month-section">
+                <div class="month-header">
+                    <h2><i class="fas fa-landmark"></i> June 2025: Constitutional Framework & Concepts</h2>
+                    <div class="month-progress">
+                        <p>Month Progress</p>
+                        <div class="progress-bar-container"><div class="progress-bar" id="june-2025-progress"></div></div>
+                    </div>
+                </div>
+                
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 1: Historical Background & Making of the Constitution</h3><span class="book-ref">Laxmikant (Ch. 1-4)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-06-02"><div class="day-header"><h4><i class="fas fa-scroll"></i> Day 1</h4><span class="date-span">Mon, Jun 2</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w1-d1-t1"><label for="jun-w1-d1-t1">Historical Background (1773-1858)</label></div><span class="task-details">Regulating Act, Pitt’s India Act, Charter Acts.</span></li><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jun-w1-d1-t2"><label for="jun-w1-d1-t2">Newspaper Reading & Notes</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-06-03"><div class="day-header"><h4><i class="fas fa-crown"></i> Day 2</h4><span class="date-span">Tue, Jun 3</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w1-d2-t1"><label for="jun-w1-d2-t1">British Reforms (1858-1947)</label></div><span class="task-details">GOI Acts 1858, 1909, 1919, 1935.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-04"><div class="day-header"><h4><i class="fas fa-users"></i> Day 3</h4><span class="date-span">Wed, Jun 4</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w1-d3-t1"><label for="jun-w1-d3-t1">Constituent Assembly</label></div><span class="task-details">Composition, Sessions, Key Committees.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-05"><div class="day-header"><h4><i class="fas fa-pencil-ruler"></i> Day 4</h4><span class="date-span">Thu, Jun 5</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w1-d4-t1"><label for="jun-w1-d4-t1">Drafting Process & Influences</label></div><span class="task-details">e.g., GOI Act 1935, U.S. Bill of Rights.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-06"><div class="day-header"><h4><i class="fas fa-star"></i> Day 5</h4><span class="date-span">Fri, Jun 6</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w1-d5-t1"><label for="jun-w1-d5-t1">Salient Features of Constitution</label></div><span class="task-details">Federalism, Parliamentary System, FRs.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-07"><div class="day-header"><h4><i class="fas fa-file-alt"></i> Day 6</h4><span class="date-span">Sat, Jun 7</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w1-d6-t1"><label for="jun-w1-d6-t1">Preamble</label></div><span class="task-details">Keywords, Amendability (Berubari Case).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-08"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jun 8</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jun-w1-d7-t1"><label for="jun-w1-d7-t1">MCQs on Ch. 1-4</label></div></li><li class="task-item answer-writing"><div class="task-item-content"><input type="checkbox" id="jun-w1-d7-t2"><label for="jun-w1-d7-t2">Answer: "Significance of GOI Act 1935..."</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jun-w1-d7-t3"><label for="jun-w1-d7-t3">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 2: Union & Its Territory, Citizenship</h3><span class="book-ref">Laxmikant (Ch. 5-6)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-06-09"><div class="day-header"><h4><i class="fas fa-flag-usa"></i> Day 1</h4><span class="date-span">Mon, Jun 9</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w2-d1-t1"><label for="jun-w2-d1-t1">Article 1-4: Union & Territory</label></div><span class="task-details">Reorganization of States (1956, 2000).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-10"><div class="day-header"><h4><i class="fas fa-id-card"></i> Day 2</h4><span class="date-span">Tue, Jun 10</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w2-d2-t1"><label for="jun-w2-d2-t1">Citizenship (Articles 5-11)</label></div><span class="task-details">Acquisition & Termination, CAA 2019, NRC.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-11"><div class="day-header"><h4><i class="fas fa-map-pin"></i> Day 3</h4><span class="date-span">Wed, Jun 11</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w2-d3-t1"><label for="jun-w2-d3-t1">Special Provisions (Art 371A-J)</label></div><span class="task-details">Post-370 J&K, Northeastern States.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-12"><div class="day-header"><h4><i class="fas fa-map"></i> Day 4</h4><span class="date-span">Thu, Jun 12</span></div><ul class="task-list"><li class="task-item map-work"><div class="task-item-content"><input type="checkbox" id="jun-w2-d4-t1"><label for="jun-w2-d4-t1">Map Work: Post-2000 States</label></div><span class="task-details">Mark Telangana, Uttarakhand, etc.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-13"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 5</h4><span class="date-span">Fri, Jun 13</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jun-w2-d5-t1"><label for="jun-w2-d5-t1">Current Affairs: Statehood Demands</label></div><span class="task-details">e.g., Ladakh, Gorkhaland.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-14"><div class="day-header"><h4><i class="fas fa-sync-alt"></i> Day 6</h4><span class="date-span">Sat, Jun 14</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jun-w2-d6-t1"><label for="jun-w2-d6-t1">Revision: Compare Citizenship Acts</label></div><span class="task-details">Citizenship Act 1955 vs CAA 2019.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-15"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jun 15</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jun-w2-d7-t1"><label for="jun-w2-d7-t1">PYQs on State Reorganization</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jun-w2-d7-t2"><label for="jun-w2-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 3: Fundamental Rights (Part III)</h3><span class="book-ref">Laxmikant (Ch. 7-8)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-06-16"><div class="day-header"><h4><i class="fas fa-landmark"></i> Day 1</h4><span class="date-span">Mon, Jun 16</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w3-d1-t1"><label for="jun-w3-d1-t1">Articles 12-13: Definition of State</label></div><span class="task-details">Doctrine of Eclipse.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-17"><div class="day-header"><h4><i class="fas fa-equals"></i> Day 2</h4><span class="date-span">Tue, Jun 17</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w3-d2-t1"><label for="jun-w3-d2-t1">Right to Equality (Art 14-18)</label></div><span class="task-details">Affirmative Action, Recent SC Judgments.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-18"><div class="day-header"><h4><i class="fas fa-comments"></i> Day 3</h4><span class="date-span">Wed, Jun 18</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w3-d3-t1"><label for="jun-w3-d3-t1">Right to Freedom (Art 19-22)</label></div><span class="task-details">Reasonable Restrictions, Sedition Law.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-19"><div class="day-header"><h4><i class="fas fa-ban"></i> Day 4</h4><span class="date-span">Thu, Jun 19</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w3-d4-t1"><label for="jun-w3-d4-t1">Right Against Exploitation (Art 23-24)</label></div><span class="task-details">Trafficking, Child Labor.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-20"><div class="day-header"><h4><i class="fas fa-praying-hands"></i> Day 5</h4><span class="date-span">Fri, Jun 20</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w3-d5-t1"><label for="jun-w3-d5-t1">Right to Religion (Art 25-28)</label></div><span class="task-details">Sabarimala Case, Hijab Controversy.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-21"><div class="day-header"><h4><i class="fas fa-gavel"></i> Day 6</h4><span class="date-span">Sat, Jun 21</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w3-d6-t1"><label for="jun-w3-d6-t1">Constitutional Remedies (Art 32)</label></div><span class="task-details">Writ Jurisdiction (Habeas Corpus vs Mandamus).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-22"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jun 22</span></div><ul class="task-list"><li class="task-item answer-writing"><div class="task-item-content"><input type="checkbox" id="jun-w3-d7-t1"><label for="jun-w3-d7-t1">Case Studies: Analyze recent SC Judgments</label></div><span class="task-details">e.g., Privacy as FR, Aadhaar.</span></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jun-w3-d7-t2"><label for="jun-w3-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 4: DPSPs & Fundamental Duties</h3><span class="book-ref">Laxmikant (Ch. 9-10)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-06-23"><div class="day-header"><h4><i class="fas fa-tasks"></i> Day 1</h4><span class="date-span">Mon, Jun 23</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w4-d1-t1"><label for="jun-w4-d1-t1">DPSP (Art 36-51)</label></div><span class="task-details">Socialist, Gandhian, Liberal Principles.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-24"><div class="day-header"><h4><i class="fas fa-balance-scale-left"></i> Day 2</h4><span class="date-span">Tue, Jun 24</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w4-d2-t1"><label for="jun-w4-d2-t1">Conflict with FRs</label></div><span class="task-details">Champakam Dorairajan, Basic Structure.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-25"><div class="day-header"><h4><i class="fas fa-book-reader"></i> Day 3</h4><span class="date-span">Wed, Jun 25</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jun-w4-d3-t1"><label for="jun-w4-d3-t1">Fundamental Duties (Art 51A)</label></div><span class="task-details">Swaran Singh Committee, Enforcement.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-26"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 4</h4><span class="date-span">Thu, Jun 26</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jun-w4-d4-t1"><label for="jun-w4-d4-t1">Current Affairs: DPSP-linked Schemes</label></div><span class="task-details">MGNREGA, Right to Education.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-06-27"><div class="day-header"><h4><i class="fas fa-pen-nib"></i> Day 5</h4><span class="date-span">Fri, Jun 27</span></div><ul class="task-list"><li class="task-item answer-writing"><div class="task-item-content"><input type="checkbox" id="jun-w4-d5-t1"><label for="jun-w4-d5-t1">Answer: "Critically examine DPSP enforceability."</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-06-28"><div class="day-header"><h4><i class="fas fa-sync-alt"></i> Day 6</h4><span class="date-span">Sat, Jun 28</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jun-w4-d6-t1"><label for="jun-w4-d6-t1">Revision: Compare FRs, DPSPs, FDs</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-06-29"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jun 29</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jun-w4-d7-t1"><label for="jun-w4-d7-t1">PYQs on DPSPs (Minerva Mills)</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jun-w4-d7-t2"><label for="jun-w4-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== JULY 2025 ==================== -->
+            <section id="july-2025" class="month-section">
+                <div class="month-header">
+                    <h2><i class="fas fa-university"></i> July 2025: Governance & Central/State Bodies</h2>
+                    <div class="month-progress">
+                        <p>Month Progress</p>
+                        <div class="progress-bar-container"><div class="progress-bar" id="july-2025-progress"></div></div>
+                    </div>
+                </div>
+                
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 5: Parliamentary System & President</h3><span class="book-ref">Laxmikant (Ch. 12-14)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                         <div class="daily-grid">
+                            <div class="day-card" data-date="2025-06-30"><div class="day-header"><h4><i class="fas fa-user-tie"></i> Day 1</h4><span class="date-span">Mon, Jun 30</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w5-d1-t1"><label for="jul-w5-d1-t1">President (Art 52-62)</label></div><span class="task-details">Election, Impeachment, Ordinance Power.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-01"><div class="day-header"><h4><i class="fas fa-users-cog"></i> Day 2</h4><span class="date-span">Tue, Jul 1</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w5-d2-t1"><label for="jul-w5-d2-t1">Vice President & PM (Art 63-78)</label></div><span class="task-details">Role in Cabinet, Collective Responsibility.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-02"><div class="day-header"><h4><i class="fas fa-landmark"></i> Day 3</h4><span class="date-span">Wed, Jul 2</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w5-d3-t1"><label for="jul-w5-d3-t1">Parliament (Art 79-122)</label></div><span class="task-details">Sessions, Motions (No-Confidence, Censure).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-03"><div class="day-header"><h4><i class="fas fa-file-invoice-dollar"></i> Day 4</h4><span class="date-span">Thu, Jul 3</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w5-d4-t1"><label for="jul-w5-d4-t1">Legislative Process</label></div><span class="task-details">Money Bill vs Ordinary Bill (Role of RS).</span></li></ul></div>
+                             <div class="day-card" data-date="2025-07-04"><div class="day-header"><h4><i class="far fa-folder-open"></i> Day 5</h4><span class="date-span">Fri, Jul 4</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w5-d5-t1"><label for="jul-w5-d5-t1">Parliamentary Committees</label></div><span class="task-details">PAC, Estimates, Standing Committees.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-05"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 6</h4><span class="date-span">Sat, Jul 5</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w5-d6-t1"><label for="jul-w5-d6-t1">Current Affairs: Recent Ordinances</label></div><span class="task-details">e.g., Farm Laws Repeal.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-06"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jul 6</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jul-w5-d7-t1"><label for="jul-w5-d7-t1">PYQs on Presidential Powers (Pocket Veto)</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jul-w5-d7-t2"><label for="jul-w5-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+                
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 6: Judiciary & State Government</h3><span class="book-ref">Laxmikant (Ch. 15-18)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-07-07"><div class="day-header"><h4><i class="fas fa-gavel"></i> Day 1</h4><span class="date-span">Mon, Jul 7</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w6-d1-t1"><label for="jul-w6-d1-t1">Supreme Court (Art 124-147)</label></div><span class="task-details">Collegium System, NJAC.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-08"><div class="day-header"><h4><i class="fas fa-balance-scale"></i> Day 2</h4><span class="date-span">Tue, Jul 8</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w6-d2-t1"><label for="jul-w6-d2-t1">High Courts (Art 214-231)</label></div><span class="task-details">Jurisdiction, Appointment.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-09"><div class="day-header"><h4><i class="fas fa-user-shield"></i> Day 3</h4><span class="date-span">Wed, Jul 9</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w6-d3-t1"><label for="jul-w6-d3-t1">Governor (Art 153-162)</label></div><span class="task-details">Discretionary Powers (Sarkaria Comm.).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-10"><div class="day-header"><h4><i class="fas fa-building"></i> Day 4</h4><span class="date-span">Thu, Jul 10</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w6-d4-t1"><label for="jul-w6-d4-t1">State Legislature</label></div><span class="task-details">Unicameral vs Bicameral, Special Status.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-11"><div class="day-header"><h4><i class="fas fa-city"></i> Day 5</h4><span class="date-span">Fri, Jul 11</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w6-d5-t1"><label for="jul-w6-d5-t1">Local Governance</label></div><span class="task-details">73rd & 74th Amendments, Panchayati Raj.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-12"><div class="day-header"><h4><i class="fas fa-pen-nib"></i> Day 6</h4><span class="date-span">Sat, Jul 12</span></div><ul class="task-list"><li class="task-item answer-writing"><div class="task-item-content"><input type="checkbox" id="jul-w6-d6-t1"><label for="jul-w6-d6-t1">Answer: "Is Governor's role a constitutional dilemma?"</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-07-13"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jul 13</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jul-w6-d7-t1"><label for="jul-w6-d7-t1">PYQs on Judiciary (Basic Structure)</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jul-w6-d7-t2"><label for="jul-w6-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 7: Constitutional & Non-Constitutional Bodies</h3><span class="book-ref">Laxmikant (Ch. 19-24)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-07-14"><div class="day-header"><h4><i class="fas fa-person-booth"></i> Day 1</h4><span class="date-span">Mon, Jul 14</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w7-d1-t1"><label for="jul-w7-d1-t1">Election Commission</label></div><span class="task-details">Powers, Electoral Reforms (NOTA, VVPAT).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-15"><div class="day-header"><h4><i class="fas fa-user-graduate"></i> Day 2</h4><span class="date-span">Tue, Jul 15</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w7-d2-t1"><label for="jul-w7-d2-t1">UPSC & SPSC</label></div><span class="task-details">Role in Recruitment, Autonomy.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-16"><div class="day-header"><h4><i class="fas fa-hand-holding-usd"></i> Day 3</h4><span class="date-span">Wed, Jul 16</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w7-d3-t1"><label for="jul-w7-d3-t1">Finance Commission</label></div><span class="task-details">Vertical & Horizontal Devolution.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-17"><div class="day-header"><h4><i class="fas fa-search-dollar"></i> Day 4</h4><span class="date-span">Thu, Jul 17</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w7-d4-t1"><label for="jul-w7-d4-t1">CAG, AGI, CVC</label></div><span class="task-details">Functions, Recent Reports (Rafale Audit).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-18"><div class="day-header"><h4><i class="fas fa-cogs"></i> Day 5</h4><span class="date-span">Fri, Jul 18</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w7-d5-t1"><label for="jul-w7-d5-t1">NDC & NITI Aayog</label></div><span class="task-details">Planning in India (5-Year Plans vs SDGs).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-19"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 6</h4><span class="date-span">Sat, Jul 19</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w7-d6-t1"><label for="jul-w7-d6-t1">Current Affairs: ECI Appointments Bill</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-07-20"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jul 20</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jul-w7-d7-t1"><label for="jul-w7-d7-t1">PYQs on CAG (Audit of PPP Projects)</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jul-w7-d7-t2"><label for="jul-w7-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 8: Emergency Provisions & Amendments</h3><span class="book-ref">Laxmikant (Ch. 25-26)</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-07-21"><div class="day-header"><h4><i class="fas fa-exclamation-triangle"></i> Day 1</h4><span class="date-span">Mon, Jul 21</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w8-d1-t1"><label for="jul-w8-d1-t1">National Emergency (Art 352)</label></div><span class="task-details">44th Amendment, Effects on FRs.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-22"><div class="day-header"><h4><i class="fas fa-house-user"></i> Day 2</h4><span class="date-span">Tue, Jul 22</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w8-d2-t1"><label for="jul-w8-d2-t1">President's Rule (Art 356)</label></div><span class="task-details">Bommai Case Guidelines.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-23"><div class="day-header"><h4><i class="fas fa-piggy-bank"></i> Day 3</h4><span class="date-span">Wed, Jul 23</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w8-d3-t1"><label for="jul-w8-d3-t1">Financial Emergency (Art 360)</label></div><span class="task-details">Never Invoked.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-24"><div class="day-header"><h4><i class="fas fa-tools"></i> Day 4</h4><span class="date-span">Thu, Jul 24</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w8-d4-t1"><label for="jul-w8-d4-t1">Amendment Process (Art 368)</label></div><span class="task-details">Basic Structure (Kesavananda Bharati).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-25"><div class="day-header"><h4><i class="fas fa-history"></i> Day 5</h4><span class="date-span">Fri, Jul 25</span></div><ul class="task-list"><li class="task-item polity"><div class="task-item-content"><input type="checkbox" id="jul-w8-d5-t1"><label for="jul-w8-d5-t1">Important Amendments</label></div><span class="task-details">42nd (Mini Constitution), 44th (Restoring FRs).</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-26"><div class="day-header"><h4><i class="fas fa-pen-nib"></i> Day 6</h4><span class="date-span">Sat, Jul 26</span></div><ul class="task-list"><li class="task-item answer-writing"><div class="task-item-content"><input type="checkbox" id="jul-w8-d6-t1"><label for="jul-w8-d6-t1">Answer: "Critically analyze misuse of Art 356."</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-07-27"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Jul 27</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="jul-w8-d7-t1"><label for="jul-w8-d7-t1">PYQs on Emergency (1975 Emergency)</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jul-w8-d7-t2"><label for="jul-w8-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                 <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 9: Current Affairs Integration</h3><span class="book-ref">The Hindu, PRS India</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                        <div class="daily-grid">
+                            <div class="day-card" data-date="2025-07-28"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 1</h4><span class="date-span">Mon, Jul 28</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w9-d1-t1"><label for="jul-w9-d1-t1">Polity in News: Recent SC Judgments</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-07-29"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 2</h4><span class="date-span">Tue, Jul 29</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w9-d2-t1"><label for="jul-w9-d2-t1">Polity in News: Important Bills</label></div><span class="task-details">e.g., Data Protection Bill.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-07-30"><div class="day-header"><h4><i class="far fa-newspaper"></i> Day 3</h4><span class="date-span">Wed, Jul 30</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w9-d3-t1"><label for="jul-w9-d3-t1">Polity in News: Governor's Role, ECI</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-07-31"><div class="day-header"><h4><i class="fas fa-layer-group"></i> Day 4</h4><span class="date-span">Thu, Jul 31</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w9-d4-t1"><label for="jul-w9-d4-t1">Government Schemes & Federalism</label></div><span class="task-details">PM-KISAN, Ayushman Bharat.</span></li></ul></div>
+                            <div class="day-card" data-date="2025-08-01"><div class="day-header"><h4><i class="fas fa-layer-group"></i> Day 5</h4><span class="date-span">Fri, Aug 1</span></div><ul class="task-list"><li class="task-item current-affairs"><div class="task-item-content"><input type="checkbox" id="jul-w9-d5-t1"><label for="jul-w9-d5-t1">Analyze Schemes: Objectives & Challenges</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-02"><div class="day-header"><h4><i class="fas fa-file-signature"></i> Day 6</h4><span class="date-span">Sat, Aug 2</span></div><ul class="task-list"><li class="task-item test"><div class="task-item-content"><input type="checkbox" id="jul-w9-d6-t1"><label for="jul-w9-d6-t1">Full-Length Test: Polity MCQs (50 Qs)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-03"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Aug 3</span></div><ul class="task-list"><li class="task-item answer-writing"><div class="task-item-content"><input type="checkbox" id="jul-w9-d7-t1"><label for="jul-w9-d7-t1">Mains Answer Writing Practice</label></div></li><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="jul-w9-d7-t2"><label for="jul-w9-d7-t2">Weekly Revision</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ==================== AUGUST 2025 ==================== -->
+            <section id="august-2025" class="month-section">
+                 <div class="month-header">
+                    <h2><i class="fas fa-sync-alt"></i> August 2025: Polity Revision & Mock Tests</h2>
+                    <div class="month-progress">
+                        <p>Month Progress</p>
+                        <div class="progress-bar-container"><div class="progress-bar" id="august-2025-progress"></div></div>
+                    </div>
+                </div>
+                 <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 10: Revision (Part 1)</h3><span class="book-ref">FRs, DPSPs, President, Parliament</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                         <div class="daily-grid">
+                            <div class="day-card" data-date="2025-08-04"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 1</h4><span class="date-span">Mon, Aug 4</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w10-d1-t1"><label for="aug-w10-d1-t1">Revise: Fundamental Rights (Part 1)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-05"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 2</h4><span class="date-span">Tue, Aug 5</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w10-d2-t1"><label for="aug-w10-d2-t1">Revise: Fundamental Rights (Part 2)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-06"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 3</h4><span class="date-span">Wed, Aug 6</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w10-d3-t1"><label for="aug-w10-d3-t1">Revise: DPSPs & FDs</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-07"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 4</h4><span class="date-span">Thu, Aug 7</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w10-d4-t1"><label for="aug-w10-d4-t1">Revise: President & Vice President</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-08"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 5</h4><span class="date-span">Fri, Aug 8</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w10-d5-t1"><label for="aug-w10-d5-t1">Revise: Parliament</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-09"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 6</h4><span class="date-span">Sat, Aug 9</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w10-d6-t1"><label for="aug-w10-d6-t1">Revise: Parliamentary Committees & Process</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-10"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Aug 10</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="aug-w10-d7-t1"><label for="aug-w10-d7-t1">MCQs on this week's revision topics</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 11: Revision (Part 2)</h3><span class="book-ref">Judiciary, Governor, Local Governance</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                         <div class="daily-grid">
+                            <div class="day-card" data-date="2025-08-11"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 1</h4><span class="date-span">Mon, Aug 11</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w11-d1-t1"><label for="aug-w11-d1-t1">Revise: Supreme Court</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-12"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 2</h4><span class="date-span">Tue, Aug 12</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w11-d2-t1"><label for="aug-w11-d2-t1">Revise: High Courts & Subordinate Courts</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-13"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 3</h4><span class="date-span">Wed, Aug 13</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w11-d3-t1"><label for="aug-w11-d3-t1">Revise: Governor & State Legislature</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-14"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 4</h4><span class="date-span">Thu, Aug 14</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w11-d4-t1"><label for="aug-w11-d4-t1">Revise: Local Governance (Panchayati Raj)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-15"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 5</h4><span class="date-span">Fri, Aug 15</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w11-d5-t1"><label for="aug-w11-d5-t1">Revise: Local Governance (Municipalities)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-16"><div class="day-header"><h4><i class="fas fa-book-open"></i> Day 6</h4><span class="date-span">Sat, Aug 16</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w11-d6-t1"><label for="aug-w11-d6-t1">Revise: Constitutional & Statutory Bodies</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-17"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Aug 17</span></div><ul class="task-list"><li class="task-item mcq-practice"><div class="task-item-content"><input type="checkbox" id="aug-w11-d7-t1"><label for="aug-w11-d7-t1">MCQs on this week's revision topics</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+
+                 <div class="week-section">
+                    <div class="week-header">
+                        <div class="week-title"><h3>Week 12: Full-Length Mock Tests</h3><span class="book-ref">Prelims + Mains Practice</span></div>
+                        <div class="week-progress-indicator"><i class="fas fa-chevron-down"></i></div>
+                    </div>
+                    <div class="week-content">
+                         <div class="daily-grid">
+                            <div class="day-card" data-date="2025-08-18"><div class="day-header"><h4><i class="fas fa-lightbulb"></i> Day 1</h4><span class="date-span">Mon, Aug 18</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w12-d1-t1"><label for="aug-w12-d1-t1">Final Quick Revision (Entire Polity)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-19"><div class="day-header"><h4><i class="fas fa-file-signature"></i> Day 2</h4><span class="date-span">Tue, Aug 19</span></div><ul class="task-list"><li class="task-item test"><div class="task-item-content"><input type="checkbox" id="aug-w12-d2-t1"><label for="aug-w12-d2-t1">Full-Length Polity Test 1 (Prelims)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-20"><div class="day-header"><h4><i class="fas fa-search"></i> Day 3</h4><span class="date-span">Wed, Aug 20</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w12-d3-t1"><label for="aug-w12-d3-t1">Analyze Test 1 & Revise Weak Areas</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-21"><div class="day-header"><h4><i class="fas fa-file-signature"></i> Day 4</h4><span class="date-span">Thu, Aug 21</span></div><ul class="task-list"><li class="task-item test"><div class="task-item-content"><input type="checkbox" id="aug-w12-d4-t1"><label for="aug-w12-d4-t1">Full-Length Polity Test 2 (Prelims)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-22"><div class="day-header"><h4><i class="fas fa-search"></i> Day 5</h4><span class="date-span">Fri, Aug 22</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w12-d5-t1"><label for="aug-w12-d5-t1">Analyze Test 2 & Revise Weak Areas</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-23"><div class="day-header"><h4><i class="fas-solid fa-pen-nib"></i> Day 6</h4><span class="date-span">Sat, Aug 23</span></div><ul class="task-list"><li class="task-item test"><div class="task-item-content"><input type="checkbox" id="aug-w12-d6-t1"><label for="aug-w12-d6-t1">Full-Length Polity Test 3 (Mains Answers)</label></div></li></ul></div>
+                            <div class="day-card" data-date="2025-08-24"><div class="day-header"><h4><i class="fas fa-bullseye"></i> Day 7</h4><span class="date-span">Sun, Aug 24</span></div><ul class="task-list"><li class="task-item revision"><div class="task-item-content"><input type="checkbox" id="aug-w12-d7-t1"><label for="aug-w12-d7-t1">Consolidated Polity Revision & Notes</label></div></li></ul></div>
+                        </div>
+                        <div class="week-notes"><textarea placeholder="Add your weekly notes, doubts, or key takeaways here..."></textarea></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="planner-footer">
+            <p>© <span id="currentYear"></span> UPSC Ascent Planner - Conquer your Goals.</p>
+        </footer>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const checkboxes = document.querySelectorAll('.task-item input[type="checkbox"]');
+        const totalTasksCountEl = document.getElementById('total-tasks-count');
+        const tasksCompletedCountEl = document.getElementById('tasks-completed-count');
+        const overallProgressBar = document.getElementById('overall-progress-bar');
+        const monthSelect = document.getElementById('month-select');
+        const jumpToTodayBtn = document.getElementById('jump-to-today-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+
+        // --- THEME ---
+        const applyTheme = (theme) => {
+            if (theme === 'dark') {
+                document.body.classList.add('dark-mode');
+                themeToggle.checked = true;
+            } else {
+                document.body.classList.remove('dark-mode');
+                themeToggle.checked = false;
+            }
+        };
+
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        applyTheme(currentTheme);
+
+        themeToggle.addEventListener('change', () => {
+            const newTheme = themeToggle.checked ? 'dark' : 'light';
+            localStorage.setItem('theme', newTheme);
+            applyTheme(newTheme);
+        });
+
+        // --- TASK PERSISTENCE ---
+        checkboxes.forEach(checkbox => {
+            if (localStorage.getItem(checkbox.id) === 'true') {
+                checkbox.checked = true;
+            }
+            checkbox.addEventListener('change', () => {
+                localStorage.setItem(checkbox.id, checkbox.checked);
+                updateAllProgress();
+            });
+        });
+
+        // --- PROGRESS CALCULATION ---
+        function updateAllProgress() {
+            let totalChecked = 0;
+            totalTasksCountEl.textContent = checkboxes.length;
+
+            // Calculate progress for each month
+            document.querySelectorAll('.month-section').forEach(month => {
+                const monthCheckboxes = month.querySelectorAll('input[type="checkbox"]');
+                const monthChecked = month.querySelectorAll('input[type="checkbox"]:checked');
+                const monthProgress = monthCheckboxes.length > 0 ? (monthChecked.length / monthCheckboxes.length) * 100 : 0;
+                const monthProgressBar = document.getElementById(`${month.id}-progress`);
+                if(monthProgressBar) monthProgressBar.style.width = `${monthProgress}%`;
+            });
+
+            // Calculate overall progress
+            checkboxes.forEach(cb => {
+                if (cb.checked) totalChecked++;
+            });
+
+            tasksCompletedCountEl.textContent = totalChecked;
+            const overallProgress = checkboxes.length > 0 ? (totalChecked / checkboxes.length) * 100 : 0;
+            overallProgressBar.style.width = `${overallProgress}%`;
+        }
+
+        // --- ACCORDION FOR WEEKS ---
+        document.querySelectorAll('.week-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const weekSection = header.closest('.week-section');
+                weekSection.classList.toggle('expanded');
+            });
+        });
+
+        // --- DATE & NAVIGATION ---
+        function initializeDateAndNav() {
+            const today = new Date();
+            // FOR DEMONSTRATION PURPOSES, uncomment a future date
+            // const today = new Date('2025-07-08T12:00:00'); 
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            const todayString = `${year}-${month}-${day}`;
+            
+            // Set header date
+            document.getElementById('current-date-header').textContent = today.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            document.getElementById('currentYear').textContent = year;
+            
+            const todayCard = document.querySelector(`.day-card[data-date="${todayString}"]`);
+            
+            if (todayCard) {
+                // Highlight today's card
+                todayCard.classList.add('current-day');
+                
+                // Expand today's week and month
+                const currentWeek = todayCard.closest('.week-section');
+                if (currentWeek) {
+                    currentWeek.classList.add('expanded');
+                }
+                
+                // Set Jump to Today functionality
+                jumpToTodayBtn.addEventListener('click', () => {
+                    todayCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                });
+            } else {
+                 jumpToTodayBtn.textContent = "No Tasks Today";
+                 jumpToTodayBtn.disabled = true;
+            }
+        }
+        
+        monthSelect.addEventListener('change', function() {
+            if (this.value) {
+                const targetSection = document.getElementById(this.value);
+                if (targetSection) {
+                    targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            }
+        });
+
+        // --- INITIALIZATION ---
+        updateAllProgress();
+        initializeDateAndNav();
+    });
+    </script>
+</body>
+</html>

@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+   <meta charset="UTF-8">
+   <meta http-equiv="X-UA-Compatible" content="IE=edge">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+   <title>PrepLibrary: UPSC Hub</title>
+
+   <!-- Font Awesome CDN -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+   <!-- Google Fonts -->
+   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+   <!-- Custom Styles -->
+   <style>
+      :root {
+         --primary-start: #6a11cb;
+         --primary-end: #2575fc;
+         --primary-gradient: linear-gradient(135deg, var(--primary-start), var(--primary-end));
+         --bg-light: #f0f2f5; --card-bg-light: rgba(255, 255, 255, 0.65);
+         --text-primary-light: #1c1e21; --text-secondary-light: #555c6e;
+         --border-light: rgba(0, 0, 0, 0.1);
+         --bg-dark: #101114; --card-bg-dark: #1c1e23;
+         --text-primary-dark: #e4e6eb; --text-secondary-dark: #b0b3b8;
+         --border-dark: rgba(255, 255, 255, 0.1);
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+         font-family: 'Inter', sans-serif; background-color: var(--bg-light); color: var(--text-primary-light);
+         overflow-x: hidden; transition: background-color 0.4s ease, color 0.4s ease;
+         padding-top: 110px; padding-bottom: 80px;
+      }
+      body::before {
+         content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+         background: radial-gradient(circle at 10% 20%, #d9c2ff, transparent 40%),
+                     radial-gradient(circle at 80% 70%, #b5d8ff, transparent 40%);
+         animation: moveGradient 20s linear infinite; transition: opacity 0.5s ease;
+      }
+      @keyframes moveGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+      body.dark-mode { background-color: var(--bg-dark); color: var(--text-primary-dark); }
+      body.dark-mode::before { opacity: 0; }
+      h1, h2, h3, h4 { font-family: 'Poppins', sans-serif; font-weight: 600; }
+      
+      /* --- Header, Runner, Sidebar, Bottom Nav (Largely Unchanged) --- */
+      .app-header,.runner-bar,.side-bar,.bottom-nav{/* Styles from previous example are kept for brevity */}
+      .app-header {position: fixed; top: 0; left: 0; right: 0; padding: 0 25px; height: 65px; display: flex; align-items: center; justify-content: space-between; background: var(--card-bg-light); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border-light); z-index: 1000; transition: all 0.4s ease;}
+      body.dark-mode .app-header { background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none; }
+      .app-header .logo {font-size: 22px; font-weight: 700; text-decoration: none; background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;}
+      .app-header .icon-btn {font-size: 20px; color: var(--text-secondary-light); cursor: pointer; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; transition: all 0.2s;}
+      body.dark-mode .app-header .icon-btn { color: var(--text-secondary-dark); } .app-header .icon-btn:hover { background-color: rgba(0,0,0,0.05); } body.dark-mode .app-header .icon-btn:hover { background-color: rgba(255,255,255,0.1); }
+      .runner-bar {position: fixed; top: 65px; left: 0; right: 0; z-index: 999; background: var(--primary-gradient); color: white; padding: 8px 0; overflow: hidden; white-space: nowrap; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+      .runner-bar .runner-text { display: inline-block; padding-left: 100%; animation: scroll-left 45s linear infinite; font-size: 0.9rem; }
+      .runner-bar .runner-text i { margin: 0 10px; opacity: 0.8; }
+      @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+      .side-bar{position:fixed;top:0;left:-320px;width:300px;height:100vh;background-color: var(--bg-light);z-index:1002;transition:left .4s cubic-bezier(.25,.46,.45,.94);display:flex;flex-direction:column;box-shadow:10px 0 40px rgba(0,0,0,.1)}
+      body.dark-mode .side-bar{background-color: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none;}
+      .side-bar.active{left:0}.sidebar-header{padding:15px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border-light)}body.dark-mode .sidebar-header{border-bottom-color:var(--border-dark)}.sidebar-header .title{font-size:18px}#close-btn{font-size:22px;cursor:pointer;color:var(--text-secondary-light)}.side-bar .profile{padding:20px;text-align:center;border-bottom:1px solid var(--border-light)}body.dark-mode .side-bar .profile{border-bottom-color:var(--border-dark)}
+      .side-bar .profile img{width:90px;height:90px;border-radius:50%;}
+      .side-bar .navbar{flex-grow:1;overflow-y:auto}.sidebar-category{padding:15px 25px 5px 25px}.sidebar-category h4{font-size:.8rem;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary-light);font-weight:700}body.dark-mode .sidebar-category h4{color:var(--text-secondary-dark)}.side-bar .navbar a{display:flex;align-items:center;padding:13px 25px;color:var(--text-primary-light);text-decoration:none;transition:all .2s ease;border-left:3px solid transparent;font-size:.95rem}body.dark-mode .side-bar .navbar a{color:var(--text-primary-dark)}.side-bar .navbar a:hover{background-color:rgba(0,0,0,.03);border-left-color:var(--primary-start)}body.dark-mode .side-bar .navbar a:hover{background-color:rgba(255,255,255,.05)}.side-bar .navbar a i{margin-right:15px;font-size:18px;width:24px;text-align:center;color:var(--text-secondary-light)}body.dark-mode .side-bar .navbar a i{color:var(--text-secondary-dark)}.side-bar .navbar a:hover i{color:var(--primary-start)}
+      .bottom-nav {position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: var(--card-bg-light); backdrop-filter: blur(12px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; z-index: 1000; transition: transform 0.4s cubic-bezier(.25,.46,.45,.94);}
+      .bottom-nav.nav-hidden { transform: translateY(100%); }
+      body.dark-mode .bottom-nav { background: var(--card-bg-dark); border-top-color: var(--border-dark); backdrop-filter: none; }
+      .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color 0.2s, transform 0.2s; cursor: pointer; }
+      body.dark-mode .nav-item { color: var(--text-secondary-dark); }
+      .nav-item i { font-size: 22px; margin-bottom: 4px; } .nav-item span { font-size: 11px; font-weight: 500; }
+      .nav-item.active { color: var(--primary-start); }
+      .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
+      
+      /* --- Hero Section --- */
+      .hero-section { text-align: center; padding: 30px 20px 0; }
+      .hero-section h1 {
+         font-size: 2.5rem; font-weight: 700; margin-bottom: 8px;
+         background: var(--primary-gradient); -webkit-background-clip: text;
+         -webkit-text-fill-color: transparent;
+      }
+      .hero-section p { font-size: 1.1rem; color: var(--text-secondary-light); max-width: 600px; margin: 0 auto; }
+      body.dark-mode .hero-section p { color: var(--text-secondary-dark); }
+
+      /* --- ADVANCED TAB SYSTEM --- */
+      .tab-container { max-width: 1200px; margin: 40px auto 0; padding: 0 20px; }
+      .tab-switcher {
+         display: flex; gap: 10px; border-bottom: 1px solid var(--border-light); position: relative;
+         margin-bottom: 30px;
+      }
+      body.dark-mode .tab-switcher { border-color: var(--border-dark); }
+      .tab-btn {
+         padding: 15px 25px; border: none; background: none; cursor: pointer; font-size: 1.1rem;
+         font-weight: 600; font-family: 'Poppins', sans-serif; color: var(--text-secondary-light);
+         transition: color 0.3s ease; position: relative;
+      }
+      body.dark-mode .tab-btn { color: var(--text-secondary-dark); }
+      .tab-btn.active { color: var(--text-primary-light); }
+      body.dark-mode .tab-btn.active { color: var(--text-primary-dark); }
+      .tab-underline {
+         position: absolute; bottom: -1px; height: 3px; background: var(--primary-gradient);
+         border-radius: 3px; transition: left 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+      .tab-pane { display: none; animation: fadeIn 0.5s ease-out; }
+      .tab-pane.active { display: block; }
+      @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+      /* --- Section Specific Headers --- */
+      .section-header {
+         display: flex; justify-content: space-between; align-items: center;
+         margin-bottom: 20px; flex-wrap: wrap; gap: 15px;
+      }
+      .section-header h2 { font-size: 1.8rem; color: var(--text-primary-light); }
+      body.dark-mode .section-header h2 { color: var(--text-primary-dark); }
+      .section-filters { display: flex; gap: 15px; }
+      .section-filters select {
+         padding: 8px 12px; border-radius: 8px; font-size: 0.9rem;
+         background-color: var(--card-bg-light); border: 1px solid var(--border-light);
+         color: var(--text-secondary-light);
+      }
+      body.dark-mode .section-filters select {
+         background-color: var(--card-bg-dark); border-color: var(--border-dark);
+         color: var(--text-secondary-dark);
+      }
+
+      /* --- CURRENT AFFAIRS SECTION STYLES --- */
+      #ca-featured {
+         background: var(--card-bg-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light);
+         border-radius: 16px; margin-bottom: 30px; display: flex;
+         overflow: hidden; flex-direction: column; md:flex-direction: row;
+         transition: all 0.4s ease;
+      }
+      body.dark-mode #ca-featured { background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none; }
+      #ca-featured .featured-image {
+          min-height: 200px; background: var(--primary-gradient); color: white;
+          display: flex; flex-direction: column; justify-content: center; align-items: center;
+          padding: 20px; text-align: center;
+      }
+      #ca-featured .featured-image .fa-newspaper { font-size: 4rem; opacity: 0.5; }
+      #ca-featured .featured-image h3 { font-size: 1.5rem; margin-top: 10px; }
+      #ca-featured .featured-content { padding: 25px; flex-grow: 1; }
+      #ca-featured .featured-title { font-size: 1.4rem; margin-bottom: 10px; }
+      #ca-featured .featured-source { font-size: 0.9rem; color: var(--text-secondary-light); margin-bottom: 20px; }
+      body.dark-mode #ca-featured .featured-source { color: var(--text-secondary-dark); }
+      .featured-actions .card-btn {
+          padding: 12px 20px; font-size: 1rem;
+      }
+      .card-actions { display: flex; gap: 10px; }
+      .card-btn { flex: 1; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease; display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid transparent;}
+      .card-btn.view-btn { background-color: var(--primary-start); color: white; }
+      .card-btn.download-btn { background-color: transparent; color: var(--primary-start); border-color: var(--primary-start); }
+      .card-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+      body.dark-mode .card-btn.download-btn { color: #c49fff; border-color: #c49fff; }
+
+      #ca-recent-list .recent-item {
+         display: flex; align-items: center; padding: 15px;
+         background: var(--card-bg-light); border-radius: 12px; margin-bottom: 15px;
+         border: 1px solid var(--border-light); transition: all 0.3s ease;
+      }
+      #ca-recent-list .recent-item:hover { transform: translateX(5px); border-left: 4px solid var(--primary-start); }
+      body.dark-mode #ca-recent-list .recent-item { background: var(--card-bg-dark); border-color: var(--border-dark); }
+      .recent-item .date-box { text-align: center; margin-right: 20px; flex-shrink: 0; }
+      .recent-item .date-box .month { font-size: 0.8rem; text-transform: uppercase; font-weight: 600; color: var(--text-secondary-light); }
+      body.dark-mode .recent-item .date-box .month { color: var(--text-secondary-dark); }
+      .recent-item .date-box .day { font-size: 1.8rem; font-weight: 700; color: var(--primary-start); line-height: 1; }
+      .recent-item .item-title { flex-grow: 1; font-weight: 500; }
+      .recent-item .item-actions { display: flex; gap: 10px; }
+      .recent-item .item-actions .card-btn { padding: 8px 12px; font-size: 0.8rem; flex-grow: 0; }
+
+      /* --- e-PDF LIBRARY SECTION STYLES --- */
+      .pdf-filter-hub {
+         background: var(--card-bg-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light);
+         border-radius: 16px; padding: 20px; margin-bottom: 30px;
+      }
+      body.dark-mode .pdf-filter-hub { background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none; }
+      .pdf-filter-hub .search-bar { display: flex; margin-bottom: 15px; }
+      .pdf-filter-hub .search-bar input { flex: 1; padding: 12px 18px; border-radius: 8px; font-size: 1rem; background-color: var(--bg-light); border: 1px solid var(--border-light); color: var(--text-primary-light); outline: none; transition: all 0.2s ease; }
+      body.dark-mode .pdf-filter-hub .search-bar input { background-color: var(--bg-dark); border-color: var(--border-dark); color: var(--text-primary-dark); }
+      .pdf-filter-hub .search-bar input:focus { border-color: var(--primary-end); box-shadow: 0 0 0 3px rgba(37, 117, 252, 0.2); }
+      .pdf-filter-hub .filter-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+      .pdf-filter-hub .filter-options select { padding: 10px 15px; border-radius: 8px; font-size: 0.9rem; background-color: var(--bg-light); border: 1px solid var(--border-light); color: var(--text-secondary-light); }
+      body.dark-mode .pdf-filter-hub .filter-options select { background-color: var(--bg-dark); border-color: var(--border-dark); color: var(--text-secondary-dark); }
+      
+      .resource-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+      .resource-card {
+         background: var(--card-bg-light); backdrop-filter: blur(12px); border: 1px solid var(--border-light);
+         border-radius: 16px; padding: 20px; display: flex; flex-direction: column;
+         transition: all 0.3s ease; animation: popIn 0.5s ease-out forwards; opacity: 0;
+      }
+      .resource-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.08); }
+      body.dark-mode .resource-card { background: var(--card-bg-dark); border-color: var(--border-dark); backdrop-filter: none; }
+      .resource-card .card-header { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 12px; }
+      .resource-card .card-icon-wrapper { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 12px; background: var(--primary-gradient); color: white; font-size: 20px; flex-shrink: 0; }
+      .resource-card .card-content { flex-grow: 1; }
+      .resource-card .card-title { font-size: 1.1rem; margin: 0 0 8px; color: var(--text-primary-light); }
+      body.dark-mode .resource-card .card-title { color: var(--text-primary-dark); }
+      .resource-card .card-meta-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+      .meta-tag { font-size: 0.75rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; letter-spacing: 0.5px; }
+      .meta-tag.subject { background-color: rgba(106, 17, 203, 0.1); color: #580ead; }
+      .meta-tag.type { background-color: rgba(37, 117, 252, 0.1); color: #1f61cf; }
+      body.dark-mode .meta-tag.subject { background-color: rgba(160, 107, 224, 0.15); color: #c49fff; }
+      body.dark-mode .meta-tag.type { background-color: rgba(108, 158, 255, 0.15); color: #8cbaff; }
+      .no-results { text-align: center; padding: 60px 20px; background: var(--card-bg-light); border-radius: 16px; display: none; }
+      .no-results i { font-size: 3rem; color: var(--primary-end); margin-bottom: 15px; }
+      body.dark-mode .no-results { background: var(--card-bg-dark); }
+      @keyframes popIn { from { transform: translateY(10px) scale(0.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
+
+   </style>
+</head><body>
+  
+
+    <header class="app-header">
+
+<!-- App Header, Runner Bar, Sidebar (Structure is unchanged) -->
+<header class="app-header"><a href="homeUPSChub.html" class="logo">UPSC Hub</a><div id="toggle-btn" class="icon-btn fas fa-sun"></div></header>
+<div class="runner-bar"><div class="runner-text"><span><i class="fas fa-bolt"></i> Latest: Daily Current Affairs updated at 8 AM.</span><span><i class="fas fa-star"></i> New Notes Added: Modern History.</span></div></div>
+<div class="side-bar">
+    <div class="sidebar-header"><h3 class="title">Complete Menu</h3><div id="close-btn"><i class="fas fa-times"></i></div></div>
+    <div class="profile"><img src="images/LOGO.jpg" class="image" alt="UPSC Hub Logo"><h3 class="name">UPSC Hub</h3><p class="role">Your Success Partner</p></div>
+     <nav class="navbar">
+        <div class="sidebar-category"><h4>Learn</h4></div>
+        <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>PrepLibrary</span></a>
+        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+        <div class="sidebar-category"><h4>Practice & Tools</h4></div>
+        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+        <a href="casimulator.html"><i class="fas fa-lightbulb"></i><span>CA Simulator</span></a>
+        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+        <div class="sidebar-category"><h4>Resources</h4></div>
+        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+        <div class="sidebar-category"><h4>Support & Info</h4></div>
+        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+    </nav>
+</div>
+
+<!-- Main Content Area -->
+<main>
+    <section class="hero-section">
+        <h1>PrepLibrary</h1>
+        <p>Your centralized hub for notes, current affairs, and all study materials.</p>
+    </section>
+    
+    <div class="tab-container">
+        <!-- TAB SWITCHER -->
+        <div class="tab-switcher" id="tab-switcher">
+            <button class="tab-btn active" data-tab="ca-pane">
+                <i class="fas fa-newspaper"></i> Current Affairs
+            </button>
+            <button class="tab-btn" data-tab="pdf-pane">
+                <i class="fas fa-book"></i> e-PDF Library
+            </button>
+            <div class="tab-underline" id="tab-underline"></div>
+        </div>
+
+        <!-- TAB CONTENT PANES -->
+        <div class="tab-content">
+            <!-- Current Affairs Pane -->
+            <div id="ca-pane" class="tab-pane active">
+                <div class="section-header">
+                    <h2>Today's Highlights</h2>
+                    <div class="section-filters">
+                        <select id="ca-month-filter">
+                            <option value="">All Months</option>
+                            <!-- Months will be populated by JS -->
+                        </select>
+                        <select id="ca-year-filter">
+                           <option value="">All Years</option>
+                           <option value="2025">2025</option>
+                           <option value="2024">2024</option>
+                           <option value="2023">2023</option>
+                        </select>
+                    </div>
+                </div>
+                <!-- Featured CA will be injected here -->
+                <div id="ca-featured"></div>
+                
+                <h2 style="margin-top: 40px; margin-bottom: 20px;">Recent Articles</h2>
+                <!-- Recent CA List will be injected here -->
+                <div id="ca-recent-list"></div>
+                 <div class="no-results" id="ca-no-results" style="display: none;"><i class="fas fa-calendar-times"></i><h3>No Articles Found</h3><p>No current affairs articles match your filter criteria.</p></div>
+            </div>
+
+            <!-- e-PDF Library Pane -->
+            <div id="pdf-pane" class="tab-pane">
+                <div class="pdf-filter-hub">
+                    <div class="search-bar">
+                        <input type="text" id="pdf-search-input" placeholder="Search for Polity, History, Economy, etc...">
+                    </div>
+                    <div class="filter-options">
+                        <select id="pdf-subject-filter">
+                           <option value="">All Subjects</option>
+                           <option value="Polity">Polity</option>
+                           <option value="History">History</option>
+                           <option value="Art & Culture">Art & Culture</option>
+                           <option value="Economics">Economics</option>
+                           <option value="Geography">Geography</option>
+                           <option value="Environment">Environment</option>
+                           <option value="Science & Technology">Science & Tech</option>
+                           <option value="International Relations">International Relations</option>
+                           <option value="Internal Security">Internal Security</option>
+                        </select>
+                        <select id="pdf-type-filter">
+                           <option value="">All Types</option>
+                           <option value="Notes">Notes</option>
+                           <option value="Conceptual">Conceptual</option>
+                           <option value="Factual">Factual</option>
+                           <option value="Report">Report</option>
+                           <option value="Schemes">Schemes</option>
+                           <option value="Map-based">Map-based</option>
+                           <option value="Analysis">Analysis</option>
+                           <option value="Current Affairs">Current Affairs</option>
+                           <option value="Social Issues">Social Issues</option>
+                           <option value="Ancient History">Ancient History</option>
+                           <option value="PYQ">PYQ</option>
+                           <option value="Magazine">Magazine</option>
+                           <option value="Book">Book</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="resource-grid" id="pdf-grid"></div>
+                <div class="no-results" id="pdf-no-results" style="display: none;"><i class="fas fa-folder-open"></i><h3>No Materials Found</h3><p>Try adjusting your search or filter criteria.</p></div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Bottom Navigation Bar -->
+<nav class="bottom-nav"><a href="homeUPSChub.html" class="nav-item"> <i class="fas fa-home"></i> <span>Home</span> </a><a href="preplibrary.html" class="nav-item active"> <i class="fas fa-book-reader"></i> <span>Library</span> </a><a href="testinterface.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Mocks</span> </a><div id="menu-btn" class="nav-item"> <i class="fas fa-bars-staggered"></i> <span>Menu</span> </div></nav>
+
+<script>
+// --- DATA MANAGEMENT ---
+// Note: We now have two separate data sources for better organization.
+const currentAffairsData = [
+    { date: '2025-05-29', title: 'Analysis of New Space Policy', source: 'The Hindu, PIB', file: 'CurrentXpress_29May2025.pdf' },
+    { date: '2025-05-28', title: 'RBI Monetary Policy Updates', source: 'Indian Express', file: 'CurrentXpress_28May2025.pdf' },
+    { date: '2025-05-27', title: 'Report on Climate Change Impact', source: 'UNEP, The Hindu', file: 'CurrentXpress_27May2025.pdf' },
+    { date: '2025-04-15', title: 'International Relations Digest', source: 'Multiple Sources', file: 'CA_April_15_2025.pdf' },
+    { date: '2025-04-14', title: 'Economic Survey Highlights', source: 'PIB', file: 'CA_April_14_2025.pdf' },
+    { date: '2023-06-30', title: 'June 2023 Monthly Roundup', source: 'UPSC Hub Compilation', file: 'Monthly Current Affairs - June 2023.pdf' }
+].sort((a, b) => new Date(b.date) - new Date(a.date)); // Sort newest first
+
+const pdfLibraryData = [
+    // Indian Polity & Constitution
+    { title: 'Preamble & Its Philosophy', subject: 'Polity', type: 'Notes', file: 'Polity/Preamble_Philosophy.pdf' },
+    { title: 'Citizenship & Related Amendments (CAA)', subject: 'Polity', type: 'Current Affairs', file: 'Polity/Citizenship_CAA.pdf' },
+    { title: 'DPSP & Fundamental Duties', subject: 'Polity', type: 'Notes', file: 'Polity/DPSP_Fundamental_Duties.pdf' },
+    { title: 'Parliament & Its Functioning', subject: 'Polity', type: 'Conceptual', file: 'Polity/Parliament_Functioning.pdf' },
+    { title: 'The Judiciary: SC, HC & Judicial Review', subject: 'Polity', type: 'Notes', file: 'Polity/The_Judiciary.pdf' },
+    { title: 'Federalism & Centre-State Relations', subject: 'Polity', type: 'Conceptual', file: 'Polity/Federalism_Centre_State.pdf' },
+    { title: 'Panchayati Raj & Urban Local Bodies', subject: 'Polity', type: 'Notes', file: 'Polity/Panchayati_Raj.pdf' },
+    { title: 'Constitutional & Non-Constitutional Bodies', subject: 'Polity', type: 'Factual', file: 'Polity/Constitutional_Bodies.pdf' },
+
+    // Modern History & Art and Culture
+    { title: 'The Revolt of 1857: Causes & Consequences', subject: 'History', type: 'Notes', file: 'History/Revolt_of_1857.pdf' },
+    { title: 'Social & Religious Reform Movements', subject: 'History', type: 'Social Issues', file: 'History/Social_Religious_Reforms.pdf' },
+    { title: 'Gandhian Era (1915-1947): Major Movements', subject: 'History', type: 'Notes', file: 'History/Gandhian_Era.pdf' },
+    { title: 'Indus Valley Civilization: Society, Art & Decline', subject: 'Art & Culture', type: 'Ancient History', file: 'ArtCulture/Indus_Valley_Civilization.pdf' },
+    { title: 'Temple Architecture of India (Nagara, Dravida)', subject: 'Art & Culture', type: 'Notes', file: 'ArtCulture/Temple_Architecture.pdf' },
+    { title: 'Bhakti & Sufi Movements: Impact on Society', subject: 'Art & Culture', type: 'Notes', file: 'ArtCulture/Bhakti_Sufi_Movements.pdf' },
+
+    // Economy
+    { title: 'Economic Survey Analysis', subject: 'Economics', type: 'Report', file: 'Economy/Economic_Survey_Analysis.pdf' },
+    { title: 'Monetary Policy & The Role of RBI', subject: 'Economics', type: 'Conceptual', file: 'Economy/Monetary_Policy_RBI.pdf' },
+    { title: 'Inflation: Types, Causes, and Control', subject: 'Economics', type: 'Conceptual', file: 'Economy/Inflation.pdf' },
+    { title: 'National Income Accounting (GDP, GNP, NNP)', subject: 'Economics', type: 'Notes', file: 'Economy/National_Income_Accounting.pdf' },
+    { title: 'Major Government Schemes & Initiatives', subject: 'Economics', type: 'Schemes', file: 'Economy/Govt_Schemes.pdf' },
+
+    // Geography & Environment
+    { title: 'The Indian Monsoon System: Mechanism & Impact', subject: 'Geography', type: 'Conceptual', file: 'Geography/Indian_Monsoon_System.pdf' },
+    { title: 'Major River Systems of India & Tributaries', subject: 'Geography', type: 'Map-based', file: 'Geography/River_Systems_India.pdf' },
+    { title: 'Physiographic Divisions of India', subject: 'Geography', type: 'Notes', file: 'Geography/Physiographic_Divisions.pdf' },
+    { title: 'Climate Change: Conventions & Summits', subject: 'Environment', type: 'Report', file: 'Environment/Climate_Change_Conventions.pdf' },
+    { title: 'National Parks & Sanctuaries in News', subject: 'Environment', type: 'Map-based', file: 'Environment/National_Parks_News.pdf' },
+
+    // Science & Technology
+    { title: 'Indian Defence Technology', subject: 'Science & Technology', type: 'Notes', file: 'SciTech/Defence_Technology.pdf' },
+    { title: 'Biotechnology: Genetic Engineering & CRISPR', subject: 'Science & Technology', type: 'Conceptual', file: 'SciTech/Biotechnology_Applications.pdf' },
+    { title: 'Artificial Intelligence, Big Data & IoT', subject: 'Science & Technology', type: 'Current Affairs', file: 'SciTech/AI_Big_Data_IoT.pdf' },
+    
+    // Internal Security & International Relations
+    { title: "India's Neighborhood First Policy", subject: 'International Relations', type: 'Analysis', file: 'IR/Neighborhood_First_Policy.pdf' },
+    { title: 'Cyber Security: Threats & Framework', subject: 'Internal Security', type: 'Notes', file: 'Security/Cyber_Security.pdf' },
+];
+
+// --- TAB SWITCHING LOGIC ---
+const tabSwitcher = document.getElementById('tab-switcher');
+const tabButtons = tabSwitcher.querySelectorAll('.tab-btn');
+const tabUnderline = document.getElementById('tab-underline');
+const tabPanes = document.querySelectorAll('.tab-pane');
+
+function updateUnderline(activeTab) {
+    tabUnderline.style.width = `${activeTab.offsetWidth}px`;
+    tabUnderline.style.left = `${activeTab.offsetLeft}px`;
+}
+
+tabButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        const targetPaneId = button.dataset.tab;
+        
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        button.classList.add('active');
+        
+        updateUnderline(button);
+
+        tabPanes.forEach(pane => {
+            pane.classList.toggle('active', pane.id === targetPaneId);
+        });
+    });
+});
+
+
+// --- CURRENT AFFAIRS SECTION LOGIC ---
+const caFeaturedContainer = document.getElementById('ca-featured');
+const caRecentListContainer = document.getElementById('ca-recent-list');
+const caMonthFilter = document.getElementById('ca-month-filter');
+const caYearFilter = document.getElementById('ca-year-filter');
+const caNoResults = document.getElementById('ca-no-results');
+
+function populateMonthFilter() {
+    const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    months.forEach((month, index) => {
+        const option = document.createElement('option');
+        option.value = index; // 0-indexed month
+        option.textContent = month;
+        caMonthFilter.appendChild(option);
+    });
+}
+
+function renderCurrentAffairs() {
+    const month = caMonthFilter.value;
+    const year = caYearFilter.value;
+
+    const filteredCA = currentAffairsData.filter(ca => {
+        const date = new Date(ca.date);
+        const monthMatch = (month === '') || (date.getMonth() == month);
+        const yearMatch = (year === '') || (date.getFullYear() == year);
+        return monthMatch && yearMatch;
+    });
+
+    caNoResults.style.display = filteredCA.length === 0 ? 'block' : 'none';
+    caFeaturedContainer.style.display = filteredCA.length === 0 ? 'none' : 'flex';
+    caRecentListContainer.style.display = filteredCA.length <= 1 ? 'none' : 'block';
+
+
+    if (filteredCA.length > 0) {
+        // Render Featured (latest)
+        const featured = filteredCA[0];
+        const featuredDate = new Date(featured.date);
+        caFeaturedContainer.innerHTML = `
+            <div class="featured-image">
+                <i class="fas fa-newspaper"></i>
+                <h3>${featuredDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</h3>
+            </div>
+            <div class="featured-content">
+                <h3 class="featured-title">${featured.title}</h3>
+                <p class="featured-source">Source: ${featured.source}</p>
+                <div class="card-actions featured-actions">
+                    <button class="card-btn view-btn" onclick="viewPDF('${featured.file}')"><i class="fas fa-eye"></i> View Analysis</button>
+                    <button class="card-btn download-btn" onclick="downloadPDF('${featured.file}')"><i class="fas fa-download"></i> Download PDF</button>
+                </div>
+            </div>
+        `;
+
+        // Render Recent (the rest)
+        caRecentListContainer.innerHTML = '';
+        filteredCA.slice(1).forEach(item => {
+            const itemDate = new Date(item.date);
+            const day = itemDate.getDate();
+            const month = itemDate.toLocaleString('en-US', { month: 'short' });
+            caRecentListContainer.innerHTML += `
+                <div class="recent-item">
+                    <div class="date-box"><span class="day">${day}</span><span class="month">${month}</span></div>
+                    <p class="item-title">${item.title}</p>
+                    <div class="item-actions">
+                        <button class="card-btn view-btn" onclick="viewPDF('${item.file}')"><i class="fas fa-eye"></i></button>
+                        <button class="card-btn download-btn" onclick="downloadPDF('${item.file}')"><i class="fas fa-download"></i></button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+}
+
+caMonthFilter.addEventListener('change', renderCurrentAffairs);
+caYearFilter.addEventListener('change', renderCurrentAffairs);
+
+
+// --- e-PDF LIBRARY SECTION LOGIC ---
+const pdfGrid = document.getElementById('pdf-grid');
+const pdfSearchInput = document.getElementById('pdf-search-input');
+const pdfSubjectFilter = document.getElementById('pdf-subject-filter');
+const pdfTypeFilter = document.getElementById('pdf-type-filter');
+const pdfNoResults = document.getElementById('pdf-no-results');
+
+const getIconForType = (type) => ({
+    'Notes': 'fa-file-alt', 
+    'Magazine': 'fa-book-open', 
+    'Book': 'fa-book', 
+    'PYQ': 'fa-question-circle', 
+    'Report': 'fa-chart-bar',
+    'Conceptual': 'fa-lightbulb',
+    'Factual': 'fa-list-ol',
+    'Current Affairs': 'fa-newspaper',
+    'Schemes': 'fa-bullhorn',
+    'Map-based': 'fa-map-marked-alt',
+    'Analysis': 'fa-search-plus',
+    'Social Issues': 'fa-users',
+    'Ancient History': 'fa-landmark'
+}[type] || 'fa-file-pdf');
+
+function renderPdfLibrary() {
+    const searchTerm = pdfSearchInput.value.toLowerCase();
+    const subject = pdfSubjectFilter.value;
+    const type = pdfTypeFilter.value;
+    
+    const filteredPDFs = pdfLibraryData.filter(pdf => 
+        (pdf.title.toLowerCase().includes(searchTerm) || pdf.subject.toLowerCase().includes(searchTerm)) &&
+        (subject === '' || pdf.subject === subject) &&
+        (type === '' || pdf.type === type)
+    );
+    
+    pdfGrid.innerHTML = '';
+    pdfNoResults.style.display = filteredPDFs.length === 0 ? 'block' : 'none';
+
+    filteredPDFs.forEach((pdf, index) => {
+        const card = document.createElement('div');
+        card.className = 'resource-card';
+        card.style.animationDelay = `${index * 0.05}s`;
+        card.innerHTML = `
+            <div class="card-header">
+               <div class="card-icon-wrapper"><i class="fas ${getIconForType(pdf.type)}"></i></div>
+               <div class="card-content">
+                  <h3 class="card-title">${pdf.title}</h3>
+                  <div class="card-meta-tags">
+                     <span class="meta-tag subject"><i class="fas fa-tag"></i> ${pdf.subject}</span>
+                     <span class="meta-tag type"><i class="fas fa-info-circle"></i> ${pdf.type}</span>
+                  </div>
+               </div>
+            </div>
+            <div class="card-actions">
+               <button class="card-btn view-btn" onclick="viewPDF('${pdf.file}')"><i class="fas fa-eye"></i> View</button>
+               <button class="card-btn download-btn" onclick="downloadPDF('${pdf.file}')"><i class="fas fa-download"></i> Download</button>
+            </div>
+        `;
+        pdfGrid.appendChild(card);
+    });
+}
+
+pdfSearchInput.addEventListener('keyup', renderPdfLibrary);
+pdfSubjectFilter.addEventListener('change', renderPdfLibrary);
+pdfTypeFilter.addEventListener('change', renderPdfLibrary);
+
+
+// --- UTILITY & THEME SCRIPTS (SHARED) ---
+function viewPDF(fileName) { const url = `https://pratyushswain01.github.io/UPSCstudyhub.github.io/pdfs/${encodeURIComponent(fileName)}`; window.open(url, '_blank'); }
+function downloadPDF(fileName) { const url = `https://pratyushswain01.github.io/UPSCstudyhub.github.io/pdfs/${encodeURIComponent(fileName)}`; const a = document.createElement('a'); a.href = url; a.download = fileName; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+const toggleBtn = document.querySelector('#toggle-btn');
+const body = document.body;
+function applyTheme(theme) { body.classList.toggle('dark-mode', theme === 'dark'); toggleBtn.classList.toggle('fa-moon', theme === 'dark'); toggleBtn.classList.toggle('fa-sun', theme !== 'dark'); };
+const savedTheme = localStorage.getItem('theme') || 'light';
+applyTheme(savedTheme);
+toggleBtn.addEventListener('click', () => { const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark'; localStorage.setItem('theme', newTheme); applyTheme(newTheme); });
+const menuBtn = document.querySelector('#menu-btn'), closeBtn = document.querySelector('#close-btn'), sideBar = document.querySelector('.side-bar');
+menuBtn.addEventListener('click', () => sideBar.classList.add('active'));
+closeBtn.addEventListener('click', () => sideBar.classList.remove('active'));
+const bottomNav = document.querySelector('.bottom-nav'); let lastScrollY = window.scrollY;
+window.addEventListener('scroll', () => { if (window.scrollY > lastScrollY && window.scrollY > 100) bottomNav.classList.add('nav-hidden'); else bottomNav.classList.remove('nav-hidden'); lastScrollY = Math.max(0, window.scrollY); });
+
+
+// --- INITIAL PAGE LOAD ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Set up tabs
+    const initialActiveTab = document.querySelector('.tab-btn.active');
+    updateUnderline(initialActiveTab);
+
+    // Populate and render sections
+    populateMonthFilter();
+    renderCurrentAffairs();
+    renderPdfLibrary();
+});
+</script>
+
+</body>
+</html>

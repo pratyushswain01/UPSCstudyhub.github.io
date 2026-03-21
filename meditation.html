@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Meditation | UPSChub </title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      overflow: hidden; /* Prevent scrolling */
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+      color: #ffffff;
+    }
+
+    .container {
+      width: 95%;
+      max-width: 800px;
+      height: 95vh; /* Fit within viewport height */
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden; /* Prevent content overflow */
+    }
+
+    header, footer {
+      background: #1a73e8;
+      padding: 15px 20px;
+      color: #fff;
+      text-align: center;
+      font-weight: bold;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    header {
+      font-size: 1.5rem;
+    }
+
+    footer {
+      font-size: 0.9rem;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .current-time {
+      font-size: 2rem;
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+
+    .quote {
+      font-size: 1.2rem;
+      font-style: italic;
+      margin: 20px 0;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .timer {
+      font-size: 1.5rem;
+      margin: 20px 0;
+    }
+
+    .breathing-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      animation: breathe 6s infinite;
+      margin: 20px 0;
+    }
+
+    @keyframes breathe {
+      0%, 100% {
+        transform: scale(1);
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      50% {
+        transform: scale(1.5);
+        background-color: rgba(255, 255, 255, 0.5);
+      }
+    }
+
+    .buttons {
+      margin-top: 20px;
+    }
+
+    .button {
+      background: linear-gradient(to right, #6a11cb, #2575fc);
+      border: none;
+      padding: 10px 20px;
+      color: white;
+      font-size: 1rem;
+      border-radius: 25px;
+      cursor: pointer;
+      margin: 5px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+      transition: transform 0.2s, background 0.3s;
+    }
+
+    .button:hover {
+      transform: scale(1.05);
+      background: linear-gradient(to right, #2575fc, #6a11cb);
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head><body>
+  
+
+    <header class="app-header">
+  <div class="container">
+    <!-- Header -->
+    <header>
+      UPSChub Meditation 
+    </header>
+
+    <!-- Content -->
+    <div class="content">
+      <!-- Digital Clock -->
+      <div class="current-time" id="current-time">00:00:00</div>
+
+      <!-- Page Title -->
+      <h1>Meditation </h1>
+
+      <!-- Inspirational Quote -->
+      <div class="quote" id="quote">"Breathe in calmness, breathe out stress."</div>
+
+      <!-- Timer -->
+      <div class="timer" id="timer">05:00</div>
+
+      <!-- Breathing Circle -->
+      <div class="breathing-circle"></div>
+
+      <!-- Buttons -->
+      <div class="buttons">
+        <button class="button" id="start-button">Start Meditation</button>
+        <button class="button" id="pause-button" style="display: none;">Pause</button>
+        <button class="button" id="reset-button" style="display: none;">Reset</button>
+        <button class="button" id="music-button">Play Music</button>
+      </div>
+
+      <!-- Meditation Sound -->
+      <audio id="meditation-sound" loop>
+        <source src="omm.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      &copy; 2025 UPSChub Yoga. All rights reserved.
+    </footer>
+  </div>
+
+  <script>
+    // Digital Clock
+    function updateCurrentTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      document.getElementById('current-time').textContent = timeString;
+    }
+    setInterval(updateCurrentTime, 1000);
+
+    // Timer Variables
+    let timerDuration = 300; // 5 minutes in seconds
+    let timerInterval;
+    let isTimerRunning = false;
+
+    const timerElement = document.getElementById('timer');
+    const startButton = document.getElementById('start-button');
+    const pauseButton = document.getElementById('pause-button');
+    const resetButton = document.getElementById('reset-button');
+
+    function formatTime(seconds) {
+      const mins = Math.floor(seconds / 60);
+      const secs = seconds % 60;
+      return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+      if (!isTimerRunning) {
+        isTimerRunning = true;
+        timerInterval = setInterval(() => {
+          if (timerDuration > 0) {
+            timerDuration--;
+            timerElement.textContent = formatTime(timerDuration);
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            alert("Meditation complete!");
+          }
+        }, 1000);
+
+        startButton.style.display = 'none';
+        pauseButton.style.display = 'inline-block';
+        resetButton.style.display = 'inline-block';
+      }
+    }
+
+    function pauseTimer() {
+      if (isTimerRunning) {
+        clearInterval(timerInterval);
+        isTimerRunning = false;
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerDuration = 300;
+      timerElement.textContent = formatTime(timerDuration);
+      startButton.style.display = 'inline-block';
+      pauseButton.style.display = 'none';
+      resetButton.style.display = 'none';
+    }
+
+    // Attach Timer Functions to Buttons
+    startButton.addEventListener('click', startTimer);
+    pauseButton.addEventListener('click', pauseTimer);
+    resetButton.addEventListener('click', resetTimer);
+
+    // Play Music Button
+    const musicButton = document.getElementById('music-button');
+    const meditationSound = document.getElementById('meditation-sound');
+    let isMusicPlaying = false;
+
+    musicButton.addEventListener('click', () => {
+      if (isMusicPlaying) {
+        meditationSound.pause();
+        musicButton.textContent = 'Play Music';
+      } else {
+        meditationSound.play();
+        musicButton.textContent = 'Pause Music';
+      }
+      isMusicPlaying = !isMusicPlaying;
+    });
+
+    // Update Timer Display
+    timerElement.textContent = formatTime(timerDuration);
+  </script>
+</body>
+</html>

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>International Relations – UPSChub</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy2: #1a2d42;
+    --teal: #0e9f8e;
+    --teal2: #12c4b0;
+    --gold: #e8a021;
+    --cream: #f7f4ef;
+    --white: #ffffff;
+    --muted: #6b7a8d;
+    --border: #e0ddd7;
+    --card-bg: #ffffff;
+    --section-bg: #f2f5f9;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--navy);
+    min-height: 100vh;
+  }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    height: 64px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 20px rgba(0,0,0,.3);
+  }
+
+  .logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    letter-spacing: .5px;
+  }
+  .logo span { color: var(--teal2); }
+
+  .nav-links {
+    display: flex;
+    gap: 28px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: rgba(255,255,255,.75);
+    text-decoration: none;
+    font-size: 13.5px;
+    font-weight: 500;
+    letter-spacing: .3px;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--teal2); }
+
+  .nav-right {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .btn-outline {
+    border: 1.5px solid rgba(255,255,255,.3);
+    color: var(--white);
+    background: none;
+    padding: 7px 18px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-outline:hover { border-color: var(--teal2); color: var(--teal2); }
+
+  .btn-prime {
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    color: var(--white);
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    transition: opacity .2s;
+  }
+  .btn-prime:hover { opacity: .9; }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, var(--navy) 0%, var(--navy2) 60%, #1e3a5f 100%);
+    padding: 72px 40px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 60% 50% at 20% 50%, rgba(14,159,142,.15) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 60% at 80% 30%, rgba(232,160,33,.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(14,159,142,.18);
+    border: 1px solid rgba(14,159,142,.4);
+    color: var(--teal2);
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 5vw, 56px);
+    color: var(--white);
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .hero h1 em { color: var(--teal2); font-style: normal; }
+  .hero p {
+    color: rgba(255,255,255,.6);
+    font-size: 15.5px;
+    max-width: 520px;
+    margin: 0 auto 36px;
+    line-height: 1.6;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 14px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .action-btn {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 13px 26px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-family: 'DM Sans', sans-serif;
+    transition: transform .15s, box-shadow .15s;
+    text-decoration: none;
+  }
+  .action-btn:hover { transform: translateY(-2px); }
+
+  .action-btn.primary {
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    color: white;
+    box-shadow: 0 6px 24px rgba(14,159,142,.4);
+  }
+  .action-btn.secondary {
+    background: rgba(255,255,255,.1);
+    color: white;
+    border: 1.5px solid rgba(255,255,255,.2);
+    backdrop-filter: blur(8px);
+  }
+  .action-btn.gold {
+    background: linear-gradient(135deg, #c87e0c, var(--gold));
+    color: white;
+    box-shadow: 0 6px 24px rgba(232,160,33,.35);
+  }
+
+  /* ── STATS BAR ── */
+  .stats-bar {
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+    gap: 0;
+  }
+  .stat-item {
+    padding: 18px 40px;
+    text-align: center;
+    border-right: 1px solid var(--border);
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--teal);
+    font-weight: 700;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+    font-weight: 500;
+    letter-spacing: .3px;
+  }
+
+  /* ── CONTENT ── */
+  .content { max-width: 1200px; margin: 0 auto; padding: 56px 40px; }
+
+  /* ── UNIT HEADER ── */
+  .unit-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 28px;
+    margin-top: 48px;
+  }
+  .unit-header:first-child { margin-top: 0; }
+  .unit-number {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 6px;
+    letter-spacing: .5px;
+    white-space: nowrap;
+  }
+  .unit-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    color: var(--navy);
+    font-weight: 700;
+  }
+  .unit-line {
+    flex: 1;
+    height: 1.5px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  /* ── TOPIC GRID ── */
+  .topic-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+
+  .topic-card {
+    background: var(--card-bg);
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: pointer;
+    transition: all .2s;
+    text-decoration: none;
+    color: var(--navy);
+    position: relative;
+    overflow: hidden;
+  }
+  .topic-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--teal);
+    opacity: 0;
+    transition: opacity .2s;
+    border-radius: 3px 0 0 3px;
+  }
+  .topic-card:hover {
+    border-color: var(--teal);
+    box-shadow: 0 4px 20px rgba(14,159,142,.12);
+    transform: translateY(-1px);
+  }
+  .topic-card:hover::before { opacity: 1; }
+
+  .topic-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, rgba(14,159,142,.1), rgba(14,196,176,.15));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--teal);
+    font-size: 15px;
+  }
+  .topic-name {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    flex: 1;
+  }
+  .topic-arrow {
+    color: var(--muted);
+    font-size: 14px;
+    opacity: 0;
+    transition: opacity .2s, transform .2s;
+  }
+  .topic-card:hover .topic-arrow { opacity: 1; transform: translateX(3px); }
+
+  /* ── SECTION BG ── */
+  .section-alt { background: var(--section-bg); border-radius: 16px; padding: 36px; margin-bottom: 0; }
+
+  /* ── DOWNLOAD BANNER ── */
+  .download-banner {
+    background: linear-gradient(135deg, var(--navy), var(--navy2));
+    border-radius: 16px;
+    padding: 48px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 56px;
+    position: relative;
+    overflow: hidden;
+  }
+  .download-banner::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: rgba(14,159,142,.12);
+  }
+  .dl-text h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .dl-text p {
+    color: rgba(255,255,255,.6);
+    font-size: 14.5px;
+    line-height: 1.5;
+  }
+  .dl-btn {
+    background: linear-gradient(135deg, var(--teal), var(--teal2));
+    color: white;
+    border: none;
+    padding: 14px 32px;
+    border-radius: 10px;
+    font-size: 14.5px;
+    font-weight: 700;
+    cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    white-space: nowrap;
+    box-shadow: 0 6px 24px rgba(14,159,142,.4);
+    transition: opacity .2s, transform .15s;
+    flex-shrink: 0;
+  }
+  .dl-btn:hover { opacity: .9; transform: translateY(-2px); }
+
+  /* ── FOOTER ── */
+  footer {
+    background: var(--navy);
+    color: rgba(255,255,255,.5);
+    text-align: center;
+    padding: 24px 40px;
+    font-size: 13px;
+    margin-top: 72px;
+  }
+  footer span { color: var(--teal2); }
+
+  @media (max-width: 700px) {
+    nav { padding: 0 20px; }
+    .nav-links { display: none; }
+    .content { padding: 36px 20px; }
+    .hero { padding: 52px 20px 60px; }
+    .stats-bar { flex-wrap: wrap; }
+    .download-banner { flex-direction: column; text-align: center; padding: 36px 24px; }
+    .hero-actions { flex-direction: column; align-items: center; }
+  }
+  
+  /* container spacing */
+.btn-center {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;   /* small gap top & bottom */
+}
+
+/* button */
+.view-notes-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 6px 12px;   /* smaller button */
+  font-size: 13px;
+  font-weight: 500;
+
+  color: #fff;
+  background: #2563eb;
+
+  border-radius: 6px;
+  text-decoration: none;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+
+  transition: all 0.2s ease;
+}
+
+/* icon spacing */
+.view-notes-btn i {
+  margin-right: 5px;
+  font-size: 12px;
+}
+
+/* hover */
+.view-notes-btn:hover {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">UPSC<span>hub</span></div>
+  <ul class="nav-links">
+    <li><a href="#">Home</a></li>
+    <li><a href="#">PYQPs</a></li>
+    <li><a href="#">Blog</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn-outline">Login</button>
+   
+  </div>
+</nav>
+
+        
+<!-- HERO -->
+<section class="hero">
+  
+  <div class="btn-center">
+  <a href="notes.html" class="view-notes-btn">
+    <i class="fas fa-arrow-left"></i> View Notes Page
+  </a>
+</div>
+
+  <div class="hero-badge">📘 GS Paper II · UPSC Mains</div>
+  <h1>International<br><em>Relations</em></h1>
+  <p>Comprehensive, exam-focused IR notes covering India's foreign policy, bilateral ties, global institutions & regional groupings.</p>
+  <div class="hero-actions">
+    <a href="#" class="action-btn primary">📄 Syllabus</a>
+    <a href="#" class="action-btn gold">⬇ Download Notes PDF</a>
+    <a href="#" class="action-btn secondary">❓ UPSC PYQPs</a>
+  </div>
+</section>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">5</div><div class="stat-label">Units</div></div>
+  <div class="stat-item"><div class="stat-num">80+</div><div class="stat-label">Topics Covered</div></div>
+  <div class="stat-item"><div class="stat-num">200+</div><div class="stat-label">PYQ Questions</div></div>
+  <div class="stat-item"><div class="stat-num">Free</div><div class="stat-label">PDF Download</div></div>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="content">
+
+  <!-- UNIT I -->
+  <div class="unit-header">
+    <div class="unit-number">UNIT I</div>
+    <div class="unit-title">India and Its Neighbourhood</div>
+    <div class="unit-line"></div>
+  </div>
+  <div class="topic-grid">
+    <a href="#" class="topic-card"><div class="topic-icon">🏛</div><div class="topic-name">Indian Foreign Policy: Objectives and Evolution</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌐</div><div class="topic-name">India and its Neighbourhood Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇧🇩</div><div class="topic-name">India–Bangladesh Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇵🇰</div><div class="topic-name">India–Pakistan Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇱🇰</div><div class="topic-name">India–Sri Lanka Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇦🇫</div><div class="topic-name">India–Afghanistan Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇨🇳</div><div class="topic-name">India–China Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇧🇹</div><div class="topic-name">India–Bhutan Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇳🇵</div><div class="topic-name">India–Nepal Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇲🇻</div><div class="topic-name">India–Maldives Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇲🇲</div><div class="topic-name">India–Myanmar Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">✈️</div><div class="topic-name">India's Diaspora Policy</div><div class="topic-arrow">→</div></a>
+  </div>
+
+  <!-- UNIT II -->
+  <div class="unit-header">
+    <div class="unit-number">UNIT II</div>
+    <div class="unit-title">India and its Extended Neighbourhood</div>
+    <div class="unit-line"></div>
+  </div>
+  <div class="topic-grid">
+    <a href="#" class="topic-card"><div class="topic-icon">🌏</div><div class="topic-name">India–ASEAN Relations (Southeast Asia)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌊</div><div class="topic-name">Mekong-Ganga Cooperation (MGC)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🤝</div><div class="topic-name">East Asia Summit (EAS)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">📦</div><div class="topic-name">Regional Comprehensive Economic Partnership</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇸🇬</div><div class="topic-name">India–Singapore Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇮🇩</div><div class="topic-name">India–Indonesia Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇻🇳</div><div class="topic-name">India–Vietnam Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇲🇾</div><div class="topic-name">India–Malaysia Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇹🇭</div><div class="topic-name">India–Thailand Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🕌</div><div class="topic-name">India–West Asia Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇸🇦</div><div class="topic-name">India–Saudi Arabia Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇮🇷</div><div class="topic-name">India–Iran Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇮🇱</div><div class="topic-name">India–Israel Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇦🇪</div><div class="topic-name">India–UAE Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🛣</div><div class="topic-name">INSTC (North-South Transport Corridor)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">⛽</div><div class="topic-name">TAPI Gas Pipeline</div><div class="topic-arrow">→</div></a>
+  </div>
+
+  <!-- UNIT III -->
+  <div class="unit-header">
+    <div class="unit-number">UNIT III</div>
+    <div class="unit-title">Bilateral Relations with Important Countries</div>
+    <div class="unit-line"></div>
+  </div>
+  <div class="topic-grid">
+    <a href="#" class="topic-card"><div class="topic-icon">🇺🇸</div><div class="topic-name">India–US Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇷🇺</div><div class="topic-name">India–Russia Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇯🇵</div><div class="topic-name">India–Japan Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇰🇷</div><div class="topic-name">India–South Korea Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇦🇺</div><div class="topic-name">India–Australia Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇫🇷</div><div class="topic-name">India–France Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇩🇪</div><div class="topic-name">India–Germany Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇬🇧</div><div class="topic-name">India–UK Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇪🇺</div><div class="topic-name">India–EU Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇨🇦</div><div class="topic-name">India–Canada Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌴</div><div class="topic-name">India and Pacific Island Nations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌍</div><div class="topic-name">India–Africa Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🇧🇷</div><div class="topic-name">India–Brazil Relations</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌎</div><div class="topic-name">India–Latin America Relations</div><div class="topic-arrow">→</div></a>
+  </div>
+
+  <!-- UNIT IV -->
+  <div class="unit-header">
+    <div class="unit-number">UNIT IV</div>
+    <div class="unit-title">Regional and Global Groupings</div>
+    <div class="unit-line"></div>
+  </div>
+  <div class="topic-grid">
+    <a href="#" class="topic-card"><div class="topic-icon">🌐</div><div class="topic-name">Regionalism & Multilateralism</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🧱</div><div class="topic-name">BRICS</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌊</div><div class="topic-name">BIMSTEC</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🤝</div><div class="topic-name">SAARC</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🔗</div><div class="topic-name">SCO (Shanghai Cooperation Organisation)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">7️⃣</div><div class="topic-name">G7 – Group of Seven</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">2️⃣0️⃣</div><div class="topic-name">G20 – Group of Twenty</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🔱</div><div class="topic-name">QUAD</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">⚓</div><div class="topic-name">AUKUS</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🌏</div><div class="topic-name">India and Indian Ocean Region</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🕊</div><div class="topic-name">Non-Aligned Movement (NAM)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">⛽</div><div class="topic-name">OPEC</div><div class="topic-arrow">→</div></a>
+  </div>
+
+  <!-- UNIT V -->
+  <div class="unit-header">
+    <div class="unit-number">UNIT V</div>
+    <div class="unit-title">Important International Institutions & Agencies</div>
+    <div class="unit-line"></div>
+  </div>
+  <div class="topic-grid">
+    <a href="#" class="topic-card"><div class="topic-icon">🏛</div><div class="topic-name">United Nations (UN)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🛡</div><div class="topic-name">UN Security Council</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">⚖️</div><div class="topic-name">International Court of Justice (ICJ)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">⚖️</div><div class="topic-name">International Criminal Court (ICC)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🏦</div><div class="topic-name">World Bank Group</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">💱</div><div class="topic-name">IMF</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">📦</div><div class="topic-name">WTO</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🎓</div><div class="topic-name">UNESCO</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">☀️</div><div class="topic-name">International Solar Alliance (ISA)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">💰</div><div class="topic-name">FATF</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🛡</div><div class="topic-name">NATO</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🏦</div><div class="topic-name">Asian Infrastructure Investment Bank (AIIB)</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">🏥</div><div class="topic-name">WHO</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">☢️</div><div class="topic-name">IAEA</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">👮</div><div class="topic-name">Interpol</div><div class="topic-arrow">→</div></a>
+    <a href="#" class="topic-card"><div class="topic-icon">👶</div><div class="topic-name">UNICEF</div><div class="topic-arrow">→</div></a>
+  </div>
+
+  <!-- DOWNLOAD BANNER -->
+  <div class="download-banner">
+    <div class="dl-text">
+      <h2>Download Complete IR Notes PDF</h2>
+      <p>Get all 5 units in a single, print-ready PDF — curated for UPSC Mains GS Paper II. Updated for 2025–26.</p>
+    </div>
+    <button class="dl-btn">⬇ Download Free PDF</button>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<footer>
+  © 2026 <span>UPSChub</span> &nbsp;·&nbsp; support@upschub.com &nbsp;·&nbsp; All rights reserved
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Daily Test Series - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .gradient-text { background-image: linear-gradient(to right, #1e3a8a, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        @keyframes scaleIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .animate-scale { animation: scaleIn 0.3s ease-out forwards; }
+    </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+    <div id="page-loader" class="fixed inset-0 z-[100] flex items-center justify-center bg-white">
+        <div class="text-center">
+            <svg class="animate-spin h-10 w-10 text-blue-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            <p id="loader-text" class="mt-4 text-slate-500 font-semibold tracking-wide">Connecting to UPSChub...</p>
+        </div>
+    </div>
+
+    <div id="main-content" class="hidden flex flex-col min-h-screen">
+        <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
+             <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3 text-2xl font-extrabold text-blue-600">
+                    <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="Logo" class="h-10 w-10 rounded-xl shadow-sm">
+                    <span>UPSChub</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span id="user-status" class="hidden sm:inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black bg-slate-100 text-slate-500 uppercase tracking-widest border border-slate-200">Aspirant</span>
+                    <a href="dashboard.html" class="px-5 py-2 text-sm font-bold rounded-xl bg-blue-600 text-white hover:bg-blue-700 transition-all shadow-md">Dashboard</a>
+                </div>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-8 flex-grow">
+            <div class="text-center mb-12">
+                 <h1 class="text-4xl sm:text-6xl font-black tracking-tight gradient-text mb-4">Daily Test Series</h1>
+                 <p class="text-slate-500 text-lg max-w-xl mx-auto">Master UPSC Topics chapter-by-chapter with expert practice sets.</p>
+            </div>
+
+            <div id="recent-results-container" class="mb-16 hidden">
+                <div class="flex items-center gap-2 mb-6">
+                    <div class="h-8 w-1.5 bg-yellow-500 rounded-full"></div>
+                    <h3 class="text-xl font-bold text-slate-800">Your Progress</h3>
+                </div>
+                <div id="results-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            </div>
+            
+            <div class="mb-10">
+                 <div class="relative w-full sm:max-w-md mx-auto">
+                    <input type="text" id="search-input" placeholder="Search chapter names..." class="w-full pl-12 pr-5 py-3.5 border border-slate-200 rounded-2xl focus:ring-4 focus:ring-blue-100 focus:border-blue-500 transition shadow-sm outline-none font-medium">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
+                        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    </div>
+                </div>
+            </div>
+
+            <div id="test-list-container" class="space-y-16">
+                </div>
+        </main>
+
+        <footer class="bg-white border-t border-slate-200 py-10 text-center">
+            <p class="text-slate-400 font-bold text-sm tracking-widest">&copy; 2026 UPSChub • SUCCEED WITH US</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = { 
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", 
+            authDomain: "upscstudyhub-github.firebaseapp.com", 
+            projectId: "upscstudyhub-github", 
+            storageBucket: "upscstudyhub-github.firebasestorage.app", 
+            messagingSenderId: "451692540885", 
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c" 
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        
+        let allTests = [];
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    // SILENT FETCH: Premium status
+                    getDoc(doc(db, "users", user.uid)).then(uDoc => {
+                        if (uDoc.exists() && uDoc.data().isPremium) {
+                            const s = document.getElementById('user-status');
+                            s.textContent = 'Premium Member';
+                            s.classList.replace('text-slate-500', 'text-blue-600');
+                            s.classList.replace('bg-slate-100', 'bg-blue-50');
+                        }
+                        document.getElementById('user-status').classList.remove('hidden');
+                    }).catch(() => console.log("User doc not created yet."));
+
+                    // CRITICAL FETCH: Test List
+                    const snap = await getDocs(collection(db, "dailytests"));
+                    allTests = [];
+                    snap.forEach(d => allTests.push({ id: d.id, ...d.data() }));
+
+                    // SILENT FETCH: Recent Results
+                    fetchUserHistory(user.uid);
+
+                    renderUI();
+
+                    document.getElementById('page-loader').classList.add('hidden');
+                    document.getElementById('main-content').classList.remove('hidden');
+                    document.getElementById('search-input').addEventListener('input', renderUI);
+
+                } catch (error) { 
+                    console.error("Critical Sync Error:", error);
+                    document.getElementById('loader-text').innerHTML = `
+                        <div class="text-red-600 font-black text-xl mb-1">Database Error</div>
+                        <div class="text-slate-400 text-sm">Verify the 'dailytests' collection exists in Firestore root.</div>`;
+                }
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        async function fetchUserHistory(uid) {
+            try {
+                const resultsRef = collection(db, "users", uid, "testHistory");
+                const q = query(resultsRef, orderBy("timestamp", "desc"), limit(4));
+                const snap = await getDocs(q);
+                
+                if (!snap.empty) {
+                    const grid = document.getElementById('results-grid');
+                    document.getElementById('recent-results-container').classList.remove('hidden');
+                    grid.innerHTML = ''; 
+                    snap.forEach(d => {
+                        const r = d.data();
+                        grid.innerHTML += `
+                            <div class="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm animate-scale">
+                                <p class="text-[10px] text-blue-600 font-black uppercase mb-1">${r.subject || 'Polity'}</p>
+                                <h4 class="font-extrabold text-slate-800 truncate text-sm mb-3">${r.testName}</h4>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xl font-black">${r.score}/${r.totalScore}</span>
+                                    <span class="text-[10px] px-2 py-0.5 rounded-full bg-green-50 text-green-700 font-bold border border-green-100">${r.percentage}%</span>
+                                </div>
+                            </div>`;
+                    });
+                }
+            } catch (e) { console.warn("History fetch failed - likely no results yet."); }
+        }
+
+        function renderUI() {
+            const container = document.getElementById('test-list-container');
+            const search = document.getElementById('search-input').value.toLowerCase();
+            
+            if (allTests.length === 0) {
+                container.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-slate-200"><p class="text-slate-400 font-bold">No tests found in 'dailytests' root collection.</p></div>`;
+                return;
+            }
+
+            const grouped = allTests.reduce((acc, t) => {
+                const sub = t.subject || 'Indian Polity';
+                const ch = t.chapterName || `Chapter ${t.chapter || '1'}`;
+                if (!acc[sub]) acc[sub] = {};
+                if (!acc[sub][ch]) acc[sub][ch] = [];
+                acc[sub][ch].push(t);
+                return acc;
+            }, {});
+
+            container.innerHTML = '';
+            for (const sub in grouped) {
+                const subDiv = document.createElement('div');
+                subDiv.innerHTML = `<h2 class="text-3xl font-black text-slate-900 mb-8 border-l-8 border-blue-600 pl-6 uppercase tracking-tight">${sub}</h2>`;
+                
+                for (const ch in grouped[sub]) {
+                    if (ch.toLowerCase().includes(search)) {
+                        const section = document.createElement('div');
+                        section.className = "mb-12 bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm";
+                        section.innerHTML = `<h3 class="text-xl font-extrabold text-slate-700 mb-8 flex items-center gap-3"><span class="h-2 w-2 bg-blue-500 rounded-full"></span> ${ch}</h3>`;
+                        
+                        const grid = document.createElement('div');
+                        grid.className = "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6";
+                        
+                        grouped[sub][ch].sort((a,b) => (a.set || 0) - (b.set || 0)).forEach(test => {
+                            const card = document.createElement('div');
+                            card.className = "group bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 hover:border-blue-400 hover:bg-white hover:shadow-2xl transition-all duration-500";
+                            card.innerHTML = `
+                                <div class="flex justify-between items-start mb-6">
+                                    <span class="text-[11px] font-black text-white bg-blue-600 px-4 py-1.5 rounded-full uppercase">Set ${test.set || '1'}</span>
+                                    <div class="text-right text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                                        <p>${test.totalQuestions || 50} Qs</p>
+                                        <p>${test.durationMinutes || 50} Mins</p>
+                                    </div>
+                                </div>
+                                <h4 class="font-bold text-slate-800 text-lg mb-8 line-clamp-2">${test.testName}</h4>
+                                <a href="test_player.html?testId=${test.id}" class="block w-full text-center py-4 bg-white text-slate-900 border-2 border-slate-100 rounded-2xl text-xs font-black group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all shadow-sm">START PRACTICE</a>
+                            `;
+                            grid.appendChild(card);
+                        });
+                        section.appendChild(grid);
+                        subDiv.appendChild(section);
+                    }
+                }
+                container.appendChild(subDiv);
+            }
+        }
+    </script>
+</body>
+</html>
