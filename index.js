@@ -1,10 +1,8 @@
-require('dotenv').config();
-
 const express = require('express');
 const cors = require('cors');
 const admin = require('firebase-admin');
 const path = require('path');
-const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+const serviceAccount = require('./serviceAccount.json');
 
 // ─── FIREBASE INIT ─────────────────
 admin.initializeApp({
@@ -25,10 +23,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
-
-// Handle preflight requests
 app.options('*', cors());
-
 app.use(express.json());
 
 // ─── BASIC ROUTE ─────────────────
@@ -404,10 +399,15 @@ app.get('*', (req, res) => {
 // ─── START SERVER ─────────────────
 const PORT = process.env.PORT || 5003;
 app.listen(PORT, () => {
-  console.log(`🔥 Server running on http://localhost:${PORT}`);
-  console.log(`🔥 Connected to Firestore`);
-  // Keep alive — prevents Render free tier from sleeping
+  console.log('🔥 Server running on port ' + PORT);
+  console.log('🔥 Connected to Firestore');
+
+  // Keep-alive: ping self every 10 mins to prevent Render free tier sleep
   setInterval(() => {
-    require('https').get('https://upse-planner.onrender.com/').on('error', ()=>{});
-  }, 600000);
+    require('https').get('https://upse-planner.onrender.com/', (res) => {
+      console.log('Keep-alive ping: ' + res.statusCode);
+    }).on('error', (e) => {
+      console.log('Keep-alive error (ok): ' + e.message);
+    });
+  }, 10 * 60 * 1000); // every 10 minutes
 });
