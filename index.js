@@ -380,22 +380,9 @@ setInterval(async () => {
   }
 }, 3600000);
 
-// ─── SERVE HTML ─────────────────
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'login.html'));
-});
-
-app.get('/app', (req, res) => {
-  res.sendFile(path.join(__dirname, 'upschub-app.html'));
-});
-
-app.get('/add-task', (req, res) => {
-  res.sendFile(path.join(__dirname, 'upschub-app.html'));
-});
-
-// ✅ Catch-all — must be LAST, handles any other frontend routes
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'upschub-app.html'));
+// ─── CATCH UNKNOWN ROUTES ─────────────────
+app.use((req, res) => {
+  res.status(404).json({ error: 'Route not found: ' + req.path });
 });
 
 // ─── START SERVER ─────────────────
