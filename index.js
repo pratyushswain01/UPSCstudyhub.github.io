@@ -405,7 +405,7 @@ app.listen(PORT, () => {
 
   // Keep-alive: ping self every 10 mins to prevent Render free tier sleep
   setInterval(() => {
-    require('https').get('https://upse-planner.onrender.com/', (res) => {
+    require('https').get('https://upsc-planner.onrender.com/', (res) => {
       console.log('Keep-alive ping: ' + res.statusCode);
     }).on('error', (e) => {
       console.log('Keep-alive error (ok): ' + e.message);
