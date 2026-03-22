@@ -392,8 +392,12 @@ app.get('*', (req, res) => {
 });
 
 // ─── START SERVER ─────────────────
-const PORT = 5003;
+const PORT = process.env.PORT || 5003;
 app.listen(PORT, () => {
   console.log(`🔥 Server running on http://localhost:${PORT}`);
   console.log(`🔥 Connected to Firestore`);
+  // Keep alive — prevents Render free tier from sleeping
+  setInterval(() => {
+    require('https').get('https://upse-planner.onrender.com/').on('error', ()=>{});
+  }, 600000);
 });
