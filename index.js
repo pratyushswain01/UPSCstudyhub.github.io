@@ -110,8 +110,9 @@ app.post('/add-task', async (req, res) => {
 
     console.log("✅ Task saved:", ref.id);
 
+    // Send Telegram — don't let it block or crash the response
     if (sendTelegramReminder) {
-      await sendTelegramReminder({ title, time: "Added Now ✅" });
+      sendTelegramReminder({ title, time: "Added Now" }).catch(e => console.log("Telegram skip:", e.message));
     }
 
     res.json({ id: ref.id, ...taskData });
@@ -405,7 +406,7 @@ app.listen(PORT, () => {
 
   // Keep-alive: ping self every 10 mins to prevent Render free tier sleep
   setInterval(() => {
-    require('https').get('https://upsc-planner.onrender.com/', (res) => {
+    require('https').get('https://upse-planner.onrender.com/', (res) => {
       console.log('Keep-alive ping: ' + res.statusCode);
     }).on('error', (e) => {
       console.log('Keep-alive error (ok): ' + e.message);
