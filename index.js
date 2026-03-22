@@ -13,18 +13,18 @@ admin.initializeApp({
 const db = admin.firestore();
 
 const app = express();
-app.use(cors({
-  origin: [
-    'https://upscstudyhub-github.web.app',
-    'https://upscstudyhub-github.firebaseapp.com',
-    'http://localhost:5003',
-    'http://localhost:3000'
-  ],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
-app.options('*', cors());
+const corsOptions = {
+  origin: function(origin, callback) {
+    // Allow all origins including null (mobile apps, curl, etc)
+    callback(null, true);
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
 app.use(express.json());
 
 // ─── BASIC ROUTE ─────────────────
