@@ -119,14 +119,14 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // Path
+        // 🔥 FIXED PATH
         const appId = "default-app-id";
 
         // AUTH STATE
         setPersistence(auth, browserLocalPersistence).then(() => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
-                    console.log("User logged in:", user.uid);
+                    console.log("✅ User logged in:", user.uid);
 
                     try {
                         const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
@@ -134,20 +134,29 @@
                         let snap = await getDoc(userRef);
 
                         if (!snap.exists()) {
+                            console.log("🟡 Creating new user document...");
+
                             await setDoc(userRef, {
                                 email: user.email,
                                 isPremium: false,
                                 createdAt: new Date()
                             });
+
+                            console.log("✅ User document created:", user.uid);
+                        } else {
+                            console.log("✅ User document already exists");
                         }
 
                         const urlParams = new URLSearchParams(window.location.search);
                         const redirectUrl = urlParams.get('redirect');
 
+                        console.log("➡️ Redirecting...");
                         window.location.href = redirectUrl || "dashboard.html";
 
                     } catch (error) {
-                        console.error("Auth error:", error);
+                        console.error("🔥 Firestore ERROR:", error);
+
+                        // IMPORTANT: still redirect
                         window.location.href = "dashboard.html";
                     }
                 }
@@ -170,6 +179,8 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
+                console.log("🟡 Signup success:", user.uid);
+
                 const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
 
                 await setDoc(userRef, {
@@ -178,10 +189,12 @@
                     createdAt: new Date()
                 });
 
+                console.log("✅ Firestore saved:", user.uid);
+
                 displayMessage("Account created successfully!", "green");
 
             } catch (error) {
-                console.error(error.code, error.message);
+                console.error("🔥 Signup ERROR:", error);
                 displayMessage(error.message, "red");
             }
         });
@@ -195,9 +208,10 @@
 
             try {
                 await signInWithEmailAndPassword(auth, email, password);
+                console.log("🟡 Login success");
                 displayMessage("Logging in...", "green");
             } catch (error) {
-                console.error(error.code, error.message);
+                console.error("🔥 Login ERROR:", error);
                 displayMessage("Invalid email or password", "red");
             }
         });
@@ -208,7 +222,7 @@
             messageDiv.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
         }
 
-        // FORM TOGGLE (IMPORTANT - fixes signup button issue)
+        // FORM TOGGLE
         const showSignup = document.getElementById("show-signup");
         const showSignin = document.getElementById("show-signin");
         const loginSection = document.getElementById("loginForm").parentElement;
