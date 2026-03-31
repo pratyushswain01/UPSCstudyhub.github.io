@@ -205,7 +205,9 @@
                 try {
                     document.getElementById('loader-text').textContent = 'Fetching user data...';
                     // CORRECTED: Using the original, correct path for the user document
-                    const userDocRef = doc(db, "users", user.uid);
+                    const appId = "default-app-id";  // ADD THIS ABOVE
+
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const docSnap = await getDoc(userDocRef);
 
                     if (docSnap.exists()) {
@@ -369,7 +371,9 @@
                 "key": "rzp_test_YourKey", "amount": 9900, "currency": "INR", "name": "UPSChub",
                 "description": "UPSChub Lifetime Premium Access",
                 "handler": async function (response) {
-                    const userDocRef = doc(db, "users", user.uid);
+                    const appId = "default-app-id";
+
+                    const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     await updateDoc(userDocRef, { isPremium: true });
                     window.location.reload();
                 },
@@ -512,9 +516,7 @@
             else if (target.id === 'upgrade-btn-modal') handleUpgrade();
         });
 
-        if (!docSnap.exists()) {
-            await setDoc(userDocRef, { email: user.email, isPremium: false });
-        }
+
 
 
     </script>

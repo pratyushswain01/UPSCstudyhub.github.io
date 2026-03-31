@@ -119,14 +119,17 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ✅ AUTH STATE (VERY IMPORTANT)
+        // ✅ IMPORTANT (your required path)
+        const appId = "default-app-id";
+
+        // ✅ AUTH STATE
         setPersistence(auth, browserLocalPersistence).then(() => {
             onAuthStateChanged(auth, async (user) => {
                 if (user) {
                     console.log("User logged in:", user.uid);
 
-                    // ✅ Ensure user document exists
-                    const userRef = doc(db, "users", user.uid);
+                    // ✅ CHECK / CREATE USER DOC IN ARTIFACTS PATH
+                    const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const snap = await getDoc(userRef);
 
                     if (!snap.exists()) {
@@ -135,7 +138,7 @@
                             isPremium: false,
                             createdAt: new Date()
                         });
-                        console.log("User doc created automatically");
+                        console.log("User doc created in artifacts ✅");
                     }
 
                     // Redirect
@@ -163,8 +166,8 @@
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                // ✅ FIXED PATH (IMPORTANT)
-                await setDoc(doc(db, "users", user.uid), {
+                // ✅ SAVE IN ARTIFACTS PATH
+                await setDoc(doc(db, `artifacts/${appId}/users`, user.uid), {
                     email: user.email,
                     isPremium: false,
                     createdAt: new Date()
