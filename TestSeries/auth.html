@@ -128,24 +128,33 @@
                 if (user) {
                     console.log("User logged in:", user.uid);
 
-                    // ✅ CHECK / CREATE USER DOC IN ARTIFACTS PATH
-                    const userRef = doc(db, `artifacts/default-app-id/users`, user.uid);
-                    const snap = await getDoc(userRef);
+                    try {
+                        const userRef = doc(db, `artifacts/default-app-id/users`, user.uid);
 
-                    if (!snap.exists()) {
-                        await setDoc(userRef, {
-                            email: user.email,
-                            isPremium: false,
-                            createdAt: new Date()
-                        });
-                        console.log("User doc created in artifacts ✅");
+                        let snap = await getDoc(userRef);
+
+                        if (!snap.exists()) {
+                            await setDoc(userRef, {
+                                email: user.email,
+                                isPremium: false,
+                                createdAt: new Date()
+                            });
+                        }
+
+                        console.log("User ready, redirecting...");
+
+                        // ✅ IMPORTANT: redirect MUST be inside try
+                        const urlParams = new URLSearchParams(window.location.search);
+                        const redirectUrl = urlParams.get('redirect');
+
+                        window.location.href = redirectUrl || "dashboard.html";
+
+                    } catch (error) {
+                        console.error("Auth error:", error);
+
+                        // 🔥 fallback redirect (VERY IMPORTANT)
+                        window.location.href = "dashboard.html";
                     }
-
-                    // Redirect
-                    const urlParams = new URLSearchParams(window.location.search);
-                    const redirectUrl = urlParams.get('redirect');
-
-                    window.location.href = redirectUrl || "dashboard.html";
                 }
             });
         });
