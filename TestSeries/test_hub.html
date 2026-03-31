@@ -216,8 +216,12 @@
                         isPremiumUser = docSnap.data().isPremium || false;
                     } else {
                         // This case might occur for a brand new user.
-                        await setDoc(userDocRef, { email: user.email, isPremium: false }, { merge: true });
-                        isPremiumUser = false;
+                        await setDoc(userDocRef, {
+                            email: user.email,
+                            isPremium: false,
+                            createdAt: new Date()
+                        });
+
                     }
 
                     document.getElementById('loader-text').textContent = 'Loading tests...';
@@ -229,7 +233,7 @@
                     mainContent.classList.remove('hidden');
 
                 } catch (error) {
-                    console.error("Authentication or data fetching failed:", error);
+                    console.error("🔥 FULL ERROR:", error.code, error.message, error);
                     // Handle the error: show an error message instead of a stuck loader
                     pageLoader.innerHTML = `<div class="text-center text-red-500 p-4">
                         <p class="font-semibold">Could not load page data.</p>
