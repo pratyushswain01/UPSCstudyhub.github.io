@@ -172,7 +172,7 @@
         }
 
         .dark.exam-active::after {
-            color: rgba(255, 255, 255, 0.02);
+            color: rgba(0, 0, 0, 0.03);
         }
 
         /* ==================== UTILITY CLASSES ==================== */
@@ -249,7 +249,7 @@
         .site-header {
             position: sticky;
             top: 0;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: space-between;
             padding: var(--spacing-md) var(--spacing-xl);
@@ -594,17 +594,30 @@
         .topbar {
             position: sticky;
             top: 0;
+            z-index: 1000;
+
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: var(--spacing-md) var(--spacing-xl);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border-color);
-            z-index: 99;
+
+            height: 70px;
+            padding: 12px 25px;
+
+            /* Glass effect */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            /* Border + subtle shadow */
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+
+            /* Smooth transition */
+            transition: all 0.3s ease;
+
+            /* Responsive */
             flex-wrap: wrap;
-            gap: var(--spacing-md);
+            gap: 10px;
         }
 
         .topbar-left-group,
@@ -660,34 +673,52 @@
 
         .navigation-tabs {
             display: flex;
-            gap: var(--spacing-xs);
-            background: rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: var(--radius-lg);
+            gap: 6px;
             padding: 4px;
+
+            /* Modern soft background */
+            background: #e2e8f0;
+
+            /* Glass + depth feel */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+
+            border-radius: 14px;
+
+            /* Subtle inner effect */
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+
+            /* Smooth UI */
+            transition: all 0.3s ease;
         }
 
         .nav-tab {
-            padding: var(--spacing-sm) var(--spacing-lg);
+            padding: 10px 22px;
+
             border: none;
-            border-radius: var(--radius-md);
+            border-radius: 12px;
+
             background: transparent;
-            color: var(--text-primary);
-            font-size: 0.875rem;
-            font-weight: 600;
+            color: #64748b;
+
+            font-size: 0.9rem;
+            font-weight: 700;
+
             cursor: pointer;
-            transition: all var(--transition-fast);
             position: relative;
+
+            transition: all 0.3s ease;
         }
+
 
         .nav-tab:hover:not(.locked) {
             background: rgba(255, 255, 255, 0.1);
         }
 
         .nav-tab.active {
-            background: white;
-            color: var(--primary-color);
-            box-shadow: var(--shadow-md);
+            background: #ffffff;
+            color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
 
         .dark .nav-tab.active {
@@ -949,23 +980,40 @@
             z-index: 1;
         }
 
-        /* ==================== SIDEBAR (QUESTION PALETTE) ==================== */
         .sidebar {
             position: fixed;
-            top: 140px;
-            right: -320px;
+            top: 90px;
+            right: 25px;
+
             width: 320px;
-            height: calc(100% - 140px);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-left: 1px solid var(--glass-border);
+            max-height: calc(100vh - 110px);
+            /* Prevent overflow */
+
             display: flex;
             flex-direction: column;
-            transition: right var(--transition-base);
+
+            /* Clean card UI */
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 25px;
+
+            /* Subtle border + shadow */
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+
+            /* Optional glass feel */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            /* Smooth appearance */
+            transition: all 0.3s ease;
+
             z-index: 150;
-            box-shadow: var(--shadow-2xl);
+
+            overflow-y: auto;
         }
+
+
 
         .sidebar-open .sidebar {
             right: 0;
@@ -996,18 +1044,37 @@
         }
 
         .question-number {
-            width: 42px;
-            height: 42px;
+            width: 48px;
+            height: 48px;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: var(--radius-md);
-            cursor: pointer;
+
+            border-radius: 14px;
+
+            background: #f1f5f9;
+            color: #334155;
+
+            font-size: 1rem;
             font-weight: 700;
-            font-size: 0.875rem;
-            transition: all var(--transition-fast);
-            border: 2px solid transparent;
+
+            cursor: pointer;
             position: relative;
+
+            border: 2px solid transparent;
+
+            transition: all 0.25s ease;
+        }
+
+
+
+        .question-number.active {
+            background: #007bff;
+            color: #ffffff;
+            border-color: #007bff;
+
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
         }
 
         .question-number:hover {
@@ -1043,9 +1110,10 @@
         }
 
         .question-number.current {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
-            transform: scale(1.1);
+            background: #e0e7ff;
+            border-color: #6366f1;
+            color: #4338ca;
+            transform: scale(1.05);
         }
 
         .palette-summary {
@@ -1143,13 +1211,20 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border-color);
-            padding: var(--spacing-md) var(--spacing-xl);
+
+            padding: 15px 40px;
+
+            /* Clean modern background */
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+
             z-index: 100;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+
+            /* Soft top shadow */
+            box-shadow: 0 -6px 25px rgba(0, 0, 0, 0.08);
         }
 
         .action-buttons {
@@ -1161,20 +1236,29 @@
 
         .btn-action {
             flex: 1;
-            padding: var(--spacing-md);
-            border: none;
-            border-radius: var(--radius-lg);
-            font-weight: 700;
-            font-size: 0.875rem;
-            cursor: pointer;
+
+            height: 55px;
+            padding: 0 16px;
+
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: var(--spacing-sm);
-            transition: all var(--transition-fast);
-            box-shadow: var(--shadow-md);
+            gap: 8px;
+
+            border: none;
+            border-radius: 16px;
+
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+
+            cursor: pointer;
             position: relative;
             overflow: hidden;
+
+            transition: all 0.3s ease;
+
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
         }
 
         .btn-action::before {
@@ -1229,7 +1313,12 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: var(--spacing-2xl);
+
+            padding: 40px;
+            padding-top: 40px;
+
+            background: #f8fafc;
+
             overflow-y: auto;
         }
 
@@ -1253,15 +1342,22 @@
 
         .scorecard-details {
             width: 100%;
-            max-width: 600px;
-            padding: var(--spacing-2xl);
-            border-radius: var(--radius-2xl);
-            background: var(--glass-bg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            box-shadow: var(--shadow-2xl);
-            margin-bottom: var(--spacing-xl);
+            max-width: 480px;
+
+            padding: 35px;
+            margin-bottom: 20px;
+
+            /* Clean card UI */
+            background: #ffffff;
+            border-radius: 28px;
+
+            /* Subtle border + shadow */
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.06);
+
+            /* Optional soft glass feel */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .scorecard-table {
@@ -1271,9 +1367,14 @@
         }
 
         .scorecard-table td {
-            padding: var(--spacing-md) var(--spacing-lg);
-            font-size: 1.0625rem;
+            padding: 18px 0;
+
+            font-size: 1.1rem;
+            color: #334155;
+
+            border-bottom: 1px solid #f1f5f9;
         }
+
 
         .scorecard-table td:first-child {
             font-weight: 600;
@@ -1349,18 +1450,25 @@
         }
 
         .submit-button {
-            padding: var(--spacing-md) var(--spacing-xl);
-            border: none;
-            border-radius: var(--radius-lg);
-            background: var(--primary-gradient);
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all var(--transition-fast);
-            box-shadow: var(--shadow-lg);
+            height: 52px;
+            padding: 0 30px;
+
             display: flex;
             align-items: center;
-            gap: var(--spacing-sm);
+            gap: 8px;
+
+            border: none;
+            border-radius: 16px;
+
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: #ffffff;
+
+            font-weight: 700;
+            cursor: pointer;
+
+            box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+
+            transition: all 0.3s ease;
         }
 
         .submit-button:hover {
