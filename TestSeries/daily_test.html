@@ -426,6 +426,20 @@
             }
         }
 
+        async function fetchQuestions(testId) {
+            const querySnapshot = await getDocs(
+                collection(db, "Daily_Test", testId, "questions")
+            );
+
+            let questions = [];
+            querySnapshot.forEach(doc => {
+                questions.push(doc.data());
+            });
+
+            return questions;
+        }
+
+
         async function getAiPracticeQuestions(topicName) {
             const questionsContent = document.getElementById('ai-questions-content');
             questionsContent.classList.remove('hidden');
