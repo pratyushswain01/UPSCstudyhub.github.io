@@ -1395,8 +1395,22 @@
             <li><a href="#"><i class="fas fa-blog"></i> Blog</a></li>
         </ul>
         <div class="nav-right">
-            <button class="btn-nav btn-outline"><i class="fas fa-sign-in-alt"></i> Login</button>
             <button class="mobile-menu-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+
+        <div id="auth-container">
+            <button id="login-btn" class="btn-nav btn-outline" onclick="goToLogin()">
+                <i class="fas fa-sign-in-alt"></i> Login
+            </button>
+
+            <div id="profile-container" style="display: none; align-items: center; gap: 10px; cursor: pointer;"
+                onclick="showProfileMenu()">
+                <div id="profile-icon" style="width: 38px; height: 38px; background: linear-gradient(135deg, #0e9f8e, #12c4b0); 
+             color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
+             font-weight: 700; font-size: 16px;">
+                    U
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -2593,6 +2607,81 @@
             card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
             observer.observe(card);
         });
+
+
+        function checkLoginStatus() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            const loginBtn = document.getElementById('login-btn');
+            const profileContainer = document.getElementById('profile-container');
+
+            if (isLoggedIn) {
+                loginBtn.style.display = 'none';
+                profileContainer.style.display = 'flex';
+
+                // Set first letter of user ID
+                const userId = localStorage.getItem('userId') || 'User';
+                const firstLetter = userId.charAt(0).toUpperCase();
+                document.getElementById('profile-icon').textContent = firstLetter;
+            } else {
+                loginBtn.style.display = 'block';
+                profileContainer.style.display = 'none';
+            }
+        }
+
+        // Go to Login Page
+        function goToLogin() {
+            window.location.href = "auth.html";
+        }
+
+        // Show Profile Menu (Simple Dropdown)
+        function showProfileMenu() {
+            const userId = localStorage.getItem('userId') || 'user@upschub.com';
+
+            const menuHTML = `
+        <div style="position: absolute; top: 75px; right: 20px; background: white; border-radius: 12px; 
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 15px 20px; min-width: 200px; z-index: 10000;">
+            <div style="padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 10px;">
+                <strong>Logged in as:</strong><br>
+                <span style="color: #0e9f8e;">${userId}</span>
+            </div>
+            <button onclick="logout()" style="width:100%; padding:10px; background:#ef4444; color:white; 
+                    border:none; border-radius:8px; cursor:pointer;">
+                Logout
+            </button>
+        </div>
+    `;
+
+            // Remove existing menu if any
+            const oldMenu = document.getElementById('profile-menu');
+            if (oldMenu) oldMenu.remove();
+
+            const menuDiv = document.createElement('div');
+            menuDiv.id = 'profile-menu';
+            menuDiv.innerHTML = menuHTML;
+            document.body.appendChild(menuDiv);
+
+            // Close menu when clicking outside
+            setTimeout(() => {
+                document.addEventListener('click', function closeMenu(e) {
+                    if (!menuDiv.contains(e.target)) {
+                        menuDiv.remove();
+                        document.removeEventListener('click', closeMenu);
+                    }
+                });
+            }, 10);
+        }
+
+        // Logout Function
+        function logout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('userId');
+            alert("👋 Logged out successfully");
+            window.location.reload();
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', checkLoginStatus);
+
     </script>
 
 </body>
