@@ -1395,22 +1395,33 @@
             <li><a href="#"><i class="fas fa-blog"></i> Blog</a></li>
         </ul>
         <div class="nav-right">
-            <button class="mobile-menu-toggle"><i class="fas fa-bars"></i></button>
-        </div>
+            <!-- Auth Container -->
+            <div id="auth-container" style="display: flex; align-items: center; gap: 12px;">
 
-        <div id="auth-container">
-            <button id="login-btn" class="btn-nav btn-outline" onclick="goToLogin()">
-                <i class="fas fa-sign-in-alt"></i> Login
-            </button>
+                <!-- Login Button -->
+                <button id="login-btn" class="btn-nav btn-outline" onclick="goToLogin()">
+                    <i class="fas fa-sign-in-alt"></i> Login
+                </button>
 
-            <div id="profile-container" style="display: none; align-items: center; gap: 10px; cursor: pointer;"
-                onclick="showProfileMenu()">
-                <div id="profile-icon" style="width: 38px; height: 38px; background: linear-gradient(135deg, #0e9f8e, #12c4b0); 
-             color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; 
-             font-weight: 700; font-size: 16px;">
-                    U
+                <!-- Profile Icon -->
+                <div id="profile-container" onclick="showProfileMenu()"
+                    style="display: none; align-items: center; gap: 8px; cursor: pointer;">
+                    <div id="profile-icon" style="width: 38px; height: 38px; 
+                        background: linear-gradient(135deg, var(--teal), var(--teal-light));
+                        color: white; 
+                        border-radius: 50%; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-weight: 700; 
+                        font-size: 17px;
+                        box-shadow: 0 2px 10px rgba(14, 159, 142, 0.3);">
+                    </div>
                 </div>
             </div>
+
+            <button class="mobile-menu-toggle"><i class="fas fa-bars"></i></button>
+        </div>
         </div>
     </nav>
 
@@ -2609,79 +2620,115 @@
         });
 
 
+
+        // ==================== AUTHENTICATION SYSTEM ====================
+
         function checkLoginStatus() {
             const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
             const loginBtn = document.getElementById('login-btn');
             const profileContainer = document.getElementById('profile-container');
+            const profileIcon = document.getElementById('profile-icon');
+
+            if (!loginBtn || !profileContainer) {
+                console.error("Auth elements not found!");
+                return;
+            }
 
             if (isLoggedIn) {
+                const userId = localStorage.getItem('userId') || 'user@upschub.com';
+
+                // Show profile, hide login
                 loginBtn.style.display = 'none';
                 profileContainer.style.display = 'flex';
 
-                // Set first letter of user ID
-                const userId = localStorage.getItem('userId') || 'User';
+                // Set profile icon (first letter)
                 const firstLetter = userId.charAt(0).toUpperCase();
-                document.getElementById('profile-icon').textContent = firstLetter;
+                profileIcon.textContent = firstLetter;
+
+                // Optional: Add tooltip with email
+                profileIcon.title = userId;
+
+                console.log("✅ User is logged in as:", userId);
             } else {
                 loginBtn.style.display = 'block';
                 profileContainer.style.display = 'none';
+                console.log("User is not logged in");
             }
         }
 
-        // Go to Login Page
         function goToLogin() {
             window.location.href = "auth.html";
         }
 
-        // Show Profile Menu (Simple Dropdown)
         function showProfileMenu() {
             const userId = localStorage.getItem('userId') || 'user@upschub.com';
 
-            const menuHTML = `
-        <div style="position: absolute; top: 75px; right: 20px; background: white; border-radius: 12px; 
-                    box-shadow: 0 10px 30px rgba(0,0,0,0.2); padding: 15px 20px; min-width: 200px; z-index: 10000;">
-            <div style="padding: 10px 0; border-bottom: 1px solid #eee; margin-bottom: 10px;">
-                <strong>Logged in as:</strong><br>
-                <span style="color: #0e9f8e;">${userId}</span>
+            // Remove any existing menu
+            const existing = document.getElementById('profile-menu');
+            if (existing) existing.remove();
+
+            const menu = document.createElement('div');
+            menu.id = 'profile-menu';
+            menu.style.cssText = `
+            position: absolute;
+            top: 75px;
+            right: 25px;
+            background: white;
+            border-radius: 14px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+            padding: 18px 22px;
+            min-width: 240px;
+            z-index: 10000;
+            border: 1px solid #e5e7eb;
+            `;
+
+            menu.innerHTML = `
+            <div style="margin-bottom: 15px; padding-bottom: 12px; border-bottom: 1px solid #eee;">
+                <div style="font-weight: 600; color: #0d1b2a;">Logged in as</div>
+                <div style="color: var(--teal); margin-top: 4px; word-break: break-all;">${userId}</div>
             </div>
-            <button onclick="logout()" style="width:100%; padding:10px; background:#ef4444; color:white; 
-                    border:none; border-radius:8px; cursor:pointer;">
+
+            <button onclick="logout()" style="
+            width: 100%; 
+            padding: 12px; 
+            background: #ef4444; 
+            color: white; 
+            border: none; 
+            border-radius: 10px; 
+            font-weight: 600; 
+            cursor: pointer;">
                 Logout
             </button>
-        </div>
     `;
 
-            // Remove existing menu if any
-            const oldMenu = document.getElementById('profile-menu');
-            if (oldMenu) oldMenu.remove();
-
-            const menuDiv = document.createElement('div');
-            menuDiv.id = 'profile-menu';
-            menuDiv.innerHTML = menuHTML;
-            document.body.appendChild(menuDiv);
+            document.body.appendChild(menu);
 
             // Close menu when clicking outside
             setTimeout(() => {
-                document.addEventListener('click', function closeMenu(e) {
-                    if (!menuDiv.contains(e.target)) {
-                        menuDiv.remove();
-                        document.removeEventListener('click', closeMenu);
+                document.addEventListener('click', function handler(e) {
+                    if (!menu.contains(e.target)) {
+                        menu.remove();
+                        document.removeEventListener('click', handler);
                     }
                 });
-            }, 10);
+            }, 100);
         }
 
-        // Logout Function
         function logout() {
-            localStorage.removeItem('isLoggedIn');
-            localStorage.removeItem('userId');
-            alert("👋 Logged out successfully");
-            window.location.reload();
+            if (confirm("Are you sure you want to logout?")) {
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userId');
+                alert("👋 Logged out successfully!");
+                window.location.reload();
+            }
         }
 
         // Initialize on page load
-        window.addEventListener('load', checkLoginStatus);
-
+        window.addEventListener('load', () => {
+            checkLoginStatus();
+            // Retry once after 800ms in case DOM is slow
+            setTimeout(checkLoginStatus, 800);
+        });
     </script>
 
 </body>
