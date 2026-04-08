@@ -1,718 +1,2600 @@
 <!DOCTYPE html>
-<html lang="en" class="light">
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>UPSC Prelims Dashboard: GS & CSAT</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- IMPORTANT: Base href adjusted for the new Prelims/ directory structure -->
-    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/Prelims/">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Prelims – GS & CSAT Complete Notes | UPSChub</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .footer-nav a.active { color: #2563EB; transform: scale(1.1); }
-        .footer-nav a { transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
-        .tab-active { background-color: #3B82F6; color: white; }
-        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
-         
-        @keyframes fall {
-            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        :root {
+            --navy: #0d1b2a;
+            --navy-light: #1a2d42;
+            --navy-lighter: #2a4158;
+            --teal: #0e9f8e;
+            --teal-light: #12c4b0;
+            --teal-lighter: #5eddd0;
+            --gold: #e8a021;
+            --gold-dark: #c87e0c;
+            --purple: #7c3aed;
+            --purple-light: #a78bfa;
+            --cream: #f7f4ef;
+            --white: #ffffff;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --muted: #6b7a8d;
+            --border: #e0ddd7;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
         }
-        .confetti-piece {
-            position: absolute; width: 10px; height: 20px; border-radius: 50%;
-            opacity: 0; animation: fall 5s linear infinite;
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
-        .toggle-checkbox { transition: transform 0.2s ease-in-out; }
-        .toggle-checkbox:checked { transform: translateX(1rem); }
-        .sidebar-item.active { 
-            background-color: #3B82F6; 
-            color: white; 
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--cream);
+            color: var(--navy);
+            min-height: 100vh;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* ========== NAVIGATION ========== */
+        nav {
+            background: var(--navy);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 3rem;
+            height: 70px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, .3);
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 26px;
+            color: var(--white);
+            letter-spacing: 0.5px;
+            font-weight: 800;
+        }
+
+        .logo span {
+            color: var(--teal-light);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: rgba(255, 255, 255, .8);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            transition: all .3s ease;
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--teal-light);
+            transition: width .3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--teal-light);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-right {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-nav {
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 13px;
             font-weight: 600;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all .3s ease;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
-        .sidebar-item.active svg {
+
+        .btn-outline {
+            border: 1.5px solid rgba(255, 255, 255, .3);
+            color: var(--white);
+            background: transparent;
+        }
+
+        .btn-outline:hover {
+            border-color: var(--teal-light);
+            background: rgba(18, 196, 176, .1);
+            color: var(--teal-light);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--teal), var(--teal-light));
+            color: var(--white);
+            box-shadow: 0 4px 15px rgba(14, 159, 142, .3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 159, 142, .4);
+        }
+
+        /* Mobile Menu Toggle */
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--white);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        /* ========== HERO SECTION ========== */
+        .hero {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 50%, #1e3a5f 100%);
+            padding: 4rem 3rem 5rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 50% 60% at 25% 50%, rgba(14, 159, 142, .12) 0%, transparent 70%),
+                radial-gradient(ellipse 60% 50% at 75% 40%, rgba(124, 58, 237, .1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(124, 58, 237, .15);
+            border: 1px solid rgba(124, 58, 237, .3);
+            color: var(--purple-light);
+            padding: 6px 16px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 1.5rem;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            color: var(--white);
+            line-height: 1.15;
+            margin-bottom: 1rem;
+            font-weight: 800;
+            animation: fadeInUp 0.6s ease 0.1s backwards;
+        }
+
+        .hero h1 .highlight {
+            background: linear-gradient(135deg, var(--teal-light), var(--teal-lighter));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero h1 .highlight-purple {
+            background: linear-gradient(135deg, var(--purple), var(--purple-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            color: rgba(255, 255, 255, .7);
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto 2.5rem;
+            line-height: 1.7;
+            animation: fadeInUp 0.6s ease 0.2s backwards;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease 0.3s backwards;
+        }
+
+        .hero-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            transition: all .3s ease;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .1);
+        }
+
+        .hero-btn:hover {
+            transform: translateY(-3px);
+        }
+
+        .hero-btn.btn-gs {
+            background: linear-gradient(135deg, var(--teal), var(--teal-light));
+            color: white;
+            box-shadow: 0 6px 25px rgba(14, 159, 142, .4);
+        }
+
+        .hero-btn.btn-csat {
+            background: linear-gradient(135deg, var(--purple), var(--purple-light));
+            color: white;
+            box-shadow: 0 6px 25px rgba(124, 58, 237, .4);
+        }
+
+        .hero-btn.btn-pyq {
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: white;
+            box-shadow: 0 6px 25px rgba(232, 160, 33, .35);
+        }
+
+        .hero-btn.btn-secondary {
+            background: rgba(255, 255, 255, .12);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, .2);
+            backdrop-filter: blur(10px);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== STATS BAR ========== */
+        .stats-bar {
+            background: var(--white);
+            border-bottom: 2px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            box-shadow: 0 4px 20px rgba(0, 0, 0, .05);
+        }
+
+        .stat-item {
+            padding: 1.5rem 2rem;
+            text-align: center;
+            border-right: 1px solid var(--border);
+            transition: all .3s ease;
+        }
+
+        .stat-item:last-child {
+            border-right: none;
+        }
+
+        .stat-item:hover {
+            background: var(--gray-50);
+            transform: scale(1.05);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--teal);
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        /* ========== TABS NAVIGATION ========== */
+        .tabs-section {
+            background: var(--white);
+            padding: 0;
+            position: sticky;
+            top: 70px;
+            z-index: 100;
+            box-shadow: 0 2px 15px rgba(0, 0, 0, .08);
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tabs-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            gap: 0;
+        }
+
+        .tab-btn {
+            flex: 1;
+            max-width: 400px;
+            padding: 1.25rem 2rem;
+            background: transparent;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--gray-600);
+            cursor: pointer;
+            transition: all .3s ease;
+            border-bottom: 3px solid transparent;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .tab-btn i {
+            font-size: 18px;
+        }
+
+        .tab-btn:hover {
+            background: var(--gray-50);
+            color: var(--navy);
+        }
+
+        .tab-btn.active {
+            color: var(--teal);
+            border-bottom-color: var(--teal);
+            background: linear-gradient(to bottom, rgba(14, 159, 142, .05), transparent);
+        }
+
+        .tab-btn.active.csat-tab {
+            color: var(--purple);
+            border-bottom-color: var(--purple);
+            background: linear-gradient(to bottom, rgba(124, 58, 237, .05), transparent);
+        }
+
+        /* ========== MAIN CONTENT ========== */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ========== SECTION HEADER ========== */
+        .section-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            color: var(--navy);
+            margin-bottom: 1rem;
+            font-weight: 800;
+        }
+
+        .section-subtitle {
+            color: var(--muted);
+            font-size: 1.125rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .syllabus-toggle {
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .toggle-btn {
+            padding: 10px 24px;
+            border: 2px solid var(--teal);
+            background: white;
+            color: var(--teal);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .3s ease;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toggle-btn:hover {
+            background: var(--teal);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(14, 159, 142, .3);
+        }
+
+        .toggle-btn.csat-toggle {
+            border-color: var(--purple);
+            color: var(--purple);
+        }
+
+        .toggle-btn.csat-toggle:hover {
+            background: var(--purple);
+            color: white;
+            box-shadow: 0 4px 15px rgba(124, 58, 237, .3);
+        }
+
+        /* ========== SYLLABUS MODAL ========== */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 10000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .6);
+            backdrop-filter: blur(5px);
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, .3);
+            animation: slideUp 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 2rem 2.5rem;
+            border-bottom: 2px solid var(--border);
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+            font-weight: 800;
+        }
+
+        .modal-subtitle {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: var(--gray-100);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-600);
+            transition: all .3s ease;
+        }
+
+        .close-modal:hover {
+            background: var(--danger);
+            color: white;
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem 2.5rem 2.5rem;
+        }
+
+        .syllabus-section {
+            margin-bottom: 2rem;
+        }
+
+        .syllabus-section h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--teal);
+            margin-bottom: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .syllabus-section.csat-section h3 {
+            color: var(--purple);
+        }
+
+        .syllabus-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .syllabus-section li {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--gray-200);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            color: var(--gray-700);
+        }
+
+        .syllabus-section li:last-child {
+            border-bottom: none;
+        }
+
+        .syllabus-section li i {
+            color: var(--teal);
+            margin-top: 4px;
+            font-size: 14px;
+        }
+
+        .syllabus-section.csat-section li i {
+            color: var(--purple);
+        }
+
+        /* ========== PAPERS GRID ========== */
+        .papers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .paper-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all .3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .paper-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(135deg, var(--teal), var(--teal-light));
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+
+        .paper-card.csat-card::before {
+            background: linear-gradient(135deg, var(--purple), var(--purple-light));
+        }
+
+        .paper-card:hover {
+            border-color: var(--teal);
+            box-shadow: 0 10px 40px rgba(14, 159, 142, .15);
+            transform: translateY(-5px);
+        }
+
+        .paper-card:hover::before {
+            opacity: 1;
+        }
+
+        .paper-card.csat-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 10px 40px rgba(124, 58, 237, .15);
+        }
+
+        .paper-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .paper-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, rgba(14, 159, 142, .1), rgba(14, 196, 176, .2));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+        .paper-card.csat-card .paper-icon {
+            background: linear-gradient(135deg, rgba(124, 58, 237, .1), rgba(167, 139, 250, .2));
+        }
+
+        .paper-info h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--navy);
+            margin-bottom: 0.25rem;
+            font-weight: 700;
+        }
+
+        .paper-meta {
+            color: var(--muted);
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .paper-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .paper-description {
+            color: var(--gray-600);
+            font-size: 15px;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .paper-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            background: var(--gray-50);
+            padding: 0.75rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-box-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--teal);
+            font-weight: 700;
+        }
+
+        .paper-card.csat-card .stat-box-value {
+            color: var(--purple);
+        }
+
+        .stat-box-label {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .paper-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-link {
+            flex: 1;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: all .3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .action-link.primary {
+            background: linear-gradient(135deg, var(--teal), var(--teal-light));
             color: white;
         }
 
-        /* Styling for the main content to look good */
-        .dashboard-container {
-            max-width: 1400px;
-            margin: auto;
+        .action-link.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(14, 159, 142, .3);
         }
-        
-        #welcome-banner {
+
+        .paper-card.csat-card .action-link.primary {
+            background: linear-gradient(135deg, var(--purple), var(--purple-light));
+        }
+
+        .paper-card.csat-card .action-link.primary:hover {
+            box-shadow: 0 6px 20px rgba(124, 58, 237, .3);
+        }
+
+        .action-link.secondary {
+            background: white;
+            color: var(--teal);
+            border: 2px solid var(--teal);
+        }
+
+        .action-link.secondary:hover {
+            background: var(--teal);
+            color: white;
+        }
+
+        .paper-card.csat-card .action-link.secondary {
+            color: var(--purple);
+            border-color: var(--purple);
+        }
+
+        .paper-card.csat-card .action-link.secondary:hover {
+            background: var(--purple);
+            color: white;
+        }
+
+        /* ========== UNITS SECTION ========== */
+        .units-section {
+            margin-top: 3rem;
+        }
+
+        .unit-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            transition: all .3s ease;
+        }
+
+        .unit-card:hover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, .08);
+        }
+
+        .unit-header {
+            background: linear-gradient(135deg, var(--teal), var(--teal-light));
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all .3s ease;
+        }
+
+        .unit-card.csat-unit .unit-header {
+            background: linear-gradient(135deg, var(--purple), var(--purple-light));
+        }
+
+        .unit-header:hover {
+            padding-left: 2.5rem;
+        }
+
+        .unit-title-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .unit-number {
+            background: rgba(255, 255, 255, .2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .unit-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .unit-toggle {
+            background: rgba(255, 255, 255, .2);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all .3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .unit-toggle:hover {
+            background: rgba(255, 255, 255, .3);
+            transform: scale(1.1);
+        }
+
+        .unit-toggle.active {
+            transform: rotate(180deg);
+        }
+
+        .unit-content {
+            padding: 2rem;
+            display: none;
+        }
+
+        .unit-content.active {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .topic-card {
+            background: var(--gray-50);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: all .3s ease;
+            text-decoration: none;
+            color: var(--navy);
             position: relative;
-            background-size: cover;
-            background-position: center;
-            transition: background-image 0.5s ease-in-out;
             overflow: hidden;
         }
-        #welcome-banner::before {
+
+        .topic-card::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0, 0, 0, 0.35);
-            border-radius: 1rem;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: var(--teal);
+            opacity: 0;
+            transition: opacity .3s ease;
+        }
+
+        .unit-card.csat-unit .topic-card::before {
+            background: var(--purple);
+        }
+
+        .topic-card:hover {
+            border-color: var(--teal);
+            background: white;
+            box-shadow: 0 6px 25px rgba(14, 159, 142, .12);
+            transform: translateX(8px);
+        }
+
+        .unit-card.csat-unit .topic-card:hover {
+            border-color: var(--purple);
+            box-shadow: 0 6px 25px rgba(124, 58, 237, .12);
+        }
+
+        .topic-card:hover::before {
+            opacity: 1;
+        }
+
+        .topic-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(14, 159, 142, .15), rgba(14, 196, 176, .25));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 20px;
+            transition: all .3s ease;
+        }
+
+        .unit-card.csat-unit .topic-icon {
+            background: linear-gradient(135deg, rgba(124, 58, 237, .15), rgba(167, 139, 250, .25));
+        }
+
+        .topic-card:hover .topic-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .topic-name {
+            font-size: 15px;
+            font-weight: 600;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .topic-arrow {
+            color: var(--muted);
+            font-size: 16px;
+            opacity: 0;
+            transition: all .3s ease;
+        }
+
+        .topic-card:hover .topic-arrow {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+        /* ========== DOWNLOAD BANNER ========== */
+        .download-banner {
+            background: linear-gradient(135deg, var(--navy), var(--navy-light));
+            border-radius: 20px;
+            padding: 3rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-top: 4rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-banner::before {
+            content: '';
+            position: absolute;
+            right: -80px;
+            top: -80px;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            background: rgba(14, 159, 142, .15);
+        }
+
+        .download-banner::after {
+            content: '';
+            position: absolute;
+            left: -60px;
+            bottom: -60px;
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: rgba(124, 58, 237, .1);
+        }
+
+        .download-content {
+            flex: 1;
+            position: relative;
             z-index: 1;
         }
-        #welcome-banner > * {
+
+        .download-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 0.75rem;
+            font-weight: 800;
+        }
+
+        .download-content p {
+            color: rgba(255, 255, 255, .7);
+            font-size: 1rem;
+            line-height: 1.6;
+            max-width: 600px;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, var(--teal), var(--teal-light));
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            box-shadow: 0 8px 30px rgba(14, 159, 142, .4);
+            transition: all .3s ease;
+            flex-shrink: 0;
             position: relative;
-            z-index: 2;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 40px rgba(14, 159, 142, .5);
+        }
+
+        .download-btn i {
+            font-size: 18px;
+        }
+
+        /* ========== FOOTER ========== */
+        footer {
+            background: var(--navy);
+            color: rgba(255, 255, 255, .6);
+            padding: 3rem 3rem 2rem;
+            margin-top: 5rem;
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-section h3 {
+            color: var(--teal-light);
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-section a {
+            color: rgba(255, 255, 255, .6);
+            text-decoration: none;
+            transition: color .3s ease;
+            font-size: 14px;
+        }
+
+        .footer-section a:hover {
+            color: var(--teal-light);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, .1);
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .footer-bottom span {
+            color: var(--teal-light);
+            font-weight: 600;
+        }
+
+        /* ========== RESPONSIVE DESIGN ========== */
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 2rem;
+            }
+
+            .papers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topics-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            nav {
+                padding: 0 1.5rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: block;
+            }
+
+            .hero {
+                padding: 3rem 1.5rem 4rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .hero-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .hero-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stat-item {
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .stat-item:nth-child(2n) {
+                border-right: none;
+            }
+
+            .tabs-container {
+                flex-direction: column;
+            }
+
+            .tab-btn {
+                max-width: none;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .tab-btn.active {
+                border-bottom: 3px solid var(--teal);
+            }
+
+            .main-content {
+                padding: 2rem 1.5rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .topics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .download-banner {
+                flex-direction: column;
+                text-align: center;
+                padding: 2.5rem 1.5rem;
+            }
+
+            .download-content p {
+                max-width: 100%;
+            }
+
+            .download-btn {
+                width: 100%;
+            }
+
+            .modal-content {
+                margin: 1rem;
+            }
+
+            .modal-header,
+            .modal-body {
+                padding: 1.5rem;
+            }
+
+            .close-modal {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            footer {
+                padding: 2rem 1.5rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.75rem;
+            }
+
+            .section-title {
+                font-size: 1.75rem;
+            }
+
+            .unit-header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .unit-title {
+                font-size: 1.125rem;
+            }
+
+            .unit-number {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            .unit-content {
+                padding: 1.5rem;
+            }
+
+            .paper-card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* ========== ACCESSIBILITY ========== */
+        *:focus {
+            outline: 2px solid var(--teal);
+            outline-offset: 2px;
+        }
+
+        button:focus,
+        a:focus {
+            outline: 2px solid var(--teal);
+            outline-offset: 2px;
+        }
+
+        /* ========== PRINT STYLES ========== */
+        @media print {
+
+            nav,
+            .hero,
+            .stats-bar,
+            .tabs-section,
+            .download-banner,
+            footer {
+                display: none;
+            }
+
+            .main-content {
+                padding: 0;
+            }
+
+            .unit-card {
+                page-break-inside: avoid;
+            }
         }
     </style>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
 
-    <!-- MODAL PLACEHOLDERS (Minimal required structure) -->
-    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
-        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6">
-            <p id="alert-message" class="font-medium"></p>
-            <button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="logo">UPSC<span>hub</span></div>
+        <ul class="nav-links">
+            <li><a href="index.html"><i class="fas fa-home"></i> Home</a></li>
+            <li><a href="notes.html"><i class="fas fa-book"></i> All Notes</a></li>
+            <li><a href="#"><i class="fas fa-file-alt"></i> PYQPs</a></li>
+            <li><a href="#"><i class="fas fa-blog"></i> Blog</a></li>
+        </ul>
+        <div class="nav-right">
+            <button class="btn-nav btn-outline"><i class="fas fa-sign-in-alt"></i> Login</button>
+            <button class="mobile-menu-toggle"><i class="fas fa-bars"></i></button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-graduation-cap"></i>
+                UPSC Civil Services Preliminary Examination
+            </div>
+            <h1>Complete <span class="highlight">Prelims</span> Notes<br>
+                <span class="highlight-purple">GS</span> & <span class="highlight-purple">CSAT</span>
+            </h1>
+            <p class="hero-subtitle">Comprehensive, exam-focused notes for both General Studies (Paper I) and Civil
+                Services Aptitude Test (Paper II). Everything you need to ace UPSC Prelims 2026.</p>
+            <div class="hero-actions">
+                <a href="#gs-content" class="hero-btn btn-gs">
+                    <i class="fas fa-book-open"></i> GS Paper I Notes
+                </a>
+                <a href="#csat-content" class="hero-btn btn-csat">
+                    <i class="fas fa-calculator"></i> CSAT Paper II Notes
+                </a>
+                <button onclick="openModal('gs-syllabus')" class="hero-btn btn-secondary">
+                    <i class="fas fa-list-alt"></i> View Syllabus
+                </button>
+                <a href="#" class="hero-btn btn-pyq">
+                    <i class="fas fa-question-circle"></i> Practice PYQs
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS BAR -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-icon">📚</div>
+            <div class="stat-num">2</div>
+            <div class="stat-label">Papers Covered</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">📖</div>
+            <div class="stat-num">150+</div>
+            <div class="stat-label">Topics</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">❓</div>
+            <div class="stat-num">500+</div>
+            <div class="stat-label">PYQ Questions</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-icon">⬇️</div>
+            <div class="stat-num">Free</div>
+            <div class="stat-label">PDF Downloads</div>
         </div>
     </div>
-    
-    <div id="app-view" class="hidden"> <!-- Initially hidden until user loads -->
-        <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
-            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
-                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+
+    <!-- TABS NAVIGATION -->
+    <div class="tabs-section">
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab('gs')">
+                <i class="fas fa-globe-asia"></i>
+                <span>GS Paper I</span>
+            </button>
+            <button class="tab-btn csat-tab" onclick="switchTab('csat')">
+                <i class="fas fa-brain"></i>
+                <span>CSAT Paper II</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- GS PAPER CONTENT -->
+        <div id="gs-content" class="tab-content active">
+            <div class="section-header">
+                <h2 class="section-title">General Studies Paper I</h2>
+                <p class="section-subtitle">Complete notes covering Current Events, Indian Polity, Geography, Economy,
+                    Environment, Science & Technology, and Indian History.</p>
+                <div class="syllabus-toggle">
+                    <button class="toggle-btn" onclick="openModal('gs-syllabus')">
+                        <i class="fas fa-list-alt"></i> View Complete Syllabus
                     </button>
-                    <!-- Link adjusted relative to Prelims/dashboard.html -->
-                    <a href="../dashboard.html" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
-                        <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-8 w-8 rounded-lg">
-                        <span>UPSChub</span>
-                    </a>
+                    <button class="toggle-btn" onclick="downloadPDF('gs')">
+                        <i class="fas fa-download"></i> Download All GS Notes
+                    </button>
                 </div>
-                <!-- Header right side -->
-                <div class="flex items-center gap-4">
-                    <!-- Streak Placeholder -->
-                    <button id="streak-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
-                    </button>
-                    <!-- Calendar Placeholder -->
-                    <button id="calendar-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
-                        <svg class="h-6 w-6 text-slate-500 dark:text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                    </button>
-                    <div id="account-info-div" class="relative">
-                        <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
-                        </button>
-                        <!-- Account Dropdown -->
-                        <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20">
-                            <div class="px-4 py-2 border-b dark:border-slate-700">
-                                <p class="font-semibold text-sm" id="dropdown-display-name">UPSC Aspirant</p>
-                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate" id="user-email-display">user@example.com</p>
+            </div>
+
+            <!-- GS Paper Overview -->
+            <div class="papers-grid">
+                <div class="paper-card">
+                    <div class="paper-header">
+                        <div class="paper-icon">🌏</div>
+                        <div class="paper-info">
+                            <h3>GS Paper I</h3>
+                            <div class="paper-meta">
+                                <span><i class="fas fa-clock"></i> 200 Marks</span>
+                                <span><i class="fas fa-hourglass-half"></i> 120 Minutes</span>
                             </div>
-                            <div class="border-t border-slate-200 dark:border-slate-700"></div>
-                            <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
                         </div>
+                    </div>
+                    <p class="paper-description">Comprehensive coverage of Indian and World Geography, History, Polity,
+                        Economy, Science & Technology, Environment, and Current Affairs with exam-oriented approach.</p>
+                    <div class="paper-stats">
+                        <div class="stat-box">
+                            <div class="stat-box-value">100</div>
+                            <div class="stat-box-label">Questions</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">10</div>
+                            <div class="stat-box-label">Major Sections</div>
+                        </div>
+                    </div>
+                    <div class="paper-actions">
+                        <a href="#gs-units" class="action-link primary">
+                            <i class="fas fa-book-reader"></i> Explore Notes
+                        </a>
+                        <button onclick="openModal('gs-syllabus')" class="action-link secondary">
+                            <i class="fas fa-list"></i> Syllabus
+                        </button>
                     </div>
                 </div>
             </div>
-        </header>
-         
-        <div class="relative min-h-screen">
-             <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
-             
-             <!-- CUSTOMIZED SIDEBAR FOR PRELIMS FOCUS -->
-             <aside id="sidebar" class="fixed top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-40 pt-20 md:translate-x-0">
-                 <nav class="p-4">
-                     <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-3">Prelims Components</h3>
-                     <ul class="space-y-2">
-                         <!-- GS Section: Active Tab -->
-                         <li>
-                            <a href="#" id="sidebar-gs" data-target-view="gs-view" class="sidebar-item active flex items-center gap-3 px-3 py-2.5 rounded-lg font-medium">
-                                <svg class="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m-9 14h7m-7 0L3 18m14 3a2 2 0 002-2v-2m-12-3V6a2 2 0 012-2h2m0 10V6a2 2 0 00-2-2h-2" /></svg> 
-                                General Studies (GS)
-                            </a>
-                        </li>
-                         <!-- CSAT Section: Inactive Tab -->
-                         <li>
-                            <a href="#" id="sidebar-csat" data-target-view="csat-view" class="sidebar-item flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium">
-                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M7 12l3-3 3 3 4-4M18 21V5a2 2 0 00-2-2H8a2 2 0 00-2 2v16m12 0h2m-2 0h-5m-9 0H3m2 0h5M6 17h10M6 13h10" /></svg> 
-                                CSAT (Paper II)
-                            </a>
-                        </li>
-                     </ul>
 
-                     <h3 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-6 mb-2 px-3 border-t pt-4 border-slate-200 dark:border-slate-700">Navigation</h3>
-                     <ul class="space-y-2">
-                         <li><a href="../dashboard.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg> Main Dashboard</a></li>
-                         <li><a href="../TestSeries/test_hub.html" class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Test Library</a></li>
-                     </ul>
-                 </nav>
-             </aside>
+            <!-- GS UNITS -->
+            <div id="gs-units" class="units-section">
 
-             <!-- Main Content Area with conditional views -->
-             <main id="main-content" class="flex-1 transition-all duration-300 ease-in-out md:ml-64">
-                 <div class="dashboard-container mx-auto p-4 sm:p-6 pb-24">
-                     
-                     <!-- GS View: Default Active -->
-                     <div id="gs-view">
-                         <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">General Studies Resources</h1>
-                         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                             
-                             <div class="lg:col-span-2 space-y-6">
-                                 <!-- Welcome Banner/GS Header -->
-                                 <div id="welcome-banner-gs" class="bg-gradient-to-r from-blue-600 to-cyan-700 p-6 rounded-2xl shadow-lg text-white">
-                                     <h2 id="gs-welcome-heading" class="text-3xl font-bold">GS: Focus on Coverage!</h2>
-                                     <p class="mt-1 opacity-80">Explore the syllabus and essential reading list for General Studies.</p>
-                                 </div>
-                                 
-                                 <!-- GS Stat Cards (Re-purposed for Key Syllabus Areas) -->
-                                 <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.247m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.247" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Total Subjects</p><p id="gs-total-subjects" class="text-lg font-bold">7 Major</p></div> 
-                                     </div>
-                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Current Affairs</p><p id="gs-ca-focus" class="text-lg font-bold">18 Months</p></div>
-                                     </div>
-                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-red-100 dark:bg-red-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 14v6m-3-3h6M6 10h2m0 0h2m-2 0V6m-2 4h2m0 0V6m0 4h2m-2 0V6m-2 4h2m0 0V6m-2 4h2m0 0V6m-2 4h2m0 0V6" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Mandatory Readings</p><p id="gs-mandatory-readings" class="text-lg font-bold">NCERTs (6-12)</p></div>
-                                     </div>
-                                     <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                         <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 00-2 2v8a2 2 0 002 2m0-10V4m0 2a2 2 0 012 2v8a2 2 0 01-2 2m-3-3h6" /></svg></div>
-                                         <div><p class="text-sm text-slate-500 dark:text-slate-400">Revision Cycles</p><p id="gs-revision-cycles" class="text-lg font-bold">3+ Recommended</p></div>
-                                     </div>
-                                 </div>
-                                 
-                                 <!-- GS Syllabus Overview (Replaces Chart) -->
-                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                     <h3 class="text-lg font-bold mb-4">UPSC Prelims GS Syllabus Core Areas</h3>
-                                     <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-                                         <li>Current events of National and International importance.</li>
-                                         <li>History of India and Indian National Movement.</li>
-                                         <li>Indian and World Geography - Physical, Social, Economic Geography of India and the World.</li>
-                                         <li>Indian Polity and Governance - Constitution, Political System, Panchayati Raj, Public Policy, Rights Issues, etc.</li>
-                                         <li>Economic and Social Development - Sustainable Development, Poverty, Inclusion, Demographics, Social Sector Initiatives, etc.</li>
-                                         <li>General issues on Environmental Ecology, Bio-diversity and Climate Change.</li>
-                                         <li>General Science.</li>
-                                     </ul>
-                                     <button class="mt-4 text-center text-sm font-semibold text-blue-600 hover:underline">Download Detailed Syllabus PDF</button>
-                                 </div>
-                                 
-                                 <!-- GS Essential Books (Replaces Recent Results) -->
-                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                     <h3 class="text-lg font-bold mb-4">GS Essential Reading List (Standard Books)</h3>
-                                     <div id="gs-recent-tests-container" class="space-y-4 text-sm">
-                                         <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
-                                             <p class="font-semibold">Polity:</p> <span class="text-slate-500">M. Laxmikanth</span>
-                                         </div>
-                                         <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
-                                             <p class="font-semibold">Modern History:</p> <span class="text-slate-500">Spectrum (Rajiv Ahir)</span>
-                                         </div>
-                                         <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
-                                             <p class="font-semibold">Geography:</p> <span class="text-slate-500">G.C. Leong + NCERTs</span>
-                                         </div>
-                                     </div>
-                                     <button class="mt-4 w-full text-center text-sm font-semibold text-blue-600 hover:underline">View Full Book List & Notes</button>
-                                 </div>
-                             </div>
-                             
-                             <!-- GS Study Pattern / Right Sidebar -->
-                             <div class="lg:col-span-1 space-y-6">
-                                 <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
-                                     <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
-                                         Recommended Study Pattern
-                                     </h3>
-                                     <div id="gs-subject-focus" class="space-y-3">
-                                        <div class="p-3 bg-indigo-50 dark:bg-indigo-900/10 rounded-lg"><p class="font-semibold text-indigo-600 text-sm">Phase 1 (Concepts):</p><p class="text-xs text-slate-500">Complete 70% of static syllabus. Daily CA reading.</p></div>
-                                        <div class="p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg"><p class="font-semibold text-purple-600 text-sm">Phase 2 (Integration):</p><p class="text-xs text-slate-500">Attempt subject tests, link CA to static portions.</p></div>
-                                        <div class="p-3 bg-teal-50 dark:bg-teal-900/10 rounded-lg"><p class="font-semibold text-teal-600 text-sm">Phase 3 (Testing):</p><p class="text-xs text-slate-500">Full-length mocks & intensive revision (3 cycles min).</p></div>
-                                     </div>
-                                     <button class="mt-4 w-full text-center text-sm font-semibold text-blue-600 hover:underline">Create Custom Study Plan</button>
-                                 </div>
-                             </div>
-                         </div>
-                     </div>
-                     
-                     <!-- CSAT View: Initially Hidden -->
-                     <div id="csat-view" class="hidden">
-                        <h1 class="text-3xl font-bold mb-6 text-slate-800 dark:text-white">CSAT Resources (Paper II)</h1>
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                             
-                            <div class="lg:col-span-2 space-y-6">
-                                <!-- Welcome Banner/CSAT Header -->
-                                <div id="welcome-banner-csat" class="bg-gradient-to-r from-amber-600 to-orange-700 p-6 rounded-2xl shadow-lg text-white">
-                                    <h2 id="csat-welcome-heading" class="text-3xl font-bold">CSAT: Focus on Practice!</h2>
-                                    <p class="mt-1 opacity-80">Resources for Aptitude, Reasoning, and Comprehension.</p>
-                                </div>
-                                
-                                <!-- CSAT Stat Cards (Re-purposed) -->
-                                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Total Questions</p><p id="csat-total-questions" class="text-lg font-bold">80 Qs</p></div> 
-                                    </div>
-                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-purple-100 dark:bg-purple-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Qualifying Score</p><p id="csat-qualifying-score" class="text-lg font-bold">66 Marks</p></div>
-                                    </div>
-                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-pink-100 dark:bg-pink-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-pink-600 dark:text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01M12 6a2 2 0 100-4 2 2 0 000 4zm0 12a2 2 0 100-4 2 2 0 000 4zm0 0V10m0 10a9 9 0 110-18 9 9 0 010 18z" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">RC Weightage</p><p id="csat-rc-weightage" class="text-lg font-bold">~40-45%</p></div>
-                                    </div>
-                                    <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                        <div class="bg-teal-100 dark:bg-teal-900/50 p-3 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg></div>
-                                        <div><p class="text-sm text-slate-500 dark:text-slate-400">Practice Goal</p><p id="csat-practice-goal" class="text-lg font-bold">Daily 1 hr</p></div>
-                                    </div>
-                                </div>
-                                
-                                <!-- CSAT Syllabus Overview (Replaces Chart) -->
-                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                    <h3 class="text-lg font-bold mb-4">CSAT Syllabus Core Areas</h3>
-                                    <ul class="list-disc pl-5 space-y-2 text-sm text-slate-600 dark:text-slate-300">
-                                        <li>Comprehension</li>
-                                        <li>Interpersonal skills including communication skills;</li>
-                                        <li>Logical reasoning and analytical ability.</li>
-                                        <li>Decision-making and problem-solving.</li>
-                                        <li>General mental ability.</li>
-                                        <li>Basic numeracy (Class X level) and Data Interpretation (Class X level).</li>
-                                    </ul>
-                                    <button class="mt-4 text-center text-sm font-semibold text-amber-600 hover:underline">View Topic-wise Breakdown</button>
-                                </div>
-                                
-                                <!-- CSAT Essential Books (Replaces Recent Results) -->
-                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
-                                    <h3 class="text-lg font-bold mb-4">CSAT Essential Reading/Practice List</h3>
-                                    <div id="csat-recent-tests-container" class="space-y-4 text-sm">
-                                        <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
-                                            <p class="font-semibold">Reading Comprehension:</p> <span class="text-slate-500">Past Year Papers (Critical)</span>
-                                        </div>
-                                        <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
-                                            <p class="font-semibold">Aptitude/Reasoning:</p> <span class="text-slate-500">RS Aggarwal (Select Chapters)</span>
-                                        </div>
-                                        <div class="p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg flex justify-between items-center">
-                                            <p class="font-semibold">General Mental Ability:</p> <span class="text-slate-500">M.K. Pandey</span>
-                                        </div>
-                                    </div>
-                                    <button class="mt-4 w-full text-center text-sm font-semibold text-amber-600 hover:underline">View Advanced Practice Sources</button>
-                                </div>
-                            </div>
-                            
-                            <!-- CSAT Strategy / Right Sidebar -->
-                            <div class="lg:col-span-1 space-y-6">
-                                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm sticky top-24">
-                                    <h3 class="text-lg font-bold mb-4 flex justify-between items-center">
-                                        CSAT Strategy Guide
-                                    </h3>
-                                    <div id="csat-focus-area" class="space-y-3">
-                                        <div class="p-3 bg-red-50 dark:bg-red-900/10 rounded-lg"><p class="font-semibold text-red-600 text-sm">Rule 1: Never Ignore</p><p class="text-xs text-slate-500">CSAT is qualifying but high failure rates mean it must be respected.</p></div>
-                                        <div class="p-3 bg-yellow-50 dark:bg-yellow-900/10 rounded-lg"><p class="font-semibold text-yellow-600 text-sm">Rule 2: Selectivity</p><p class="text-xs text-slate-500">Master 40-45 Qs with high accuracy, don't try all 80.</p></div>
-                                        <div class="p-3 bg-green-50 dark:bg-green-900/10 rounded-lg"><p class="font-semibold text-green-600 text-sm">Rule 3: Time Management</p><p class="text-xs text-slate-500">Practice full length mocks under strict 2-hour conditions.</p></div>
-                                    </div>
-                                    <button class="mt-4 w-full text-center text-sm font-semibold text-amber-600 hover:underline">CSAT Time Allocation Planner</button>
-                                </div>
+                <!-- Unit 1: History -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 1</div>
+                            <div class="unit-title">Indian History & Culture</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏛️</div>
+                                <div class="topic-name">Ancient India - Indus Valley Civilization</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📜</div>
+                                <div class="topic-name">Vedic Period & Literature</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚔️</div>
+                                <div class="topic-name">Mauryan & Post-Mauryan Period</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🕌</div>
+                                <div class="topic-name">Medieval India - Delhi Sultanate</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">👑</div>
+                                <div class="topic-name">Mughal Empire & Administration</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎨</div>
+                                <div class="topic-name">Art & Architecture Through Ages</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏴</div>
+                                <div class="topic-name">British Rule & Colonial Economy</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🇮🇳</div>
+                                <div class="topic-name">Freedom Struggle & National Movement</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">✊</div>
+                                <div class="topic-name">Social & Religious Reform Movements</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🗓️</div>
+                                <div class="topic-name">Post-Independence India</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 2: Geography -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 2</div>
+                            <div class="unit-title">Indian & World Geography</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌍</div>
+                                <div class="topic-name">Physical Geography - Earth & Universe</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⛰️</div>
+                                <div class="topic-name">Indian Physiography & Landforms</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌧️</div>
+                                <div class="topic-name">Climate & Monsoon System</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌊</div>
+                                <div class="topic-name">Rivers, Lakes & Water Resources</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌱</div>
+                                <div class="topic-name">Soils & Natural Vegetation</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚡</div>
+                                <div class="topic-name">Minerals & Energy Resources</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏭</div>
+                                <div class="topic-name">Industries & Industrial Regions</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌾</div>
+                                <div class="topic-name">Agriculture & Cropping Patterns</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🚄</div>
+                                <div class="topic-name">Transport & Communication</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🗺️</div>
+                                <div class="topic-name">World Geography & Map Skills</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 3: Polity -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 3</div>
+                            <div class="unit-title">Indian Polity & Governance</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📋</div>
+                                <div class="topic-name">Constitutional Framework & Preamble</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚖️</div>
+                                <div class="topic-name">Fundamental Rights & Duties</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎯</div>
+                                <div class="topic-name">Directive Principles (DPSP)</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏛️</div>
+                                <div class="topic-name">Union Executive - President, PM, Council</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📜</div>
+                                <div class="topic-name">Parliament - Lok Sabha & Rajya Sabha</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚖️</div>
+                                <div class="topic-name">Supreme Court & Judiciary</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏢</div>
+                                <div class="topic-name">State Government & Local Bodies</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🗳️</div>
+                                <div class="topic-name">Elections & Electoral Reforms</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🛡️</div>
+                                <div class="topic-name">Constitutional Bodies & Commissions</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📝</div>
+                                <div class="topic-name">Constitutional Amendments</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 4: Economy -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 4</div>
+                            <div class="unit-title">Indian Economy</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📊</div>
+                                <div class="topic-name">Basic Economic Concepts & National Income</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏦</div>
+                                <div class="topic-name">Banking System & RBI</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💰</div>
+                                <div class="topic-name">Budget & Fiscal Policy</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💱</div>
+                                <div class="topic-name">Monetary Policy & Inflation</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📈</div>
+                                <div class="topic-name">Economic Reforms & Liberalization</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌐</div>
+                                <div class="topic-name">Foreign Trade & BOP</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">👨‍🌾</div>
+                                <div class="topic-name">Agriculture & Rural Development</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏭</div>
+                                <div class="topic-name">Industry & Services Sector</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📱</div>
+                                <div class="topic-name">Infrastructure & Digital Economy</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎯</div>
+                                <div class="topic-name">Government Schemes & Poverty Alleviation</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 5: Environment -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 5</div>
+                            <div class="unit-title">Environment & Ecology</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌿</div>
+                                <div class="topic-name">Ecosystem & Biodiversity</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌡️</div>
+                                <div class="topic-name">Climate Change & Global Warming</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">♻️</div>
+                                <div class="topic-name">Pollution & Environmental Issues</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🐅</div>
+                                <div class="topic-name">Wildlife Conservation & National Parks</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚡</div>
+                                <div class="topic-name">Renewable Energy & Sustainability</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📜</div>
+                                <div class="topic-name">Environmental Laws & Treaties</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 6: Science & Technology -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 6</div>
+                            <div class="unit-title">Science & Technology</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔬</div>
+                                <div class="topic-name">Physics - Mechanics, Heat, Light</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚗️</div>
+                                <div class="topic-name">Chemistry - Elements, Compounds, Reactions</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🧬</div>
+                                <div class="topic-name">Biology - Cell, Genetics, Human Body</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🚀</div>
+                                <div class="topic-name">Space Technology & ISRO Missions</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💻</div>
+                                <div class="topic-name">IT & Digital Revolution</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🤖</div>
+                                <div class="topic-name">AI, ML & Emerging Technologies</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💊</div>
+                                <div class="topic-name">Biotechnology & Healthcare</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚛️</div>
+                                <div class="topic-name">Nuclear Technology & Energy</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 7: Current Affairs -->
+                <div class="unit-card">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 7</div>
+                            <div class="unit-title">Current Affairs & Events</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📰</div>
+                                <div class="topic-name">National Events & Developments</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🌍</div>
+                                <div class="topic-name">International Affairs & Relations</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🏆</div>
+                                <div class="topic-name">Awards, Honors & Appointments</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚽</div>
+                                <div class="topic-name">Sports & Games</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📚</div>
+                                <div class="topic-name">Books & Authors</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎭</div>
+                                <div class="topic-name">Culture & Heritage Events</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Download Banner for GS -->
+            <div class="download-banner">
+                <div class="download-content">
+                    <h2>📥 Download Complete GS Paper I Notes</h2>
+                    <p>Get all 7 sections in a single, comprehensive PDF. Updated for UPSC Prelims 2026 with latest
+                        current affairs and exam patterns.</p>
+                </div>
+                <button class="download-btn" onclick="downloadPDF('gs')">
+                    <i class="fas fa-file-pdf"></i> Download Free PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- CSAT PAPER CONTENT -->
+        <div id="csat-content" class="tab-content">
+            <div class="section-header">
+                <h2 class="section-title">CSAT Paper II</h2>
+                <p class="section-subtitle">Complete notes for Comprehension, Logical Reasoning, Analytical Ability,
+                    Decision Making, Problem Solving, and Quantitative Aptitude.</p>
+                <div class="syllabus-toggle">
+                    <button class="toggle-btn csat-toggle" onclick="openModal('csat-syllabus')">
+                        <i class="fas fa-list-alt"></i> View Complete Syllabus
+                    </button>
+                    <button class="toggle-btn csat-toggle" onclick="downloadPDF('csat')">
+                        <i class="fas fa-download"></i> Download All CSAT Notes
+                    </button>
+                </div>
+            </div>
+
+            <!-- CSAT Paper Overview -->
+            <div class="papers-grid">
+                <div class="paper-card csat-card">
+                    <div class="paper-header">
+                        <div class="paper-icon">🧠</div>
+                        <div class="paper-info">
+                            <h3>CSAT Paper II</h3>
+                            <div class="paper-meta">
+                                <span><i class="fas fa-clock"></i> 200 Marks</span>
+                                <span><i class="fas fa-hourglass-half"></i> 120 Minutes</span>
                             </div>
                         </div>
-                     </div>
-                     
-                     <!-- NEW: NOTIFICATIONS VIEW (FOR FOOTER NAVIGATION) -->
-                     <div id="notifications-view" class="hidden">
-                         <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Notifications (Prelims Hub)</h1>
-                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 text-center text-slate-500">
-                             No new updates regarding Prelims resources.
-                         </div>
-                     </div>
-                     
-                     <!-- NEW: SETTINGS VIEW (FOR FOOTER NAVIGATION) -->
-                     <div id="settings-view" class="hidden">
-                         <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-6">Settings & Profile</h1>
-                         <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm p-6 text-center text-slate-500">
-                             General settings are handled here. (Functionality placeholders retained in JS)
-                         </div>
-                     </div>
+                    </div>
+                    <p class="paper-description">Qualifying paper (33% required) covering Comprehension, Logical
+                        Reasoning, Analytical Ability, Decision Making, Problem Solving, and Basic Numeracy.</p>
+                    <div class="paper-stats">
+                        <div class="stat-box">
+                            <div class="stat-box-value">80</div>
+                            <div class="stat-box-label">Questions</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-box-value">8</div>
+                            <div class="stat-box-label">Major Sections</div>
+                        </div>
+                    </div>
+                    <div class="paper-actions">
+                        <a href="#csat-units" class="action-link primary">
+                            <i class="fas fa-book-reader"></i> Explore Notes
+                        </a>
+                        <button onclick="openModal('csat-syllabus')" class="action-link secondary">
+                            <i class="fas fa-list"></i> Syllabus
+                        </button>
+                    </div>
+                </div>
+            </div>
 
-                     <div class="text-center mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-                         <p class="text-sm text-slate-500 dark:text-slate-400">© 2025 UPSChub. All Rights Reserved.</p>
-                     </div>
-                 </div>
-             </main>
+            <!-- CSAT UNITS -->
+            <div id="csat-units" class="units-section">
+
+                <!-- Unit 1: Comprehension -->
+                <div class="unit-card csat-unit">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 1</div>
+                            <div class="unit-title">Reading Comprehension</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📖</div>
+                                <div class="topic-name">Understanding Main Ideas & Themes</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎯</div>
+                                <div class="topic-name">Inference & Implied Meanings</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💭</div>
+                                <div class="topic-name">Author's Tone & Purpose</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📊</div>
+                                <div class="topic-name">Data Interpretation from Passages</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔍</div>
+                                <div class="topic-name">Critical Analysis of Arguments</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">✍️</div>
+                                <div class="topic-name">Vocabulary in Context</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 2: Logical Reasoning -->
+                <div class="unit-card csat-unit">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 2</div>
+                            <div class="unit-title">Logical Reasoning & Analytical Ability</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🧩</div>
+                                <div class="topic-name">Syllogisms & Statements</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎲</div>
+                                <div class="topic-name">Puzzles & Seating Arrangements</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔄</div>
+                                <div class="topic-name">Blood Relations & Family Trees</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📐</div>
+                                <div class="topic-name">Direction Sense & Distance</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔢</div>
+                                <div class="topic-name">Number & Letter Series</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎨</div>
+                                <div class="topic-name">Coding-Decoding & Pattern Recognition</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⏰</div>
+                                <div class="topic-name">Clocks & Calendars</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🧮</div>
+                                <div class="topic-name">Venn Diagrams & Set Theory</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 3: Decision Making -->
+                <div class="unit-card csat-unit">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 3</div>
+                            <div class="unit-title">Decision Making & Problem Solving</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⚖️</div>
+                                <div class="topic-name">Situation Analysis & Judgment</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🎯</div>
+                                <div class="topic-name">Prioritization & Resource Allocation</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔗</div>
+                                <div class="topic-name">Cause & Effect Relationships</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🚨</div>
+                                <div class="topic-name">Problem Identification & Solutions</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💡</div>
+                                <div class="topic-name">Ethical Decision Making</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📋</div>
+                                <div class="topic-name">Administrative Scenarios</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 4: Data Interpretation -->
+                <div class="unit-card csat-unit">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 4</div>
+                            <div class="unit-title">Data Interpretation & Sufficiency</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📊</div>
+                                <div class="topic-name">Tables & Charts Analysis</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📈</div>
+                                <div class="topic-name">Bar Graphs & Line Charts</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🥧</div>
+                                <div class="topic-name">Pie Charts & Percentages</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📉</div>
+                                <div class="topic-name">Caselets & Mixed Data</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔍</div>
+                                <div class="topic-name">Data Sufficiency Problems</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📋</div>
+                                <div class="topic-name">Comparison & Trend Analysis</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 5: Quantitative Aptitude -->
+                <div class="unit-card csat-unit">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 5</div>
+                            <div class="unit-title">Quantitative Aptitude & Basic Numeracy</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🔢</div>
+                                <div class="topic-name">Number Systems & HCF-LCM</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">%</div>
+                                <div class="topic-name">Percentages & Ratios</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📐</div>
+                                <div class="topic-name">Averages & Mixtures</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">⏱️</div>
+                                <div class="topic-name">Time & Work</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🚄</div>
+                                <div class="topic-name">Time, Speed & Distance</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💰</div>
+                                <div class="topic-name">Profit, Loss & Discount</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">💵</div>
+                                <div class="topic-name">Simple & Compound Interest</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📏</div>
+                                <div class="topic-name">Mensuration - Area & Volume</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📊</div>
+                                <div class="topic-name">Algebra & Linear Equations</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">📐</div>
+                                <div class="topic-name">Geometry & Trigonometry Basics</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unit 6: Communication -->
+                <div class="unit-card csat-unit">
+                    <div class="unit-header" onclick="toggleUnit(this)">
+                        <div class="unit-title-group">
+                            <div class="unit-number">SECTION 6</div>
+                            <div class="unit-title">Interpersonal Skills & Communication</div>
+                        </div>
+                        <button class="unit-toggle"><i class="fas fa-chevron-down"></i></button>
+                    </div>
+                    <div class="unit-content">
+                        <div class="topics-grid">
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🗣️</div>
+                                <div class="topic-name">Effective Communication Skills</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">👥</div>
+                                <div class="topic-name">Interpersonal Relations</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">🤝</div>
+                                <div class="topic-name">Conflict Resolution</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                            <a href="#" class="topic-card">
+                                <div class="topic-icon">👂</div>
+                                <div class="topic-name">Active Listening & Empathy</div>
+                                <div class="topic-arrow"><i class="fas fa-arrow-right"></i></div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Download Banner for CSAT -->
+            <div class="download-banner">
+                <div class="download-content">
+                    <h2>📥 Download Complete CSAT Paper II Notes</h2>
+                    <p>Get all 6 sections in a single, comprehensive PDF. Practice questions, shortcuts, and exam
+                        strategies included for UPSC Prelims 2026.</p>
+                </div>
+                <button class="download-btn" onclick="downloadPDF('csat')">
+                    <i class="fas fa-file-pdf"></i> Download Free PDF
+                </button>
+            </div>
         </div>
-         
-        <!-- Footer Navigation -->
-        <footer class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-[0_-2px_5px_-1px_rgba(0,0,0,0.1)] z-50">
-             <nav class="container mx-auto px-4 h-16 flex justify-around items-center footer-nav">
-                <!-- Links adjusted relative to Prelims/dashboard.html -->
-                <a href="../homeUPSChub.html" id="nav-home" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span class="text-xs font-medium">Home</span></a>
-                <a href="../dashboard.html" id="nav-dashboard" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg><span class="text-xs font-medium">Dashboard</span></a>
-                <a href="#" id="nav-tests" class="flex flex-col items-center justify-center text-blue-600 dark:text-blue-500 active"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg><span class="text-xs font-medium">Prelims</span></a>
-                <a href="#" id="nav-notifications" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" /></svg><span class="text-xs font-medium">Notify</span></a>
-                <a href="#" id="nav-settings" class="flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg><span class="text-xs font-medium">Settings</span></a>
-             </nav>
-        </footer>
+
     </div>
 
-    <!-- Placeholder HTML for missing modals/elements to prevent JS errors -->
-    <div id="alert-modal" class="hidden"> <p id="alert-message"></p><button id="alert-ok"></button></div>
-    <div id="streak-tooltip" class="hidden"> <span id="current-streak">0</span><span id="highest-streak">0</span></div>
-    <div id="user-email-display" class="hidden"></div>
-    <div id="dropdown-display-name" class="hidden">UPSC Aspirant</div>
-    <div id="dropdown-theme-toggle" class="hidden"></div>
-    <div id="settings-display-name" class="hidden"></div>
-    <div id="settings-user-email" class="hidden"></div>
-    <div id="subscription-item" class="hidden"></div>
-    <!-- End Placeholder HTML -->
+    <!-- GS SYLLABUS MODAL -->
+    <div id="gs-syllabus" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 GS Paper I - Complete Syllabus</h2>
+                <p class="modal-subtitle">Civil Services (Preliminary) Examination - General Studies Paper I</p>
+                <button class="close-modal" onclick="closeModal('gs-syllabus')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="syllabus-section">
+                    <h3><i class="fas fa-globe-asia"></i> Syllabus Overview</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Current events of national and international importance
+                        </li>
+                        <li><i class="fas fa-check-circle"></i> History of India and Indian National Movement</li>
+                        <li><i class="fas fa-check-circle"></i> Indian and World Geography - Physical, Social, Economic
+                            Geography</li>
+                        <li><i class="fas fa-check-circle"></i> Indian Polity and Governance - Constitution, Political
+                            System, Panchayati Raj, Public Policy, Rights Issues</li>
+                        <li><i class="fas fa-check-circle"></i> Economic and Social Development - Sustainable
+                            Development, Poverty, Inclusion, Demographics, Social Sector initiatives</li>
+                        <li><i class="fas fa-check-circle"></i> General issues on Environmental Ecology, Bio-diversity
+                            and Climate Change</li>
+                        <li><i class="fas fa-check-circle"></i> General Science</li>
+                    </ul>
+                </div>
 
+                <div class="syllabus-section">
+                    <h3><i class="fas fa-info-circle"></i> Exam Pattern</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> <strong>Total Questions:</strong> 100 Questions</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Maximum Marks:</strong> 200 Marks (Each question
+                            carries 2 marks)</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Duration:</strong> 2 Hours (120 Minutes)</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Negative Marking:</strong> 1/3rd penalty (0.66
+                            marks deducted for each wrong answer)</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Type:</strong> Objective Type (Multiple Choice
+                            Questions)</li>
+                    </ul>
+                </div>
 
-<script type="module">
-    // --- FIREBASE IMPORTS ---
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, updateDoc, setDoc, collection, query, orderBy, getDocs, getDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+                <div class="syllabus-section">
+                    <h3><i class="fas fa-lightbulb"></i> Preparation Tips</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Focus on NCERT textbooks (Class 6-12) for core concepts
+                        </li>
+                        <li><i class="fas fa-check-circle"></i> Read newspapers daily for current affairs (The Hindu,
+                            Indian Express)</li>
+                        <li><i class="fas fa-check-circle"></i> Practice Previous Year Questions (PYQs) extensively</li>
+                        <li><i class="fas fa-check-circle"></i> Take regular mock tests to improve time management</li>
+                        <li><i class="fas fa-check-circle"></i> Make concise notes and revise regularly</li>
+                        <li><i class="fas fa-check-circle"></i> Focus on quality over quantity - understand concepts
+                            deeply</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // --- FIREBASE CONFIG ---
-    const firebaseConfig = { apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4", authDomain: "upscstudyhub-github.firebaseapp.com", projectId: "upscstudyhub-github", storageBucket: "upscstudyhub-github.firebasestorage.app", messagingSenderId: "451692540885", appId: "1:451692540885:web:b425e85128e5de97c7c35c" };
-    // We use a specific App ID for this module to ensure unique data paths
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'prelims-app-id';
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+    <!-- CSAT SYLLABUS MODAL -->
+    <div id="csat-syllabus" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">📋 CSAT Paper II - Complete Syllabus</h2>
+                <p class="modal-subtitle">Civil Services (Preliminary) Examination - CSAT (Qualifying Paper)</p>
+                <button class="close-modal" onclick="closeModal('csat-syllabus')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="syllabus-section csat-section">
+                    <h3><i class="fas fa-brain"></i> Syllabus Overview</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Comprehension</li>
+                        <li><i class="fas fa-check-circle"></i> Interpersonal skills including communication skills</li>
+                        <li><i class="fas fa-check-circle"></i> Logical reasoning and analytical ability</li>
+                        <li><i class="fas fa-check-circle"></i> Decision-making and problem solving</li>
+                        <li><i class="fas fa-check-circle"></i> General mental ability</li>
+                        <li><i class="fas fa-check-circle"></i> Basic numeracy (numbers and their relations, orders of
+                            magnitude, etc.) - Class X level</li>
+                        <li><i class="fas fa-check-circle"></i> Data interpretation (charts, graphs, tables, data
+                            sufficiency etc.) - Class X level</li>
+                    </ul>
+                </div>
 
-    // --- ELEMENT SELECTORS ---
-    const appView = document.getElementById('app-view'); 
-    const sidebar = document.getElementById('sidebar');
-    const sidebarToggle = document.getElementById('sidebar-toggle');
-    const mainContentElement = document.getElementById('main-content');
-    const sidebarGsLink = document.getElementById('sidebar-gs');
-    const sidebarCsatLink = document.getElementById('sidebar-csat');
-    const gsView = document.getElementById('gs-view');
-    const csatView = document.getElementById('csat-view');
-    const accountDropdown = document.getElementById('account-dropdown'); 
-    const accountBtn = document.getElementById('account-btn');
-    const navNotifications = document.getElementById('nav-notifications');
-    const navSettings = document.getElementById('nav-settings');
-    const navTests = document.getElementById('nav-tests');
+                <div class="syllabus-section csat-section">
+                    <h3><i class="fas fa-info-circle"></i> Exam Pattern</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> <strong>Total Questions:</strong> 80 Questions</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Maximum Marks:</strong> 200 Marks (Each question
+                            carries 2.5 marks)</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Duration:</strong> 2 Hours (120 Minutes)</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Negative Marking:</strong> 1/3rd penalty (0.83
+                            marks deducted for each wrong answer)</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Qualifying Nature:</strong> Minimum 33% marks
+                            (66.66 marks) required to qualify</li>
+                        <li><i class="fas fa-check-circle"></i> <strong>Important:</strong> Marks obtained in CSAT are
+                            NOT counted for ranking. It's only a qualifying paper.</li>
+                    </ul>
+                </div>
 
-    // View containers added for the router logic
-    const spaViews = { 
-        gs: gsView, 
-        csat: csatView, 
-        notifications: document.getElementById('notifications-view'), 
-        settings: document.getElementById('settings-view') 
-    };
+                <div class="syllabus-section csat-section">
+                    <h3><i class="fas fa-lightbulb"></i> Preparation Tips</h3>
+                    <ul>
+                        <li><i class="fas fa-check-circle"></i> Focus on accuracy over speed - you only need 33% to
+                            qualify</li>
+                        <li><i class="fas fa-check-circle"></i> Practice comprehension passages daily - they carry
+                            maximum weightage</li>
+                        <li><i class="fas fa-check-circle"></i> Revise basic mathematics from Class 6-10 NCERT</li>
+                        <li><i class="fas fa-check-circle"></i> Develop shortcuts for quick calculations</li>
+                        <li><i class="fas fa-check-circle"></i> Practice data interpretation from newspapers and reports
+                        </li>
+                        <li><i class="fas fa-check-circle"></i> Attempt easier questions first to secure qualifying
+                            marks</li>
+                        <li><i class="fas fa-check-circle"></i> Don't ignore CSAT - many candidates have failed only due
+                            to CSAT</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    // Required by utility functions (defined as placeholders in HTML)
-    const alertModal = document.getElementById('alert-modal');
-    const alertMessage = document.getElementById('alert-message');
-    const dropdownDisplayName = document.getElementById('dropdown-display-name');
-    const welcomeBanner = document.getElementById('welcome-banner-gs'); // Use GS banner for time update
-    
-    let currentView = 'gs-view';
-    let gsChartInstance = null;
-    let csatChartInstance = null;
-    let timeUpdateInterval = null; 
+    <!-- FOOTER -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>About UPSChub</h3>
+                <p style="color: rgba(255,255,255,.6); font-size: 14px; line-height: 1.7;">
+                    Your one-stop destination for UPSC Civil Services preparation. Free quality notes, previous year
+                    questions, and expert guidance.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="notes.html">All Notes</a></li>
+                    <li><a href="#">Previous Year Papers</a></li>
+                    <li><a href="#">Mock Tests</a></li>
+                    <li><a href="#">Study Plans</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Syllabus</a></li>
+                    <li><a href="#">Current Affairs</a></li>
+                    <li><a href="#">Answer Writing</a></li>
+                    <li><a href="#">Interview Guidance</a></li>
+                    <li><a href="#">Blog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <ul>
+                    <li><a href="mailto:support@upschub.com"><i class="fas fa-envelope"></i> support@upschub.com</a>
+                    </li>
+                    <li><a href="#"><i class="fas fa-phone"></i> +91 98765 43210</a></li>
+                    <li><a href="#"><i class="fab fa-telegram"></i> Join Telegram</a></li>
+                    <li><a href="#"><i class="fab fa-youtube"></i> YouTube Channel</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 <span>UPSChub</span> | Empowering UPSC Aspirants | All Rights Reserved
+        </div>
+    </footer>
 
-    // --- AUTHENTICATION & INITIALIZATION ---
-    onAuthStateChanged(auth, async user => {
-        if (user) {
-            console.log('User logged in. Loading Prelims Dashboard...');
-            
-            // Step 1: Handle authentication token for Canvas environment
-            if (typeof __initial_auth_token !== 'undefined') { 
-                await signInWithCustomToken(auth, __initial_auth_token).catch(err => {
-                    console.error("Custom token sign-in failed:", err);
-                });
-            } else {
-                await signInAnonymously(auth).catch(err => {
-                    console.error("Anonymous sign-in failed:", err);
-                });
+    <script>
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+
+            // Remove active class from all tab buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Show selected tab content
+            document.getElementById(tabName + '-content').classList.add('active');
+
+            // Add active class to clicked button
+            event.target.closest('.tab-btn').classList.add('active');
+
+            // Scroll to content
+            document.getElementById(tabName + '-content').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Unit Toggle
+        function toggleUnit(header) {
+            const unitCard = header.closest('.unit-card');
+            const content = unitCard.querySelector('.unit-content');
+            const toggle = header.querySelector('.unit-toggle');
+
+            content.classList.toggle('active');
+            toggle.classList.toggle('active');
+        }
+
+        // Modal Functions
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('active');
+                document.body.style.overflow = 'auto';
             }
-            
-            // Set App visible immediately after auth check
-            appView.classList.remove('hidden'); 
-            
-            // Initialize basic UI components
-            if (dropdownDisplayName) dropdownDisplayName.textContent = user.displayName || 'UPSC Aspirant';
-            initializeTimeBasedUI(); 
-
-            // Step 2: Render UI and attach listeners
-            handleSidebarState(); 
-            attachEventListeners();
-            
-            // Step 3: Initialize Charts (required before data fetching)
-            // We initialize but never populate them since this is a resource page.
-            renderPerformanceChart('gsPerformanceChart', '#3B82F6');
-            renderPerformanceChart('csatPerformanceChart', '#F59E0B');
-            
-            // Step 4: Load Data for Default View (GS)
-            loadResourceData(user.uid, 'gs-view');
-
-            // Set initial active view state
-            switchView('gs-view');
-
-        } else {
-            console.log('User is not logged in. Redirecting to auth page...');
-            // Link adjusted relative to Prelims/dashboard.html
-            window.location.href = '../auth.html'; 
-        }
-    });
-
-    // --- UTILITY FUNCTIONS ---
-    function showAlert(message) { 
-        if (alertMessage && alertModal) {
-            alertMessage.textContent = message; 
-            alertModal.classList.remove('hidden'); 
-        } else {
-             console.error("Alert modal elements missing. Message:", message);
-        }
-    }
-    
-    function initializeTimeBasedUI() {
-        updateTimeAndGreeting();
-        if (timeUpdateInterval) clearInterval(timeUpdateInterval);
-        timeUpdateInterval = setInterval(updateTimeAndGreeting, 1000);
-    }
-    
-    function updateTimeAndGreeting() {
-        const morningImage = 'https://images.unsplash.com/photo-1470252649378-9c29740c9fa8?q=80&w=2070&auto=format&fit=crop';
-        const afternoonImage = 'https://images.unsplash.com/photo-1590306362572-215a054a88f5?q=80&w=2070&auto=format&fit=crop';
-        const eveningImage = 'https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=1974&auto=format&fit=crop';
-
-        const now = new Date();
-        const hour = now.getHours();
-        
-        const name = dropdownDisplayName.textContent.split(' ')[0] || 'Aspirant';
-        let greetingText;
-        
-        if (hour >= 5 && hour < 12) {
-            greetingText = `Good Morning, ${name}!`;
-        } else if (hour >= 12 && hour < 18) {
-            greetingText = `Good Afternoon, ${name}!`;
-        } else {
-            greetingText = `Good Evening, ${name}!`;
-        }
-        
-        const gsWelcomeHeading = document.getElementById('gs-welcome-heading');
-        const csatWelcomeHeading = document.getElementById('csat-welcome-heading');
-        
-        if (gsWelcomeHeading) gsWelcomeHeading.textContent = `GS: ${greetingText.replace(', Aspirant!', '!')}`;
-        if (csatWelcomeHeading) csatWelcomeHeading.textContent = `CSAT: ${greetingText.replace(', Aspirant!', '!')}`;
-    }
-    
-    function handleLogout(e) { e.preventDefault(); signOut(auth).catch(error => console.error("Logout error:", error)); }
-    
-    // --- SIDEBAR LOGIC ---
-    function handleSidebarState() {
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        if (window.innerWidth >= 768) {
-            // Desktop: Sidebar visible by default, main content indented
-            sidebar.classList.remove('-translate-x-full'); 
-            mainContentElement.classList.add('md:ml-64');
-            if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
-        } else {
-            // Mobile: Sidebar hidden by default, main content takes full width
-            sidebar.classList.add('-translate-x-full');
-            mainContentElement.classList.remove('md:ml-64');
-            if (sidebarBackdrop) sidebarBackdrop.classList.add('hidden');
-        }
-    }
-    
-    function toggleSidebar() { 
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-
-        sidebar.classList.toggle('-translate-x-full'); 
-        
-        // Toggle backdrop visibility when sidebar state changes (primarily for mobile)
-        if (window.innerWidth < 768 && sidebarBackdrop) {
-             sidebarBackdrop.classList.toggle('hidden');
-        }
-    }
-    
-    // --- VIEW SWITCHING (Handles Footer Navigation) ---
-    function switchView(viewName) {
-        let normalizedViewName;
-
-        // Hide all major views
-        gsView.classList.add('hidden');
-        csatView.classList.add('hidden');
-        spaViews.notifications.classList.add('hidden');
-        spaViews.settings.classList.add('hidden');
-
-        // Determine target and show it
-        if (viewName === 'gs-view') {
-            normalizedViewName = 'gs-view';
-            gsView.classList.remove('hidden');
-        } else if (viewName === 'csat-view') {
-            normalizedViewName = 'csat-view';
-            csatView.classList.remove('hidden');
-        } else if (viewName === 'notifications') {
-            normalizedViewName = 'notifications';
-            spaViews.notifications.classList.remove('hidden');
-        } else if (viewName === 'settings') {
-            normalizedViewName = 'settings';
-            spaViews.settings.classList.remove('hidden');
-        } else {
-            // Default/Fallback
-            normalizedViewName = 'gs-view';
-            gsView.classList.remove('hidden');
         }
 
-        // --- Sidebar Activation ---
-        document.querySelectorAll('.sidebar-item').forEach(item => {
-            item.classList.remove('active', 'bg-blue-500', 'text-white');
-            item.classList.add('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
-            item.querySelector('svg').style.color = '';
+        // Download PDF Function
+        function downloadPDF(paperType) {
+            const paperName = paperType === 'gs' ? 'GS Paper I' : 'CSAT Paper II';
+            alert(`📥 Downloading ${paperName} Complete Notes PDF...\n\nThis is a demo. In production, this would trigger an actual PDF download.`);
+
+            // In production, you would use:
+            // window.location.href = '/downloads/' + paperType + '-notes.pdf';
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                const href = this.getAttribute('href');
+                if (href !== '#' && document.querySelector(href)) {
+                    e.preventDefault();
+                    document.querySelector(href).scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
         });
-        
-        if (normalizedViewName === 'gs-view' || normalizedViewName === 'csat-view') {
-            const link = document.getElementById(`sidebar-${normalizedViewName.split('-')[0]}`);
-            if (link) {
-                link.classList.add('active');
-                link.classList.remove('text-slate-700', 'dark:text-slate-300', 'hover:bg-slate-100', 'dark:hover:bg-slate-700');
+
+        // Keyboard accessibility for modal
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = 'auto';
+                });
             }
-        }
-        
-        // Close sidebar on mobile after clicking a link
-        if (window.innerWidth < 768) {
-             // Only close if a primary content link was clicked
-             if (normalizedViewName !== currentView) {
-                 toggleSidebar(); 
-             }
-        }
+        });
 
+        // Add loading animation on page load
+        window.addEventListener('load', function () {
+            document.body.style.opacity = '0';
+            setTimeout(() => {
+                document.body.style.transition = 'opacity 0.5s ease';
+                document.body.style.opacity = '1';
+            }, 100);
+        });
 
-        // --- Footer Navigation Activation ---
-        document.querySelectorAll('.footer-nav a').forEach(a => { a.classList.remove('active'); a.querySelector('svg').style.color = ''; });
-        
-        let activeNavButton = null;
-        if (normalizedViewName === 'notifications') { activeNavButton = navNotifications; }
-        else if (normalizedViewName === 'settings') { activeNavButton = navSettings; }
-        else { activeNavButton = navTests; } // Prelims is the primary 'Tests' view
-
-        if (activeNavButton) {
-            activeNavButton.classList.add('active');
-            activeNavButton.querySelector('svg').style.color = '#2563EB';
-        }
-        
-        currentView = normalizedViewName;
-
-        // Load resources (mock data update) when switching to GS/CSAT
-        if (currentView === 'gs-view' || currentView === 'csat-view') {
-             if (auth.currentUser) loadResourceData(auth.currentUser.uid, currentView);
-        }
-    }
-
-
-    // --- DATA FETCHING (STATIC/RESOURCE VIEW LOGIC) ---
-    async function loadResourceData(userId, type) {
-        console.log(`Loading static resource view for ${type}...`);
-
-        const mockResources = {
-            'gs-view': {
-                subjects: 7,
-                ca_focus: '18 Months',
-                mandatory: 'NCERTs (6-12)',
-                cycles: '3+ Recommended',
-            },
-            'csat-view': {
-                total_qs: 80,
-                qualifying: '66 Marks',
-                rc_weightage: '~40-45%',
-                practice: 'Daily 1 hr'
-            }
+        // Intersection Observer for scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
         };
 
-        const data = mockResources[type];
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
 
-        // Update the UI based on the view type (Static content update)
-        if (type === 'gs-view') {
-            document.getElementById('gs-total-subjects').textContent = data.subjects + ' Major';
-            document.getElementById('gs-ca-focus').textContent = data.ca_focus;
-            document.getElementById('gs-mandatory-readings').textContent = data.mandatory;
-            document.getElementById('gs-revision-cycles').textContent = data.cycles;
-            
-        } else { // CSAT
-            document.getElementById('csat-total-questions').textContent = data.total_qs + ' Qs';
-            document.getElementById('csat-qualifying-score').textContent = data.qualifying;
-            document.getElementById('csat-rc-weightage').textContent = data.rc_weightage;
-            document.getElementById('csat-practice-goal').textContent = data.practice;
-        }
-    }
-    
-    // --- DUMMY/CHART FUNCTIONS (Kept for compatibility, but simplified to avoid data fetch) ---
-    function renderPerformanceChart(canvasId, color) { /* Logic omitted */ }
-    function updateChartData(chartInstance, results, canvasId, labelField, dataField) { /* Logic omitted */ }
-    function updateRecentResults(container, results, type) { /* Logic omitted */ }
-    function updateGSStats(results) { /* Logic omitted */ }
-    function updateCSATStats(results) { /* Logic omitted */ }
-    function updateSubscriptionUI() { /* Logic omitted */ }
-    function handleUpgrade() { showAlert("Upgrade feature not fully implemented in this module."); }
+        // Observe all topic cards
+        document.querySelectorAll('.topic-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+    </script>
 
-
-    // --- EVENT LISTENERS ---
-    function attachEventListeners() {
-        // Toggle Sidebar (Header Button)
-        if(sidebarToggle) sidebarToggle.onclick = toggleSidebar;
-        
-        // Sidebar View Switching (CRITICAL FUNCTIONALITY)
-        if(sidebarGsLink) sidebarGsLink.onclick = (e) => { e.preventDefault(); switchView('gs-view'); };
-        if(sidebarCsatLink) sidebarCsatLink.onclick = (e) => { e.preventDefault(); switchView('csat-view'); };
-        
-        // Footer Navigation (CRITICAL FUNCTIONALITY)
-        // These calls switch the view but also trigger toggleSidebar if on mobile (inside switchView)
-        if (navNotifications) navNotifications.onclick = (e) => { e.preventDefault(); switchView('notifications'); };
-        if (navSettings) navSettings.onclick = (e) => { e.preventDefault(); switchView('settings'); };
-        if (navTests) navTests.onclick = (e) => { e.preventDefault(); switchView('gs-view'); }; // Default to GS view
-
-        // Account Dropdown Toggle 
-        if(accountBtn) accountBtn.onclick = () => accountDropdown && accountDropdown.classList.toggle('hidden');
-        
-        // Logout Button 
-        const logoutBtn = document.getElementById('logout-btn');
-        if (logoutBtn) logoutBtn.onclick = handleLogout;
-
-        // Handle generic sidebar toggle on click outside (only for mobile)
-        const sidebarBackdrop = document.getElementById('sidebar-backdrop');
-        if(sidebarBackdrop) sidebarBackdrop.onclick = toggleSidebar;
-        
-        // Global click handler to close dropdown
-        document.onclick = (e) => {
-            if (accountBtn && !accountBtn.contains(e.target) && accountDropdown && !accountDropdown.contains(e.target)) {
-                 accountDropdown.classList.add('hidden');
-            }
-        };
-
-        // Alert modal close handler
-        const alertOk = document.getElementById('alert-ok');
-        if(alertOk) alertOk.addEventListener('click', () => alertModal.classList.add('hidden'));
-
-        // Handle window resize event to maintain correct sidebar state on desktop/mobile switch
-        window.addEventListener('resize', handleSidebarState);
-    }
-    
-    // --- THEME LOGIC ---
-    function applyTheme(theme) {
-         const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
-         if (theme === 'dark') { 
-            document.documentElement.classList.add('dark'); 
-            if(dropdownThemeToggle) dropdownThemeToggle.checked = true;
-         } else { 
-            document.documentElement.classList.remove('dark'); 
-            if(dropdownThemeToggle) dropdownThemeToggle.checked = false;
-         }
-         
-         if(auth.currentUser) {
-            loadResourceData(auth.currentUser.uid, currentView);
-         }
-    }
-    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    applyTheme(savedTheme);
-
-
-</script>
 </body>
+
 </html>
