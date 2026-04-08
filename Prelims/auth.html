@@ -105,7 +105,6 @@
             getDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
             authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -118,125 +117,110 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // 🔥 FIXED PATH
         const appId = "default-app-id";
 
-        // AUTH STATE
-        setPersistence(auth, browserLocalPersistence).then(() => {
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    console.log("✅ User logged in:", user.uid);
+        // Set persistence
+        setPersistence(auth, browserLocalPersistence);
 
-                    try {
-                        const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
+        // ==================== SYNC WITH LOCALSTORAGE ====================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("✅ Firebase User logged in:", user.uid, user.email);
 
-                        let snap = await getDoc(userRef);
+                // Save to localStorage so other pages can detect login instantly
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', user.email);
+                localStorage.setItem('userUID', user.uid);   // optional
 
-                        if (!snap.exists()) {
-                            console.log("🟡 Creating new user document...");
+                // Create/update user document in Firestore (your existing logic)
+                try {
+                    const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    const snap = await getDoc(userRef);
 
-                            await setDoc(userRef, {
-                                email: user.email,
-                                isPremium: false,
-                                createdAt: new Date()
-                            });
-
-                            console.log("✅ User document created:", user.uid);
-                        } else {
-                            console.log("✅ User document already exists");
-                        }
-
-                        const urlParams = new URLSearchParams(window.location.search);
-                        const redirectUrl = urlParams.get('redirect');
-
-                        console.log("➡️ Redirecting...");
-                        window.location.href = redirectUrl || "dashboard.html";
-
-                    } catch (error) {
-                        console.error("🔥 Firestore ERROR:", error);
-
-                        // IMPORTANT: still redirect
-                        window.location.href = "dashboard.html";
+                    if (!snap.exists()) {
+                        await setDoc(userRef, {
+                            email: user.email,
+                            isPremium: false,
+                            createdAt: new Date()
+                        });
                     }
+                } catch (e) {
+                    console.error("Firestore error:", e);
                 }
-            });
+
+                // Redirect (with small delay for safety)
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || "notes.html";
+
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 800);
+
+            } else {
+                // Not logged in
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userUID');
+            }
         });
 
-        // UI Elements
+        // ==================== LOGIN FORM ====================
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const messageDiv = document.getElementById('message');
 
-        // SIGNUP
-        registerForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-
-            const email = document.getElementById('signup-email').value.trim();
-            const password = document.getElementById('signup-password').value.trim();
-
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
-
-                console.log("🟡 Signup success:", user.uid);
-
-                const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
-
-                await setDoc(userRef, {
-                    email: user.email,
-                    isPremium: false,
-                    createdAt: new Date()
-                });
-
-                console.log("✅ Firestore saved:", user.uid);
-
-                displayMessage("Account created successfully!", "green");
-
-            } catch (error) {
-                console.error("🔥 Signup ERROR:", error);
-                displayMessage(error.message, "red");
-            }
-        });
-
-        // LOGIN
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value.trim();
 
             try {
+                displayMessage("Signing in...", "blue");
                 await signInWithEmailAndPassword(auth, email, password);
-                console.log("🟡 Login success");
-                displayMessage("Logging in...", "green");
+                // onAuthStateChanged will handle redirect
             } catch (error) {
-                console.error("🔥 Login ERROR:", error);
+                console.error(error);
                 displayMessage("Invalid email or password", "red");
             }
         });
 
-        // UI message
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+
+            try {
+                displayMessage("Creating account...", "blue");
+                await createUserWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                console.error(error);
+                displayMessage(error.message, "red");
+            }
+        });
+
         function displayMessage(msg, color) {
             messageDiv.textContent = msg;
             messageDiv.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
         }
 
-        // FORM TOGGLE
+        // Form toggle (your existing code)
         const showSignup = document.getElementById("show-signup");
         const showSignin = document.getElementById("show-signin");
-        const loginSection = document.getElementById("loginForm").parentElement;
-        const registerSection = document.getElementById("registerForm").parentElement;
+        const signinForm = document.getElementById("signin-form");
+        const signupForm = document.getElementById("signup-form");
 
         if (showSignup && showSignin) {
-            showSignup.addEventListener("click", () => {
-                loginSection.classList.add("hidden");
-                registerSection.classList.remove("hidden");
+            showSignup.addEventListener("click", (e) => {
+                e.preventDefault();
+                signinForm.classList.add("hidden");
+                signupForm.classList.remove("hidden");
             });
 
-            showSignin.addEventListener("click", () => {
-                registerSection.classList.add("hidden");
-                loginSection.classList.remove("hidden");
+            showSignin.addEventListener("click", (e) => {
+                e.preventDefault();
+                signupForm.classList.add("hidden");
+                signinForm.classList.remove("hidden");
             });
         }
     </script>
