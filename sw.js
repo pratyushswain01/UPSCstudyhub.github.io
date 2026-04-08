@@ -1,68 +1,88 @@
-const cacheName = 'upschub-v3'; // Increment this (v4, v5...) whenever you push a manual update
+const CACHE_NAME = 'upschub-v4'; // Bump version to force update
+const OFFLINE_URL = '/offline.html';
 
-// Essential files to cache for offline start
-const staticAssets = [
-  './',
-  './index.html',
-  './manifest.json',
-  './version.json',
-  './images/logo_192.png',
-  './images/logo_512.png'
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/version.json',
+  '/offline.html', // Must be cached first
+  '/images/logo_192.png',
+  '/images/logo_512.png',
+  '/home/UPSChub.html' // Add your main pages
 ];
 
-// 1. INSTALL: Pre-cache the basic app shell
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(cacheName).then(cache => {
-      console.log('UPSChub: Pre-caching app shell');
-      return cache.addAll(staticAssets);
-    })
+self.addEventListener('install', event => {
+  console.log('UPSChub: Installing service worker');
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => {
+        console.log('UPSChub: Caching app shell');
+        return cache.addAll(STATIC_ASSETS);
+      })
+      .catch(err => console.error('Cache failed:', err))
   );
-  // Important: We don't call skipWaiting() here automatically anymore
-  // so that our manual "Update Now" button has full control.
+  self.skipWaiting(); // Take control immediately
 });
 
-// 2. ACTIVATE: Clean up OLD caches (v1, v2, etc.)
-self.addEventListener('activate', e => {
-  e.waitUntil(
+self.addEventListener('activate', event => {
+  console.log('UPSChub: Activating service worker');
+  event.waitUntil(
     caches.keys().then(keys => {
       return Promise.all(
-        keys.filter(key => key !== cacheName)
-            .map(key => {
-              console.log('UPSChub: Deleting old cache', key);
-              return caches.delete(key);
-            })
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            console.log('UPSChub: Deleting old cache', key);
+            return caches.delete(key);
+          }
+        })
       );
-    })
-  );
-  return self.clients.claim(); // Immediately takes control of all open pages
-});
-
-// 3. FETCH: Network-First Strategy
-// This ensures students see the latest notes if online, but works offline too.
-self.addEventListener('fetch', e => {
-  // Skip cross-origin requests
-  if (!e.request.url.startsWith(self.location.origin)) return;
-
-  e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        // If we got the page, save a copy in the cache
-        const resClone = res.clone();
-        caches.open(cacheName).then(cache => {
-          cache.put(e.request, resClone);
-        });
-        return res;
-      })
-      .catch(() => {
-        // If internet fails, look for the page in our cache
-        return caches.match(e.request);
-      })
+    }).then(() => self.clients.claim())
   );
 });
 
-// 4. MANUAL UPDATE SIGNAL: Listen for the "Update Now" click from index.html
-self.addEventListener('message', (event) => {
+self.addEventListener('fetch', event => {
+  const request = event.request;
+
+  // Skip non-GET or cross-origin
+  if (request.method !== 'GET' || !request.url.startsWith(self.location.origin)) {
+    return;
+  }
+
+  // NAVIGATION REQUESTS (pages): Network first, offline.html fallback
+  if (request.mode === 'navigate' || request.headers.get('accept')?.includes('text/html')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          // Cache successful response
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          return response;
+        })
+        .catch(async () => {
+          console.log('UPSChub: Serving offline.html for', request.url);
+          const cache = await caches.open(CACHE_NAME);
+          const offlinePage = await cache.match(OFFLINE_URL);
+          return offlinePage || new Response('Offline page not cached', { status: 503 });
+        })
+    );
+    return;
+  }
+
+  // OTHER ASSETS: Cache-first with network fallback
+  event.respondWith(
+    caches.match(request)
+      .then(cached => cached || fetch(request).then(response => {
+        const copy = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+        return response;
+      }))
+      .catch(() => caches.match(request))
+  );
+});
+
+// Manual update from your "Update Now" button
+self.addEventListener('message', event => {
   if (event.data === 'SKIP_WAITING') {
     self.skipWaiting();
   }
