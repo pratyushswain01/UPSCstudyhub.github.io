@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSChub - Daily Updates for UPSC Aspirants</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, Timestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        // Firebase configuration - REPLACE WITH YOUR CONFIG
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+        };
+
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Admin email (change this to your admin email)
+        const ADMIN_EMAIL = "pratyushkumarswain01@gmail.com";
+
+        let currentUser = null;
+        let isAdmin = false;
+
+        // Auth state listener
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                isAdmin = user.email === ADMIN_EMAIL;
+
+                // Create user document if doesn't exist
+                const userRef = doc(db, 'users', user.uid);
+                const userDoc = await getDoc(userRef);
+                if (!userDoc.exists()) {
+                    await setDoc(userRef, {
+                        email: user.email,
+                        displayName: user.displayName || user.email.split('@')[0],
+                        createdAt: Timestamp.now(),
+                        isAdmin: isAdmin
+                    });
+                }
+
+                showApp();
+                loadDailyContent();
+                loadTodos();
+            } else {
+                currentUser = null;
+                isAdmin = false;
+                showAuth();
+            }
+        });
+
+        // Show auth screen
+        function showAuth() {
+            document.getElementById('authScreen').classList.remove('hidden');
+            document.getElementById('appScreen').classList.add('hidden');
+        }
+
+        // Show app screen
+        function showApp() {
+            document.getElementById('authScreen').classList.add('hidden');
+            document.getElementById('appScreen').classList.remove('hidden');
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('adminControls').classList.toggle('hidden', !isAdmin);
+        }
+
+        // Login with email
+        window.loginWithEmail = async () => {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert('Login failed: ' + error.message);
+            }
+        };
+
+        // Sign up with email
+        window.signupWithEmail = async () => {
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            if (password.length < 6) {
+                alert('Password must be at least 6 characters');
+                return;
+            }
+
+            try {
+                await createUserWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                alert('Signup failed: ' + error.message);
+            }
+        };
+
+        // Login with Google
+        window.loginWithGoogle = async () => {
+            try {
+                await signInWithPopup(auth, googleProvider);
+            } catch (error) {
+                alert('Google login failed: ' + error.message);
+            }
+        };
+
+        // Logout
+        window.logout = async () => {
+            await signOut(auth);
+        };
+
+        // Get today's date in YYYY-MM-DD format
+        function getTodayDate() {
+            return new Date().toISOString().split('T')[0];
+        }
+
+        // Format date for display
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-IN', options);
+        }
+
+        // Load daily content
+        async function loadDailyContent() {
+            const today = getTodayDate();
+            document.getElementById('todayDate').textContent = formatDate(today);
+
+            const contentRef = doc(db, 'dailyContent', today);
+
+            onSnapshot(contentRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    displayDailyTest(data.test);
+                    displayCurrentAffairs(data.currentAffairs || []);
+                } else {
+                    displayDailyTest(null);
+                    displayCurrentAffairs([]);
+                }
+            });
+        }
+
+        // Display daily test
+        function displayDailyTest(test) {
+            const container = document.getElementById('dailyTest');
+
+            if (!test || !test.questions || test.questions.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-orange-50 border border-orange-200 rounded-lg p-6 text-center">
+                        <svg class="w-12 h-12 text-orange-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="text-gray-600 font-medium">Today's test will be updated soon</p>
+                        <p class="text-sm text-gray-500 mt-1">Check back later for daily practice questions</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = `
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border border-blue-100">
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="text-xl font-bold text-gray-800">${test.title}</h3>
+                            <p class="text-sm text-gray-600 mt-1">${test.subject || 'General Studies'}</p>
+                        </div>
+                        <span class="bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                            Test #${test.testNumber || '1'}
+                        </span>
+                    </div>
+                    <div class="flex flex-wrap gap-4 mb-4 text-sm">
+                        <span class="flex items-center text-gray-600">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            ${test.questions.length} Questions
+                        </span>
+                        <span class="flex items-center text-gray-600">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            ${test.timeLimit || '60'} minutes
+                        </span>
+                    </div>
+                    <button onclick="openTestModal(${JSON.stringify(test).replace(/"/g, '&quot;')})" 
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-200">
+                        Start Answer Writing Practice
+                    </button>
+                </div>
+            `;
+        }
+
+        // Display current affairs
+        function displayCurrentAffairs(affairs) {
+            const container = document.getElementById('currentAffairs');
+
+            if (!affairs || affairs.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-8 text-gray-500">
+                        <p>No updates available for today</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = affairs.map((item, index) => `
+                <div class="bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition duration-200">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="font-semibold text-gray-800 flex-1">${item.title}</h4>
+                        ${item.tag ? `<span class="bg-orange-100 text-orange-700 text-xs px-2 py-1 rounded-full font-medium ml-2">${item.tag}</span>` : ''}
+                    </div>
+                    <p class="text-gray-600 text-sm mb-3">${item.description}</p>
+                    ${item.source ? `<p class="text-xs text-gray-500">Source: ${item.source}</p>` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Open test modal
+        window.openTestModal = (test) => {
+            const modal = document.getElementById('testModal');
+            const content = document.getElementById('testQuestions');
+
+            content.innerHTML = `
+                <div class="border-b border-gray-200 pb-4 mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 text-center">${test.title}</h2>
+                    <p class="text-center text-gray-600 mt-2">${test.subject || 'General Studies'}</p>
+                    <p class="text-center text-sm text-gray-500 mt-1">Answer in ${test.timeLimit || 60} minutes</p>
+                </div>
+                ${test.questions.map((q, index) => `
+                    <div class="mb-8 bg-gray-50 rounded-lg p-6">
+                        <p class="font-semibold text-gray-800 mb-4">
+                            <span class="text-blue-600">Q${index + 1}.</span> ${q.text}
+                            ${q.wordLimit ? `<span class="text-sm text-gray-500 ml-2">(${q.wordLimit} words)</span>` : ''}
+                        </p>
+                        <textarea 
+                            id="answer_${index}"
+                            class="w-full border border-gray-300 rounded-lg p-4 text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            rows="6"
+                            placeholder="Write your answer here..."
+                            oninput="updateWordCount(${index}, ${q.wordLimit || 250})"
+                        ></textarea>
+                        <div class="flex justify-between items-center mt-2">
+                            <span id="wordCount_${index}" class="text-sm text-gray-500">0 words</span>
+                            <button onclick="saveAnswer(${index}, '${test.testNumber}')" 
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition">
+                                Save Answer
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+
+            modal.classList.remove('hidden');
+            loadSavedAnswers(test.testNumber);
+        };
+
+        // Update word count
+        window.updateWordCount = (index, limit) => {
+            const textarea = document.getElementById(`answer_${index}`);
+            const words = textarea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+            const counter = document.getElementById(`wordCount_${index}`);
+            counter.textContent = `${words} words`;
+            counter.className = words > limit ? 'text-sm text-red-500 font-medium' : 'text-sm text-gray-500';
+        };
+
+        // Save answer
+        window.saveAnswer = async (questionIndex, testNumber) => {
+            const answer = document.getElementById(`answer_${questionIndex}`).value;
+            const today = getTodayDate();
+
+            const answerRef = doc(db, 'userAnswers', currentUser.uid, today, testNumber, 'answers', String(questionIndex));
+
+            try {
+                await setDoc(answerRef, {
+                    answer: answer,
+                    savedAt: Timestamp.now()
+                });
+                alert('Answer saved successfully!');
+            } catch (error) {
+                alert('Failed to save answer: ' + error.message);
+            }
+        };
+
+        // Load saved answers
+        async function loadSavedAnswers(testNumber) {
+            const today = getTodayDate();
+            const answersRef = collection(db, 'userAnswers', currentUser.uid, today, testNumber, 'answers');
+
+            const snapshot = await getDocs(answersRef);
+            snapshot.forEach((doc) => {
+                const index = doc.id;
+                const textarea = document.getElementById(`answer_${index}`);
+                if (textarea) {
+                    textarea.value = doc.data().answer;
+                    updateWordCount(parseInt(index), 250);
+                }
+            });
+        }
+
+        // Close modal
+        window.closeTestModal = () => {
+            document.getElementById('testModal').classList.add('hidden');
+        };
+
+        // Load todos
+        async function loadTodos() {
+            const todosRef = collection(db, 'userTodos', currentUser.uid, 'todos');
+
+            onSnapshot(todosRef, (snapshot) => {
+                const todos = [];
+                snapshot.forEach((doc) => {
+                    todos.push({ id: doc.id, ...doc.data() });
+                });
+                displayTodos(todos);
+            });
+        }
+
+        // Display todos
+        function displayTodos(todos) {
+            const container = document.getElementById('todoList');
+
+            if (todos.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-6 text-gray-500">
+                        <p class="text-sm">No tasks yet. Add your first task!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedTodos = todos.sort((a, b) => a.completed === b.completed ? 0 : a.completed ? 1 : -1);
+
+            container.innerHTML = sortedTodos.map(todo => `
+                <div class="flex items-center gap-3 p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition">
+                    <input type="checkbox" 
+                           ${todo.completed ? 'checked' : ''} 
+                           onchange="toggleTodo('${todo.id}', ${!todo.completed})"
+                           class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                    <span class="${todo.completed ? 'line-through text-gray-400' : 'text-gray-700'} flex-1">
+                        ${todo.text}
+                    </span>
+                    <button onclick="deleteTodo('${todo.id}')" 
+                            class="text-red-500 hover:text-red-700 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Add todo
+        window.addTodo = async () => {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const todosRef = collection(db, 'userTodos', currentUser.uid, 'todos');
+            const newTodoRef = doc(todosRef);
+
+            await setDoc(newTodoRef, {
+                text: text,
+                completed: false,
+                createdAt: Timestamp.now()
+            });
+
+            input.value = '';
+        };
+
+        // Toggle todo
+        window.toggleTodo = async (todoId, completed) => {
+            const todoRef = doc(db, 'userTodos', currentUser.uid, 'todos', todoId);
+            await updateDoc(todoRef, { completed });
+        };
+
+        // Delete todo
+        window.deleteTodo = async (todoId) => {
+            if (!confirm('Delete this task?')) return;
+            const todoRef = doc(db, 'userTodos', currentUser.uid, 'todos', todoId);
+            await deleteDoc(todoRef);
+        };
+
+        // Show admin panel
+        window.showAdminPanel = () => {
+            document.getElementById('adminPanel').classList.remove('hidden');
+            loadAdminData();
+        };
+
+        // Close admin panel
+        window.closeAdminPanel = () => {
+            document.getElementById('adminPanel').classList.add('hidden');
+        };
+
+        // Load admin data
+        async function loadAdminData() {
+            const today = getTodayDate();
+            const contentRef = doc(db, 'dailyContent', today);
+            const snapshot = await getDoc(contentRef);
+
+            if (snapshot.exists()) {
+                const data = snapshot.data();
+                if (data.test) {
+                    document.getElementById('adminTestTitle').value = data.test.title || '';
+                    document.getElementById('adminTestSubject').value = data.test.subject || '';
+                    document.getElementById('adminTestNumber').value = data.test.testNumber || '';
+                    document.getElementById('adminTestQuestions').value = JSON.stringify(data.test.questions || [], null, 2);
+                }
+            }
+        }
+
+        // Save daily test
+        window.saveDailyTest = async () => {
+            const title = document.getElementById('adminTestTitle').value;
+            const subject = document.getElementById('adminTestSubject').value;
+            const testNumber = document.getElementById('adminTestNumber').value;
+            const questionsJson = document.getElementById('adminTestQuestions').value;
+
+            try {
+                const questions = JSON.parse(questionsJson);
+                const today = getTodayDate();
+                const contentRef = doc(db, 'dailyContent', today);
+
+                await setDoc(contentRef, {
+                    test: {
+                        title,
+                        subject,
+                        testNumber,
+                        questions,
+                        timeLimit: 60
+                    },
+                    updatedAt: Timestamp.now()
+                }, { merge: true });
+
+                alert('Daily test saved successfully!');
+            } catch (error) {
+                alert('Error saving test: ' + error.message);
+            }
+        };
+
+        // Switch tabs
+        window.switchTab = (tab) => {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('border-blue-600', 'text-blue-600');
+                btn.classList.add('border-transparent', 'text-gray-500');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            event.target.classList.remove('border-transparent', 'text-gray-500');
+            event.target.classList.add('border-blue-600', 'text-blue-600');
+            document.getElementById(tab).classList.remove('hidden');
+        };
+    </script>
+</head>
+
+<body class="bg-white min-h-screen">
+
+    <!-- Auth Screen -->
+    <div id="authScreen" class="min-h-screen flex items-center justify-center px-4 py-12">
+        <div class="max-w-md w-full">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-800 mb-2">UPSChub</h1>
+                <p class="text-gray-600">Daily Updates for UPSC Aspirants</p>
+            </div>
+
+            <div class="bg-white border border-gray-200 rounded-xl p-8 shadow-lg">
+                <div class="mb-6">
+                    <div class="flex gap-2 mb-6">
+                        <button
+                            onclick="document.getElementById('loginForm').classList.remove('hidden'); document.getElementById('signupForm').classList.add('hidden');"
+                            class="flex-1 py-2 px-4 bg-blue-600 text-white rounded-lg font-medium">Login</button>
+                        <button
+                            onclick="document.getElementById('signupForm').classList.remove('hidden'); document.getElementById('loginForm').classList.add('hidden');"
+                            class="flex-1 py-2 px-4 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200">Sign
+                            Up</button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <div id="loginForm">
+                        <input type="email" id="loginEmail" placeholder="Email"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="password" id="loginPassword" placeholder="Password"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button onclick="loginWithEmail()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+                            Login
+                        </button>
+                    </div>
+
+                    <!-- Signup Form -->
+                    <div id="signupForm" class="hidden">
+                        <input type="email" id="signupEmail" placeholder="Email"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <input type="password" id="signupPassword" placeholder="Password (min 6 characters)"
+                            class="w-full px-4 py-3 border border-gray-300 rounded-lg mb-4 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <button onclick="signupWithEmail()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+                            Sign Up
+                        </button>
+                    </div>
+                </div>
+
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-gray-300"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-4 bg-white text-gray-500">OR</span>
+                    </div>
+                </div>
+
+                <button onclick="loginWithGoogle()"
+                    class="w-full border border-gray-300 hover:bg-gray-50 text-gray-700 font-medium py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4"
+                            d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                        <path fill="#34A853"
+                            d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                        <path fill="#FBBC05"
+                            d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                        <path fill="#EA4335"
+                            d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                    </svg>
+                    Continue with Google
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Screen -->
+    <div id="appScreen" class="hidden">
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <div class="max-w-6xl mx-auto px-4 py-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800">UPSChub</h1>
+                        <p class="text-sm text-gray-500">Daily UPSC Updates</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-gray-600" id="userEmail"></span>
+                        <button onclick="logout()"
+                            class="text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg transition font-medium">
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-6xl mx-auto px-4 py-8">
+            <!-- Date Header -->
+            <div class="mb-8 text-center">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2" id="todayDate"></h2>
+                <p class="text-gray-600">Daily Current Affairs & Updates</p>
+            </div>
+
+            <!-- Admin Button (visible only to admin) -->
+            <div id="adminControls" class="hidden mb-6">
+                <button onclick="showAdminPanel()"
+                    class="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-md">
+                    📝 Admin Panel
+                </button>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <!-- Left Column - Daily Test & Current Affairs (2/3 width) -->
+                <div class="lg:col-span-2 space-y-8">
+                    <!-- Daily Test Section -->
+                    <section>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            Daily Test
+                        </h3>
+                        <div id="dailyTest"></div>
+                    </section>
+
+                    <!-- Current Affairs Section -->
+                    <section>
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z">
+                                </path>
+                            </svg>
+                            Current Affairs
+                        </h3>
+                        <div id="currentAffairs" class="space-y-4"></div>
+                    </section>
+                </div>
+
+                <!-- Right Column - Todo List (1/3 width) -->
+                <div class="lg:col-span-1">
+                    <section
+                        class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl p-6 border border-green-100 sticky top-24">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                </path>
+                            </svg>
+                            My Today's Tasks
+                        </h3>
+
+                        <div class="flex gap-2 mb-4">
+                            <input type="text" id="todoInput" placeholder="Add a new task..."
+                                class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                onkeypress="if(event.key === 'Enter') addTodo()">
+                            <button onclick="addTodo()"
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition font-medium">
+                                Add
+                            </button>
+                        </div>
+
+                        <div id="todoList" class="space-y-2"></div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Test Modal -->
+    <div id="testModal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl max-w-4xl w-full my-8 shadow-2xl">
+            <div
+                class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl">
+                <h2 class="text-xl font-bold text-gray-800">Answer Writing Practice</h2>
+                <button onclick="closeTestModal()" class="text-gray-500 hover:text-gray-700 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 max-h-[70vh] overflow-y-auto" id="testQuestions"></div>
+        </div>
+    </div>
+
+    <!-- Admin Panel Modal -->
+    <div id="adminPanel"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 overflow-y-auto">
+        <div class="bg-white rounded-xl max-w-4xl w-full my-8 shadow-2xl">
+            <div
+                class="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center rounded-t-xl">
+                <h2 class="text-xl font-bold text-gray-800">Admin Panel - Manage Daily Content</h2>
+                <button onclick="closeAdminPanel()" class="text-gray-500 hover:text-gray-700 transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 space-y-6">
+                <div>
+                    <h3 class="font-bold text-gray-800 mb-4">Daily Test Configuration</h3>
+                    <div class="space-y-4">
+                        <input type="text" id="adminTestTitle" placeholder="Test Title"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="text" id="adminTestSubject" placeholder="Subject (e.g., General Studies - 1)"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <input type="number" id="adminTestNumber" placeholder="Test Number"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                        <textarea id="adminTestQuestions"
+                            placeholder='Questions JSON: [{"text": "Question 1", "wordLimit": 150}, {"text": "Question 2", "wordLimit": 250}]'
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                            rows="10"></textarea>
+                        <button onclick="saveDailyTest()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg transition">
+                            Save Daily Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>
