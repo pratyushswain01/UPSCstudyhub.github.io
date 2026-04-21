@@ -1479,7 +1479,6 @@ function doLogout() {
    AUTH STATE LISTENER
 ============================================================ */
 if (CONFIGURED) {
-const ADMIN_EMAIL = "your-email@gmail.com";
 
 auth.onAuthStateChanged(user => {
     currentUser = user;
@@ -1489,8 +1488,8 @@ auth.onAuthStateChanged(user => {
     const loginB  = document.getElementById("btnAdminLogin");
     const logoutB = document.getElementById("btnAdminLogout");
 
-    // 🔐 ONLY ADMIN CAN ACCESS
-    if (user && user.email === ADMIN_EMAIL) {
+    // 🔐 STRICT ADMIN CHECK (UID based)
+    if (user && user.uid === W0IMog3J0wca3KOYjNqnOxCSxhJ3) {
 
         panel.style.display   = "block";
         chip.style.display    = "inline-flex";
@@ -1498,6 +1497,7 @@ auth.onAuthStateChanged(user => {
         logoutB.style.display = "inline-flex";
 
         renderAdminTable();
+        toast("Welcome Admin", "success");
 
     } else {
 
@@ -1506,9 +1506,11 @@ auth.onAuthStateChanged(user => {
         loginB.style.display  = "inline-flex";
         logoutB.style.display = "none";
 
+        if (user) {
+            toast("You are not authorized as admin", "warning");
+        }
     }
 
-    // Always refresh assignments view
     if (selectedDateStr) renderAssignments(selectedDateStr);
 });
 }
