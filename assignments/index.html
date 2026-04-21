@@ -1031,7 +1031,7 @@ const firebaseConfig = {
   measurementId: "G-33F0XSLP53"
 };
 
-const ADMIN_EMAIL = "pratyushkumarswain01@gmail.com";
+
 
 /* ============================================================
    INIT
@@ -1321,7 +1321,7 @@ function renderAssignments(ds) {
           <div class="topic-name">${esc(a.topic)}</div>
           <div class="question-text">${esc(a.question)}</div>
         </div>
-        ${currentUser ? `
+        ${currentUser && currentUser.uid === ADMIN_UID ? `
         <div class="acard-actions">
           <button class="btn btn-outline btn-sm" onclick="openEditModal('${a.id}')" data-testid="edit-btn-${i}">
             <i class="fas fa-edit"></i> Edit
@@ -1330,8 +1330,11 @@ function renderAssignments(ds) {
             <i class="fas fa-trash-alt"></i> Delete
           </button>
         </div>` : ""}
-      </div>`).join("");
+
+      </div>
+    `).join("");
 }
+
 
 /* ============================================================
    STATS
@@ -1342,8 +1345,10 @@ function renderStats() {
 
     document.getElementById("statTotal").textContent = allAssignments.length;
     document.getElementById("statToday").textContent = (byDate[today] || []).length;
-    document.getElementById("statMonth").textContent = allAssignments.filter(a => (a.date||"").startsWith(yrmo)).length;
+    document.getElementById("statMonth").textContent =
+        allAssignments.filter(a => (a.date || "").startsWith(yrmo)).length;
 }
+
 
 /* ============================================================
    ADMIN TABLE
@@ -1353,15 +1358,25 @@ function renderAdminTable() {
     document.getElementById("tableCountLabel").textContent = `${allAssignments.length} total`;
 
     if (!allAssignments.length) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">No assignments yet. Add one above.</td></tr>`;
+        tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align:center;padding:24px;color:var(--text-muted)">
+            No assignments yet. Add one above.
+          </td>
+        </tr>`;
         return;
     }
 
-    const sorted = [...allAssignments].sort((a,b) => b.date.localeCompare(a.date));
+    const sorted = [...allAssignments].sort((a, b) => b.date.localeCompare(a.date));
+
     tbody.innerHTML = sorted.map(a => `
       <tr>
         <td><strong>${fmtDisplay(a.date)}</strong></td>
-        <td><span class="badge ${badgeClass(a.subject)}" style="font-size:11px;padding:3px 8px">${esc(a.subject)}</span></td>
+        <td>
+          <span class="badge ${badgeClass(a.subject)}" style="font-size:11px;padding:3px 8px">
+            ${esc(a.subject)}
+          </span>
+        </td>
         <td>${esc(a.topic)}</td>
         <td class="td-truncate" title="${esc(a.question)}">${esc(a.question)}</td>
         <td>${fmtDisplay(a.dueDate)}</td>
@@ -1375,37 +1390,43 @@ function renderAdminTable() {
             </button>
           </div>
         </td>
-      </tr>`).join("");
+      </tr>
+    `).join("");
 }
+
 
 /* ============================================================
    EXPORT CSV
 ============================================================ */
 function doExportCSV() {
-    if (!allAssignments.length) { toast("Nothing to export yet.", "warning"); return; }
+    if (!allAssignments.length) {
+        toast("Nothing to export yet.", "warning");
+        return;
+    }
 
     const rows = [
         ["Date","Subject","Topic","Question","Due Date"],
         ...allAssignments.map(a => [
             a.date,
             a.subject,
-            `"${(a.topic||"").replace(/"/g,'""')}"`,
-            `"${(a.question||"").replace(/"/g,'""')}"`,
+            `"${(a.topic || "").replace(/"/g,'""')}"`,
+            `"${(a.question || "").replace(/"/g,'""')}"`,
             a.dueDate
         ])
     ];
 
     const csv  = rows.map(r => r.join(",")).join("\n");
-    const blob = new Blob([csv], { type:"text/csv;charset=utf-8;" });
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
     const url  = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.href     = url;
+    link.href = url;
     link.download = `UPSChub_Assignments_${todayStr()}.csv`;
     link.click();
+
     URL.revokeObjectURL(url);
     toast("CSV downloaded!", "success");
 }
-
 /* ============================================================
    FORM HELPERS
 ============================================================ */
@@ -1480,6 +1501,7 @@ function doLogout() {
 ============================================================ */
 if (CONFIGURED) {
 
+const ADMIN_UID = "W0IMog3J0wca3KOYjNqnOxCSxhJ3";
 auth.onAuthStateChanged(user => {
     currentUser = user;
 
@@ -1489,7 +1511,7 @@ auth.onAuthStateChanged(user => {
     const logoutB = document.getElementById("btnAdminLogout");
 
     // 🔐 STRICT ADMIN CHECK (UID based)
-    if (user && user.uid === W0IMog3J0wca3KOYjNqnOxCSxhJ3) {
+    if (user && user.uid === ADMIN_UID) {
 
         panel.style.display   = "block";
         chip.style.display    = "inline-flex";
