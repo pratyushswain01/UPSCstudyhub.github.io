@@ -1031,11 +1031,13 @@ const firebaseConfig = {
   measurementId: "G-33F0XSLP53"
 };
 
+const ADMIN_EMAIL = "pratyushkumarswain01@gmail.com";
+
 /* ============================================================
    INIT
 ============================================================ */
 let auth, db;
-const CONFIGURED = firebaseConfig.apiKey !== "YOUR_API_KEY";
+const CONFIGURED = true;
 
 try {
     firebase.initializeApp(firebaseConfig);
@@ -1477,28 +1479,38 @@ function doLogout() {
    AUTH STATE LISTENER
 ============================================================ */
 if (CONFIGURED) {
-    auth.onAuthStateChanged(user => {
-        currentUser = user;
-        const panel   = document.getElementById("adminPanel");
-        const chip    = document.getElementById("adminChip");
-        const loginB  = document.getElementById("btnAdminLogin");
-        const logoutB = document.getElementById("btnAdminLogout");
+const ADMIN_EMAIL = "your-email@gmail.com";
 
-        if (user) {
-            panel.style.display   = "block";
-            chip.style.display    = "inline-flex";
-            loginB.style.display  = "none";
-            logoutB.style.display = "inline-flex";
-            renderAdminTable();
-            if (selectedDateStr) renderAssignments(selectedDateStr);
-        } else {
-            panel.style.display   = "none";
-            chip.style.display    = "none";
-            loginB.style.display  = "inline-flex";
-            logoutB.style.display = "none";
-            if (selectedDateStr) renderAssignments(selectedDateStr);
-        }
-    });
+auth.onAuthStateChanged(user => {
+    currentUser = user;
+
+    const panel   = document.getElementById("adminPanel");
+    const chip    = document.getElementById("adminChip");
+    const loginB  = document.getElementById("btnAdminLogin");
+    const logoutB = document.getElementById("btnAdminLogout");
+
+    // 🔐 ONLY ADMIN CAN ACCESS
+    if (user && user.email === ADMIN_EMAIL) {
+
+        panel.style.display   = "block";
+        chip.style.display    = "inline-flex";
+        loginB.style.display  = "none";
+        logoutB.style.display = "inline-flex";
+
+        renderAdminTable();
+
+    } else {
+
+        panel.style.display   = "none";
+        chip.style.display    = "none";
+        loginB.style.display  = "inline-flex";
+        logoutB.style.display = "none";
+
+    }
+
+    // Always refresh assignments view
+    if (selectedDateStr) renderAssignments(selectedDateStr);
+});
 }
 
 /* ============================================================
