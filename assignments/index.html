@@ -1131,6 +1131,8 @@ async function fetchData() {
     }
 }
 
+
+
 async function submitAdd(e) {
     e.preventDefault();
     if (!CONFIGURED) { toast("Configure Firebase first.", "warning"); return; }
@@ -1453,10 +1455,16 @@ function closeLoginModal() {
 }
 
 async function doLogin() {
-    if (!CONFIGURED) { toast("Configure Firebase first.", "warning"); return; }
+    if (!CONFIGURED) { 
+        toast("Configure Firebase first.", "warning"); 
+        return; 
+    }
+
+    const ADMIN_UID = "W0IMog3J0wca3KOYjNqnOxCSxhJ3";
 
     const email = document.getElementById("loginEmail").value.trim();
     const pwd   = document.getElementById("loginPwd").value;
+
     const errEl = document.getElementById("loginError");
     const errTx = document.getElementById("loginErrorText");
     const btn   = document.getElementById("loginBtn");
@@ -1473,35 +1481,59 @@ async function doLogin() {
     btn.disabled = true;
 
     try {
-        await auth.signInWithEmailAndPassword(email, pwd);
+        const cred = await auth.signInWithEmailAndPassword(email, pwd);
+
+        // 🔐 CHECK ADMIN HERE
+        if (cred.user.uid !== ADMIN_UID) {
+
+            // ❌ NOT ADMIN → LOGOUT IMMEDIATELY
+            await auth.signOut();
+
+            errTx.textContent = "You are not authorized as admin.";
+            errEl.classList.add("show");
+
+            toast("Access denied: Admin only", "warning");
+
+            return;
+        }
+
+        // ✅ ONLY ADMIN CAN PASS
         closeLoginModal();
-        toast("Welcome back, Admin!", "success");
+        
+
     } catch(err) {
         const msgs = {
             "auth/user-not-found":   "No account found with this email.",
             "auth/wrong-password":   "Incorrect password.",
             "auth/invalid-email":    "Please enter a valid email address.",
-            "auth/too-many-requests":"Too many failed attempts. Try again later.",
+            "auth/too-many-requests":"Too many attempts. Try later.",
             "auth/invalid-credential": "Invalid email or password."
         };
-        errTx.textContent = msgs[err.code] || "Login failed: " + err.message;
+
+        errTx.textContent = msgs[err.code] || "Login failed";
         errEl.classList.add("show");
+
     } finally {
         btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
         btn.disabled = false;
     }
+
 }
 
 function doLogout() {
-    auth.signOut().then(() => toast("Logged out successfully.", "success"));
+    auth.signOut()
+        .then(() => {
+            toast("Logged out successfully", "success");
+        })
+        .catch(err => {
+            toast("Logout failed", "error");
+        });
 }
 
-/* ============================================================
-   AUTH STATE LISTENER
-============================================================ */
-if (CONFIGURED) {
 
 const ADMIN_UID = "W0IMog3J0wca3KOYjNqnOxCSxhJ3";
+let isFirstLoad = true;
+
 auth.onAuthStateChanged(user => {
     currentUser = user;
 
@@ -1510,50 +1542,72 @@ auth.onAuthStateChanged(user => {
     const loginB  = document.getElementById("btnAdminLogin");
     const logoutB = document.getElementById("btnAdminLogout");
 
-    // 🔐 STRICT ADMIN CHECK (UID based)
+    // 🛡️ Safety (avoid null errors)
+    if (!panel || !chip || !loginB || !logoutB) return;
+
     if (user && user.uid === ADMIN_UID) {
 
+        // ✅ ADMIN VIEW
         panel.style.display   = "block";
         chip.style.display    = "inline-flex";
         loginB.style.display  = "none";
         logoutB.style.display = "inline-flex";
 
         renderAdminTable();
-        toast("Welcome Admin", "success");
+
+        // ✅ Show toast ONLY after login (not on refresh)
+        if (!isFirstLoad) {
+            toast("Welcome Admin", "success");
+        }
 
     } else {
 
+        // 👤 NORMAL USER / LOGGED OUT
         panel.style.display   = "none";
         chip.style.display    = "none";
         loginB.style.display  = "inline-flex";
         logoutB.style.display = "none";
-
-        if (user) {
-            toast("You are not authorized as admin", "warning");
-        }
     }
 
-    if (selectedDateStr) renderAssignments(selectedDateStr);
+    isFirstLoad = false;
+
+    // 🔄 Re-render assignments safely
+    if (selectedDateStr) {
+        renderAssignments(selectedDateStr);
+    }
 });
-}
+
 
 /* ============================================================
    MODAL CLOSE HELPERS
 ============================================================ */
-function closeEditModal()   { document.getElementById("editOverlay").classList.remove("open"); }
+function closeEditModal() {
+    document.getElementById("editOverlay").classList.remove("open");
+}
+
 function closeDeleteModal() {
     document.getElementById("deleteOverlay").classList.remove("open");
     pendingDeleteId = null;
 }
 
-// Close on overlay backdrop click
+
+/* ============================================================
+   OVERLAY CLICK CLOSE
+============================================================ */
 document.querySelectorAll(".overlay").forEach(ov => {
-    ov.addEventListener("click", e => { if (e.target === ov) ov.classList.remove("open"); });
+    ov.addEventListener("click", e => {
+        if (e.target === ov) ov.classList.remove("open");
+    });
 });
 
-// Enter key → login
+
+/* ============================================================
+   ENTER KEY → LOGIN
+============================================================ */
 document.addEventListener("keydown", e => {
-    if (e.key === "Enter" && document.getElementById("loginOverlay").classList.contains("open")) {
+    const loginOverlay = document.getElementById("loginOverlay");
+
+    if (e.key === "Enter" && loginOverlay && loginOverlay.classList.contains("open")) {
         doLogin();
     }
 });
