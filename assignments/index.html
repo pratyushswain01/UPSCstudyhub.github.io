@@ -649,6 +649,21 @@
             gap: 8px;
         }
 
+
+
+        /* Mobile view */
+        @media (max-width: 600px) {
+
+            .profile-text {
+                display: none;
+                /* hide name */
+            }
+
+            .profile-btn {
+                padding: 6px 10px;
+            }
+        }
+
         .due-tag {
             display: flex;
             align-items: center;
@@ -1346,22 +1361,28 @@
                     </button>
 
                     <!-- 👤 PROFILE DROPDOWN -->
-                    <div class="profile-box" id="profileBox" style="display:none;">
-                        <button class="btn btn-outline btn-sm" onclick="toggleProfileMenu()">
-                            <i class="fas fa-user-circle"></i>
-                            <span id="profileName">User</span>
-                        </button>
+                    <button class="btn btn-outline btn-sm profile-btn" onclick="toggleProfileMenu()">
+                        <i class="fas fa-user-circle"></i>
+                        <span id="profileName" class="profile-text">User</span>
+                    </button>
 
-                        <div class="profile-menu" id="profileMenu">
-                            <div class="profile-item">👤 Profile</div>
-                            <div class="profile-item">⚙ Settings</div>
-                            <div class="profile-item" onclick="doLogout()">🚪 Logout</div>
-                        </div>
+                    <div class="profile-menu" id="profileMenu">
+
+                        <!-- 🔥 USER EMAIL -->
+                        <div class="profile-item" id="profileEmail" style="font-weight:600; cursor:default;"></div>
+
+                        <hr style="margin:6px 0">
+
+                        <div class="profile-item">👤 Profile</div>
+                        <div class="profile-item">⚙ Settings</div>
+                        <div class="profile-item" onclick="doLogout()">🚪 Logout</div>
+
                     </div>
-
                 </div>
 
             </div>
+
+        </div>
         </div>
     </header>
     <!-- ============================================================
@@ -2428,6 +2449,13 @@
                 profileBox.style.display = "block";
 
                 const name = user.email.split("@")[0];
+
+
+
+                if (emailBox) {
+                    emailBox.innerText = user.email;
+                }
+
 
                 // 🔴 ADMIN CHECK
                 if (user.uid === ADMIN_UID) {
