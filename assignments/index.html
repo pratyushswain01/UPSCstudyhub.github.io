@@ -1186,6 +1186,37 @@
             }
         }
 
+
+
+
+        .profile-box {
+            position: relative;
+        }
+
+        .profile-menu {
+            position: absolute;
+            right: 0;
+            top: 40px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: none;
+            flex-direction: column;
+            min-width: 140px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-item {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .profile-item:hover {
+            background: #f5f5f5;
+        }
+
+
+
         @media (max-width: 680px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -1307,22 +1338,27 @@
                 <!-- RIGHT SIDE -->
                 <div class="header-right">
 
-                    <!-- 🔐 USER / ADMIN CHIP (hidden by default) -->
-                    <span class="admin-chip" id="adminChip" style="display:none">
-                        <i class="fas fa-user"></i> User
-                    </span>
-
                     <!-- 🔓 LOGIN BUTTON -->
                     <button class="btn btn-outline btn-sm" id="btnLogin" onclick="openLoginModal()">
                         <i class="fas fa-user"></i> Login
                     </button>
 
-                    <!-- 🚪 LOGOUT BUTTON -->
-                    <button class="btn btn-danger btn-sm" id="btnLogout" style="display:none" onclick="doLogout()">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </button>
+                    <!-- 👤 PROFILE DROPDOWN -->
+                    <div class="profile-box" id="profileBox" style="display:none;">
+                        <button class="btn btn-outline btn-sm" onclick="toggleProfileMenu()">
+                            <i class="fas fa-user-circle"></i>
+                            <span id="profileName">User</span>
+                        </button>
+
+                        <div class="profile-menu" id="profileMenu">
+                            <div class="profile-item">👤 Profile</div>
+                            <div class="profile-item">⚙ Settings</div>
+                            <div class="profile-item" onclick="doLogout()">🚪 Logout</div>
+                        </div>
+                    </div>
 
                 </div>
+
             </div>
         </div>
     </header>
@@ -2119,6 +2155,7 @@
             document.querySelectorAll(".complete-slider").forEach(slider => {
 
                 const date = document.getElementById("selDateLabel").dataset.raw;
+               
 
                 if (completed.includes(date)) {
 
@@ -2276,15 +2313,10 @@
             document.getElementById("loginFooter").style.display = "flex";
         }
 
-        function setLoginType(type) {
-            loginMode = type;
-
-            document.querySelector(".login-choice").style.display = "none";
-            document.getElementById("loginForm").style.display = "block";
-        }
 
 
         async function doLogin() {
+
             if (!CONFIGURED) {
                 toast("Configure Firebase first.", "warning");
                 return;
@@ -2311,36 +2343,33 @@
             btn.disabled = true;
 
             try {
+
                 const cred = await auth.signInWithEmailAndPassword(email, pwd);
                 const user = cred.user;
 
                 // 🔴 ADMIN MODE
-                if (loginMode === "admin") {
+                if (loginMode === "admin" && user.uid !== ADMIN_UID) {
 
-                    if (user.uid !== ADMIN_UID) {
+                    await auth.signOut();
 
-                        // ❌ Not admin → logout
-                        await auth.signOut();
+                    errTx.textContent = "You are not authorized as admin.";
+                    errEl.classList.add("show");
 
-                        errTx.textContent = "You are not authorized as admin.";
-                        errEl.classList.add("show");
-
-                        toast("Access denied: Admin only", "warning");
-                        return;
-                    }
-
-                    // ✅ Admin success
-                    toast("Welcome Admin", "success");
+                    toast("Access denied: Admin only", "warning");
+                    return;
                 }
 
-                // 🔵 USER MODE
-                else {
+                // ✅ SUCCESS TOAST (only once)
+                if (loginMode === "admin") {
+                    toast("Admin login successful", "success");
+                } else {
                     toast("Logged in successfully", "success");
                 }
 
                 closeLoginModal();
 
             } catch (err) {
+
                 const msgs = {
                     "auth/user-not-found": "No account found with this email.",
                     "auth/wrong-password": "Incorrect password.",
@@ -2353,12 +2382,16 @@
                 errEl.classList.add("show");
 
             } finally {
+
                 btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Login';
                 btn.disabled = false;
             }
         }
 
-
+        function toggleProfileMenu() {
+            const menu = document.getElementById("profileMenu");
+            menu.style.display = menu.style.display === "flex" ? "none" : "flex";
+        }
 
         function doLogout() {
             auth.signOut()
@@ -2375,46 +2408,56 @@
         let isFirstLoad = true;
 
         auth.onAuthStateChanged(user => {
+
             currentUser = user;
 
             const panel = document.getElementById("adminPanel");
-            const chip = document.getElementById("adminChip");
-            const loginB = document.getElementById("btnAdminLogin");
-            const logoutB = document.getElementById("btnAdminLogout");
+            const loginBtn = document.getElementById("btnLogin");
+            const profileBox = document.getElementById("profileBox");
+            const profileName = document.getElementById("profileName");
 
-            // 🛡️ Safety (avoid null errors)
-            if (!panel || !chip || !loginB || !logoutB) return;
+            // 🛡️ Safety
+            if (!panel || !loginBtn || !profileBox || !profileName) return;
 
-            if (user && user.uid === ADMIN_UID) {
+            if (user) {
 
-                // ✅ ADMIN VIEW
-                panel.style.display = "block";
-                chip.style.display = "inline-flex";
-                loginB.style.display = "none";
-                logoutB.style.display = "inline-flex";
+                // 🔓 USER LOGGED IN
+                loginBtn.style.display = "none";
+                profileBox.style.display = "block";
 
-                renderAdminTable();
+                // 👤 Show name (clean email)
+                profileName.innerText = user.email.split("@")[0];
 
-                // ✅ Show toast ONLY after login (not on refresh)
-                if (!isFirstLoad) {
-                    toast("Welcome Admin", "success");
+                // 🔴 ADMIN CHECK
+                if (user.uid === ADMIN_UID) {
+
+                    panel.style.display = "block";
+                    renderAdminTable();
+
+                    // Toast only after login (not refresh)
+                    if (!isFirstLoad) {
+
+                    }
+
+                } else {
+                    panel.style.display = "none";
                 }
 
             } else {
 
-                // 👤 NORMAL USER / LOGGED OUT
+                // ❌ NOT LOGGED IN
+                loginBtn.style.display = "inline-flex";
+                profileBox.style.display = "none";
                 panel.style.display = "none";
-                chip.style.display = "none";
-                loginB.style.display = "inline-flex";
-                logoutB.style.display = "none";
             }
 
             isFirstLoad = false;
 
-            // 🔄 Re-render assignments safely
+            // 🔄 Re-render assignments
             if (selectedDateStr) {
                 renderAssignments(selectedDateStr);
             }
+
         });
 
         function initSliders() {
@@ -2454,21 +2497,45 @@
 
                     if (diff > slider.offsetWidth * 0.6) {
 
-                        const date = document.getElementById("selDateLabel").dataset.raw;
-
                         slider.classList.add("completed");
-                        slider.querySelector("span").innerText = "Completed ✔";
 
-                        await markCompleted(date); // 🔥 ADD THIS
+                        const trackText = slider.querySelector("span");
+                        trackText.innerText = "Completed ✔";
+
+                        // ✅ SAVE TO FIRESTORE
+                        const date = document.getElementById("selDateLabel").dataset.raw;
+                        markCompleted(date);
 
                         toast("Marked Completed ✔", "success");
-
-                    } else {
+                    }
+                    else {
                         thumb.style.transform = "translateX(0)";
                     }
                 });
             });
         }
+
+        async function loadCompletedDates() {
+
+            if (!currentUser) return [];
+
+            try {
+                const doc = await db.collection("users")
+                    .doc(currentUser.uid)
+                    .collection("progress")
+                    .doc("main")
+                    .get();
+
+                if (!doc.exists) return [];
+
+                return doc.data().completedDates || [];
+
+            } catch (err) {
+                console.error(err);
+                return [];
+            }
+        }
+
 
 
         async function loadCompletedDates() {
@@ -2512,7 +2579,18 @@
             });
         });
 
+        document.addEventListener("DOMContentLoaded", () => {
 
+            document.addEventListener("click", (e) => {
+                const box = document.getElementById("profileBox");
+                const menu = document.getElementById("profileMenu");
+
+                if (box && !box.contains(e.target)) {
+                    menu.style.display = "none";
+                }
+            });
+
+        });
         /* ============================================================
            ENTER KEY → LOGIN
         ============================================================ */
