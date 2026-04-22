@@ -1849,18 +1849,23 @@ async function markCompleted(dateStr) {
 
     try {
         const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
-        
+
+        // Add to local array if not present
         if (!completedDates.includes(dateStr)) {
             completedDates.push(dateStr);
         }
 
         await ref.set({ completedDates: completedDates }, { merge: true });
+        
         toast("Progress saved!", "success");
-        renderAssignments(dateStr); // Refresh the view
+        
+        // RE-RENDER to show the green state
+        renderAssignments(dateStr); 
     } catch (err) {
         console.error(err);
         toast("Error saving progress", "error");
     }
+
 
         }
         /* ============================================================
@@ -2126,9 +2131,18 @@ async function markCompleted(dateStr) {
     const chip = document.getElementById("countChip");
 
     // Check if this date is already marked as done
-    const isDone = completedDates.includes(ds); 
-    const completedClass = isDone ? "completed" : "";
-    const completedText = isDone ? "Completed ✔" : "Slide to Complete";
+   // Inside renderAssignments(ds) ...
+const isDone = completedDates.includes(ds); 
+const completedClass = isDone ? "completed" : "";
+const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
+
+// Then in your pane.innerHTML mapping:
+<div class="complete-slider ${completedClass}" data-index="${i}">
+    <div class="slider-track">
+        <div class="slider-thumb">${isDone ? '✔' : '➤'}</div>
+        <span>${sliderText}</span>
+    </div>
+</div>
 
     label.textContent = fmtDisplay(ds);
     label.dataset.raw = ds;
@@ -2553,61 +2567,65 @@ async function markCompleted(dateStr) {
             }
         });
 
-        function initSliders() {
-            const sliders = document.querySelectorAll(".complete-slider");
+function initSliders() {
+    const sliders = document.querySelectorAll(".complete-slider");
 
-            sliders.forEach(slider => {
-                const thumb = slider.querySelector(".slider-thumb");
-                let startX = 0;
-
-                slider.addEventListener("touchstart", e => {
-                    startX = e.touches[0].clientX;
-                });
-
-                slider.addEventListener("touchmove", e => {
-                    let moveX = e.touches[0].clientX - startX;
-                    if (moveX > 0) {
-                        thumb.style.transform = `translateX(${Math.min(moveX, 200)}px)`;
-                    }
-                });
-
-                slider.addEventListener("click", async () => {
-
-                    const date = document.getElementById("selDateLabel").dataset.raw;
-
-                   
-
-                    await markCompleted(date); // 🔥 ADD THIS
-
-
-                    markCompleted(a.id, a);
-                });
-
-
-                slider.addEventListener("touchend", async e => {
-
-                    let diff = e.changedTouches[0].clientX - startX;
-
-                    if (diff > slider.offsetWidth * 0.6) {
-
-                        slider.classList.add("completed");
-
-                        const trackText = slider.querySelector("span");
-                        trackText.innerText = "Completed ✔";
-
-                        // ✅ SAVE TO FIRESTORE
-                        const date = document.getElementById("selDateLabel").dataset.raw;
-                        markCompleted(date);
-
-                        markCompleted(a.id, a);
-                    }
-                    else {
-                        thumb.style.transform = "translateX(0)";
-                    }
-                });
-            });
+    sliders.forEach(slider => {
+        const thumb = slider.querySelector(".slider-thumb");
+        const trackText = slider.querySelector("span");
+        const date = document.getElementById("selDateLabel").dataset.raw;
+        
+        // 1. If already completed, disable movement and just show status
+        if (slider.classList.contains("completed")) {
+            thumb.style.transform = "translateX(calc(100% - 4px))"; // Use CSS class instead if possible
+            return; 
         }
 
+        let startX = 0;
+        let isDragging = false;
+
+        // --- TOUCH EVENTS (For Sliding) ---
+        slider.addEventListener("touchstart", e => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            thumb.style.transition = "none"; // Disable transition while dragging
+        }, { passive: true });
+
+        slider.addEventListener("touchmove", e => {
+            if (!isDragging) return;
+            let moveX = e.touches[0].clientX - startX;
+            let maxMove = slider.offsetWidth - thumb.offsetWidth - 8; // boundary
+
+            if (moveX > 0 && moveX < maxMove) {
+                thumb.style.transform = `translateX(${moveX}px)`;
+            }
+        }, { passive: true });
+
+        slider.addEventListener("touchend", async e => {
+            isDragging = false;
+            thumb.style.transition = "0.3s"; // Re-enable transition
+            let diff = e.changedTouches[0].clientX - startX;
+
+            if (diff > slider.offsetWidth * 0.6) {
+                // SUCCESSFUL SLIDE
+                slider.classList.add("completed");
+                trackText.innerText = "Completed ✔";
+                await markCompleted(date);
+            } else {
+                // RESET
+                thumb.style.transform = "translateX(0)";
+            }
+        });
+
+        // --- CLICK EVENT (For Desktop/Fallback) ---
+        slider.addEventListener("click", async (e) => {
+            // Prevent click if we just finished a touch swipe
+            if (slider.classList.contains("completed")) return;
+            
+            await markCompleted(date);
+        });
+    });
+}
 
 
         let completedMap = {};
