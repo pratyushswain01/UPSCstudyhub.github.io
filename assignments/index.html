@@ -1841,32 +1841,37 @@
         };
 
 
-async function markCompleted(dateStr) {
-    if (!currentUser) {
-        toast("Login required", "warning");
-        return;
-    }
+        async function markCompleted(dateStr) {
 
-    try {
-        const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
+            if (!currentUser) {
+                toast("Login required", "warning");
+                return;
+            }
 
-        // Add to local array if not present
-        if (!completedDates.includes(dateStr)) {
-            completedDates.push(dateStr);
-        }
+            try {
+                const ref = db.collection("users")
+                    .doc(currentUser.uid)
+                    .collection("progress")
+                    .doc("main");
 
-        await ref.set({ completedDates: completedDates }, { merge: true });
-        
-        toast("Progress saved!", "success");
-        
-        // RE-RENDER to show the green state
-        renderAssignments(dateStr); 
-    } catch (err) {
-        console.error(err);
-        toast("Error saving progress", "error");
-    }
+                const doc = await ref.get();
 
+                let completed = [];
 
+                if (doc.exists) {
+                    completed = doc.data().completedDates || [];
+                }
+
+                if (!completed.includes(dateStr)) {
+                    completed.push(dateStr);
+                }
+
+                await ref.set({ completedDates: completed }, { merge: true });
+
+            } catch (err) {
+                console.error(err);
+                toast("Error saving progress", "error");
+            }
         }
         /* ============================================================
            INIT
@@ -1890,7 +1895,6 @@ async function markCompleted(dateStr) {
            APP STATE
         ============================================================ */
         let currentUser = null;
-        let completedDates = [];
         let viewDate = new Date();       // month being shown on calendar
         let selectedDateStr = null;
         let allAssignments = [];               // flat array
@@ -2125,29 +2129,16 @@ async function markCompleted(dateStr) {
             renderCalendar();
             renderAssignments(ds);
         }
- function renderAssignments(ds) {
-    const pane = document.getElementById("assignmentsPane");
-    const label = document.getElementById("selDateLabel");
-    const chip = document.getElementById("countChip");
+        function renderAssignments(ds) {
+            const pane = document.getElementById("assignmentsPane");
+            const label = document.getElementById("selDateLabel");
+            const chip = document.getElementById("countChip");
 
-    // Check if this date is already marked as done
-   // Inside renderAssignments(ds) ...
-const isDone = completedDates.includes(ds); 
-const completedClass = isDone ? "completed" : "";
-const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
+            // Store date for slider
+            label.textContent = fmtDisplay(ds);
+            label.dataset.raw = ds;
 
-// Then in your pane.innerHTML mapping:
-<div class="complete-slider ${completedClass}" data-index="${i}">
-    <div class="slider-track">
-        <div class="slider-thumb">${isDone ? '✔' : '➤'}</div>
-        <span>${sliderText}</span>
-    </div>
-</div>
-
-    label.textContent = fmtDisplay(ds);
-    label.dataset.raw = ds;
-
-    const list = (byDate && byDate[ds]) || [];
+            const list = (byDate && byDate[ds]) || [];
 
             // Chip
             chip.style.display = list.length ? "inline-flex" : "none";
@@ -2206,27 +2197,26 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
 
             // ✅ VERY IMPORTANT
             initSliders();
-            applyCompletedState(list);
+            applyCompletedState();
         }
 
 
-        function applyCompletedState(list) {
-            document.querySelectorAll(".acard").forEach((card, i) => {
+        async function applyCompletedState() {
 
-                const a = list[i]; // make sure `list` is accessible OR pass it
-                if (!a) return;
+            const completed = await loadCompletedDates();
 
-                const slider = card.querySelector(".complete-slider");
-                const track = slider?.querySelector(".slider-track");
+            document.querySelectorAll(".complete-slider").forEach(slider => {
 
-                if (!slider || !track) return;
+                const date = document.getElementById("selDateLabel").dataset.raw;
 
-                if (completedMap[a.id]) {
+
+                if (completed.includes(date)) {
+
                     slider.classList.add("completed");
-                    track.querySelector("span").innerText = "Completed ✔";
-                } else {
-                    slider.classList.remove("completed");
-                    track.querySelector("span").innerText = "Slide to Complete";
+                    slider.querySelector("span").innerText = "Completed ✔";
+
+                    slider.style.pointerEvents = "none";
+                    slider.style.opacity = "0.7";
                 }
             });
         }
@@ -2477,7 +2467,7 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
         const ADMIN_UID = "W0IMog3J0wca3KOYjNqnOxCSxhJ3";
         let isFirstLoad = true;
 
-        auth.onAuthStateChanged(async (user) => {
+        auth.onAuthStateChanged(user => {
 
             currentUser = user;
 
@@ -2490,10 +2480,6 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
             // 🛡️ Safety
             if (!panel || !loginBtn || !profileBox || !profileName) return;
 
-
-            if (user) {
-                await loadCompleted(); // ✅ now valid
-            }
             if (user) {
 
                 // 🔓 USER LOGGED IN
@@ -2508,10 +2494,8 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
                     emailBox.innerText = safeEmail;
                 }
 
-
-
                 // 🔴 ADMIN CHECK
-                if (user && user.uid === ADMIN_UID) {
+                if (user.uid === ADMIN_UID) {
 
                     // 👑 Admin UI
                     profileName.innerHTML = `
@@ -2553,11 +2537,11 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
                 profileBox.style.display = "none";
                 panel.style.display = "none";
 
-                if (emailBox) {
-                    emailBox.innerText = "";
-                }
-            }
-
+                 if (emailBox) {
+            emailBox.innerText = "";
+        }
+    }
+            
 
             isFirstLoad = false;
 
@@ -2567,85 +2551,60 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
             }
         });
 
-function initSliders() {
-    const sliders = document.querySelectorAll(".complete-slider");
+        function initSliders() {
+            const sliders = document.querySelectorAll(".complete-slider");
 
-    sliders.forEach(slider => {
-        const thumb = slider.querySelector(".slider-thumb");
-        const trackText = slider.querySelector("span");
-        const date = document.getElementById("selDateLabel").dataset.raw;
-        
-        // 1. If already completed, disable movement and just show status
-        if (slider.classList.contains("completed")) {
-            thumb.style.transform = "translateX(calc(100% - 4px))"; // Use CSS class instead if possible
-            return; 
-        }
+            sliders.forEach(slider => {
+                const thumb = slider.querySelector(".slider-thumb");
+                let startX = 0;
 
-        let startX = 0;
-        let isDragging = false;
+                slider.addEventListener("touchstart", e => {
+                    startX = e.touches[0].clientX;
+                });
 
-        // --- TOUCH EVENTS (For Sliding) ---
-        slider.addEventListener("touchstart", e => {
-            startX = e.touches[0].clientX;
-            isDragging = true;
-            thumb.style.transition = "none"; // Disable transition while dragging
-        }, { passive: true });
+                slider.addEventListener("touchmove", e => {
+                    let moveX = e.touches[0].clientX - startX;
+                    if (moveX > 0) {
+                        thumb.style.transform = `translateX(${Math.min(moveX, 200)}px)`;
+                    }
+                });
 
-        slider.addEventListener("touchmove", e => {
-            if (!isDragging) return;
-            let moveX = e.touches[0].clientX - startX;
-            let maxMove = slider.offsetWidth - thumb.offsetWidth - 8; // boundary
+                slider.addEventListener("click", async () => {
 
-            if (moveX > 0 && moveX < maxMove) {
-                thumb.style.transform = `translateX(${moveX}px)`;
-            }
-        }, { passive: true });
+                    const date = document.getElementById("selDateLabel").dataset.raw;
 
-        slider.addEventListener("touchend", async e => {
-            isDragging = false;
-            thumb.style.transition = "0.3s"; // Re-enable transition
-            let diff = e.changedTouches[0].clientX - startX;
+                    slider.classList.add("completed");
+                    slider.querySelector("span").innerText = "Completed ✔";
 
-            if (diff > slider.offsetWidth * 0.6) {
-                // SUCCESSFUL SLIDE
-                slider.classList.add("completed");
-                trackText.innerText = "Completed ✔";
-                await markCompleted(date);
-            } else {
-                // RESET
-                thumb.style.transform = "translateX(0)";
-            }
-        });
+                    await markCompleted(date); // 🔥 ADD THIS
 
-        // --- CLICK EVENT (For Desktop/Fallback) ---
-        slider.addEventListener("click", async (e) => {
-            // Prevent click if we just finished a touch swipe
-            if (slider.classList.contains("completed")) return;
-            
-            await markCompleted(date);
-        });
-    });
-}
+                    toast("Marked Completed ✔", "success");
+                });
 
 
-        let completedMap = {};
+                slider.addEventListener("touchend", async e => {
 
-        async function loadCompleted() {
+                    let diff = e.changedTouches[0].clientX - startX;
 
-            if (!currentUser) return;
+                    if (diff > slider.offsetWidth * 0.6) {
 
-            const snap = await db.collection("userProgress")
-                .doc(currentUser.uid)
-                .collection("completed")
-                .get();
+                        slider.classList.add("completed");
 
-            completedMap = {};
+                        const trackText = slider.querySelector("span");
+                        trackText.innerText = "Completed ✔";
 
-            snap.forEach(doc => {
-                completedMap[doc.id] = true;
+                        // ✅ SAVE TO FIRESTORE
+                        const date = document.getElementById("selDateLabel").dataset.raw;
+                        markCompleted(date);
+
+                        toast("Marked Completed ✔", "success");
+                    }
+                    else {
+                        thumb.style.transform = "translateX(0)";
+                    }
+                });
             });
         }
-
 
         async function loadCompletedDates() {
 
