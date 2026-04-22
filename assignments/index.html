@@ -4,23 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="canonical" href="https://upschub.online/assignments">
-    <title>UPSC Assignments | Daily Practice - UPSChub</title>
-
-    <meta name="description"
-        content="Practice UPSC assignments daily on UPSChub. Improve answer writing, track progress, and prepare for Prelims & Mains effectively.">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <meta charset="UTF-8">
-
-    <meta name="robots" content="index, follow">
-    <meta name="author" content="UPSChub">
-    <meta property="og:title" content="UPSC Assignments | UPSChub">
-    <meta property="og:description" content="Daily UPSC assignments with smart tracking and answer writing tools.">
-    <meta property="og:image" content="https://upschub.online/preview.png">
-    <meta property="og:url" content="https://upschub.online/assignments">
-    <meta property="og:type" content="website">
     <title>UPSChub — Daily Assignment Platform</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1717,7 +1700,38 @@
         };
 
 
+        async function markCompleted(dateStr) {
 
+            if (!currentUser) {
+                toast("Login required", "warning");
+                return;
+            }
+
+            try {
+                const ref = db.collection("users")
+                    .doc(currentUser.uid)
+                    .collection("progress")
+                    .doc("main");
+
+                const doc = await ref.get();
+
+                let completed = [];
+
+                if (doc.exists) {
+                    completed = doc.data().completedDates || [];
+                }
+
+                if (!completed.includes(dateStr)) {
+                    completed.push(dateStr);
+                }
+
+                await ref.set({ completedDates: completed }, { merge: true });
+
+            } catch (err) {
+                console.error(err);
+                toast("Error saving progress", "error");
+            }
+        }
         /* ============================================================
            INIT
         ============================================================ */
@@ -2042,9 +2056,28 @@
 
             // ✅ VERY IMPORTANT
             initSliders();
+            applyCompletedState();
         }
 
 
+        async function applyCompletedState() {
+
+            const completed = await loadCompletedDates();
+
+            document.querySelectorAll(".complete-slider").forEach(slider => {
+
+                const date = document.getElementById("selDateLabel").dataset.raw;
+
+                if (completed.includes(date)) {
+
+                    slider.classList.add("completed");
+                    slider.querySelector("span").innerText = "Completed ✔";
+
+                    slider.style.pointerEvents = "none";
+                    slider.style.opacity = "0.7";
+                }
+            });
+        }
 
         /* ============================================================
            STATS
@@ -2303,32 +2336,60 @@
                     }
                 });
 
-                slider.addEventListener("click", () => {
+                slider.addEventListener("click", async () => {
+
+                    const date = document.getElementById("selDateLabel").dataset.raw;
+
                     slider.classList.add("completed");
                     slider.querySelector("span").innerText = "Completed ✔";
+
+                    await markCompleted(date); // 🔥 ADD THIS
+
                     toast("Marked Completed ✔", "success");
                 });
 
 
-                slider.addEventListener("touchend", e => {
+                slider.addEventListener("touchend", async e => {
+
                     let diff = e.changedTouches[0].clientX - startX;
 
                     if (diff > slider.offsetWidth * 0.6) {
 
-                        slider.classList.add("completed");
+                        const date = document.getElementById("selDateLabel").dataset.raw;
 
-                        const trackText = slider.querySelector("span");
-                        trackText.innerText = "Completed ✔";
+                        slider.classList.add("completed");
+                        slider.querySelector("span").innerText = "Completed ✔";
+
+                        await markCompleted(date); // 🔥 ADD THIS
 
                         toast("Marked Completed ✔", "success");
 
                     } else {
-
                         thumb.style.transform = "translateX(0)";
                     }
                 });
             });
         }
+
+
+        async function loadCompletedDates() {
+
+            if (!currentUser) return [];
+
+            const ref = db.collection("users")
+                .doc(currentUser.uid)
+                .collection("progress")
+                .doc("main");
+
+            const doc = await ref.get();
+
+            if (doc.exists) {
+                return doc.data().completedDates || [];
+            }
+
+            return [];
+        }
+
 
         /* ============================================================
            MODAL CLOSE HELPERS
