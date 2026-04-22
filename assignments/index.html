@@ -2130,6 +2130,12 @@
             renderAssignments(ds);
         }
         function renderAssignments(ds) {
+
+
+            const isDone = completedMap[a.id];
+
+            const completedClass = isDone ? "completed" : "";
+            const completedText = isDone ? "Completed ✔" : "Slide to complete →";
             const pane = document.getElementById("assignmentsPane");
             const label = document.getElementById("selDateLabel");
             const chip = document.getElementById("countChip");
@@ -2201,22 +2207,23 @@
         }
 
 
-        async function applyCompletedState() {
+        function applyCompletedState() {
+            document.querySelectorAll(".acard").forEach((card, i) => {
 
-            const completed = await loadCompletedDates();
+                const a = list[i]; // make sure `list` is accessible OR pass it
+                if (!a) return;
 
-            document.querySelectorAll(".complete-slider").forEach(slider => {
+                const slider = card.querySelector(".complete-slider");
+                const track = slider?.querySelector(".slider-track");
 
-                const date = document.getElementById("selDateLabel").dataset.raw;
+                if (!slider || !track) return;
 
-
-                if (completed.includes(date)) {
-
+                if (completedMap[a.id]) {
                     slider.classList.add("completed");
-                    slider.querySelector("span").innerText = "Completed ✔";
-
-                    slider.style.pointerEvents = "none";
-                    slider.style.opacity = "0.7";
+                    track.querySelector("span").innerText = "Completed ✔";
+                } else {
+                    slider.classList.remove("completed");
+                    track.querySelector("span").innerText = "Slide to Complete";
                 }
             });
         }
@@ -2467,7 +2474,7 @@
         const ADMIN_UID = "W0IMog3J0wca3KOYjNqnOxCSxhJ3";
         let isFirstLoad = true;
 
-        auth.onAuthStateChanged(user => {
+        auth.onAuthStateChanged(async (user) => {
 
             currentUser = user;
 
@@ -2480,6 +2487,10 @@
             // 🛡️ Safety
             if (!panel || !loginBtn || !profileBox || !profileName) return;
 
+
+            if (user) {
+                await loadCompleted(); // ✅ now valid
+            }
             if (user) {
 
                 // 🔓 USER LOGGED IN
@@ -2494,8 +2505,10 @@
                     emailBox.innerText = safeEmail;
                 }
 
+
+
                 // 🔴 ADMIN CHECK
-                if (user.uid === ADMIN_UID) {
+                if (user && user.uid === ADMIN_UID) {
 
                     // 👑 Admin UI
                     profileName.innerHTML = `
@@ -2537,11 +2550,11 @@
                 profileBox.style.display = "none";
                 panel.style.display = "none";
 
-                 if (emailBox) {
-            emailBox.innerText = "";
-        }
-    }
-            
+                if (emailBox) {
+                    emailBox.innerText = "";
+                }
+            }
+
 
             isFirstLoad = false;
 
@@ -2578,7 +2591,8 @@
 
                     await markCompleted(date); // 🔥 ADD THIS
 
-                    toast("Marked Completed ✔", "success");
+
+                    markCompleted(a.id, a);
                 });
 
 
@@ -2597,7 +2611,7 @@
                         const date = document.getElementById("selDateLabel").dataset.raw;
                         markCompleted(date);
 
-                        toast("Marked Completed ✔", "success");
+                        markCompleted(a.id, a);
                     }
                     else {
                         thumb.style.transform = "translateX(0)";
@@ -2605,6 +2619,27 @@
                 });
             });
         }
+
+
+
+        let completedMap = {};
+
+        async function loadCompleted() {
+
+            if (!currentUser) return;
+
+            const snap = await db.collection("userProgress")
+                .doc(currentUser.uid)
+                .collection("completed")
+                .get();
+
+            completedMap = {};
+
+            snap.forEach(doc => {
+                completedMap[doc.id] = true;
+            });
+        }
+
 
         async function loadCompletedDates() {
 
