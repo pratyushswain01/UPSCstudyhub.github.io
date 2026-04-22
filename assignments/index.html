@@ -937,26 +937,28 @@
 
 
         /* 📱 MOBILE VIEW */
-@media (max-width: 600px) {
+        @media (max-width: 600px) {
 
-    .profile-text {
-        display: none; /* hide email name */
-    }
+            .profile-text {
+                display: none;
+                /* hide email name */
+            }
 
-    .profile-btn {
-        padding: 6px 10px;
-    }
+            .profile-btn {
+                padding: 6px 10px;
+            }
 
-}
+        }
 
-/* 💻 TABLET + DESKTOP */
-@media (min-width: 601px) {
+        /* 💻 TABLET + DESKTOP */
+        @media (min-width: 601px) {
 
-    .profile-text {
-        display: inline;
-    }
+            .profile-text {
+                display: inline;
+            }
 
-}
+        }
+
         /* ========================================
            MODALS
         ======================================== */
@@ -1411,7 +1413,7 @@
             </div>
 
         </div>
-        </div>
+
     </header>
     <!-- ============================================================
      HERO
@@ -2441,9 +2443,12 @@
 
         function toggleProfileMenu() {
             const menu = document.getElementById("profileMenu");
-            menu.style.display = menu.style.display === "flex" ? "none" : "flex";
-        }
 
+            if (!menu) return;
+
+            menu.style.display =
+                (menu.style.display === "flex") ? "none" : "flex";
+        }
         function doLogout() {
             auth.signOut()
                 .then(() => {
@@ -2454,6 +2459,10 @@
                 });
         }
 
+        async function doLogout() {
+            await auth.signOut();
+            document.getElementById("profileMenu").style.display = "none";
+        }
 
         const ADMIN_UID = "W0IMog3J0wca3KOYjNqnOxCSxhJ3";
         let isFirstLoad = true;
@@ -2661,7 +2670,10 @@
                 const box = document.getElementById("profileBox");
                 const menu = document.getElementById("profileMenu");
 
-                if (box && !box.contains(e.target)) {
+                if (!box || !menu) return;
+
+                // If click is outside profile box → close
+                if (!box.contains(e.target)) {
                     menu.style.display = "none";
                 }
             });
