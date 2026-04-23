@@ -2197,39 +2197,46 @@
             renderAssignments(ds);
         }
 
-        function renderAssignments(ds) {
-            const pane = document.getElementById("assignmentsPane");
-            const label = document.getElementById("selDateLabel");
-            const chip = document.getElementById("countChip");
+function renderAssignments(ds) {
+    const pane = document.getElementById("assignmentsPane");
+    const label = document.getElementById("selDateLabel");
+    const chip = document.getElementById("countChip");
 
-            label.textContent = fmtDisplay(ds);
-            label.dataset.raw = ds;
+    // Set the current date view metadata
+    label.textContent = fmtDisplay(ds);
+    label.dataset.raw = ds;
 
-            let list = (byDate && byDate[ds]) || [];
+    // Get assignments for the specific date
+    let list = (byDate && byDate[ds]) || [];
 
-            // FILTER: Only show assignments for current user or all users
-            if (currentUser) {
-                list = list.filter(a => !a.assignedTo || a.assignedTo === "" || a.assignedTo === currentUser.email);
-            }
+    // Filter by user permissions
+    if (currentUser) {
+        list = list.filter(a => !a.assignedTo || a.assignedTo === "" || a.assignedTo === currentUser.email);
+    }
 
-            chip.style.display = list.length ? "inline-flex" : "none";
-            chip.textContent = `${list.length} assignment${list.length !== 1 ? "s" : ""}`;
+    // Update the counter chip
+    chip.style.display = list.length ? "inline-flex" : "none";
+    chip.textContent = `${list.length} assignment${list.length !== 1 ? "s" : ""}`;
 
-            if (!list.length) {
-                pane.innerHTML = `
+    // Handle empty state
+    if (!list.length) {
+        pane.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-inbox"></i>
                 <h3>No Assignments</h3>
                 <p>Nothing scheduled for ${fmtDisplay(ds)}.</p>
             </div>
         `;
-                return;
-            }
+        return;
+    }
 
-            const isDone = completedDates.includes(ds);
+    // Map through assignments and render cards
+    pane.innerHTML = list.map((a, i) => {
+        // ✅ CRITICAL FIX: Check if the UNIQUE ID is in the completed list, NOT the date string
+        const isDone = completedDates.includes(a.id);
 
-            pane.innerHTML = list.map((a, i) => `
-        <div class="acard" style="animation-delay:${i * 0.05}s" data-index="${i}">
+        return `
+        <div class="acard" style="animation-delay:${i * 0.05}s">
             
             <div class="acard-top">
                 <span class="badge ${badgeClass(a.subject)}">
@@ -2244,7 +2251,7 @@
                 <div class="topic-name">${esc(a.topic)}</div>
                 <div class="question-text">${esc(a.question)}</div>
 
-                <div class="complete-slider ${isDone ? 'completed' : ''}" data-date="${ds}">
+                <div class="complete-slider ${isDone ? 'completed' : ''}" data-id="${a.id}">
                     <div class="slider-track">
                         <div class="slider-thumb">${isDone ? '✔' : '➤'}</div>
                         <span>${isDone ? 'Completed ✔' : 'Slide to Complete'}</span>
@@ -2263,84 +2270,106 @@
             </div>` : ""}
 
         </div>
-    `).join("");
+    `;
+    }).join("");
 
-            initSliders();
-        }
-
+    // Re-bind events to the newly created slider elements
+    initSliders();
+}
         /* ============================================================
            SLIDER INITIALIZATION
         ============================================================ */
-        function initSliders() {
-            const sliders = document.querySelectorAll(".complete-slider:not(.completed)");
+      /* ============================================================
+    SLIDER INITIALIZATION
+============================================================ */
+function initSliders() {
+    // Select sliders that aren't already marked completed
+    const sliders = document.querySelectorAll(".complete-slider:not(.completed)");
 
-            sliders.forEach(slider => {
-                const thumb = slider.querySelector(".slider-thumb");
-                const trackText = slider.querySelector("span");
-                const dateStr = slider.getAttribute("data-date");
+    sliders.forEach(slider => {
+        const thumb = slider.querySelector(".slider-thumb");
+        const trackText = slider.querySelector("span");
+        
+        // Get the unique Assignment ID from the data attribute
+        const assignmentId = slider.getAttribute("data-id");
 
-                let startX = 0;
-                let isDragging = false;
+        let startX = 0;
+        let isDragging = false;
 
-                slider.addEventListener("touchstart", e => {
-                    startX = e.touches[0].clientX;
-                    isDragging = true;
-                    thumb.style.transition = "none";
-                }, { passive: true });
+        // --- TOUCH EVENTS ---
+        slider.addEventListener("touchstart", e => {
+            startX = e.touches[0].clientX;
+            isDragging = true;
+            thumb.style.transition = "none";
+        }, { passive: true });
 
-                slider.addEventListener("touchmove", e => {
-                    if (!isDragging) return;
-                    let moveX = e.touches[0].clientX - startX;
-                    let maxMove = slider.offsetWidth - thumb.offsetWidth - 8;
+        slider.addEventListener("touchmove", e => {
+            if (!isDragging) return;
+            let moveX = e.touches[0].clientX - startX;
+            let maxMove = slider.offsetWidth - thumb.offsetWidth - 8;
 
-                    if (moveX > 0 && moveX < maxMove) {
-                        thumb.style.transform = `translateX(${moveX}px)`;
-                    }
-                }, { passive: true });
+            if (moveX > 0 && moveX < maxMove) {
+                thumb.style.transform = `translateX(${moveX}px)`;
+            }
+        }, { passive: true });
 
-                slider.addEventListener("touchend", async e => {
-                    isDragging = false;
-                    thumb.style.transition = "0.4s";
-                    let diff = e.changedTouches[0].clientX - startX;
+        slider.addEventListener("touchend", async e => {
+            isDragging = false;
+            thumb.style.transition = "0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+            let diff = e.changedTouches[0].clientX - startX;
 
-                    if (diff > slider.offsetWidth * 0.6) {
-                        await markCompleted(dateStr);
-                    } else {
-                        thumb.style.transform = "translateX(0)";
-                    }
-                });
+            if (diff > slider.offsetWidth * 0.6) {
+                // SUCCESSFUL SLIDE - Instant UI feedback
+                thumb.style.transform = `translateX(${slider.offsetWidth - thumb.offsetWidth - 8}px)`;
+                await markCompleted(assignmentId);
+            } else {
+                // RESET POSITION
+                thumb.style.transform = "translateX(0)";
+            }
+        });
 
-                slider.addEventListener("click", async () => {
-                    await markCompleted(dateStr);
-                });
-            });
+        // --- CLICK EVENT (Desktop Fallback) ---
+        slider.addEventListener("click", async (e) => {
+            // Only trigger if it's a standard click, not the end of a drag
+            if (slider.classList.contains("completed")) return;
+            await markCompleted(assignmentId);
+        });
+    });
+}
+
+/* ============================================================
+    MARK COMPLETED
+============================================================ */
+async function markCompleted(assignmentId) {
+    if (!currentUser) {
+        toast("Login required", "warning");
+        return;
+    }
+
+    try {
+        const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
+
+        // ✅ Use assignmentId (the unique Firestore ID) to track progress
+        if (!completedDates.includes(assignmentId)) {
+            completedDates.push(assignmentId);
         }
 
-        /* ============================================================
-           MARK COMPLETED
-        ============================================================ */
-        async function markCompleted(dateStr) {
-            if (!currentUser) {
-                toast("Login required", "warning");
-                return;
-            }
+        // Update Firebase
+        await ref.set({ completedDates: completedDates }, { merge: true });
 
-            try {
-                const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
-
-                if (!completedDates.includes(dateStr)) {
-                    completedDates.push(dateStr);
-                }
-
-                await ref.set({ completedDates: completedDates }, { merge: true });
-
-                toast("Progress saved!", "success");
-                renderAssignments(dateStr);
-            } catch (err) {
-                console.error(err);
-                toast("Error saving progress", "error");
-            }
+        toast("Assignment Completed!", "success");
+        
+        // Get current view date from the header and re-render
+        const currentSelectedDate = document.getElementById("selDateLabel").dataset.raw;
+        if (currentSelectedDate) {
+            renderAssignments(currentSelectedDate); 
         }
+        
+    } catch (err) {
+        console.error("Save error:", err);
+        toast("Error saving progress", "error");
+    }
+}
 
         /* ============================================================
            LOAD COMPLETED DATES
