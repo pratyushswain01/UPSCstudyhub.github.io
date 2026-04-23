@@ -1841,7 +1841,7 @@
         };
 
 
-async function markCompleted(dateStr) {
+async function markCompleted(assignmentId) {
     if (!currentUser) {
         toast("Login required", "warning");
         return;
@@ -1850,22 +1850,22 @@ async function markCompleted(dateStr) {
     try {
         const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
 
-        // Add to local array if not present
-        if (!completedDates.includes(dateStr)) {
-            completedDates.push(dateStr);
+        // Use assignmentId instead of dateStr to ensure uniqueness
+        if (!completedDates.includes(assignmentId)) {
+            completedDates.push(assignmentId);
         }
 
         await ref.set({ completedDates: completedDates }, { merge: true });
         
         toast("Progress saved!", "success");
         
-        // RE-RENDER to show the green state
-        renderAssignments(dateStr); 
+        // Refresh the current view using the date stored in the heading
+        const currentSelectedDate = document.getElementById("selDateLabel").dataset.raw;
+        renderAssignments(currentSelectedDate); 
     } catch (err) {
         console.error(err);
         toast("Error saving progress", "error");
     }
-
 
         }
         /* ============================================================
@@ -2166,8 +2166,12 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
             }
 
             // Render cards
-            pane.innerHTML = list.map((a, i) => `
-        <div class="acard" style="animation-delay:${i * 0.05}s" data-index="${i}">
+pane.innerHTML = list.map((a, i) => {
+    // 1. Check if THIS specific assignment ID is in the completed list
+    const isDone = completedDates.includes(a.id);
+
+    return `
+        <div class="acard" style="animation-delay:${i * 0.05}s">
             
             <div class="acard-top">
                 <span class="badge ${badgeClass(a.subject)}">
@@ -2182,11 +2186,10 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
                 <div class="topic-name">${esc(a.topic)}</div>
                 <div class="question-text">${esc(a.question)}</div>
 
-                <!-- ✅ SLIDER -->
-                <div class="complete-slider" data-index="${i}">
+                <div class="complete-slider ${isDone ? 'completed' : ''}" data-id="${a.id}">
                     <div class="slider-track">
-                        <div class="slider-thumb">➤</div>
-                        <span>Slide to Complete</span>
+                        <div class="slider-thumb">${isDone ? '✔' : '➤'}</div>
+                        <span>${isDone ? 'Completed ✔' : 'Slide to Complete'}</span>
                     </div>
                 </div>
             </div>
@@ -2202,7 +2205,8 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
             </div>` : ""}
 
         </div>
-    `).join("");
+    `;
+}).join("");
 
             // ✅ VERY IMPORTANT
             initSliders();
@@ -2568,33 +2572,36 @@ const sliderText = isDone ? "Completed ✔" : "Slide to Complete";
         });
 
 function initSliders() {
+    // Select all sliders (both completed and incomplete to ensure correct state)
     const sliders = document.querySelectorAll(".complete-slider");
 
     sliders.forEach(slider => {
         const thumb = slider.querySelector(".slider-thumb");
         const trackText = slider.querySelector("span");
-        const date = document.getElementById("selDateLabel").dataset.raw;
         
-        // 1. If already completed, disable movement and just show status
+        // ✅ KEY FIX: Get the specific Assignment ID from the data attribute
+        const assignmentId = slider.getAttribute("data-id");
+        
         if (slider.classList.contains("completed")) {
-            thumb.style.transform = "translateX(calc(100% - 4px))"; // Use CSS class instead if possible
+            // Ensure the thumb is at the end for already completed tasks
+            thumb.style.transform = "translateX(calc(100% - 48px))"; 
             return; 
         }
 
         let startX = 0;
         let isDragging = false;
 
-        // --- TOUCH EVENTS (For Sliding) ---
+        // --- TOUCH EVENTS ---
         slider.addEventListener("touchstart", e => {
             startX = e.touches[0].clientX;
             isDragging = true;
-            thumb.style.transition = "none"; // Disable transition while dragging
+            thumb.style.transition = "none";
         }, { passive: true });
 
         slider.addEventListener("touchmove", e => {
             if (!isDragging) return;
             let moveX = e.touches[0].clientX - startX;
-            let maxMove = slider.offsetWidth - thumb.offsetWidth - 8; // boundary
+            let maxMove = slider.offsetWidth - thumb.offsetWidth - 8;
 
             if (moveX > 0 && moveX < maxMove) {
                 thumb.style.transform = `translateX(${moveX}px)`;
@@ -2603,26 +2610,28 @@ function initSliders() {
 
         slider.addEventListener("touchend", async e => {
             isDragging = false;
-            thumb.style.transition = "0.3s"; // Re-enable transition
+            thumb.style.transition = "0.3s";
             let diff = e.changedTouches[0].clientX - startX;
 
             if (diff > slider.offsetWidth * 0.6) {
                 // SUCCESSFUL SLIDE
                 slider.classList.add("completed");
                 trackText.innerText = "Completed ✔";
-                await markCompleted(date);
+                thumb.innerText = "✔";
+                
+                // ✅ Pass the unique ID, not the date
+                await markCompleted(assignmentId);
             } else {
-                // RESET
                 thumb.style.transform = "translateX(0)";
             }
         });
 
-        // --- CLICK EVENT (For Desktop/Fallback) ---
-        slider.addEventListener("click", async (e) => {
-            // Prevent click if we just finished a touch swipe
+        // --- CLICK EVENT ---
+        slider.addEventListener("click", async () => {
             if (slider.classList.contains("completed")) return;
             
-            await markCompleted(date);
+            // ✅ Pass the unique ID, not the date
+            await markCompleted(assignmentId);
         });
     });
 }
