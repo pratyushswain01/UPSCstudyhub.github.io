@@ -1687,13 +1687,15 @@
                             </div>
                             <div class="fg">
                                 <label>Assign To (User Email)</label>
-                                <select class="form-control" id="fAssignTo" data-testid="f-assign-to">
-                                    <option value="">-- All Users --</option>
-                                    <!-- ADD YOUR USER EMAILS HERE -->
-                                    <option value="user1@example.com">user1@example.com</option>
-                                    <option value="user2@example.com">user2@example.com</option>
-                                    <option value="user3@example.com">user3@example.com</option>
-                                </select>
+                                <input type="email" class="form-control" id="fAssignTo" list="userEmails"
+                                    placeholder="Type or select email (blank for all)" data-testid="f-assign-to">
+                                <datalist id="userEmails">
+                                    <option value="user1@example.com">
+                                    <option value="user2@example.com">
+                                    <option value="user3@example.com">
+                                </datalist>
+                                <small style="color: var(--text-muted); font-size: 11px;">If blank, all logged-in users
+                                    will see this task.</small>
                             </div>
                             <div class="fg full">
                                 <label>Question / Assignment Text <span>*</span></label>
@@ -1871,11 +1873,13 @@
                         <label>Assign To (User Email)</label>
                         <select class="form-control" id="eAssignTo">
                             <option value="">-- All Users --</option>
-                            <option value="user1@example.com">user1@example.com</option>
-                            <option value="user2@example.com">user2@example.com</option>
-                            <option value="user3@example.com">user3@example.com</option>
+                            <option value="pratyushkumarswain01@gmail.com">pratyushkumarswain01@gmail.com</option>
+                            <option value="panianshuja05@gmail.com">panianshuja05@gmail.com</option>
+                            
                         </select>
                     </div>
+
+
                     <div class="fg full">
                         <label>Question / Assignment <span style="color:#dc3545">*</span></label>
                         <textarea class="form-control" id="eQuestion" rows="5"></textarea>
@@ -2197,45 +2201,45 @@
             renderAssignments(ds);
         }
 
-function renderAssignments(ds) {
-    const pane = document.getElementById("assignmentsPane");
-    const label = document.getElementById("selDateLabel");
-    const chip = document.getElementById("countChip");
+        function renderAssignments(ds) {
+            const pane = document.getElementById("assignmentsPane");
+            const label = document.getElementById("selDateLabel");
+            const chip = document.getElementById("countChip");
 
-    // Set the current date view metadata
-    label.textContent = fmtDisplay(ds);
-    label.dataset.raw = ds;
+            // Set the current date view metadata
+            label.textContent = fmtDisplay(ds);
+            label.dataset.raw = ds;
 
-    // Get assignments for the specific date
-    let list = (byDate && byDate[ds]) || [];
+            // Get assignments for the specific date
+            let list = (byDate && byDate[ds]) || [];
 
-    // Filter by user permissions
-    if (currentUser) {
-        list = list.filter(a => !a.assignedTo || a.assignedTo === "" || a.assignedTo === currentUser.email);
-    }
+            // Filter by user permissions
+            if (currentUser) {
+                list = list.filter(a => !a.assignedTo || a.assignedTo === "" || a.assignedTo === currentUser.email);
+            }
 
-    // Update the counter chip
-    chip.style.display = list.length ? "inline-flex" : "none";
-    chip.textContent = `${list.length} assignment${list.length !== 1 ? "s" : ""}`;
+            // Update the counter chip
+            chip.style.display = list.length ? "inline-flex" : "none";
+            chip.textContent = `${list.length} assignment${list.length !== 1 ? "s" : ""}`;
 
-    // Handle empty state
-    if (!list.length) {
-        pane.innerHTML = `
+            // Handle empty state
+            if (!list.length) {
+                pane.innerHTML = `
             <div class="empty-state">
                 <i class="fas fa-inbox"></i>
                 <h3>No Assignments</h3>
                 <p>Nothing scheduled for ${fmtDisplay(ds)}.</p>
             </div>
         `;
-        return;
-    }
+                return;
+            }
 
-    // Map through assignments and render cards
-    pane.innerHTML = list.map((a, i) => {
-        // ✅ CRITICAL FIX: Check if the UNIQUE ID is in the completed list, NOT the date string
-        const isDone = completedDates.includes(a.id);
+            // Map through assignments and render cards
+            pane.innerHTML = list.map((a, i) => {
+                // ✅ CRITICAL FIX: Check if the UNIQUE ID is in the completed list, NOT the date string
+                const isDone = completedDates.includes(a.id);
 
-        return `
+                return `
         <div class="acard" style="animation-delay:${i * 0.05}s">
             
             <div class="acard-top">
@@ -2271,105 +2275,105 @@ function renderAssignments(ds) {
 
         </div>
     `;
-    }).join("");
+            }).join("");
 
-    // Re-bind events to the newly created slider elements
-    initSliders();
-}
+            // Re-bind events to the newly created slider elements
+            initSliders();
+        }
         /* ============================================================
            SLIDER INITIALIZATION
         ============================================================ */
-      /* ============================================================
-    SLIDER INITIALIZATION
-============================================================ */
-function initSliders() {
-    // Select sliders that aren't already marked completed
-    const sliders = document.querySelectorAll(".complete-slider:not(.completed)");
+        /* ============================================================
+      SLIDER INITIALIZATION
+  ============================================================ */
+        function initSliders() {
+            // Select sliders that aren't already marked completed
+            const sliders = document.querySelectorAll(".complete-slider:not(.completed)");
 
-    sliders.forEach(slider => {
-        const thumb = slider.querySelector(".slider-thumb");
-        const trackText = slider.querySelector("span");
-        
-        // Get the unique Assignment ID from the data attribute
-        const assignmentId = slider.getAttribute("data-id");
+            sliders.forEach(slider => {
+                const thumb = slider.querySelector(".slider-thumb");
+                const trackText = slider.querySelector("span");
 
-        let startX = 0;
-        let isDragging = false;
+                // Get the unique Assignment ID from the data attribute
+                const assignmentId = slider.getAttribute("data-id");
 
-        // --- TOUCH EVENTS ---
-        slider.addEventListener("touchstart", e => {
-            startX = e.touches[0].clientX;
-            isDragging = true;
-            thumb.style.transition = "none";
-        }, { passive: true });
+                let startX = 0;
+                let isDragging = false;
 
-        slider.addEventListener("touchmove", e => {
-            if (!isDragging) return;
-            let moveX = e.touches[0].clientX - startX;
-            let maxMove = slider.offsetWidth - thumb.offsetWidth - 8;
+                // --- TOUCH EVENTS ---
+                slider.addEventListener("touchstart", e => {
+                    startX = e.touches[0].clientX;
+                    isDragging = true;
+                    thumb.style.transition = "none";
+                }, { passive: true });
 
-            if (moveX > 0 && moveX < maxMove) {
-                thumb.style.transform = `translateX(${moveX}px)`;
-            }
-        }, { passive: true });
+                slider.addEventListener("touchmove", e => {
+                    if (!isDragging) return;
+                    let moveX = e.touches[0].clientX - startX;
+                    let maxMove = slider.offsetWidth - thumb.offsetWidth - 8;
 
-        slider.addEventListener("touchend", async e => {
-            isDragging = false;
-            thumb.style.transition = "0.4s cubic-bezier(0.4, 0, 0.2, 1)";
-            let diff = e.changedTouches[0].clientX - startX;
+                    if (moveX > 0 && moveX < maxMove) {
+                        thumb.style.transform = `translateX(${moveX}px)`;
+                    }
+                }, { passive: true });
 
-            if (diff > slider.offsetWidth * 0.6) {
-                // SUCCESSFUL SLIDE - Instant UI feedback
-                thumb.style.transform = `translateX(${slider.offsetWidth - thumb.offsetWidth - 8}px)`;
-                await markCompleted(assignmentId);
-            } else {
-                // RESET POSITION
-                thumb.style.transform = "translateX(0)";
-            }
-        });
+                slider.addEventListener("touchend", async e => {
+                    isDragging = false;
+                    thumb.style.transition = "0.4s cubic-bezier(0.4, 0, 0.2, 1)";
+                    let diff = e.changedTouches[0].clientX - startX;
 
-        // --- CLICK EVENT (Desktop Fallback) ---
-        slider.addEventListener("click", async (e) => {
-            // Only trigger if it's a standard click, not the end of a drag
-            if (slider.classList.contains("completed")) return;
-            await markCompleted(assignmentId);
-        });
-    });
-}
+                    if (diff > slider.offsetWidth * 0.6) {
+                        // SUCCESSFUL SLIDE - Instant UI feedback
+                        thumb.style.transform = `translateX(${slider.offsetWidth - thumb.offsetWidth - 8}px)`;
+                        await markCompleted(assignmentId);
+                    } else {
+                        // RESET POSITION
+                        thumb.style.transform = "translateX(0)";
+                    }
+                });
 
-/* ============================================================
-    MARK COMPLETED
-============================================================ */
-async function markCompleted(assignmentId) {
-    if (!currentUser) {
-        toast("Login required", "warning");
-        return;
-    }
-
-    try {
-        const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
-
-        // ✅ Use assignmentId (the unique Firestore ID) to track progress
-        if (!completedDates.includes(assignmentId)) {
-            completedDates.push(assignmentId);
+                // --- CLICK EVENT (Desktop Fallback) ---
+                slider.addEventListener("click", async (e) => {
+                    // Only trigger if it's a standard click, not the end of a drag
+                    if (slider.classList.contains("completed")) return;
+                    await markCompleted(assignmentId);
+                });
+            });
         }
 
-        // Update Firebase
-        await ref.set({ completedDates: completedDates }, { merge: true });
+        /* ============================================================
+            MARK COMPLETED
+        ============================================================ */
+        async function markCompleted(assignmentId) {
+            if (!currentUser) {
+                toast("Login required", "warning");
+                return;
+            }
 
-        toast("Assignment Completed!", "success");
-        
-        // Get current view date from the header and re-render
-        const currentSelectedDate = document.getElementById("selDateLabel").dataset.raw;
-        if (currentSelectedDate) {
-            renderAssignments(currentSelectedDate); 
+            try {
+                const ref = db.collection("users").doc(currentUser.uid).collection("progress").doc("main");
+
+                // ✅ Use assignmentId (the unique Firestore ID) to track progress
+                if (!completedDates.includes(assignmentId)) {
+                    completedDates.push(assignmentId);
+                }
+
+                // Update Firebase
+                await ref.set({ completedDates: completedDates }, { merge: true });
+
+                toast("Assignment Completed!", "success");
+
+                // Get current view date from the header and re-render
+                const currentSelectedDate = document.getElementById("selDateLabel").dataset.raw;
+                if (currentSelectedDate) {
+                    renderAssignments(currentSelectedDate);
+                }
+
+            } catch (err) {
+                console.error("Save error:", err);
+                toast("Error saving progress", "error");
+            }
         }
-        
-    } catch (err) {
-        console.error("Save error:", err);
-        toast("Error saving progress", "error");
-    }
-}
 
         /* ============================================================
            LOAD COMPLETED DATES
