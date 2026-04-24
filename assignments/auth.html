@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>UPSChub - Authentication</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100">
+
+    <div id="auth-view" class="flex items-center justify-center min-h-screen p-4">
+        <div class="w-full max-w-md mx-auto">
+            <div class="text-center mb-6">
+                <a href="index.html" class="text-3xl font-bold text-blue-600">UPSChub</a>
+            </div>
+            <div id="auth-container" class="bg-white p-8 rounded-2xl shadow-xl transition-all duration-500">
+
+                <div id="signin-form">
+                    <h2 class="text-2xl font-bold text-gray-800 text-center">Welcome Back!</h2>
+                    <p class="text-gray-500 text-center mt-2 mb-8">Sign in to access your Test dashboard.</p>
+
+                    <form id="loginForm">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="login-email" class="text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" id="login-email" required
+                                    class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="login-password" class="text-sm font-medium text-gray-700">Password</label>
+                                <input type="password" id="login-password" required
+                                    class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                        </div>
+                        <button type="submit" id="loginBtn"
+                            class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md transition-all duration-300">
+                            <span id="loginText">Sign In</span>
+                        </button>
+                    </form>
+
+                    <p class="text-center text-sm text-gray-500 mt-8">
+                        Don't have an account?
+                        <a href="#" id="show-signup" class="font-semibold text-blue-600 hover:underline">Create account
+                            / Sign up</a>
+                    </p>
+                </div>
+
+                <div id="signup-form" class="hidden">
+                    <h2 class="text-2xl font-bold text-gray-800 text-center">Create an Account</h2>
+                    <p class="text-gray-500 text-center mt-2 mb-8">Get started with your free account.</p>
+
+                    <form id="registerForm">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="signup-email" class="text-sm font-medium text-gray-700">Email</label>
+                                <input type="email" id="signup-email" required
+                                    class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                            <div>
+                                <label for="signup-password" class="text-sm font-medium text-gray-700">Password</label>
+                                <input type="password" id="signup-password" required minlength="6"
+                                    class="mt-1 w-full px-4 py-3 bg-slate-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="mt-8 w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            Create Account
+                        </button>
+                    </form>
+
+                    <p class="text-center text-sm text-gray-500 mt-8">
+                        Already have an account?
+                        <a href="#" id="show-signin" class="font-semibold text-blue-600 hover:underline">Sign in</a>
+                    </p>
+                </div>
+                <div id="message" class="mt-4 text-center text-sm font-medium"></div>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import {
+            getAuth,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword,
+            onAuthStateChanged,
+            setPersistence,
+            browserLocalPersistence
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            getDoc
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = "default-app-id";
+
+        // Set persistence
+        setPersistence(auth, browserLocalPersistence);
+
+        // ==================== SYNC WITH LOCALSTORAGE ====================
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                console.log("✅ Firebase User logged in:", user.uid, user.email);
+
+                // Save to localStorage so other pages can detect login instantly
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('userId', user.email);
+                localStorage.setItem('userUID', user.uid);   // optional
+
+                // Create/update user document in Firestore (your existing logic)
+                try {
+                    const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
+                    const snap = await getDoc(userRef);
+
+                    if (!snap.exists()) {
+                        await setDoc(userRef, {
+                            email: user.email,
+                            isPremium: false,
+                            createdAt: new Date()
+                        });
+                    }
+                } catch (e) {
+                    console.error("Firestore error:", e);
+                }
+
+                // Redirect (with small delay for safety)
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectUrl = urlParams.get('redirect') || "homeUPSChub.html";
+
+                setTimeout(() => {
+                    window.location.href = "auth.html?redirect=" + encodeURIComponent(window.location.href);
+                }, 800);
+
+            } else {
+                // Not logged in
+                localStorage.removeItem('isLoggedIn');
+                localStorage.removeItem('userId');
+                localStorage.removeItem('userUID');
+            }
+        });
+
+        // ==================== LOGIN FORM ====================
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const messageDiv = document.getElementById('message');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
+
+            try {
+                displayMessage("Signing in...", "blue");
+                await signInWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle redirect
+            } catch (error) {
+                console.error(error);
+                displayMessage("❌ Incorrect email or password", "red");
+            }
+        });
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value.trim();
+
+            try {
+                displayMessage("Creating account...", "blue");
+                await createUserWithEmailAndPassword(auth, email, password);
+                // onAuthStateChanged will handle the rest
+            } catch (error) {
+                console.error(error);
+                displayMessage(error.message, "red");
+            }
+        });
+
+
+
+
+        function setLoading(isLoading) {
+            const btn = document.getElementById("loginBtn");
+            const text = document.getElementById("loginText");
+
+            if (isLoading) {
+                btn.disabled = true;
+                text.innerText = "Please wait...";
+            } else {
+                btn.disabled = false;
+                text.innerText = "Sign In";
+            }
+        }
+
+
+        function displayMessage(msg, color) {
+            messageDiv.textContent = msg;
+            messageDiv.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
+        }
+
+        // Form toggle (your existing code)
+        const showSignup = document.getElementById("show-signup");
+        const showSignin = document.getElementById("show-signin");
+        const signinForm = document.getElementById("signin-form");
+        const signupForm = document.getElementById("signup-form");
+
+        if (showSignup && showSignin) {
+            showSignup.addEventListener("click", (e) => {
+                e.preventDefault();
+                signinForm.classList.add("hidden");
+                signupForm.classList.remove("hidden");
+            });
+
+            showSignin.addEventListener("click", (e) => {
+                e.preventDefault();
+                signupForm.classList.add("hidden");
+                signinForm.classList.remove("hidden");
+            });
+        }
+    </script>
+
+</body>
+
+</html>
