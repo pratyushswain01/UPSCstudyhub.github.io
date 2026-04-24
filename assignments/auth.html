@@ -123,7 +123,7 @@
         // 🔐 Keep session
         setPersistence(auth, browserLocalPersistence);
 
-        // ==================== 🔥 SAFE REDIRECT ====================
+        // ==================== 🔥 SAFE AUTH + REDIRECT ====================
         let redirected = false;
 
         onAuthStateChanged(auth, async (user) => {
@@ -153,7 +153,7 @@
                     console.error("Firestore error:", e);
                 }
 
-                // 🔥 CLEAN REDIRECT LOGIC
+                // 🔥 CLEAN REDIRECT
                 const params = new URLSearchParams(window.location.search);
                 let redirectParam = params.get("redirect");
 
@@ -162,21 +162,26 @@
                 if (redirectParam) {
                     redirectUrl = decodeURIComponent(redirectParam);
 
-                    // 🚫 Prevent auth loop
+                    // 🚫 Prevent loop
                     if (redirectUrl.includes("auth.html")) {
                         redirectUrl = "/homeUPSChub.html";
                     }
+
+                    // 🚫 Fix broken relative paths
+                    if (!redirectUrl.startsWith("http")) {
+                        redirectUrl = "/" + redirectUrl.replace(/^\/+/, "");
+                    }
+
                 } else {
                     redirectUrl = "/homeUPSChub.html";
                 }
 
                 console.log("➡ Redirecting to:", redirectUrl);
 
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 300);
+                window.location.href = redirectUrl;
             }
 
+            // Clear state if logged out
             if (!user) {
                 localStorage.removeItem("isLoggedIn");
                 localStorage.removeItem("userId");
