@@ -2276,17 +2276,24 @@
                 </div>
             </div>
 
-            ${currentUser && currentUser.uid === ADMIN_UID ? `
             <div class="acard-actions">
-                <button class="btn btn-outline btn-sm" onclick="openEditModal('${a.id}')">
-                    <i class="fas fa-edit"></i> Edit
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${a.id}')">
-                    <i class="fas fa-trash-alt"></i> Delete
-                </button>
-            </div>` : ""}
 
-        </div>
+    <!-- 🚀 START BUTTON (VISIBLE TO ALL) -->
+    <button class="btn btn-primary btn-sm" onclick="startTask('${a.id}')">
+        Start
+    </button>
+
+    <!-- 🔐 ADMIN CONTROLS -->
+    ${currentUser && currentUser.uid === ADMIN_UID ? `
+        <button class="btn btn-outline btn-sm" onclick="openEditModal('${a.id}')">
+            <i class="fas fa-edit"></i> Edit
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${a.id}')">
+            <i class="fas fa-trash-alt"></i> Delete
+        </button>
+    ` : ""}
+
+</div>
     `;
             }).join("");
 
@@ -2752,23 +2759,12 @@
         });
     </script>
 
-
     <script>
-        if (!localStorage.getItem("isLoggedIn")) {
-
-            const path = window.location.pathname;
-
-            if (!path.includes("auth.html")) {
-
-                const cleanUrl = window.location.origin + path;
-
-                window.location.replace(
-                    "/assignments/auth.html?redirect=" +
-                    encodeURIComponent(cleanUrl)
-                );
-            }
+        function startTask(taskId) {
+            window.location.href = "/assignments/focus.html?taskId=" + taskId;
         }
     </script>
+
 
 </body>
 
