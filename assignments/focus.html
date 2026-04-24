@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>UPSChub | Focus Mode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --primary:#2563eb;
+      --primary-dark:#1d4ed8;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --line:#e2e8f0;
+      --soft:#eef2ff;
+      --success:#16a34a;
+      --danger:#dc2626;
+      --shadow:0 10px 30px rgba(15,23,42,.08);
+      --shadow-sm:0 6px 18px rgba(15,23,42,.06);
+      --radius:24px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      -webkit-font-smoothing:antialiased;
+      text-rendering:optimizeLegibility;
+    }
+    .app{
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:20px 16px 28px;
+    }
+    .topbar{
+      width:min(100%,920px);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing:-.02em;
+      color:var(--text);
+    }
+    .brand-badge{
+      width:38px;height:38px;border-radius:14px;
+      background:linear-gradient(135deg,var(--primary),#60a5fa);
+      box-shadow:0 10px 24px rgba(37,99,235,.28);
+      display:grid;place-items:center;
+      color:#fff;font-weight:800;
+    }
+    .status-pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow-sm);
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .shell{
+      width:min(100%,920px);
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:18px;
+      align-items:start;
+    }
+    .card{
+      background:var(--card);
+      border:1px solid rgba(226,232,240,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+    .task-card{
+      padding:22px;
+    }
+    .badge-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:600;
+      background:var(--soft);
+      color:var(--primary-dark);
+    }
+    .badge.gray{
+      background:#f1f5f9;
+      color:#334155;
+    }
+    .label{
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+      color:var(--muted);
+      margin-bottom:8px;
+      font-weight:700;
+    }
+    h1{
+      margin:0 0 10px;
+      font-size:clamp(22px,3vw,34px);
+      line-height:1.15;
+      letter-spacing:-.04em;
+    }
+    .question{
+      margin:0;
+      color:#334155;
+      font-size:16px;
+      line-height:1.7;
+      white-space:pre-wrap;
+    }
+    .divider{
+      height:1px;
+      background:var(--line);
+      margin:18px 0;
+    }
+    .controls{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+    button{
+      border:0;
+      font:inherit;
+      cursor:pointer;
+    }
+    .btn{
+      height:48px;
+      border-radius:16px;
+      font-weight:700;
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+    .btn:active{transform:translateY(1px)}
+    .btn-outline{
+      background:#fff;
+      border:1px solid var(--line);
+      color:var(--text);
+    }
+    .btn-primary{
+      background:var(--primary);
+      color:#fff;
+      box-shadow:0 10px 22px rgba(37,99,235,.18);
+    }
+    .btn-danger{
+      background:#fff;
+      border:1px solid #fecaca;
+      color:var(--danger);
+    }
+    .side{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+    }
+    .clock-card,.timer-card,.swipe-card{
+      padding:20px;
+    }
+    .clock-wrap{
+      display:grid;
+      place-items:center;
+      padding:12px 0 4px;
+    }
+    .clock{
+      width:min(100%,290px);
+      aspect-ratio:1;
+      border-radius:50%;
+      background:
+        radial-gradient(circle at center, #ffffff 0 58%, #f8fafc 59% 100%);
+      border:1px solid #e2e8f0;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.9), var(--shadow-sm);
+      position:relative;
+    }
+    .mark{
+      position:absolute;
+      left:50%;
+      top:50%;
+      width:2px;
+      height:12px;
+      background:#cbd5e1;
+      transform-origin:center 110px;
+      border-radius:999px;
+    }
+    .mark.big{height:18px;width:3px;background:#94a3b8}
+    .hand{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform-origin:50% 100%;
+      border-radius:999px;
+    }
+    .hand.hour{
+      width:6px;height:62px;background:#0f172a;margin-left:-3px;margin-top:-62px;
+    }
+    .hand.minute{
+      width:4px;height:88px;background:#334155;margin-left:-2px;margin-top:-88px;
+    }
+    .hand.second{
+      width:2px;height:102px;background:var(--primary);margin-left:-1px;margin-top:-102px;
+    }
+    .center-dot{
+      position:absolute;left:50%;top:50%;
+      width:14px;height:14px;border-radius:50%;
+      transform:translate(-50%,-50%);
+      background:var(--primary);
+      box-shadow:0 0 0 5px rgba(37,99,235,.12);
+      z-index:3;
+    }
+    .timer{
+      font-size:44px;
+      line-height:1;
+      letter-spacing:-.05em;
+      font-weight:800;
+      text-align:center;
+      margin:8px 0 6px;
+    }
+    .timer-sub{
+      text-align:center;
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:16px;
+    }
+    .timer-actions{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+    }
+    .swipe-card{
+      user-select:none;
+      -webkit-user-select:none;
+      touch-action:none;
+    }
+    .swipe-track{
+      position:relative;
+      height:64px;
+      border-radius:20px;
+      background:#f1f5f9;
+      border:1px solid #e2e8f0;
+      overflow:hidden;
+    }
+    .swipe-fill{
+      position:absolute;inset:0 auto 0 0;
+      width:0;
+      background:linear-gradient(90deg,#dbeafe,#bfdbfe);
+      transition:width .12s linear;
+    }
+    .swipe-thumb{
+      position:absolute;
+      top:50%;
+      left:6px;
+      width:52px;
+      height:52px;
+      transform:translate3d(0,-50%,0);
+      border-radius:18px;
+      background:var(--primary);
+      box-shadow:0 10px 24px rgba(37,99,235,.25);
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-size:20px;
+      font-weight:800;
+      transition:box-shadow .2s ease, transform .2s ease;
+      will-change:transform;
+    }
+    .swipe-text{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      color:#334155;
+      font-weight:700;
+      font-size:14px;
+      padding:0 70px;
+      text-align:center;
+      pointer-events:none;
+    }
+    .swipe-hint{
+      margin-top:12px;
+      font-size:13px;
+      color:var(--muted);
+      text-align:center;
+    }
+    .loading, .error{
+      width:min(100%,920px);
+      padding:28px 22px;
+      border-radius:var(--radius);
+      background:#fff;
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      text-align:center;
+    }
+    .error{color:var(--danger)}
+    .modal-backdrop{
+      position:fixed;inset:0;
+      background:rgba(15,23,42,.42);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+    .modal{
+      width:min(100%,420px);
+      background:#fff;
+      border-radius:28px;
+      padding:24px;
+      box-shadow:0 24px 60px rgba(15,23,42,.24);
+      text-align:center;
+    }
+    .check{
+      width:68px;height:68px;border-radius:24px;
+      margin:0 auto 14px;
+      background:#dcfce7;
+      color:var(--success);
+      display:grid;place-items:center;
+      font-size:34px;font-weight:900;
+    }
+    .modal h2{margin:0 0 6px;font-size:24px}
+    .modal p{margin:0;color:var(--muted);line-height:1.6}
+    .hidden{display:none !important}
+    @media (max-width: 860px){
+      .shell{grid-template-columns:1fr}
+      .topbar{margin-bottom:14px}
+    }
+    @media (max-width: 640px){
+      .app{padding:14px 12px 22px}
+      .task-card,.clock-card,.timer-card,.swipe-card{padding:18px}
+      .timer{font-size:38px}
+      .controls,.timer-actions{grid-template-columns:1fr}
+      .btn{height:50px}
+      .status-pill{font-size:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="brand">
+        <div class="brand-badge">U</div>
+        <div>UPSChub</div>
+      </div>
+      <div class="status-pill" id="statusPill">Focus Mode</div>
+    </div>
+
+    <div id="loadingBox" class="loading">Loading your task...</div>
+    <div id="errorBox" class="error hidden"></div>
+
+    <div id="mainUI" class="shell hidden">
+      <section class="card task-card">
+        <div class="badge-row">
+          <span class="badge" id="subjectBadge">Subject</span>
+          <span class="badge gray" id="taskIdBadge">Task</span>
+        </div>
+        <div class="label">Topic</div>
+        <h1 id="topicName">—</h1>
+        <div class="label">Question</div>
+        <p class="question" id="questionText">—</p>
+        <div class="divider"></div>
+        <div class="controls">
+          <button class="btn btn-outline" id="backBtn">Back</button>
+          <button class="btn btn-outline" id="focusBtn">Focus</button>
+          <button class="btn btn-primary" id="doneBtn">Mark Ready</button>
+        </div>
+      </section>
+
+      <aside class="side">
+        <section class="card clock-card">
+          <div class="label">Analog Clock</div>
+          <div class="clock-wrap">
+            <div class="clock" id="clock">
+              <div class="hand hour" id="hourHand"></div>
+              <div class="hand minute" id="minuteHand"></div>
+              <div class="hand second" id="secondHand"></div>
+              <div class="center-dot"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card timer-card">
+          <div class="label">Study Timer</div>
+          <div class="timer" id="timerDisplay">00:00:00</div>
+          <div class="timer-sub">Auto-starts on page load and saves every second.</div>
+          <div class="timer-actions">
+            <button class="btn btn-outline" id="pauseBtn">Pause</button>
+            <button class="btn btn-primary" id="resumeBtn">Resume</button>
+            <button class="btn btn-danger" id="resetBtn">Reset</button>
+          </div>
+        </section>
+
+        <section class="card swipe-card">
+          <div class="label">Complete Task</div>
+          <div class="swipe-track" id="swipeTrack" aria-label="Swipe to complete task">
+            <div class="swipe-fill" id="swipeFill"></div>
+            <div class="swipe-thumb" id="swipeThumb">→</div>
+            <div class="swipe-text" id="swipeText">Swipe to Complete Task</div>
+          </div>
+          <div class="swipe-hint">Drag the knob to 90% to finish.</div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="check">✓</div>
+      <h2>Task Completed</h2>
+      <p id="modalText">Great work.</p>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "YOUR_API_KEY",
+      authDomain: "YOUR_AUTH_DOMAIN",
+      projectId: "YOUR_PROJECT_ID",
+      storageBucket: "YOUR_STORAGE_BUCKET",
+      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+      appId: "YOUR_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const params = new URLSearchParams(window.location.search);
+    const taskId = params.get("taskId");
+
+    const loadingBox = document.getElementById("loadingBox");
+    const errorBox = document.getElementById("errorBox");
+    const mainUI = document.getElementById("mainUI");
+    const subjectBadge = document.getElementById("subjectBadge");
+    const taskIdBadge = document.getElementById("taskIdBadge");
+    const topicName = document.getElementById("topicName");
+    const questionText = document.getElementById("questionText");
+    const statusPill = document.getElementById("statusPill");
+    const timerDisplay = document.getElementById("timerDisplay");
+    const pauseBtn = document.getElementById("pauseBtn");
+    const resumeBtn = document.getElementById("resumeBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const backBtn = document.getElementById("backBtn");
+    const focusBtn = document.getElementById("focusBtn");
+    const doneBtn = document.getElementById("doneBtn");
+    const swipeTrack = document.getElementById("swipeTrack");
+    const swipeFill = document.getElementById("swipeFill");
+    const swipeThumb = document.getElementById("swipeThumb");
+    const swipeText = document.getElementById("swipeText");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalText = document.getElementById("modalText");
+    const hourHand = document.getElementById("hourHand");
+    const minuteHand = document.getElementById("minuteHand");
+    const secondHand = document.getElementById("secondHand");
+
+    let currentUser = null;
+    let currentTask = null;
+    let timerSeconds = 0;
+    let timerRunning = true;
+    let timerInterval = null;
+    let clockInterval = null;
+    let maxSwipe = 0;
+    let dragging = false;
+    let dragStartX = 0;
+    let thumbX = 0;
+    let completed = false;
+    let exitGuardEnabled = true;
+
+    if (!taskId) {
+      showError("Missing taskId.");
+    }
+
+    function showError(msg){
+      loadingBox.classList.add("hidden");
+      mainUI.classList.add("hidden");
+      errorBox.textContent = msg;
+      errorBox.classList.remove("hidden");
+    }
+
+    function pad(n){ return String(n).padStart(2, "0"); }
+    function formatTime(s){
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const sec = s % 60;
+      return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+    }
+    function saveTimer(){
+      if (!taskId) return;
+      localStorage.setItem(`focus_timer_${taskId}`, String(timerSeconds));
+    }
+    function loadTimer(){
+      if (!taskId) return 0;
+      const saved = localStorage.getItem(`focus_timer_${taskId}`);
+      return saved ? Math.max(0, parseInt(saved, 10) || 0) : 0;
+    }
+    function renderTimer(){
+      timerDisplay.textContent = formatTime(timerSeconds);
+    }
+    function startTimer(){
+      stopTimer();
+      timerRunning = true;
+      timerInterval = setInterval(() => {
+        if (!timerRunning || completed) return;
+        timerSeconds += 1;
+        renderTimer();
+        saveTimer();
+      }, 1000);
+    }
+    function stopTimer(){
+      if (timerInterval) clearInterval(timerInterval);
+      timerInterval = null;
+    }
+    function updateClock(){
+      const now = new Date();
+      const sec = now.getSeconds();
+      const min = now.getMinutes();
+      const hr = now.getHours() % 12;
+      const secDeg = sec * 6;
+      const minDeg = min * 6 + sec * 0.1;
+      const hrDeg = hr * 30 + min * 0.5;
+      secondHand.style.transform = `rotate(${secDeg}deg)`;
+      minuteHand.style.transform = `rotate(${minDeg}deg)`;
+      hourHand.style.transform = `rotate(${hrDeg}deg)`;
+    }
+    function initClockMarks(){
+      const clock = document.getElementById("clock");
+      for (let i = 0; i < 60; i++) {
+        const m = document.createElement("div");
+        m.className = "mark" + (i % 5 === 0 ? " big" : "");
+        m.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg) translateY(-108px)`;
+        clock.appendChild(m);
+      }
+    }
+
+    async function loadTask(){
+      const snap = await getDoc(doc(db, "assignments", taskId));
+      if (!snap.exists()) throw new Error("Task not found.");
+      currentTask = snap.data();
+      subjectBadge.textContent = currentTask.subject || "General";
+      taskIdBadge.textContent = `Task • ${taskId}`;
+      topicName.textContent = currentTask.topicName || currentTask.topic || "Untitled Topic";
+      questionText.textContent = currentTask.questionText || currentTask.question || "No question available.";
+    }
+
+    async function completeTask(){
+      if (completed || !currentUser) return;
+      completed = true;
+      exitGuardEnabled = false;
+      stopTimer();
+      timerRunning = false;
+      saveTimer();
+
+      const userProgressRef = doc(db, "userProgress", currentUser.uid);
+      await setDoc(userProgressRef, {
+        completed: arrayUnion(taskId),
+        completedAt: serverTimestamp(),
+        studyTime: timerSeconds,
+        [`tasks.${taskId}`]: {
+          completedAt: serverTimestamp(),
+          studyTime: timerSeconds
+        }
+      }, { merge: true });
+
+      modalText.textContent = `Study time: ${formatTime(timerSeconds)}`;
+      modalBackdrop.style.display = "flex";
+      statusPill.textContent = "Completed";
+      setTimeout(() => window.location.href = "/assignments", 2500);
+    }
+
+    function setThumb(x){
+      thumbX = Math.max(0, Math.min(maxSwipe, x));
+      const pct = maxSwipe ? thumbX / maxSwipe : 0;
+      swipeThumb.style.transform = `translate3d(${thumbX}px,-50%,0)`;
+      swipeFill.style.width = `${Math.max(0, Math.min(100, pct * 100))}%`;
+      swipeText.style.opacity = `${1 - Math.min(1, pct * 1.15)}`;
+      if (pct >= 0.9) completeTask().catch(err => showError(err.message || "Failed to complete task."));
+    }
+
+    function resetSwipe(){
+      thumbX = 0;
+      swipeThumb.style.transform = "translate3d(0,-50%,0)";
+      swipeFill.style.width = "0%";
+      swipeText.style.opacity = "1";
+    }
+
+    function bindSwipe(){
+      const onDown = (e) => {
+        if (completed) return;
+        dragging = true;
+        dragStartX = (e.touches ? e.touches[0].clientX : e.clientX) - thumbX;
+        swipeThumb.style.transition = "none";
+        swipeFill.style.transition = "none";
+        document.body.style.userSelect = "none";
+        document.body.style.touchAction = "none";
+      };
+      const onMove = (e) => {
+        if (!dragging || completed) return;
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const x = clientX - dragStartX;
+        setThumb(x);
+      };
+      const onUp = () => {
+        if (!dragging) return;
+        dragging = false;
+        swipeThumb.style.transition = "box-shadow .2s ease, transform .2s ease";
+        swipeFill.style.transition = "width .12s linear";
+        document.body.style.userSelect = "";
+        document.body.style.touchAction = "";
+        if (thumbX < maxSwipe * 0.9) {
+          swipeThumb.style.transform = "translate3d(0,-50%,0)";
+          swipeFill.style.width = "0%";
+          swipeText.style.opacity = "1";
+          thumbX = 0;
+        }
+      };
+      swipeTrack.addEventListener("mousedown", onDown);
+      window.addEventListener("mousemove", onMove);
+      window.addEventListener("mouseup", onUp);
+      swipeTrack.addEventListener("touchstart", onDown, { passive: true });
+      window.addEventListener("touchmove", onMove, { passive: true });
+      window.addEventListener("touchend", onUp);
+      window.addEventListener("touchcancel", onUp);
+    }
+
+    function bindButtons(){
+      pauseBtn.addEventListener("click", () => {
+        timerRunning = false;
+        statusPill.textContent = "Paused";
+      });
+      resumeBtn.addEventListener("click", () => {
+        if (completed) return;
+        timerRunning = true;
+        statusPill.textContent = "Focus Mode";
+      });
+      resetBtn.addEventListener("click", () => {
+        if (completed) return;
+        timerSeconds = 0;
+        renderTimer();
+        saveTimer();
+        statusPill.textContent = "Focus Mode";
+      });
+      backBtn.addEventListener("click", () => window.location.href = "/assignments");
+      focusBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+      doneBtn.addEventListener("click", () => completeTask().catch(err => showError(err.message || "Failed to complete task.")));
+    }
+
+    window.addEventListener("load", () => {
+      maxSwipe = Math.max(0, swipeTrack.clientWidth - swipeThumb.offsetWidth - 12);
+      setThumb(0);
+      updateClock();
+      clockInterval = setInterval(updateClock, 1000);
+      initClockMarks();
+    });
+
+    window.addEventListener("beforeunload", (e) => {
+      if (!exitGuardEnabled || completed) return;
+      e.preventDefault();
+      e.returnValue = "";
+    });
+
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        window.location.replace("/login");
+        return;
+      }
+      currentUser = user;
+      try {
+        await loadTask();
+        timerSeconds = loadTimer();
+        renderTimer();
+        loadingBox.classList.add("hidden");
+        mainUI.classList.remove("hidden");
+        bindButtons();
+        bindSwipe();
+        startTimer();
+      } catch (err) {
+        showError(err.message || "Something went wrong.");
+      }
+    });
+  </script>
+</body>
+</html>
