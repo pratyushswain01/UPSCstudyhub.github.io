@@ -2214,42 +2214,45 @@
             renderAssignments(ds);
         }
 
+        /* ============================================================
+            DATE SELECTION → UPDATED ASSIGNMENTS VIEW
+        ============================================================ */
         function renderAssignments(ds) {
             const pane = document.getElementById("assignmentsPane");
             const label = document.getElementById("selDateLabel");
             const chip = document.getElementById("countChip");
 
-            // Set the current date view metadata
+            // 1. Set metadata for the view
             label.textContent = fmtDisplay(ds);
             label.dataset.raw = ds;
 
-            // Get assignments for the specific date
+            // 2. Get assignments for the specific date
             let list = (byDate && byDate[ds]) || [];
 
-            // Filter by user permissions
+            // 3. Filter by user permissions (Personalization)
             if (currentUser) {
                 list = list.filter(a => !a.assignedTo || a.assignedTo === "" || a.assignedTo === currentUser.email);
             }
 
-            // Update the counter chip
+            // 4. Update the counter chip UI
             chip.style.display = list.length ? "inline-flex" : "none";
             chip.textContent = `${list.length} assignment${list.length !== 1 ? "s" : ""}`;
 
-            // Handle empty state
+            // 5. Handle empty state visual
             if (!list.length) {
                 pane.innerHTML = `
             <div class="empty-state">
-                <i class="fas fa-inbox"></i>
-                <h3>No Assignments</h3>
-                <p>Nothing scheduled for ${fmtDisplay(ds)}.</p>
+                <i class="fas fa-calendar-check"></i>
+                <h3>All Clear!</h3>
+                <p>No assignments scheduled for ${fmtDisplay(ds)}.</p>
             </div>
         `;
                 return;
             }
 
-            // Map through assignments and render cards
+            // 6. Map through assignments and render updated cards
             pane.innerHTML = list.map((a, i) => {
-                // ✅ CRITICAL FIX: Check if the UNIQUE ID is in the completed list, NOT the date string
+                // Check if the unique Firestore ID is in the user's completed list
                 const isDone = completedDates.includes(a.id);
 
                 return `
@@ -2264,49 +2267,47 @@
                 </span>
             </div>
 
-       >
-          <div class="acard-body">
-    <div class="topic-name">${esc(a.topic)}</div>
-    <div class="question-text">${esc(a.question)}</div>
+            <div class="acard-body">
+                <div class="topic-name">${esc(a.topic)}</div>
+                <div class="question-text">${esc(a.question)}</div>
 
-    ${isDone ? `
-        <div class="complete-slider completed" style="pointer-events: none;">
-            <div class="slider-track">
-                <div class="slider-thumb">✔</div>
-                <span>Completed ✔</span>
+                ${isDone ? `
+                    <div class="complete-slider completed" style="margin-top: 15px;">
+                        <div class="slider-track">
+                            <div class="slider-thumb"><i class="fas fa-check"></i></div>
+                            <span>Task Completed Successfully</span>
+                        </div>
+                    </div>
+                ` : ''}
             </div>
-        </div>
-    ` : ''}
-</div>
 
-           <div class="acard-actions">
-    ${!isDone ? `
-        <button class="btn btn-primary btn-sm" onclick="startTask('${a.id}')">
-            <i class="fas fa-play"></i> Start Task
-        </button>
-    ` : `
-        <button class="btn btn-success btn-sm" disabled style="cursor: not-allowed; opacity: 0.7;">
-            <i class="fas fa-check-circle"></i> Completed
-        </button>
-    `}
+            <div class="acard-actions">
+                ${!isDone ? `
+                    <button class="btn btn-primary btn-sm" onclick="startTask('${a.id}')">
+                        <i class="fas fa-play"></i> Start Task
+                    </button>
+                ` : `
+                    <button class="btn btn-success btn-sm" disabled style="opacity: 0.8; cursor: default;">
+                        <i class="fas fa-check-double"></i> Finished
+                    </button>
+                `}
 
-    <!-- 🔐 ADMIN CONTROLS -->
-    ${currentUser && currentUser.uid === ADMIN_UID ? `
-        <button class="btn btn-outline btn-sm" onclick="openEditModal('${a.id}')">
-            <i class="fas fa-edit"></i> Edit
-        </button>
-        <button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${a.id}')">
-            <i class="fas fa-trash-alt"></i> Delete
-        </button>
-    ` : ""}
-
-</div>
-    `;
+                ${currentUser && currentUser.uid === ADMIN_UID ? `
+                    <button class="btn btn-outline btn-sm" onclick="openEditModal('${a.id}')">
+                        <i class="fas fa-edit"></i> Edit
+                    </button>
+                    <button class="btn btn-danger btn-sm" onclick="openDeleteConfirm('${a.id}')">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </button>
+                ` : ""}
+            </div>
+        </div>`;
             }).join("");
-
-            // Re-bind events to the newly created slider elements
-            initSliders();
         }
+
+        // Re-bind events to the newly created slider elements
+        //initSliders();
+
         /* ============================================================
            SLIDER INITIALIZATION
         ============================================================ */
@@ -2405,10 +2406,17 @@
         /* ============================================================
            LOAD COMPLETED DATES
         ============================================================ */
+        /* ============================================================
+     LOAD COMPLETED DATES & SYNC UI
+ ============================================================ */
         async function loadCompletedDates() {
-            if (!currentUser) return;
+            if (!currentUser) {
+                completedDates = [];
+                return;
+            }
 
             try {
+                // Fetch the progress document from: users -> {uid} -> progress -> main
                 const doc = await db.collection("users")
                     .doc(currentUser.uid)
                     .collection("progress")
@@ -2416,13 +2424,30 @@
                     .get();
 
                 if (doc.exists) {
+                    // Retrieve the array of completed Assignment IDs
                     completedDates = doc.data().completedDates || [];
+                    console.log("Successfully loaded progress:", completedDates.length, "tasks done.");
+                } else {
+                    // If no document exists yet, initialize with an empty array
+                    completedDates = [];
+                    console.log("No existing progress found for this user.");
                 }
+
+                // ✅ CRITICAL: Force a re-render of the assignments if a date is already selected
+                // This ensures that when a user logs in or returns from focus.html, 
+                // the "Completed" sliders appear immediately.
+                if (selectedDateStr) {
+                    renderAssignments(selectedDateStr);
+                }
+
+                // Also update the stats (total/today/month) based on new completion data
+                renderStats();
+
             } catch (err) {
-                console.error(err);
+                console.error("Error loading completed dates:", err);
+                toast("Error syncing your progress.", "error");
             }
         }
-
         /* ============================================================
            STATS
         ============================================================ */

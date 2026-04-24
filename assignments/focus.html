@@ -974,40 +974,49 @@
 
     /* ================= COMPLETE ================= */
     // Complete Task
+    /* ================= COMPLETE ================= */
     async function completeTask() {
-      // Stop dragging
-      isDragging = false;
-
-      // Stop timer
+      if (completed) return;
+      completed = true; // Prevents double-triggering
+      timerRunning = false;
       clearInterval(timerInterval);
 
+      // Visual feedback: Lock the slider at the end
+      const rect = swipeTrack.getBoundingClientRect();
+      const max = rect.width - swipeThumb.offsetWidth - 6;
+      swipeThumb.style.left = max + "px";
+      swipeFill.style.width = "100%";
+      swipeText.style.opacity = "0";
+
       try {
-        // ✅ CRITICAL: Match the structure used in assignments page
+        // Ensure we are updating the correct Firestore path
         const userProgressRef = doc(db, 'users', currentUser.uid, 'progress', 'main');
 
         await setDoc(userProgressRef, {
-          completedDates: arrayUnion(taskId)  // ✅ Use 'completedDates' array
+          completedDates: arrayUnion(taskId)
         }, { merge: true });
 
-        // Show success modal
-        successTime.textContent = timerDisplay.textContent;
-        successModal.classList.add('show');
+        // Show the success modal
+        const modal = document.getElementById("modalBackdrop");
+        const modalText = document.getElementById("modalText");
+        modalText.textContent = `Time taken: ${formatTime(timerSeconds)}`;
+        modal.classList.add('show');
 
-        // Redirect after 3 seconds
+        // Clear local storage for this specific task timer
+        localStorage.removeItem("timer_" + taskId);
+
+        // Redirect after 2.5 seconds
         setTimeout(() => {
-          window.location.href = '/assignments';
-        }, 3000);
+          window.location.href = 'index.html'; // Adjust this path to your main page
+        }, 2500);
 
       } catch (error) {
         console.error('Error completing task:', error);
         alert('Failed to save progress. Please try again.');
 
-        // Reset swipe
-        swipeButton.style.left = '4px';
-        swipeProgress.style.width = '0%';
-        currentX = 0;
-
-        // Restart timer
+        // Reset state so user can try swiping again
+        completed = false;
+        timerRunning = true;
         startTimer();
       }
     }
@@ -1023,6 +1032,8 @@
       }
 
       function update(x) {
+        if (completed) return; // Lock UI if already finished
+
         const rect = swipeTrack.getBoundingClientRect();
         const max = rect.width - swipeThumb.offsetWidth - 6;
 
@@ -1035,7 +1046,11 @@
         swipeFill.style.width = (percent * 100) + "%";
         swipeText.style.opacity = 1 - percent;
 
-        if (percent >= 0.9) completeTask();
+        // Trigger completion at 90%
+        if (percent >= 0.9) {
+          dragging = false; // Stop the drag event
+          completeTask();
+        }
       }
 
       function start(e) {
