@@ -2264,24 +2264,31 @@
                 </span>
             </div>
 
-            <div class="acard-body">
-                <div class="topic-name">${esc(a.topic)}</div>
-                <div class="question-text">${esc(a.question)}</div>
+       >
+          <div class="acard-body">
+    <div class="topic-name">${esc(a.topic)}</div>
+    <div class="question-text">${esc(a.question)}</div>
 
-                <div class="complete-slider ${isDone ? 'completed' : ''}" data-id="${a.id}">
-                    <div class="slider-track">
-                        <div class="slider-thumb">${isDone ? '✔' : '➤'}</div>
-                        <span>${isDone ? 'Completed ✔' : 'Slide to Complete'}</span>
-                    </div>
-                </div>
+    ${isDone ? `
+        <div class="complete-slider completed" style="pointer-events: none;">
+            <div class="slider-track">
+                <div class="slider-thumb">✔</div>
+                <span>Completed ✔</span>
             </div>
+        </div>
+    ` : ''}
+</div>
 
-            <div class="acard-actions">
-
-    <!-- 🚀 START BUTTON (VISIBLE TO ALL) -->
-    <button class="btn btn-primary btn-sm" onclick="startTask('${a.id}')">
-        Start
-    </button>
+           <div class="acard-actions">
+    ${!isDone ? `
+        <button class="btn btn-primary btn-sm" onclick="startTask('${a.id}')">
+            <i class="fas fa-play"></i> Start Task
+        </button>
+    ` : `
+        <button class="btn btn-success btn-sm" disabled style="cursor: not-allowed; opacity: 0.7;">
+            <i class="fas fa-check-circle"></i> Completed
+        </button>
+    `}
 
     <!-- 🔐 ADMIN CONTROLS -->
     ${currentUser && currentUser.uid === ADMIN_UID ? `

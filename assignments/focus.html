@@ -973,22 +973,43 @@
     }
 
     /* ================= COMPLETE ================= */
+    // Complete Task
     async function completeTask() {
-      if (completed || !currentUser) return;
+      // Stop dragging
+      isDragging = false;
 
-      completed = true;
+      // Stop timer
       clearInterval(timerInterval);
 
-      await setDoc(doc(db, "userProgress", currentUser.uid), {
-        completed: arrayUnion(taskId),
-        [`tasks.${taskId}`]: {
-          completedAt: serverTimestamp(),
-          studyTime: timerSeconds
-        }
-      }, { merge: true });
+      try {
+        // ✅ CRITICAL: Match the structure used in assignments page
+        const userProgressRef = doc(db, 'users', currentUser.uid, 'progress', 'main');
 
-      swipeText.textContent = "Completed ✔";
-      swipeFill.style.width = "100%";
+        await setDoc(userProgressRef, {
+          completedDates: arrayUnion(taskId)  // ✅ Use 'completedDates' array
+        }, { merge: true });
+
+        // Show success modal
+        successTime.textContent = timerDisplay.textContent;
+        successModal.classList.add('show');
+
+        // Redirect after 3 seconds
+        setTimeout(() => {
+          window.location.href = '/assignments';
+        }, 3000);
+
+      } catch (error) {
+        console.error('Error completing task:', error);
+        alert('Failed to save progress. Please try again.');
+
+        // Reset swipe
+        swipeButton.style.left = '4px';
+        swipeProgress.style.width = '0%';
+        currentX = 0;
+
+        // Restart timer
+        startTimer();
+      }
     }
 
     /* ================= SWIPE ================= */
