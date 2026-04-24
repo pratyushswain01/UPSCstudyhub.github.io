@@ -150,7 +150,8 @@
 
                 // Redirect (with small delay for safety)
                 const urlParams = new URLSearchParams(window.location.search);
-                const redirectUrl = urlParams.get('redirect') || "homeUPSChub.html";
+                const redirectParam = urlParams.get('redirect');
+                const redirectUrl = redirectParam ? decodeURIComponent(redirectParam) : "homeUPSChub.html";
 
                 setTimeout(() => {
                     window.location.href = "auth.html?redirect=" + encodeURIComponent(window.location.href);
@@ -200,7 +201,25 @@
         });
 
 
+        let redirected = false;
 
+        onAuthStateChanged(auth, async (user) => {
+            if (user && !redirected) {
+                redirected = true;
+
+                localStorage.setItem('isLoggedIn', 'true');
+
+                const urlParams = new URLSearchParams(window.location.search);
+                const redirectParam = urlParams.get('redirect');
+                const redirectUrl = redirectParam
+                    ? decodeURIComponent(redirectParam)
+                    : "homeUPSChub.html";
+
+                setTimeout(() => {
+                    window.location.href = redirectUrl;
+                }, 500);
+            }
+        });
 
         function setLoading(isLoading) {
             const btn = document.getElementById("loginBtn");
