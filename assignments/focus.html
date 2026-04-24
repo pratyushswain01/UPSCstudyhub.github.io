@@ -1,489 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>UPSChub | Focus Mode</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --primary: #2563eb;
-      --primary-dark: #1d4ed8;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --muted: #64748b;
-      --line: #e2e8f0;
-      --soft: #eef2ff;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --shadow: 0 10px 30px rgba(15, 23, 42, .08);
-      --shadow-sm: 0 6px 18px rgba(15, 23, 42, .06);
-      --radius: 24px;
-    }
+:root {
+--primary: #2563eb;
+--primary-dark: #1d4ed8;
+--bg: #f8fafc;
+--card: #ffffff;
+--text: #0f172a;
+--muted: #64748b;
+--line: #e2e8f0;
+--soft: #eef2ff;
+--success: #16a34a;
+--danger: #dc2626;
+--shadow: 0 10px 30px rgba(15, 23, 42, .08);
+--shadow-sm: 0 6px 18px rgba(15, 23, 42, .06);
+--radius: 22px;
+}
 
-    * {
-      box-sizing: border-box
-    }
+/* RESET */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 
-    html,
-    body {
-      height: 100%
-    }
+body {
+font-family: Inter, system-ui, sans-serif;
+background: var(--bg);
+color: var(--text);
+}
 
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      -webkit-font-smoothing: antialiased;
-      text-rendering: optimizeLegibility;
-    }
+/* APP */
+.app {
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 18px 14px 24px;
+}
 
-    .app {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px 16px 28px;
-    }
+/* TOPBAR */
+.topbar {
+width: min(100%, 920px);
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 16px;
+}
 
-    .topbar {
-      width: min(100%, 920px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
+.brand {
+display: flex;
+align-items: center;
+gap: 10px;
+font-weight: 800;
+}
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 800;
-      letter-spacing: -.02em;
-      color: var(--text);
-    }
+.brand-badge {
+width: 36px;
+height: 36px;
+border-radius: 12px;
+background: linear-gradient(135deg, var(--primary), #60a5fa);
+display: flex;
+align-items: center;
+justify-content: center;
+color: #fff;
+}
 
-    .brand-badge {
-      width: 38px;
-      height: 38px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, var(--primary), #60a5fa);
-      box-shadow: 0 10px 24px rgba(37, 99, 235, .28);
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-weight: 800;
-    }
+.status-pill {
+padding: 8px 12px;
+border-radius: 999px;
+border: 1px solid var(--line);
+background: #fff;
+font-size: 12px;
+}
 
-    .status-pill {
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: #fff;
-      border: 1px solid var(--line);
-      box-shadow: var(--shadow-sm);
-      color: var(--muted);
-      font-size: 13px;
-      white-space: nowrap;
-    }
+/* GRID */
+.shell {
+width: min(100%, 920px);
+display: grid;
+grid-template-columns: 1.1fr .9fr;
+gap: 16px;
+}
 
-    .shell {
-      width: min(100%, 920px);
-      display: grid;
-      grid-template-columns: 1.1fr .9fr;
-      gap: 18px;
-      align-items: start;
-    }
+/* CARD */
+.card {
+background: var(--card);
+border-radius: var(--radius);
+box-shadow: var(--shadow);
+border: 1px solid var(--line);
+}
 
-    .card {
-      background: var(--card);
-      border: 1px solid rgba(226, 232, 240, .9);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-    }
+/* TASK */
+.task-card { padding: 18px; }
 
-    .task-card {
-      padding: 22px;
-    }
+.badge-row {
+display: flex;
+gap: 8px;
+flex-wrap: wrap;
+margin-bottom: 10px;
+}
 
-    .badge-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
+.badge {
+padding: 6px 10px;
+border-radius: 999px;
+background: var(--soft);
+font-size: 12px;
+}
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 12px;
-      font-weight: 600;
-      background: var(--soft);
-      color: var(--primary-dark);
-    }
+.badge.gray {
+background: #f1f5f9;
+color: #334155;
+}
 
-    .badge.gray {
-      background: #f1f5f9;
-      color: #334155;
-    }
+.label {
+font-size: 11px;
+color: var(--muted);
+margin-top: 10px;
+}
 
-    .label {
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: .08em;
-      color: var(--muted);
-      margin-bottom: 8px;
-      font-weight: 700;
-    }
+h1 {
+font-size: 22px;
+margin: 6px 0;
+}
 
-    h1 {
-      margin: 0 0 10px;
-      font-size: clamp(22px, 3vw, 34px);
-      line-height: 1.15;
-      letter-spacing: -.04em;
-    }
+.question {
+font-size: 14px;
+line-height: 1.6;
+}
 
-    .question {
-      margin: 0;
-      color: #334155;
-      font-size: 16px;
-      line-height: 1.7;
-      white-space: pre-wrap;
-    }
+/* BUTTONS */
+.controls {
+margin-top: 14px;
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+}
 
-    .divider {
-      height: 1px;
-      background: var(--line);
-      margin: 18px 0;
-    }
+.btn {
+height: 44px;
+border-radius: 12px;
+font-weight: 600;
+}
 
-    .controls {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
+.btn-primary {
+background: var(--primary);
+color: white;
+}
 
-    button {
-      border: 0;
-      font: inherit;
-      cursor: pointer;
-    }
+.btn-outline {
+border: 1px solid var(--line);
+background: white;
+}
 
-    .btn {
-      height: 48px;
-      border-radius: 16px;
-      font-weight: 700;
-      transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-    }
+.btn-danger {
+border: 1px solid #fecaca;
+color: var(--danger);
+}
 
-    .btn:active {
-      transform: translateY(1px)
-    }
+/* SIDE */
+.side {
+display: flex;
+flex-direction: column;
+gap: 16px;
+}
 
-    .btn-outline {
-      background: #fff;
-      border: 1px solid var(--line);
-      color: var(--text);
-    }
+/* CLOCK */
+.clock {
+width: 160px; /* FIXED SMALL */
+height: 160px;
+border-radius: 50%;
+margin: auto;
+border: 1px solid var(--line);
+position: relative;
+}
 
-    .btn-primary {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 10px 22px rgba(37, 99, 235, .18);
-    }
+.hand {
+position: absolute;
+left: 50%;
+bottom: 50%;
+transform-origin: bottom;
+}
 
-    .btn-danger {
-      background: #fff;
-      border: 1px solid #fecaca;
-      color: var(--danger);
-    }
+.hand.hour {
+width: 5px;
+height: 40px;
+background: black;
+}
 
-    .side {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
+.hand.minute {
+width: 3px;
+height: 55px;
+background: #333;
+}
 
-    .clock-card,
-    .timer-card,
-    .swipe-card {
-      padding: 20px;
-    }
+.hand.second {
+width: 2px;
+height: 65px;
+background: var(--primary);
+}
 
-    .clock-wrap {
-      display: grid;
-      place-items: center;
-      padding: 12px 0 4px;
-    }
+.center-dot {
+width: 10px;
+height: 10px;
+background: var(--primary);
+border-radius: 50%;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+}
 
-    .clock {
-      width: min(100%, 290px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at center, #ffffff 0 58%, #f8fafc 59% 100%);
-      border: 1px solid #e2e8f0;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, .9), var(--shadow-sm);
-      position: relative;
-    }
+/* TIMER */
+.timer {
+font-size: 32px;
+text-align: center;
+font-weight: 700;
+}
 
-    .mark {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 2px;
-      height: 12px;
-      background: #cbd5e1;
-      transform-origin: center 110px;
-      border-radius: 999px;
-    }
+.timer-actions {
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: 8px;
+}
 
-    .mark.big {
-      height: 18px;
-      width: 3px;
-      background: #94a3b8
-    }
+/* SWIPE */
+.swipe-track {
+position: relative;
+height: 58px;
+border-radius: 16px;
+background: #f1f5f9;
+overflow: hidden;
+}
 
-    .hand {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      transform-origin: 50% 100%;
-      border-radius: 999px;
-    }
+.swipe-fill {
+position: absolute;
+height: 100%;
+width: 0%;
+background: #bfdbfe;
+}
 
-    .hand.hour {
-      width: 6px;
-      height: 62px;
-      background: #0f172a;
-      margin-left: -3px;
-      margin-top: -62px;
-    }
+.swipe-thumb {
+position: absolute;
+top: 50%;
+left: 6px;
+transform: translateY(-50%); /* FIXED */
+width: 48px;
+height: 48px;
+background: var(--primary);
+border-radius: 14px;
+display: flex;
+align-items: center;
+justify-content: center;
+color: white;
+}
 
-    .hand.minute {
-      width: 4px;
-      height: 88px;
-      background: #334155;
-      margin-left: -2px;
-      margin-top: -88px;
-    }
+.swipe-text {
+position: absolute;
+width: 100%;
+text-align: center;
+top: 50%;
+transform: translateY(-50%);
+font-size: 13px;
+}
 
-    .hand.second {
-      width: 2px;
-      height: 102px;
-      background: var(--primary);
-      margin-left: -1px;
-      margin-top: -102px;
-    }
+/* LOADING */
+.loading, .error {
+width: min(100%, 920px);
+padding: 20px;
+text-align: center;
+}
 
-    .center-dot {
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: var(--primary);
-      box-shadow: 0 0 0 5px rgba(37, 99, 235, .12);
-      z-index: 3;
-    }
+.error { color: var(--danger); }
 
-    .timer {
-      font-size: 44px;
-      line-height: 1;
-      letter-spacing: -.05em;
-      font-weight: 800;
-      text-align: center;
-      margin: 8px 0 6px;
-    }
+/* MODAL */
+.modal-backdrop {
+position: fixed;
+inset: 0;
+background: rgba(0,0,0,0.4);
+display: none;
+justify-content: center;
+align-items: center;
+}
 
-    .timer-sub {
-      text-align: center;
-      color: var(--muted);
-      font-size: 13px;
-      margin-bottom: 16px;
-    }
+.modal {
+background: white;
+padding: 20px;
+border-radius: 20px;
+text-align: center;
+}
 
-    .timer-actions {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-    }
+.hidden { display: none !important; }
 
-    .swipe-card {
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: none;
-    }
+/* RESPONSIVE */
+@media (max-width: 860px) {
+.shell { grid-template-columns: 1fr; }
+}
 
-    .swipe-track {
-      position: relative;
-      height: 64px;
-      border-radius: 20px;
-      background: #f1f5f9;
-      border: 1px solid #e2e8f0;
-      overflow: hidden;
-    }
+@media (max-width: 640px) {
+.controls,
+.timer-actions {
+grid-template-columns: 1fr;
+}
 
-    .swipe-fill {
-      position: absolute;
-      inset: 0 auto 0 0;
-      width: 0;
-      background: linear-gradient(90deg, #dbeafe, #bfdbfe);
-      transition: width .12s linear;
-    }
-
-    .swipe-thumb {
-      position: absolute;
-      top: 50%;
-      left: 6px;
-      width: 52px;
-      height: 52px;
-      transform: translate3d(0, -50%, 0);
-      border-radius: 18px;
-      background: var(--primary);
-      box-shadow: 0 10px 24px rgba(37, 99, 235, .25);
-      display: grid;
-      place-items: center;
-      color: #fff;
-      font-size: 20px;
-      font-weight: 800;
-      transition: box-shadow .2s ease, transform .2s ease;
-      will-change: transform;
-    }
-
-    .swipe-text {
-      position: absolute;
-      inset: 0;
-      display: grid;
-      place-items: center;
-      color: #334155;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 0 70px;
-      text-align: center;
-      pointer-events: none;
-    }
-
-    .swipe-hint {
-      margin-top: 12px;
-      font-size: 13px;
-      color: var(--muted);
-      text-align: center;
-    }
-
-    .loading,
-    .error {
-      width: min(100%, 920px);
-      padding: 28px 22px;
-      border-radius: var(--radius);
-      background: #fff;
-      box-shadow: var(--shadow);
-      border: 1px solid var(--line);
-      text-align: center;
-    }
-
-    .error {
-      color: var(--danger)
-    }
-
-    .modal-backdrop {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, .42);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
-      z-index: 50;
-    }
-
-    .modal {
-      width: min(100%, 420px);
-      background: #fff;
-      border-radius: 28px;
-      padding: 24px;
-      box-shadow: 0 24px 60px rgba(15, 23, 42, .24);
-      text-align: center;
-    }
-
-    .check {
-      width: 68px;
-      height: 68px;
-      border-radius: 24px;
-      margin: 0 auto 14px;
-      background: #dcfce7;
-      color: var(--success);
-      display: grid;
-      place-items: center;
-      font-size: 34px;
-      font-weight: 900;
-    }
-
-    .modal h2 {
-      margin: 0 0 6px;
-      font-size: 24px
-    }
-
-    .modal p {
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6
-    }
-
-    .hidden {
-      display: none !important
-    }
-
-    @media (max-width: 860px) {
-      .shell {
-        grid-template-columns: 1fr
-      }
-
-      .topbar {
-        margin-bottom: 14px
-      }
-    }
-
-    @media (max-width: 640px) {
-      .app {
-        padding: 14px 12px 22px
-      }
-
-      .task-card,
-      .clock-card,
-      .timer-card,
-      .swipe-card {
-        padding: 18px
-      }
-
-      .timer {
-        font-size: 38px
-      }
-
-      .controls,
-      .timer-actions {
-        grid-template-columns: 1fr
-      }
-
-      .btn {
-        height: 50px
-      }
-
-      .status-pill {
-        font-size: 12px
-      }
-    }
-  </style>
+.clock {
+width: 140px;
+height: 140px;
+}
+}
 </head>
 
 <body>
@@ -623,12 +443,13 @@
       errorBox.classList.remove("hidden");
     }
 
-    function pad(n) { return String(n).padStart(2, "0") }
+    function pad(n) { return String(n).padStart(2, "0"); }
+
     function formatTime(s) {
       const h = Math.floor(s / 3600);
       const m = Math.floor((s % 3600) / 60);
       const sec = s % 60;
-      return `${pad(h)}:${pad(m)}:${pad(sec)}`
+      return `${pad(h)}:${pad(m)}:${pad(sec)}`;
     }
 
     /* ================= TIMER ================= */
@@ -641,16 +462,23 @@
     }
 
     function startTimer() {
+      clearInterval(timerInterval); // ✅ FIXED
+
       timerInterval = setInterval(() => {
         if (!timerRunning || completed) return;
+
         timerSeconds++;
         timerDisplay.textContent = formatTime(timerSeconds);
         saveTimer();
       }, 1000);
     }
 
-    pauseBtn.onclick = () => timerRunning = false;
-    resumeBtn.onclick = () => timerRunning = true;
+    pauseBtn.onclick = () => { timerRunning = false; };
+
+    resumeBtn.onclick = () => {
+      if (!completed) timerRunning = true;
+    };
+
     resetBtn.onclick = () => {
       timerSeconds = 0;
       timerDisplay.textContent = formatTime(timerSeconds);
@@ -685,6 +513,7 @@
         mainUI.classList.remove("hidden");
 
       } catch (e) {
+        console.error(e);
         showError("Failed to load task");
       }
     }
@@ -708,7 +537,7 @@
       swipeFill.style.width = "100%";
     }
 
-    /* ================= PERFECT SWIPE ================= */
+    /* ================= SWIPE ================= */
     function initSwipe() {
       let dragging = false;
       let startX = 0;
@@ -793,7 +622,6 @@
       initSwipe();
     });
   </script>
-
 
 
 
