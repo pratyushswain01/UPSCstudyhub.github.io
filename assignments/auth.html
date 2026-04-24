@@ -105,6 +105,7 @@
             getDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
+        // 🔥 YOUR FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
             authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -119,20 +120,24 @@
         const db = getFirestore(app);
         const appId = "default-app-id";
 
-        // Set persistence
+        // 🔐 Keep user logged in
         setPersistence(auth, browserLocalPersistence);
 
-        // ==================== SYNC WITH LOCALSTORAGE ====================
+        // ==================== LOGIN / REDIRECT LOGIC ====================
+        let redirected = false;
+
         onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                console.log("✅ Firebase User logged in:", user.uid, user.email);
+            if (user && !redirected) {
+                redirected = true;
 
-                // Save to localStorage so other pages can detect login instantly
-                localStorage.setItem('isLoggedIn', 'true');
-                localStorage.setItem('userId', user.email);
-                localStorage.setItem('userUID', user.uid);   // optional
+                console.log("✅ Logged in:", user.email);
 
-                // Create/update user document in Firestore (your existing logic)
+                // Save login state
+                localStorage.setItem("isLoggedIn", "true");
+                localStorage.setItem("userId", user.email);
+                localStorage.setItem("userUID", user.uid);
+
+                // Firestore user setup (safe)
                 try {
                     const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const snap = await getDoc(userRef);
@@ -148,79 +153,72 @@
                     console.error("Firestore error:", e);
                 }
 
-                // Redirect (with small delay for safety)
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectParam = urlParams.get('redirect');
-                const redirectUrl = redirectParam ? decodeURIComponent(redirectParam) : "homeUPSChub.html";
+                // 🔥 SMART REDIRECT
+                const params = new URLSearchParams(window.location.search);
+                const redirectParam = params.get("redirect");
+
+                const redirectUrl = redirectParam
+                    ? decodeURIComponent(redirectParam)
+                    : "/homeUPSChub.html"; // default page
+
+                console.log("➡ Redirecting to:", redirectUrl);
 
                 setTimeout(() => {
-                    window.location.href = "auth.html?redirect=" + encodeURIComponent(window.location.href);
-                }, 800);
+                    window.location.href = redirectUrl;
+                }, 400);
+            }
 
-            } else {
-                // Not logged in
-                localStorage.removeItem('isLoggedIn');
-                localStorage.removeItem('userId');
-                localStorage.removeItem('userUID');
+            // If not logged in → clear state
+            if (!user) {
+                localStorage.removeItem("isLoggedIn");
+                localStorage.removeItem("userId");
+                localStorage.removeItem("userUID");
             }
         });
 
-        // ==================== LOGIN FORM ====================
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const messageDiv = document.getElementById('message');
+        // ==================== LOGIN ====================
+        const loginForm = document.getElementById("loginForm");
+        const registerForm = document.getElementById("registerForm");
+        const messageDiv = document.getElementById("message");
 
-        loginForm.addEventListener('submit', async (e) => {
+        loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value.trim();
+
+            const email = document.getElementById("login-email").value.trim();
+            const password = document.getElementById("login-password").value.trim();
 
             try {
+                setLoading(true);
                 displayMessage("Signing in...", "blue");
+
                 await signInWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will handle redirect
+
             } catch (error) {
                 console.error(error);
                 displayMessage("❌ Incorrect email or password", "red");
+                setLoading(false);
             }
         });
 
-        registerForm.addEventListener('submit', async (e) => {
+        // ==================== REGISTER ====================
+        registerForm.addEventListener("submit", async (e) => {
             e.preventDefault();
-            const email = document.getElementById('signup-email').value.trim();
-            const password = document.getElementById('signup-password').value.trim();
+
+            const email = document.getElementById("signup-email").value.trim();
+            const password = document.getElementById("signup-password").value.trim();
 
             try {
                 displayMessage("Creating account...", "blue");
+
                 await createUserWithEmailAndPassword(auth, email, password);
-                // onAuthStateChanged will handle the rest
+
             } catch (error) {
                 console.error(error);
                 displayMessage(error.message, "red");
             }
         });
 
-
-        let redirected = false;
-
-        onAuthStateChanged(auth, async (user) => {
-            if (user && !redirected) {
-                redirected = true;
-
-                localStorage.setItem('isLoggedIn', 'true');
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const redirectParam = urlParams.get('redirect');
-                const redirectUrl = redirectParam
-                    ? decodeURIComponent(redirectParam)
-                    : "homeUPSChub.html";
-
-                setTimeout(() => {
-                    window.location.href = redirectUrl;
-                }, 500);
-            }
-        });
-
+        // ==================== UI HELPERS ====================
         function setLoading(isLoading) {
             const btn = document.getElementById("loginBtn");
             const text = document.getElementById("loginText");
@@ -234,13 +232,12 @@
             }
         }
 
-
         function displayMessage(msg, color) {
             messageDiv.textContent = msg;
             messageDiv.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
         }
 
-        // Form toggle (your existing code)
+        // ==================== FORM TOGGLE ====================
         const showSignup = document.getElementById("show-signup");
         const showSignin = document.getElementById("show-signin");
         const signinForm = document.getElementById("signin-form");
