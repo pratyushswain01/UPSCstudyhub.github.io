@@ -105,7 +105,7 @@
             getDoc
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // 🔥 YOUR FIREBASE CONFIG
+        // 🔥 FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
             authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -120,10 +120,10 @@
         const db = getFirestore(app);
         const appId = "default-app-id";
 
-        // 🔐 Keep user logged in
+        // 🔐 Keep session
         setPersistence(auth, browserLocalPersistence);
 
-        // ==================== LOGIN / REDIRECT LOGIC ====================
+        // ==================== 🔥 SAFE REDIRECT ====================
         let redirected = false;
 
         onAuthStateChanged(auth, async (user) => {
@@ -137,7 +137,7 @@
                 localStorage.setItem("userId", user.email);
                 localStorage.setItem("userUID", user.uid);
 
-                // Firestore user setup (safe)
+                // Create user in Firestore (only once)
                 try {
                     const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const snap = await getDoc(userRef);
@@ -153,22 +153,30 @@
                     console.error("Firestore error:", e);
                 }
 
-                // 🔥 SMART REDIRECT
+                // 🔥 CLEAN REDIRECT LOGIC
                 const params = new URLSearchParams(window.location.search);
-                const redirectParam = params.get("redirect");
+                let redirectParam = params.get("redirect");
 
-                const redirectUrl = redirectParam
-                    ? decodeURIComponent(redirectParam)
-                    : "/homeUPSChub.html"; // default page
+                let redirectUrl;
+
+                if (redirectParam) {
+                    redirectUrl = decodeURIComponent(redirectParam);
+
+                    // 🚫 Prevent auth loop
+                    if (redirectUrl.includes("auth.html")) {
+                        redirectUrl = "/homeUPSChub.html";
+                    }
+                } else {
+                    redirectUrl = "/homeUPSChub.html";
+                }
 
                 console.log("➡ Redirecting to:", redirectUrl);
 
                 setTimeout(() => {
                     window.location.href = redirectUrl;
-                }, 400);
+                }, 300);
             }
 
-            // If not logged in → clear state
             if (!user) {
                 localStorage.removeItem("isLoggedIn");
                 localStorage.removeItem("userId");
@@ -218,7 +226,7 @@
             }
         });
 
-        // ==================== UI HELPERS ====================
+        // ==================== UI ====================
         function setLoading(isLoading) {
             const btn = document.getElementById("loginBtn");
             const text = document.getElementById("loginText");
@@ -237,7 +245,7 @@
             messageDiv.className = `mt-4 text-center text-sm font-medium text-${color}-600`;
         }
 
-        // ==================== FORM TOGGLE ====================
+        // ==================== TOGGLE ====================
         const showSignup = document.getElementById("show-signup");
         const showSignin = document.getElementById("show-signin");
         const signinForm = document.getElementById("signin-form");
