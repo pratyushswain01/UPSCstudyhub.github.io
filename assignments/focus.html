@@ -562,16 +562,12 @@
     </div>
   </div>
 
-
-
-
-
-
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
     import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
     import { getFirestore, doc, getDoc, setDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
+    /* ================= FIREBASE ================= */
     const firebaseConfig = {
       apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
       authDomain: "upscstudyhub-github.firebaseapp.com",
@@ -585,51 +581,41 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    /* ================= PARAM ================= */
     const params = new URLSearchParams(window.location.search);
     const taskId = params.get("taskId");
 
+    /* ================= UI ================= */
     const loadingBox = document.getElementById("loadingBox");
     const errorBox = document.getElementById("errorBox");
     const mainUI = document.getElementById("mainUI");
+
     const subjectBadge = document.getElementById("subjectBadge");
-    const taskIdBadge = document.getElementById("taskIdBadge");
     const topicName = document.getElementById("topicName");
     const questionText = document.getElementById("questionText");
-    const statusPill = document.getElementById("statusPill");
+
     const timerDisplay = document.getElementById("timerDisplay");
     const pauseBtn = document.getElementById("pauseBtn");
     const resumeBtn = document.getElementById("resumeBtn");
     const resetBtn = document.getElementById("resetBtn");
-    const backBtn = document.getElementById("backBtn");
-    const focusBtn = document.getElementById("focusBtn");
-    const doneBtn = document.getElementById("doneBtn");
+
     const swipeTrack = document.getElementById("swipeTrack");
     const swipeFill = document.getElementById("swipeFill");
     const swipeThumb = document.getElementById("swipeThumb");
     const swipeText = document.getElementById("swipeText");
-    const modalBackdrop = document.getElementById("modalBackdrop");
-    const modalText = document.getElementById("modalText");
+
     const hourHand = document.getElementById("hourHand");
     const minuteHand = document.getElementById("minuteHand");
     const secondHand = document.getElementById("secondHand");
 
+    /* ================= STATE ================= */
     let currentUser = null;
-    let currentTask = null;
     let timerSeconds = 0;
     let timerRunning = true;
     let timerInterval = null;
-    let clockInterval = null;
-    let maxSwipe = 0;
-    let dragging = false;
-    let dragStartX = 0;
-    let thumbX = 0;
     let completed = false;
-    let exitGuardEnabled = false;
 
-    if (!taskId) {
-      showError("Missing taskId.");
-    }
-
+    /* ================= HELPERS ================= */
     function showError(msg) {
       loadingBox.classList.add("hidden");
       mainUI.classList.add("hidden");
@@ -637,71 +623,60 @@
       errorBox.classList.remove("hidden");
     }
 
-    function pad(n) { return String(n).padStart(2, "0"); }
+    function pad(n) { return String(n).padStart(2, "0") }
     function formatTime(s) {
       const h = Math.floor(s / 3600);
       const m = Math.floor((s % 3600) / 60);
       const sec = s % 60;
-      return `${pad(h)}:${pad(m)}:${pad(sec)}`;
+      return `${pad(h)}:${pad(m)}:${pad(sec)}`
     }
+
+    /* ================= TIMER ================= */
     function saveTimer() {
-      if (!taskId) return;
-      localStorage.setItem(`focus_timer_${taskId}`, String(timerSeconds));
+      localStorage.setItem("timer_" + taskId, timerSeconds);
     }
+
     function loadTimer() {
-      if (!taskId) return 0;
-      const saved = localStorage.getItem(`focus_timer_${taskId}`);
-      return saved ? Math.max(0, parseInt(saved, 10) || 0) : 0;
+      return parseInt(localStorage.getItem("timer_" + taskId)) || 0;
     }
-    function renderTimer() {
-      timerDisplay.textContent = formatTime(timerSeconds);
-    }
+
     function startTimer() {
-      stopTimer();
-      timerRunning = true;
       timerInterval = setInterval(() => {
         if (!timerRunning || completed) return;
-        timerSeconds += 1;
-        renderTimer();
+        timerSeconds++;
+        timerDisplay.textContent = formatTime(timerSeconds);
         saveTimer();
       }, 1000);
     }
-    function stopTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = null;
-    }
+
+    pauseBtn.onclick = () => timerRunning = false;
+    resumeBtn.onclick = () => timerRunning = true;
+    resetBtn.onclick = () => {
+      timerSeconds = 0;
+      timerDisplay.textContent = formatTime(timerSeconds);
+      saveTimer();
+    };
+
+    /* ================= CLOCK ================= */
     function updateClock() {
       const now = new Date();
       const sec = now.getSeconds();
       const min = now.getMinutes();
       const hr = now.getHours() % 12;
-      const secDeg = sec * 6;
-      const minDeg = min * 6 + sec * 0.1;
-      const hrDeg = hr * 30 + min * 0.5;
-      secondHand.style.transform = `rotate(${secDeg}deg)`;
-      minuteHand.style.transform = `rotate(${minDeg}deg)`;
-      hourHand.style.transform = `rotate(${hrDeg}deg)`;
-    }
-    function initClockMarks() {
-      const clock = document.getElementById("clock");
-      for (let i = 0; i < 60; i++) {
-        const m = document.createElement("div");
-        m.className = "mark" + (i % 5 === 0 ? " big" : "");
-        m.style.transform = `translate(-50%, -50%) rotate(${i * 6}deg) translateY(-108px)`;
-        clock.appendChild(m);
-      }
-    }
 
+      secondHand.style.transform = `rotate(${sec * 6}deg)`;
+      minuteHand.style.transform = `rotate(${min * 6}deg)`;
+      hourHand.style.transform = `rotate(${hr * 30 + min * 0.5}deg)`;
+    }
+    setInterval(updateClock, 1000);
+
+    /* ================= LOAD TASK ================= */
     async function loadTask() {
       try {
         const snap = await getDoc(doc(db, "assignments", taskId));
-
-        if (!snap.exists()) {
-          throw new Error("Task not found");
-        }
+        if (!snap.exists()) throw new Error("Task not found");
 
         const data = snap.data();
-
         subjectBadge.textContent = data.subject || "General";
         topicName.textContent = data.topic || "No topic";
         questionText.textContent = data.question || "No question";
@@ -709,148 +684,119 @@
         loadingBox.classList.add("hidden");
         mainUI.classList.remove("hidden");
 
-      } catch (err) {
-        console.error(err);
-        showError("Failed to load task.");
+      } catch (e) {
+        showError("Failed to load task");
       }
     }
 
+    /* ================= COMPLETE ================= */
     async function completeTask() {
       if (completed || !currentUser) return;
-      completed = true;
-      exitGuardEnabled = false;
-      stopTimer();
-      timerRunning = false;
-      saveTimer();
 
-      const userProgressRef = doc(db, "userProgress", currentUser.uid);
-      await setDoc(userProgressRef, {
+      completed = true;
+      clearInterval(timerInterval);
+
+      await setDoc(doc(db, "userProgress", currentUser.uid), {
         completed: arrayUnion(taskId),
-        completedAt: serverTimestamp(),
-        studyTime: timerSeconds,
         [`tasks.${taskId}`]: {
           completedAt: serverTimestamp(),
           studyTime: timerSeconds
         }
       }, { merge: true });
 
-      modalText.textContent = `Study time: ${formatTime(timerSeconds)}`;
-      modalBackdrop.style.display = "flex";
-      statusPill.textContent = "Completed";
-      setTimeout(() => window.location.href = "/assignments", 2500);
+      swipeText.textContent = "Completed ✔";
+      swipeFill.style.width = "100%";
     }
 
-    function setThumb(x) {
-      thumbX = Math.max(0, Math.min(maxSwipe, x));
-      const pct = maxSwipe ? thumbX / maxSwipe : 0;
-      swipeThumb.style.transform = `translate3d(${thumbX}px,-50%,0)`;
-      swipeFill.style.width = `${Math.max(0, Math.min(100, pct * 100))}%`;
-      swipeText.style.opacity = `${1 - Math.min(1, pct * 1.15)}`;
-      if (pct >= 0.9) completeTask().catch(err => showError(err.message || "Failed to complete task."));
-    }
+    /* ================= PERFECT SWIPE ================= */
+    function initSwipe() {
+      let dragging = false;
+      let startX = 0;
+      let currentX = 0;
 
-    function resetSwipe() {
-      thumbX = 0;
-      swipeThumb.style.transform = "translate3d(0,-50%,0)";
-      swipeFill.style.width = "0%";
-      swipeText.style.opacity = "1";
-    }
+      function getX(e) {
+        return e.touches ? e.touches[0].clientX : e.clientX;
+      }
 
-    function bindSwipe() {
-      const onDown = (e) => {
+      function update(x) {
+        const rect = swipeTrack.getBoundingClientRect();
+        const max = rect.width - swipeThumb.offsetWidth - 6;
+
+        let move = Math.max(0, Math.min(x, max));
+        currentX = move;
+
+        const percent = move / max;
+
+        swipeThumb.style.left = move + "px";
+        swipeFill.style.width = (percent * 100) + "%";
+        swipeText.style.opacity = 1 - percent;
+
+        if (percent >= 0.9) completeTask();
+      }
+
+      function start(e) {
         if (completed) return;
         dragging = true;
-        dragStartX = (e.touches ? e.touches[0].clientX : e.clientX) - thumbX;
+        startX = getX(e) - currentX;
         swipeThumb.style.transition = "none";
-        swipeFill.style.transition = "none";
-        document.body.style.userSelect = "none";
-        document.body.style.touchAction = "none";
-      };
-      const onMove = (e) => {
-        if (!dragging || completed) return;
-        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-        const x = clientX - dragStartX;
-        setThumb(x);
-      };
-      const onUp = () => {
+      }
+
+      function move(e) {
+        if (!dragging) return;
+        update(getX(e) - startX);
+      }
+
+      function end() {
         if (!dragging) return;
         dragging = false;
-        swipeThumb.style.transition = "box-shadow .2s ease, transform .2s ease";
-        swipeFill.style.transition = "width .12s linear";
-        document.body.style.userSelect = "";
-        document.body.style.touchAction = "";
-        if (thumbX < maxSwipe * 0.9) {
-          swipeThumb.style.transform = "translate3d(0,-50%,0)";
+
+        const rect = swipeTrack.getBoundingClientRect();
+        const max = rect.width - swipeThumb.offsetWidth - 6;
+
+        swipeThumb.style.transition = "left 0.3s";
+
+        if (currentX < max * 0.9) {
+          swipeThumb.style.left = "6px";
           swipeFill.style.width = "0%";
           swipeText.style.opacity = "1";
-          thumbX = 0;
+          currentX = 0;
+        } else {
+          swipeThumb.style.left = max + "px";
         }
-      };
-      swipeTrack.addEventListener("mousedown", onDown);
-      window.addEventListener("mousemove", onMove);
-      window.addEventListener("mouseup", onUp);
-      swipeTrack.addEventListener("touchstart", onDown, { passive: true });
-      window.addEventListener("touchmove", onMove, { passive: true });
-      window.addEventListener("touchend", onUp);
-      window.addEventListener("touchcancel", onUp);
+      }
+
+      swipeThumb.addEventListener("mousedown", start);
+      swipeThumb.addEventListener("touchstart", start, { passive: true });
+
+      window.addEventListener("mousemove", move);
+      window.addEventListener("touchmove", move, { passive: true });
+
+      window.addEventListener("mouseup", end);
+      window.addEventListener("touchend", end);
     }
 
-    function bindButtons() {
-      pauseBtn.addEventListener("click", () => {
-        timerRunning = false;
-        statusPill.textContent = "Paused";
-      });
-      resumeBtn.addEventListener("click", () => {
-        if (completed) return;
-        timerRunning = true;
-        statusPill.textContent = "Focus Mode";
-      });
-      resetBtn.addEventListener("click", () => {
-        if (completed) return;
-        timerSeconds = 0;
-        renderTimer();
-        saveTimer();
-        statusPill.textContent = "Focus Mode";
-      });
-      backBtn.addEventListener("click", () => window.location.href = "/assignments");
-      focusBtn.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-      doneBtn.addEventListener("click", () => completeTask().catch(err => showError(err.message || "Failed to complete task.")));
-    }
-
-    window.addEventListener("load", () => {
-      maxSwipe = Math.max(0, swipeTrack.clientWidth - swipeThumb.offsetWidth - 12);
-      setThumb(0);
-      updateClock();
-      clockInterval = setInterval(updateClock, 1000);
-      initClockMarks();
-    });
-
-    window.addEventListener("beforeunload", (e) => {
-      if (!exitGuardEnabled || completed) return;
-      e.preventDefault();
-      e.returnValue = "";
-    });
-
+    /* ================= AUTH ================= */
     onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        window.location.replace("/login");
+        window.location.replace("/assignments/auth.html?redirect=" + encodeURIComponent(window.location.href));
         return;
       }
+
       currentUser = user;
-      try {
-        await loadTask();
-        timerSeconds = loadTimer();
-        renderTimer();
-        loadingBox.classList.add("hidden");
-        mainUI.classList.remove("hidden");
-        bindButtons();
-        bindSwipe();
-        startTimer();
-      } catch (err) {
-        showError(err.message || "Something went wrong.");
-      }
+
+      await loadTask();
+
+      timerSeconds = loadTimer();
+      timerDisplay.textContent = formatTime(timerSeconds);
+
+      startTimer();
+      initSwipe();
     });
   </script>
+
+
+
+
 
 
 
