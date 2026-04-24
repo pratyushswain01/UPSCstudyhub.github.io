@@ -120,24 +120,25 @@
         const db = getFirestore(app);
         const appId = "default-app-id";
 
-        // 🔐 Keep session
+        // 🔐 Keep user logged in
         setPersistence(auth, browserLocalPersistence);
 
-        // ==================== 🔥 SAFE AUTH + REDIRECT ====================
+        // ==================== AUTH STATE ====================
         let redirected = false;
 
         onAuthStateChanged(auth, async (user) => {
+
             if (user && !redirected) {
                 redirected = true;
 
                 console.log("✅ Logged in:", user.email);
 
-                // Save login state
+                // Save session
                 localStorage.setItem("isLoggedIn", "true");
                 localStorage.setItem("userId", user.email);
                 localStorage.setItem("userUID", user.uid);
 
-                // Create user in Firestore (only once)
+                // 🔥 Create user doc (once)
                 try {
                     const userRef = doc(db, `artifacts/${appId}/users`, user.uid);
                     const snap = await getDoc(userRef);
@@ -153,35 +154,26 @@
                     console.error("Firestore error:", e);
                 }
 
-                // 🔥 CLEAN REDIRECT
+                // ==================== CLEAN REDIRECT ====================
                 const params = new URLSearchParams(window.location.search);
-                let redirectParam = params.get("redirect");
+                const redirectParam = params.get("redirect");
 
-                let redirectUrl;
+                let redirectUrl = "/assignments/index.html"; // ✅ fallback
 
                 if (redirectParam) {
-                    redirectUrl = decodeURIComponent(redirectParam);
+                    const decoded = decodeURIComponent(redirectParam);
 
                     // 🚫 Prevent loop
-                    if (redirectUrl.includes("auth.html")) {
-                        redirectUrl = "/homeUPSChub.html";
+                    if (!decoded.includes("auth.html")) {
+                        redirectUrl = decoded;
                     }
-
-                    // 🚫 Fix broken relative paths
-                    if (!redirectUrl.startsWith("http")) {
-                        redirectUrl = "/" + redirectUrl.replace(/^\/+/, "");
-                    }
-
-                } else {
-                    redirectUrl = "/homeUPSChub.html";
                 }
 
                 console.log("➡ Redirecting to:", redirectUrl);
-
                 window.location.href = redirectUrl;
             }
 
-            // Clear state if logged out
+            // Clear session if logged out
             if (!user) {
                 localStorage.removeItem("isLoggedIn");
                 localStorage.removeItem("userId");
