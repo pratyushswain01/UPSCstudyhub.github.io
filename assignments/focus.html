@@ -564,20 +564,7 @@
 
 
 
-  <script>
-    if (!localStorage.getItem("isLoggedIn")) {
 
-      const fullUrl =
-        window.location.origin +
-        window.location.pathname +
-        window.location.search;
-
-      window.location.replace(
-        "/assignments/auth.html?redirect=" +
-        encodeURIComponent(fullUrl)
-      );
-    }
-  </script>
 
 
   <script type="module">
@@ -586,12 +573,12 @@
     import { getFirestore, doc, getDoc, setDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "YOUR_API_KEY",
-      authDomain: "YOUR_AUTH_DOMAIN",
-      projectId: "YOUR_PROJECT_ID",
-      storageBucket: "YOUR_STORAGE_BUCKET",
-      messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-      appId: "YOUR_APP_ID"
+      apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+      authDomain: "upscstudyhub-github.firebaseapp.com",
+      projectId: "upscstudyhub-github",
+      storageBucket: "upscstudyhub-github.firebasestorage.app",
+      messagingSenderId: "451692540885",
+      appId: "1:451692540885:web:b425e85128e5de97c7c35c"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -637,7 +624,7 @@
     let dragStartX = 0;
     let thumbX = 0;
     let completed = false;
-    let exitGuardEnabled = true;
+    let exitGuardEnabled = false;
 
     if (!taskId) {
       showError("Missing taskId.");
@@ -706,13 +693,26 @@
     }
 
     async function loadTask() {
-      const snap = await getDoc(doc(db, "assignments", taskId));
-      if (!snap.exists()) throw new Error("Task not found.");
-      currentTask = snap.data();
-      subjectBadge.textContent = currentTask.subject || "General";
-      taskIdBadge.textContent = `Task • ${taskId}`;
-      topicName.textContent = currentTask.topicName || currentTask.topic || "Untitled Topic";
-      questionText.textContent = currentTask.questionText || currentTask.question || "No question available.";
+      try {
+        const snap = await getDoc(doc(db, "assignments", taskId));
+
+        if (!snap.exists()) {
+          throw new Error("Task not found");
+        }
+
+        const data = snap.data();
+
+        subjectBadge.textContent = data.subject || "General";
+        topicName.textContent = data.topic || "No topic";
+        questionText.textContent = data.question || "No question";
+
+        loadingBox.classList.add("hidden");
+        mainUI.classList.remove("hidden");
+
+      } catch (err) {
+        console.error(err);
+        showError("Failed to load task.");
+      }
     }
 
     async function completeTask() {
