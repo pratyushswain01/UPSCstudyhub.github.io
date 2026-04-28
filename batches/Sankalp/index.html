@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Sankalp Batch - UPSChub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <base href="https://pratyushswain01.github.io/UPSCstudyhub.github.io/">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .footer-nav a.active { color: #2563EB; transform: scale(1.1); }
+        .footer-nav a { transition: color 0.2s ease-in-out, transform 0.2s ease-in-out; }
+        .tab-active { background-color: #3B82F6; color: white; }
+        .modal-backdrop { background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(4px); }
+        
+        @keyframes fall {
+            0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+        }
+        .confetti-piece {
+            position: absolute; width: 10px; height: 20px; border-radius: 50%;
+            opacity: 0; animation: fall 5s linear infinite;
+        }
+        .toggle-checkbox:checked + .toggle-label { background-color: #3B82F6; }
+        .toggle-checkbox { transition: transform 0.2s ease-in-out; }
+        .toggle-checkbox:checked { transform: translateX(1rem); }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-in-out; }
+        .faq-question.open + .faq-answer { max-height: 200px; }
+        .faq-question .icon { transition: transform 0.3s ease-in-out; }
+        .faq-question.open .icon { transform: rotate(180deg); }
+        .calendar-day.has-activity { background-color: #bfdbfe; color: #1e40af; border-radius: 50%; font-weight: bold; }
+        .calendar-day.selected-day { background-color: #3b82f6; color: white; border-radius: 50%; }
+
+        #welcome-banner {
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 0.5s ease-in-out;
+            overflow: hidden;
+        }
+        #welcome-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.35);
+            border-radius: 1rem;
+            z-index: 1;
+        }
+        #welcome-banner > * {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .premium-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .premium-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .feature-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .heatmap-day {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+            background: #eee;
+            transition: all 0.2s;
+        }
+        .heatmap-day.level-1 { background: #c6e48b; }
+        .heatmap-day.level-2 { background: #7bc96f; }
+        .heatmap-day.level-3 { background: #239a3b; }
+        .heatmap-day.level-4 { background: #196127; }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .subject-tab {
+            transition: all 0.3s ease;
+        }
+        .subject-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+    </style>
+    <script>
+      tailwind.config = { darkMode: 'class' }
+    </script>
+</head>
+<body class="bg-slate-100 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+
+    <div id="flash-notification" class="hidden fixed bottom-20 left-1/2 -translate-x-1/2 w-11/12 max-w-sm z-[100] md:left-auto md:translate-x-0 md:right-5 md:bottom-5">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-2xl border dark:border-slate-700 p-4 transform transition-all duration-300 translate-y-8 opacity-0">
+            <div class="flex items-start gap-3">
+                <div class="bg-blue-100 dark:bg-blue-900/50 p-2 rounded-full">
+                    <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                </div>
+                <div class="flex-1">
+                    <p id="flash-title" class="font-bold text-slate-800 dark:text-white"></p>
+                    <p id="flash-message" class="text-sm text-slate-600 dark:text-slate-300 mt-1"></p>
+                </div>
+                <button id="flash-close-btn" class="p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700">
+                    <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-view" class="hidden">
+        <header class="bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-4 sm:px-6 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <button id="sidebar-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+                    </button>
+                    <a href="#" class="flex items-center gap-2 text-2xl font-bold text-blue-600 dark:text-blue-500">
+                        <img src="https://pratyushswain01.github.io/UPSCstudyhub.github.io/images/LOGO.jpg" alt="UPSChub Logo" class="h-8 w-8 rounded-lg">
+                        <span>Sankalp Batch</span>
+                    </a>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="relative">
+                        <button id="streak-btn" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+                            <svg class="h-6 w-6 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7.014A8.003 8.003 0 0122 12c0 3-1 6-3.5 6-1.667 0-2.5-1.5-2.5-3s1-2.5 2.5-2.5c1.105 0 2.14.44 2.899 1.157" /></svg>
+                        </button>
+                        <div id="streak-tooltip" class="hidden absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-lg shadow-xl p-3 z-20 text-sm">
+                            <p><strong>Current Streak:</strong> <span id="current-streak">0</span> days</p>
+                            <p><strong>Highest Streak:</strong> <span id="highest-streak">0</span> days</p>
+                            <p><strong>Study Time:</strong> <span id="today-study-time">0h</span></p>
+                        </div>
+                    </div>
+                    <div id="account-info-div" class="relative">
+                        <button id="account-btn" class="w-9 h-9 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
+                        </button>
+                        <div id="account-dropdown" class="hidden absolute right-0 mt-2 w-56 bg-white dark:bg-slate-800 rounded-lg shadow-xl py-2 z-20">
+                            <div class="px-4 py-2 border-b dark:border-slate-700">
+                                <p class="font-semibold text-sm" id="dropdown-display-name">UPSC Aspirant</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate" id="user-email-display"></p>
+                            </div>
+                            <div class="py-1">
+                                <a href="#" id="dropdown-profile-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">My Profile</a>
+                                <a href="#" id="dropdown-settings-btn" class="block w-full text-left px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">Settings</a>
+                                <div class="p-2">
+                                    <div class="p-2 flex items-center justify-between rounded-lg bg-slate-100 dark:bg-slate-700/50">
+                                        <span class="text-sm font-medium">Dark Mode</span>
+                                        <div class="relative inline-block w-10 align-middle select-none">
+                                            <input type="checkbox" id="dropdown-theme-toggle" class="toggle-checkbox absolute block w-6 h-6 rounded-full bg-white border-4 appearance-none cursor-pointer"/>
+                                            <label for="dropdown-theme-toggle" class="toggle-label block overflow:hidden h-6 rounded-full bg-gray-300 dark:bg-slate-600 cursor-pointer"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-t border-slate-200 dark:border-slate-700"></div>
+                            <a href="#" id="logout-btn" class="block w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-500 hover:bg-slate-100 dark:hover:bg-slate-700">Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+        
+        <div class="relative min-h-screen">
+            <div id="sidebar-backdrop" class="fixed inset-0 bg-black/50 z-30 hidden md:hidden"></div>
+            <aside id="sidebar" class="fixed top-0 left-0 h-full bg-white dark:bg-slate-800 shadow-lg w-64 transform -translate-x-full transition-transform duration-300 ease-in-out z-40 pt-20 overflow-y-auto">
+                <nav class="p-4">
+                    <ul class="space-y-2">
+                        <li><a href="#" data-view="home" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg> Dashboard</a></li>
+                        <li><a href="#" data-view="planner" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg> Planner</a></li>
+                        <li><a href="#" data-view="tracker" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg> Tracker</a></li>
+                        <li><a href="#" data-view="dpp" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg> DPP</a></li>
+                        <li><a href="#" data-view="answer-writing" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg> Answer Writing</a></li>
+                        <li><a href="#" data-view="pdfs" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg> PDFs</a></li>
+                        <li><a href="#" data-view="mindmaps" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg> Mindmaps</a></li>
+                        <li><a href="TestSeries/test_hub.html" class="sidebar-link flex items-center gap-3 px-3 py-2.5 rounded-lg text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 font-medium"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg> Test Series</a></li>
+                    </ul>
+                </nav>
+            </aside>
+
+            <main id="main-content" class="flex-1 transition-all duration-300 ease-in-out">
+                <div class="container mx-auto p-4 sm:p-6 pb-24">
+                    
+                    <!-- DASHBOARD VIEW -->
+                    <div id="home-view" class="hidden">
+                        <div id="welcome-banner" class="bg-gradient-to-r from-blue-500 to-indigo-600 p-6 rounded-2xl shadow-lg text-white mb-6">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h1 id="welcome-heading" class="text-3xl font-bold">Welcome back!</h1>
+                                    <p class="mt-1 opacity-80">Sankalp Batch - UPSC CSE 2027</p>
+                                </div>
+                                <div id="date-time-container" class="text-right flex-shrink-0 ml-4 hidden sm:block">
+                                    <p id="time-display" class="text-2xl font-bold">12:00:00 AM</p>
+                                    <p id="date-display" class="text-sm opacity-80">Monday, October 6, 2025</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-green-100 dark:bg-green-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Overall Progress</p><p id="overall-progress-value" class="text-lg font-bold">0%</p></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Study Hours</p><p id="study-hours-value" class="text-lg font-bold">0h</p></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-amber-100 dark:bg-amber-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-amber-600 dark:text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">DPPs Done</p><p id="dpp-done-value" class="text-lg font-bold">0/30</p></div>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm flex items-center gap-4">
+                                <div class="bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full"><svg class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                                <div><p class="text-sm text-slate-500 dark:text-slate-400">Tasks Today</p><p id="tasks-today-value" class="text-lg font-bold">0/0</p></div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm mb-6">
+                            <h3 class="text-lg font-bold mb-4">Weekly Progress</h3>
+                            <div><canvas id="performanceChart"></canvas></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                            <div class="feature-card bg-gradient-to-br from-purple-500 to-pink-500 p-6 rounded-2xl shadow-lg text-white" data-view="planner">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">Planner</h3>
+                                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                </div>
+                                <p class="text-sm opacity-90">Plan your study schedule</p>
+                            </div>
+                            
+                            <div class="feature-card bg-gradient-to-br from-blue-500 to-cyan-500 p-6 rounded-2xl shadow-lg text-white" data-view="tracker">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">Tracker</h3>
+                                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                </div>
+                                <p class="text-sm opacity-90">Track daily study hours</p>
+                            </div>
+                            
+                            <div class="feature-card bg-gradient-to-br from-green-500 to-teal-500 p-6 rounded-2xl shadow-lg text-white" data-view="dpp">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">DPP</h3>
+                                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                </div>
+                                <p class="text-sm opacity-90">Daily practice papers</p>
+                            </div>
+                            
+                            <div class="feature-card bg-gradient-to-br from-orange-500 to-red-500 p-6 rounded-2xl shadow-lg text-white" data-view="answer-writing">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">Answer Writing</h3>
+                                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                                </div>
+                                <p class="text-sm opacity-90">Practice mains answers</p>
+                            </div>
+                            
+                            <div class="feature-card bg-gradient-to-br from-indigo-500 to-purple-500 p-6 rounded-2xl shadow-lg text-white" data-view="pdfs">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">PDFs</h3>
+                                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                                </div>
+                                <p class="text-sm opacity-90">Study materials & notes</p>
+                            </div>
+                            
+                            <div class="feature-card bg-gradient-to-br from-pink-500 to-rose-500 p-6 rounded-2xl shadow-lg text-white" data-view="mindmaps">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="text-xl font-bold">Mindmaps</h3>
+                                    <svg class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" /></svg>
+                                </div>
+                                <p class="text-sm opacity-90">Visual revision maps</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PLANNER VIEW -->
+                    <div id="planner-view" class="hidden">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-3xl font-bold">Study Planner</h1>
+                            <button id="add-planner-task-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                                Add Task
+                            </button>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                            <div class="mb-4 flex items-center gap-2">
+                                <input type="date" id="planner-date" class="px-4 py-2 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                            </div>
+                            <div id="planner-tasks-container" class="space-y-3"></div>
+                        </div>
+                    </div>
+
+                    <!-- TRACKER VIEW -->
+                    <div id="tracker-view" class="hidden">
+                        <h1 class="text-3xl font-bold mb-6">Study Tracker</h1>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-bold">Today's Goal</h3>
+                                    <svg class="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <p class="text-3xl font-bold"><span id="tracker-today-hours">0</span> / 8 hrs</p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-bold">This Week</h3>
+                                    <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" /></svg>
+                                </div>
+                                <p class="text-3xl font-bold"><span id="tracker-week-hours">0</span> hrs</p>
+                            </div>
+                            
+                            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm">
+                                <div class="flex items-center justify-between mb-2">
+                                    <h3 class="font-bold">Total</h3>
+                                    <svg class="h-6 w-6 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                                </div>
+                                <p class="text-3xl font-bold"><span id="tracker-total-hours">0</span> hrs</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm mb-6">
+                            <h3 class="text-lg font-bold mb-4">Log Study Session</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="text-sm font-medium block mb-2">Subject</label>
+                                    <select id="tracker-subject" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                                        <option value="History">History</option>
+                                        <option value="Geography">Geography</option>
+                                        <option value="Polity">Polity</option>
+                                        <option value="Economy">Economy</option>
+                                        <option value="Science">Science & Tech</option>
+                                        <option value="Environment">Environment</option>
+                                        <option value="Ethics">Ethics</option>
+                                        <option value="Essay">Essay</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium block mb-2">Hours</label>
+                                    <input type="number" id="tracker-hours" min="0" max="24" step="0.5" class="w-full px-4 py-2 bg-slate-50 dark:bg-slate-700 border rounded-lg" placeholder="2.5">
+                                </div>
+                                <div class="flex items-end">
+                                    <button id="add-tracker-session-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold">Add Session</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                            <h3 class="text-lg font-bold mb-4">Activity Heatmap</h3>
+                            <div id="tracker-heatmap" class="grid grid-cols-7 gap-1"></div>
+                        </div>
+                    </div>
+
+                    <!-- DPP VIEW -->
+                    <div id="dpp-view" class="hidden">
+                        <h1 class="text-3xl font-bold mb-6">Daily Practice Papers</h1>
+                        
+                        <div class="mb-6">
+                            <div class="flex gap-2 overflow-x-auto pb-2">
+                                <button class="subject-tab active px-4 py-2 rounded-lg font-semibold whitespace-nowrap" data-subject="all">All</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="History">History</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="Geography">Geography</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="Polity">Polity</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="Economy">Economy</button>
+                            </div>
+                        </div>
+                        
+                        <div id="dpp-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <!-- ANSWER WRITING VIEW -->
+                    <div id="answer-writing-view" class="hidden">
+                        <h1 class="text-3xl font-bold mb-6">Answer Writing Practice</h1>
+                        
+                        <div id="answer-questions-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6"></div>
+                        
+                        <div id="answer-writing-area" class="hidden bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex-1">
+                                    <h3 class="font-bold text-lg" id="current-question-text"></h3>
+                                    <p class="text-sm text-slate-500 mt-1" id="current-question-marks"></p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl font-bold text-blue-600" id="answer-timer">00:00</div>
+                                    <button id="toggle-timer-btn" class="text-sm text-blue-600 hover:underline">Start Timer</button>
+                                </div>
+                            </div>
+                            <textarea id="answer-textarea" class="w-full h-96 p-4 bg-slate-50 dark:bg-slate-700 border rounded-lg resize-none" placeholder="Write your answer here..."></textarea>
+                            <div class="flex justify-between mt-4">
+                                <button id="back-to-questions-btn" class="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-lg font-semibold hover:bg-slate-300 dark:hover:bg-slate-600">Back</button>
+                                <button id="save-answer-btn" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold">Save Answer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PDFs VIEW -->
+                    <div id="pdfs-view" class="hidden">
+                        <h1 class="text-3xl font-bold mb-6">Study Materials</h1>
+                        
+                        <div class="mb-6">
+                            <div class="flex gap-2 overflow-x-auto pb-2">
+                                <button class="subject-tab active px-4 py-2 rounded-lg font-semibold whitespace-nowrap" data-subject="all">All Subjects</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="History">History</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="Geography">Geography</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="Polity">Polity</button>
+                                <button class="subject-tab px-4 py-2 rounded-lg font-semibold bg-slate-100 dark:bg-slate-700 whitespace-nowrap" data-subject="Economy">Economy</button>
+                            </div>
+                        </div>
+                        
+                        <div id="pdfs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <!-- MINDMAPS VIEW -->
+                    <div id="mindmaps-view" class="hidden">
+                        <h1 class="text-3xl font-bold mb-6">Mindmaps</h1>
+                        <div id="mindmaps-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                    </div>
+
+                    <!-- SETTINGS VIEW -->
+                    <div id="settings-view" class="hidden">
+                        <h1 class="text-3xl font-bold text-slate-800 dark:text-white mb-8">Settings</h1>
+                        <div class="max-w-3xl mx-auto space-y-8">
+                            <div>
+                                <h2 class="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2 px-2">Account</h2>
+                                <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm divide-y divide-slate-200 dark:divide-slate-700">
+                                    <div class="p-4 flex items-center justify-between">
+                                        <div class="flex items-center gap-4">
+                                            <div class="w-12 h-12 bg-slate-200 dark:bg-slate-700 rounded-full flex items-center justify-center">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-6 h-6 text-slate-500 dark:text-slate-400"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-5.5-2.5a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0zM10 12a5.99 5.99 0 00-4.793 2.39A6.483 6.483 0 0010 16.5a6.483 6.483 0 004.793-2.11A5.99 5.99 0 0010 12z" clip-rule="evenodd" /></svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-bold" id="settings-display-name">UPSC Aspirant</p>
+                                                <p class="text-sm text-slate-500 dark:text-slate-400" id="settings-user-email"></p>
+                                            </div>
+                                        </div>
+                                        <button id="edit-profile-btn" class="text-sm font-semibold text-blue-600 hover:underline">Edit</button>
+                                    </div>
+                                    <div id="subscription-item" class="p-4 flex items-center justify-between"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </main>
+        </div>
+        
+        <footer class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md shadow-[0_-2px_5px_-1px_rgba(0,0,0,0.1)] z-50">
+            <nav class="container mx-auto px-4 h-16 flex justify-around items-center footer-nav">
+                <a href="#" data-view="home" class="nav-link flex flex-col items-center justify-center text-slate-500 dark:text-slate-400 active"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg><span class="text-xs font-medium">Home</span></a>
+                <a href="#" data-view="planner" class="nav-link flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg><span class="text-xs font-medium">Planner</span></a>
+                <a href="#" data-view="dpp" class="nav-link flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg><span class="text-xs font-medium">DPP</span></a>
+                <a href="#" data-view="tracker" class="nav-link flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg><span class="text-xs font-medium">Track</span></a>
+                <a href="#" data-view="settings" class="nav-link flex flex-col items-center justify-center text-slate-500 dark:text-slate-400"><svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg><span class="text-xs font-medium">Settings</span></a>
+            </nav>
+        </footer>
+    </div>
+    
+    <!-- MODALS -->
+    <div id="add-planner-task-modal" class="hidden fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-md">
+            <div class="p-6 border-b dark:border-slate-700">
+                <h3 class="text-xl font-bold">Add Task to Planner</h3>
+            </div>
+            <form id="add-planner-task-form">
+                <div class="p-6 space-y-4">
+                    <div>
+                        <label for="planner-task-title" class="text-sm font-medium">Task Title</label>
+                        <input type="text" id="planner-task-title" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                    </div>
+                    <div>
+                        <label for="planner-task-subject" class="text-sm font-medium">Subject</label>
+                        <select id="planner-task-subject" class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                            <option value="History">History</option>
+                            <option value="Geography">Geography</option>
+                            <option value="Polity">Polity</option>
+                            <option value="Economy">Economy</option>
+                            <option value="Science">Science & Tech</option>
+                            <option value="Environment">Environment</option>
+                            <option value="Ethics">Ethics</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label for="planner-task-start" class="text-sm font-medium">Start Time</label>
+                            <input type="time" id="planner-task-start" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                        </div>
+                        <div>
+                            <label for="planner-task-end" class="text-sm font-medium">End Time</label>
+                            <input type="time" id="planner-task-end" required class="mt-1 w-full px-4 py-3 bg-slate-50 dark:bg-slate-700 border rounded-lg">
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-b-xl flex justify-end gap-3">
+                    <button type="button" id="cancel-planner-task" class="px-4 py-2 text-sm font-semibold rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700">Cancel</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">Add Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="alert-modal" class="hidden fixed inset-0 z-[70] flex items-center justify-center p-4 modal-backdrop">
+        <div class="bg-white dark:bg-slate-800 rounded-xl shadow-lg w-full max-w-sm text-center p-6">
+            <p id="alert-message" class="font-medium"></p>
+            <button id="alert-ok" class="mt-4 px-6 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white hover:bg-blue-700">OK</button>
+        </div>
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signOut, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, onSnapshot, updateDoc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+        authDomain: "upscstudyhub-github.firebaseapp.com",
+        databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com",
+        projectId: "upscstudyhub-github",
+        storageBucket: "upscstudyhub-github.firebasestorage.app",
+        messagingSenderId: "451692540885",
+        appId: "1:451692540885:web:b425e85128e5de97c7c35c",
+        measurementId: "G-33F0XSLP53"
+    };
+    
+    const appId = 'sankalp-batch';
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Elements
+    const appView = document.getElementById('app-view');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarBackdrop = document.getElementById('sidebar-backdrop');
+    const accountBtn = document.getElementById('account-btn');
+    const accountDropdown = document.getElementById('account-dropdown');
+    const logoutBtn = document.getElementById('logout-btn');
+    const dropdownThemeToggle = document.getElementById('dropdown-theme-toggle');
+    const welcomeHeading = document.getElementById('welcome-heading');
+    const dropdownDisplayName = document.getElementById('dropdown-display-name');
+    const alertModal = document.getElementById('alert-modal');
+    const alertMessage = document.getElementById('alert-message');
+    const streakBtn = document.getElementById('streak-btn');
+    const streakTooltip = document.getElementById('streak-tooltip');
+
+    let performanceChartInstance = null;
+    let currentUser = null;
+    let timerInterval = null;
+    let timerSeconds = 0;
+
+    // Sample Data
+    const dppData = [
+        { id: 'dpp1', subject: 'History', title: 'Ancient India - Part 1', questions: 20, completed: false },
+        { id: 'dpp2', subject: 'Geography', title: 'Physical Geography', questions: 25, completed: false },
+        { id: 'dpp3', subject: 'Polity', title: 'Constitutional Framework', questions: 30, completed: false },
+        { id: 'dpp4', subject: 'Economy', title: 'Indian Economy Basics', questions: 20, completed: false },
+        { id: 'dpp5', subject: 'History', title: 'Medieval India', questions: 25, completed: false },
+        { id: 'dpp6', subject: 'Geography', title: 'Indian Geography', questions: 30, completed: false }
+    ];
+
+    const answerQuestions = [
+        { id: 'q1', question: 'Discuss the significance of the 73rd and 74th Constitutional Amendments in strengthening grassroots democracy in India.', marks: 250, subject: 'Polity' },
+        { id: 'q2', question: 'Analyze the impact of monsoon on Indian agriculture and economy.', marks: 250, subject: 'Geography' },
+        { id: 'q3', question: 'Examine the role of women in the Indian freedom struggle.', marks: 250, subject: 'History' },
+        { id: 'q4', question: 'Critically evaluate the Make in India initiative and its impact on manufacturing sector.', marks: 250, subject: 'Economy' }
+    ];
+
+    const pdfResources = [
+        { id: 'pdf1', subject: 'History', title: 'Ancient India Notes', url: '#' },
+        { id: 'pdf2', subject: 'Geography', title: 'Physical Geography Handouts', url: '#' },
+        { id: 'pdf3', subject: 'Polity', title: 'Indian Constitution', url: '#' },
+        { id: 'pdf4', subject: 'Economy', title: 'Economic Survey Summary', url: '#' },
+        { id: 'pdf5', subject: 'History', title: 'Modern India', url: '#' },
+        { id: 'pdf6', subject: 'Geography', title: 'World Geography', url: '#' }
+    ];
+
+    const mindmaps = [
+        { id: 'mm1', title: 'Ancient Civilizations', subject: 'History', img: 'https://via.placeholder.com/400x300/667eea/ffffff?text=Ancient+Civilizations' },
+        { id: 'mm2', title: 'Climate Zones', subject: 'Geography', img: 'https://via.placeholder.com/400x300/764ba2/ffffff?text=Climate+Zones' },
+        { id: 'mm3', title: 'Fundamental Rights', subject: 'Polity', img: 'https://via.placeholder.com/400x300/f093fb/ffffff?text=Fundamental+Rights' },
+        { id: 'mm4', title: 'Fiscal Policy', subject: 'Economy', img: 'https://via.placeholder.com/400x300/4facfe/ffffff?text=Fiscal+Policy' },
+        { id: 'mm5', title: 'Freedom Struggle', subject: 'History', img: 'https://via.placeholder.com/400x300/00f2fe/ffffff?text=Freedom+Struggle' },
+        { id: 'mm6', title: 'Indian Monsoon', subject: 'Geography', img: 'https://via.placeholder.com/400x300/43e97b/ffffff?text=Indian+Monsoon' }
+    ];
+
+    // Helper Functions
+    function showAlert(message) {
+        alertMessage.textContent = message;
+        alertModal.classList.remove('hidden');
+    }
+
+    document.getElementById('alert-ok').addEventListener('click', () => {
+        alertModal.classList.add('hidden');
+    });
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('-translate-x-full');
+        if (!sidebar.classList.contains('-translate-x-full')) {
+            if (window.innerWidth < 768) {
+                sidebarBackdrop.classList.remove('hidden');
+            }
+        } else {
+            sidebarBackdrop.classList.add('hidden');
+        }
+    }
+
+    function showView(viewName) {
+        document.querySelectorAll('[id$="-view"]').forEach(view => view.classList.add('hidden'));
+        document.getElementById(`${viewName}-view`).classList.remove('hidden');
+        
+        document.querySelectorAll('.nav-link, .sidebar-link').forEach(link => link.classList.remove('active'));
+        document.querySelectorAll(`[data-view="${viewName}"]`).forEach(link => link.classList.add('active'));
+        
+        if (window.innerWidth < 768) {
+            sidebar.classList.add('-translate-x-full');
+            sidebarBackdrop.classList.add('hidden');
+        }
+
+        // Load view-specific data
+        if (viewName === 'planner') loadPlannerTasks();
+        if (viewName === 'tracker') loadTrackerData();
+        if (viewName === 'dpp') loadDPPs();
+        if (viewName === 'answer-writing') loadAnswerQuestions();
+        if (viewName === 'pdfs') loadPDFs();
+        if (viewName === 'mindmaps') loadMindmaps();
+    }
+
+    function applyTheme(theme) {
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+            if (dropdownThemeToggle) dropdownThemeToggle.checked = true;
+        } else {
+            document.documentElement.classList.remove('dark');
+            if (dropdownThemeToggle) dropdownThemeToggle.checked = false;
+        }
+        if (performanceChartInstance) {
+            renderPerformanceChart();
+        }
+    }
+
+    function toggleTheme() {
+        const isDark = !document.documentElement.classList.contains('dark');
+        const newTheme = isDark ? 'dark' : 'light';
+        localStorage.setItem('color-theme', newTheme);
+        applyTheme(newTheme);
+    }
+
+    // Initialize
+    const savedTheme = localStorage.getItem('color-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    applyTheme(savedTheme);
+
+    // Event Listeners
+    if (sidebarToggle) sidebarToggle.onclick = toggleSidebar;
+    if (sidebarBackdrop) sidebarBackdrop.onclick = toggleSidebar;
+    if (accountBtn) accountBtn.onclick = () => accountDropdown.classList.toggle('hidden');
+    if (logoutBtn) logoutBtn.onclick = (e) => { e.preventDefault(); signOut(auth); };
+    if (dropdownThemeToggle) dropdownThemeToggle.onchange = toggleTheme;
+    
+    if (streakBtn) {
+        streakBtn.onmouseenter = () => streakTooltip && streakTooltip.classList.remove('hidden');
+        streakBtn.onmouseleave = () => streakTooltip && streakTooltip.classList.add('hidden');
+    }
+
+    document.onclick = (e) => {
+        if (accountBtn && !accountBtn.contains(e.target) && accountDropdown && !accountDropdown.contains(e.target)) {
+            accountDropdown.classList.add('hidden');
+        }
+    };
+
+    // Navigation
+    document.querySelectorAll('.nav-link, .sidebar-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const view = link.getAttribute('data-view');
+            if (view) showView(view);
+        });
+    });
+
+    document.querySelectorAll('.feature-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const view = card.getAttribute('data-view');
+            if (view) showView(view);
+        });
+    });
+
+    // PLANNER
+    const addPlannerTaskBtn = document.getElementById('add-planner-task-btn');
+    const addPlannerTaskModal = document.getElementById('add-planner-task-modal');
+    const addPlannerTaskForm = document.getElementById('add-planner-task-form');
+    const cancelPlannerTask = document.getElementById('cancel-planner-task');
+    const plannerDate = document.getElementById('planner-date');
+
+    if (addPlannerTaskBtn) {
+        addPlannerTaskBtn.onclick = () => {
+            addPlannerTaskForm.reset();
+            addPlannerTaskModal.classList.remove('hidden');
+        };
+    }
+
+    if (cancelPlannerTask) {
+        cancelPlannerTask.onclick = () => addPlannerTaskModal.classList.add('hidden');
+    }
+
+    if (plannerDate) {
+        plannerDate.value = new Date().toISOString().split('T')[0];
+        plannerDate.onchange = () => loadPlannerTasks();
+    }
+
+    if (addPlannerTaskForm) {
+        addPlannerTaskForm.onsubmit = async (e) => {
+            e.preventDefault();
+            if (!currentUser) return;
+
+            const task = {
+                id: 'task_' + Date.now(),
+                title: document.getElementById('planner-task-title').value,
+                subject: document.getElementById('planner-task-subject').value,
+                startTime: document.getElementById('planner-task-start').value,
+                endTime: document.getElementById('planner-task-end').value,
+                completed: false,
+                date: plannerDate.value
+            };
+
+            const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+            const docSnap = await getDoc(userDocRef);
+            const userData = docSnap.exists() ? docSnap.data() : {};
+            const plannerTasks = userData.planner_tasks || {};
+            
+            if (!plannerTasks[task.date]) plannerTasks[task.date] = [];
+            plannerTasks[task.date].push(task);
+
+            await setDoc(userDocRef, { planner_tasks: plannerTasks }, { merge: true });
+            addPlannerTaskModal.classList.add('hidden');
+            loadPlannerTasks();
+        };
+    }
+
+    async function loadPlannerTasks() {
+        if (!currentUser) return;
+        const date = plannerDate.value;
+        const container = document.getElementById('planner-tasks-container');
+        
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.exists() ? docSnap.data() : {};
+        const plannerTasks = userData.planner_tasks || {};
+        const tasks = plannerTasks[date] || [];
+
+        if (tasks.length === 0) {
+            container.innerHTML = '<p class="text-sm text-slate-500 text-center py-8">No tasks planned for this day</p>';
+            return;
+        }
+
+        container.innerHTML = tasks.map(task => `
+            <div class="bg-slate-50 dark:bg-slate-700/50 p-4 rounded-lg flex items-center justify-between">
+                <div class="flex items-center gap-3 flex-1">
+                    <input type="checkbox" class="h-5 w-5 rounded text-blue-600" ${task.completed ? 'checked' : ''} onchange="toggleTaskCompletion('${task.id}', '${date}')">
+                    <div class="flex-1">
+                        <h4 class="font-semibold ${task.completed ? 'line-through text-slate-400' : ''}">${task.title}</h4>
+                        <p class="text-sm text-slate-500">${task.subject} · ${task.startTime} - ${task.endTime}</p>
+                    </div>
+                </div>
+                <button class="text-red-500 hover:text-red-700 text-sm font-semibold" onclick="deleteTask('${task.id}', '${date}')">Delete</button>
+            </div>
+        `).join('');
+    }
+
+    window.toggleTaskCompletion = async (taskId, date) => {
+        if (!currentUser) return;
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.data();
+        const plannerTasks = userData.planner_tasks || {};
+        const tasks = plannerTasks[date] || [];
+        
+        const task = tasks.find(t => t.id === taskId);
+        if (task) {
+            task.completed = !task.completed;
+            await updateDoc(userDocRef, { planner_tasks: plannerTasks });
+            loadPlannerTasks();
+            updateDashboardStats();
+        }
+    };
+
+    window.deleteTask = async (taskId, date) => {
+        if (!currentUser || !confirm('Delete this task?')) return;
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.data();
+        const plannerTasks = userData.planner_tasks || {};
+        const tasks = plannerTasks[date] || [];
+        
+        plannerTasks[date] = tasks.filter(t => t.id !== taskId);
+        await updateDoc(userDocRef, { planner_tasks: plannerTasks });
+        loadPlannerTasks();
+        updateDashboardStats();
+    };
+
+    // TRACKER
+    const addTrackerSessionBtn = document.getElementById('add-tracker-session-btn');
+    
+    if (addTrackerSessionBtn) {
+        addTrackerSessionBtn.onclick = async () => {
+            if (!currentUser) return;
+            
+            const subject = document.getElementById('tracker-subject').value;
+            const hours = parseFloat(document.getElementById('tracker-hours').value);
+            
+            if (!hours || hours <= 0) {
+                showAlert('Please enter valid hours');
+                return;
+            }
+
+            const today = new Date().toISOString().split('T')[0];
+            const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+            const docSnap = await getDoc(userDocRef);
+            const userData = docSnap.exists() ? docSnap.data() : {};
+            const trackerData = userData.tracker_data || {};
+            
+            if (!trackerData[today]) trackerData[today] = [];
+            trackerData[today].push({ subject, hours, timestamp: new Date().toISOString() });
+
+            await setDoc(userDocRef, { tracker_data: trackerData }, { merge: true });
+            document.getElementById('tracker-hours').value = '';
+            loadTrackerData();
+            updateDashboardStats();
+            showAlert('Study session logged!');
+        };
+    }
+
+    async function loadTrackerData() {
+        if (!currentUser) return;
+        
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.exists() ? docSnap.data() : {};
+        const trackerData = userData.tracker_data || {};
+        
+        const today = new Date().toISOString().split('T')[0];
+        const todayData = trackerData[today] || [];
+        const todayHours = todayData.reduce((sum, session) => sum + session.hours, 0);
+        
+        const weekStart = new Date();
+        weekStart.setDate(weekStart.getDate() - 7);
+        let weekHours = 0;
+        let totalHours = 0;
+        
+        Object.entries(trackerData).forEach(([date, sessions]) => {
+            const dayHours = sessions.reduce((sum, s) => sum + s.hours, 0);
+            totalHours += dayHours;
+            if (new Date(date) >= weekStart) weekHours += dayHours;
+        });
+        
+        document.getElementById('tracker-today-hours').textContent = todayHours.toFixed(1);
+        document.getElementById('tracker-week-hours').textContent = weekHours.toFixed(1);
+        document.getElementById('tracker-total-hours').textContent = totalHours.toFixed(1);
+        
+        renderHeatmap(trackerData);
+    }
+
+    function renderHeatmap(trackerData) {
+        const heatmap = document.getElementById('tracker-heatmap');
+        const days = 49; // 7 weeks
+        const today = new Date();
+        
+        heatmap.innerHTML = '';
+        for (let i = days - 1; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(date.getDate() - i);
+            const dateStr = date.toISOString().split('T')[0];
+            const dayData = trackerData[dateStr] || [];
+            const hours = dayData.reduce((sum, s) => sum + s.hours, 0);
+            
+            const level = hours === 0 ? '' : hours < 2 ? 'level-1' : hours < 4 ? 'level-2' : hours < 6 ? 'level-3' : 'level-4';
+            const div = document.createElement('div');
+            div.className = `heatmap-day ${level}`;
+            div.title = `${dateStr}: ${hours}h`;
+            heatmap.appendChild(div);
+        }
+    }
+
+    // DPP
+    function loadDPPs(filterSubject = 'all') {
+        const container = document.getElementById('dpp-container');
+        const filtered = filterSubject === 'all' ? dppData : dppData.filter(d => d.subject === filterSubject);
+        
+        container.innerHTML = filtered.map(dpp => `
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm">
+                <div class="flex items-start justify-between mb-4">
+                    <div>
+                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-300">${dpp.subject}</span>
+                        <h3 class="font-bold mt-2">${dpp.title}</h3>
+                        <p class="text-sm text-slate-500">${dpp.questions} Questions</p>
+                    </div>
+                    <input type="checkbox" class="h-5 w-5 rounded text-green-600" ${dpp.completed ? 'checked' : ''} onchange="toggleDPP('${dpp.id}')">
+                </div>
+                <button class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold" onclick="startDPP('${dpp.id}')">
+                    ${dpp.completed ? 'Review' : 'Start DPP'}
+                </button>
+            </div>
+        `).join('');
+    }
+
+    window.toggleDPP = async (dppId) => {
+        if (!currentUser) return;
+        const dpp = dppData.find(d => d.id === dppId);
+        if (!dpp) return;
+        
+        dpp.completed = !dpp.completed;
+        
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.exists() ? docSnap.data() : {};
+        const dppProgress = userData.dpp_progress || {};
+        
+        dppProgress[dppId] = { completed: dpp.completed, timestamp: new Date().toISOString() };
+        await setDoc(userDocRef, { dpp_progress: dppProgress }, { merge: true });
+        
+        updateDashboardStats();
+    };
+
+    window.startDPP = (dppId) => {
+        showAlert('DPP feature will open the practice paper');
+    };
+
+    document.querySelectorAll('#dpp-view .subject-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#dpp-view .subject-tab').forEach(t => {
+                t.classList.remove('active');
+                t.classList.add('bg-slate-100', 'dark:bg-slate-700');
+            });
+            tab.classList.add('active');
+            tab.classList.remove('bg-slate-100', 'dark:bg-slate-700');
+            loadDPPs(tab.dataset.subject);
+        });
+    });
+
+    // ANSWER WRITING
+    function loadAnswerQuestions() {
+        const container = document.getElementById('answer-questions-list');
+        container.innerHTML = answerQuestions.map(q => `
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm cursor-pointer hover:shadow-lg transition-shadow" onclick="openAnswerWriting('${q.id}')">
+                <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">${q.subject}</span>
+                <h3 class="font-bold mt-2 mb-2">${q.question}</h3>
+                <p class="text-sm text-slate-500">${q.marks} words</p>
+            </div>
+        `).join('');
+    }
+
+    window.openAnswerWriting = (questionId) => {
+        const question = answerQuestions.find(q => q.id === questionId);
+        if (!question) return;
+        
+        document.getElementById('answer-questions-list').classList.add('hidden');
+        document.getElementById('answer-writing-area').classList.remove('hidden');
+        document.getElementById('current-question-text').textContent = question.question;
+        document.getElementById('current-question-marks').textContent = `${question.marks} words · ${question.subject}`;
+        
+        loadSavedAnswer(questionId);
+    };
+
+    async function loadSavedAnswer(questionId) {
+        if (!currentUser) return;
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.exists() ? docSnap.data() : {};
+        const answers = userData.answer_writing || {};
+        
+        const textarea = document.getElementById('answer-textarea');
+        textarea.value = answers[questionId]?.text || '';
+    }
+
+    document.getElementById('back-to-questions-btn')?.addEventListener('click', () => {
+        document.getElementById('answer-questions-list').classList.remove('hidden');
+        document.getElementById('answer-writing-area').classList.add('hidden');
+        stopTimer();
+    });
+
+    document.getElementById('save-answer-btn')?.addEventListener('click', async () => {
+        if (!currentUser) return;
+        const questionId = answerQuestions[0].id; // You'd track current question
+        const text = document.getElementById('answer-textarea').value;
+        
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.exists() ? docSnap.data() : {};
+        const answers = userData.answer_writing || {};
+        
+        answers[questionId] = { text, timestamp: new Date().toISOString(), timeSpent: timerSeconds };
+        await setDoc(userDocRef, { answer_writing: answers }, { merge: true });
+        
+        showAlert('Answer saved successfully!');
+    });
+
+    document.getElementById('toggle-timer-btn')?.addEventListener('click', () => {
+        if (timerInterval) {
+            stopTimer();
+        } else {
+            startTimer();
+        }
+    });
+
+    function startTimer() {
+        timerInterval = setInterval(() => {
+            timerSeconds++;
+            const mins = Math.floor(timerSeconds / 60);
+            const secs = timerSeconds % 60;
+            document.getElementById('answer-timer').textContent = `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }, 1000);
+        document.getElementById('toggle-timer-btn').textContent = 'Stop Timer';
+    }
+
+    function stopTimer() {
+        if (timerInterval) {
+            clearInterval(timerInterval);
+            timerInterval = null;
+            document.getElementById('toggle-timer-btn').textContent = 'Start Timer';
+        }
+    }
+
+    // PDFs
+    function loadPDFs(filterSubject = 'all') {
+        const container = document.getElementById('pdfs-container');
+        const filtered = filterSubject === 'all' ? pdfResources : pdfResources.filter(p => p.subject === filterSubject);
+        
+        container.innerHTML = filtered.map(pdf => `
+            <div class="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="bg-red-100 dark:bg-red-900/50 p-3 rounded-lg">
+                        <svg class="h-8 w-8 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>
+                    </div>
+                    <div class="flex-1">
+                        <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300">${pdf.subject}</span>
+                        <h3 class="font-bold mt-1">${pdf.title}</h3>
+                    </div>
+                </div>
+                <div class="flex gap-2">
+                    <button class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold" onclick="viewPDF('${pdf.id}')">View</button>
+                    <button class="flex-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 px-4 py-2 rounded-lg font-semibold" onclick="downloadPDF('${pdf.id}')">Download</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.viewPDF = (pdfId) => {
+        showAlert('PDF viewer will open');
+    };
+
+    window.downloadPDF = (pdfId) => {
+        showAlert('PDF download started');
+    };
+
+    document.querySelectorAll('#pdfs-view .subject-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            document.querySelectorAll('#pdfs-view .subject-tab').forEach(t => {
+                t.classList.remove('active');
+                t.classList.add('bg-slate-100', 'dark:bg-slate-700');
+            });
+            tab.classList.add('active');
+            tab.classList.remove('bg-slate-100', 'dark:bg-slate-700');
+            loadPDFs(tab.dataset.subject);
+        });
+    });
+
+    // MINDMAPS
+    function loadMindmaps() {
+        const container = document.getElementById('mindmaps-container');
+        container.innerHTML = mindmaps.map(mm => `
+            <div class="bg-white dark:bg-slate-800 rounded-xl shadow-sm overflow-hidden cursor-pointer hover:shadow-lg transition-shadow" onclick="viewMindmap('${mm.id}')">
+                <img src="${mm.img}" alt="${mm.title}" class="w-full h-48 object-cover">
+                <div class="p-4">
+                    <span class="inline-block px-2 py-1 text-xs font-semibold rounded bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">${mm.subject}</span>
+                    <h3 class="font-bold mt-2">${mm.title}</h3>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    window.viewMindmap = (mmId) => {
+        showAlert('Mindmap viewer will open');
+    };
+
+    // DASHBOARD
+    function renderPerformanceChart() {
+        const canvas = document.getElementById('performanceChart');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        
+        if (performanceChartInstance) {
+            performanceChartInstance.destroy();
+        }
+
+        const isDark = document.documentElement.classList.contains('dark');
+        const tickColor = isDark ? '#94a3b8' : '#64748b';
+        const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+
+        performanceChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Study Hours',
+                    data: [6, 7, 5, 8, 6, 7, 5],
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 10,
+                        ticks: { color: tickColor },
+                        grid: { color: gridColor }
+                    },
+                    x: {
+                        ticks: { color: tickColor },
+                        grid: { display: false }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+    }
+
+    async function updateDashboardStats() {
+        if (!currentUser) return;
+        
+        const userDocRef = doc(db, `artifacts/${appId}/users`, currentUser.uid);
+        const docSnap = await getDoc(userDocRef);
+        const userData = docSnap.exists() ? docSnap.data() : {};
+        
+        const plannerTasks = userData.planner_tasks || {};
+        const trackerData = userData.tracker_data || {};
+        const dppProgress = userData.dpp_progress || {};
+        
+        const today = new Date().toISOString().split('T')[0];
+        const todayTasks = plannerTasks[today] || [];
+        const completedTasks = todayTasks.filter(t => t.completed).length;
+        
+        const todayStudy = trackerData[today] || [];
+        const todayHours = todayStudy.reduce((sum, s) => sum + s.hours, 0);
+        
+        const dppCompleted = Object.values(dppProgress).filter(d => d.completed).length;
+        
+        let totalHours = 0;
+        Object.values(trackerData).forEach(sessions => {
+            totalHours += sessions.reduce((sum, s) => sum + s.hours, 0);
+        });
+        
+        const totalTasks = Object.values(plannerTasks).flat().length;
+        const completedAllTasks = Object.values(plannerTasks).flat().filter(t => t.completed).length;
+        const progress = totalTasks > 0 ? Math.round((completedAllTasks / totalTasks) * 100) : 0;
+        
+        document.getElementById('overall-progress-value').textContent = progress + '%';
+        document.getElementById('study-hours-value').textContent = totalHours.toFixed(1) + 'h';
+        document.getElementById('dpp-done-value').textContent = `${dppCompleted}/30`;
+        document.getElementById('tasks-today-value').textContent = `${completedTasks}/${todayTasks.length}`;
+        
+        if (document.getElementById('today-study-time')) {
+            document.getElementById('today-study-time').textContent = todayHours.toFixed(1) + 'h';
+        }
+    }
+
+    // AUTH
+    onAuthStateChanged(auth, user => {
+        if (user) {
+            currentUser = user;
+            appView.classList.remove('hidden');
+            
+            if (dropdownDisplayName) dropdownDisplayName.textContent = user.displayName || 'UPSC Aspirant';
+            if (welcomeHeading) welcomeHeading.textContent = `Welcome back, ${(user.displayName || 'Aspirant').split(' ')[0]}!`;
+            
+            const userDocRef = doc(db, `artifacts/${appId}/users`, user.uid);
+            onSnapshot(userDocRef, (docSnap) => {
+                if (docSnap.exists()) {
+                    updateDashboardStats();
+                } else {
+                    setDoc(userDocRef, {
+                        displayName: user.displayName || 'UPSC Aspirant',
+                        email: user.email,
+                        createdAt: serverTimestamp(),
+                        planner_tasks: {},
+                        tracker_data: {},
+                        dpp_progress: {},
+                        answer_writing: {}
+                    });
+                }
+            });
+            
+            renderPerformanceChart();
+            showView('home');
+        } else {
+            window.location.href = 'TestSeries/auth.html';
+        }
+    });
+</script>
+</body>
+</html>
