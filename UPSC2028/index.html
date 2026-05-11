@@ -7,6 +7,9 @@
 
     <title>UPSChub Planner</title>
 
+    <!-- jsPDF Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -43,6 +46,28 @@
         .title-box p {
             font-size: 16px;
             opacity: 0.9;
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 15px;
+        }
+
+        .download-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #0056cc;
         }
 
         .table-container {
@@ -108,6 +133,14 @@
                 padding: 10px;
             }
 
+            .download-btn {
+                width: 100%;
+            }
+
+            .top-actions {
+                justify-content: center;
+            }
+
         }
     </style>
 </head>
@@ -119,6 +152,12 @@
         <div class="title-box">
             <h1>UPSChub Planner</h1>
             <p>Mission UPSC 2028 • Daily Planner • Strategic Preparation Tracker</p>
+        </div>
+
+        <div class="top-actions">
+            <button class="download-btn" onclick="downloadPDF()">
+                Download Monthly Tracker PDF
+            </button>
         </div>
 
         <div class="table-container">
@@ -139,14 +178,16 @@
 
     <script>
 
-        const API_KEY = "AIzaSyA3OcSW6qV-gfQEV2NVT0QEfzbt53kUVRc";
+        const API_KEY = "YOUR_API_KEY";
 
-        const SHEET_ID = "1zaUOi3WDvBoBhCOEOZaRQgSYGVob9ktcbOTPYlG6v-s";
+        const SHEET_ID = "YOUR_SHEET_ID";
 
         const RANGE = "A5:E100";
 
         const url =
             `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
+
+        let plannerRows = [];
 
         async function loadPlanner() {
 
@@ -159,6 +200,8 @@
                 console.log(data);
 
                 const rows = data.values;
+
+                plannerRows = rows;
 
                 let tableHTML = "";
 
@@ -200,6 +243,42 @@
                     "Failed to load planner.";
 
             }
+
+        }
+
+        function downloadPDF() {
+
+            const { jsPDF } = window.jspdf;
+
+            const doc = new jsPDF();
+
+            doc.setFontSize(18);
+
+            doc.text("UPSChub Monthly Planner", 20, 20);
+
+            doc.setFontSize(11);
+
+            let y = 35;
+
+            plannerRows.forEach((row, index) => {
+
+                let line = row.join(" | ");
+
+                doc.text(line, 10, y);
+
+                y += 10;
+
+                if (y > 280) {
+
+                    doc.addPage();
+
+                    y = 20;
+
+                }
+
+            });
+
+            doc.save("Tracker.pdf");
 
         }
 
