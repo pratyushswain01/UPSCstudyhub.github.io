@@ -7,9 +7,6 @@
 
     <title>UPSChub Planner</title>
 
-    <!-- jsPDF Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
     <style>
         * {
             margin: 0;
@@ -143,6 +140,7 @@
 
         }
     </style>
+
 </head>
 
 <body>
@@ -150,20 +148,35 @@
     <div class="container">
 
         <div class="title-box">
+
             <h1>UPSChub Planner</h1>
-            <p>Mission UPSC 2028 • Daily Planner • Strategic Preparation Tracker</p>
+
+            <p>
+                Mission UPSC 2028 • Daily Planner • Strategic Preparation Tracker
+            </p>
+
         </div>
 
         <div class="top-actions">
-            <button class="download-btn" onclick="downloadPDF()">
-                Download Monthly Tracker PDF
-            </button>
+
+            <a href="monthly-tracker.pdf" download>
+
+                <button class="download-btn">
+
+                    Download Monthly Tracker PDF
+
+                </button>
+
+            </a>
+
         </div>
 
         <div class="table-container">
 
             <div class="loading" id="loading">
+
                 Loading Planner...
+
             </div>
 
             <table id="plannerTable"></table>
@@ -171,23 +184,25 @@
         </div>
 
         <div class="footer">
+
             UPSChub © 2026 • Smart UPSC Planner System
+
         </div>
 
     </div>
 
     <script>
 
-        const API_KEY = "AIzaSyA3OcSW6qV-gfQEV2NVT0QEfzbt53kUVRc";
+        const API_KEY =
+            "AIzaSyA3OcSW6qV-gfQEV2NVT0QEfzbt53kUVRc";
 
-        const SHEET_ID = "1zaUOi3WDvBoBhCOEOZaRQgSYGVob9ktcbOTPYlG6v-s";
+        const SHEET_ID =
+            "1zaUOi3WDvBoBhCOEOZaRQgSYGVob9ktcbOTPYlG6v-s";
 
         const RANGE = "A5:E100";
 
         const url =
             `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${RANGE}?key=${API_KEY}`;
-
-        let plannerRows = [];
 
         async function loadPlanner() {
 
@@ -200,8 +215,6 @@
                 console.log(data);
 
                 const rows = data.values;
-
-                plannerRows = rows;
 
                 let tableHTML = "";
 
@@ -229,9 +242,11 @@
 
                 });
 
-                document.getElementById("plannerTable").innerHTML = tableHTML;
+                document.getElementById("plannerTable").innerHTML =
+                    tableHTML;
 
-                document.getElementById("loading").style.display = "none";
+                document.getElementById("loading").style.display =
+                    "none";
 
             }
 
@@ -246,45 +261,9 @@
 
         }
 
-        function downloadPDF() {
-
-            const { jsPDF } = window.jspdf;
-
-            const doc = new jsPDF();
-
-            doc.setFontSize(18);
-
-            doc.text("UPSChub Monthly Planner", 20, 20);
-
-            doc.setFontSize(11);
-
-            let y = 35;
-
-            plannerRows.forEach((row, index) => {
-
-                let line = row.join(" | ");
-
-                doc.text(line, 10, y);
-
-                y += 10;
-
-                if (y > 280) {
-
-                    doc.addPage();
-
-                    y = 20;
-
-                }
-
-            });
-
-            doc.save("Tracker.pdf");
-
-        }
-
         loadPlanner();
 
-        // Auto refresh every 10 seconds
+        // Auto Refresh Every 10 Seconds
 
         setInterval(loadPlanner, 10000);
 
