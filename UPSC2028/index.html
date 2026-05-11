@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>UPSChub Planner</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #007bff;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        th {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>UPSChub Planner</h1>
+
+    <table id="plannerTable">
+
+    </table>
+
+    <script>
+
+        const API_KEY = "AIzaSyA3OcSW6qV-gfQEV2NVT0QEfzbt53kUVRc";
+
+        const SHEET_ID = "1zaUOi3WDvBoBhCOEOZaRQgSYGVob9ktcbOTPYlG6v-s";
+
+        const SHEET_NAME = "SANKALP LUXE 2026";
+
+
+        const url =
+            `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${SHEET_NAME}?key=${API_KEY}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+
+                const rows = data.values;
+
+                let table = "<tr>";
+
+                rows[0].forEach(col => {
+                    table += `<th>${col}</th>`;
+                });
+
+                table += "</tr>";
+
+                for (let i = 1; i < rows.length; i++) {
+
+                    table += "<tr>";
+
+                    rows[i].forEach(cell => {
+                        table += `<td>${cell}</td>`;
+                    });
+
+                    table += "</tr>";
+                }
+
+                document.getElementById("plannerTable").innerHTML = table;
+
+            });
+
+    </script>
+
+</body>
+
+</html>
