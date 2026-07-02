@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chapters | UPSChub Datasheet</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --secondary: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --gradient-start: #007bff;
+            --gradient-end: #00c6ff;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.5rem 1rem 1rem;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .subject-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            padding: 0.5rem;
+            background-color: var(--card);
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: var(--card);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .filters {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 0.875rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background-color: var(--card);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            border-color: var(--primary);
+            background-color: rgba(0, 123, 255, 0.15);
+            color: var(--primary);
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 88px;
+            max-height: calc(100vh - 90px);
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 0.75rem;
+            margin-right: 1rem;
+            background-color: var(--card);
+            font-size: 0.9rem;
+            scrollbar-width: thin;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: static;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .sidebar-title {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.3rem;
+        }
+
+        .sidebar-nav a {
+            display: block;
+            padding: 0.3rem 0;
+            text-decoration: none;
+            color: var(--secondary);
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav a:hover {
+            color: var(--primary);
+        }
+
+        .sidebar-nav a.active {
+            color: var(--primary);
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .main {
+            flex: 1;
+        }
+
+        .chapter-list {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        .chapter-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        [data-theme="dark"] .chapter-card {
+            background: var(--card);
+            border-color: #333;
+        }
+
+        .chapter-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .chapter-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.6rem;
+        }
+
+        .chapter-header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .chapter-number {
+            font-size: 0.9rem;
+            padding: 0.25rem 0.625rem;
+            border-radius: 24px;
+            background-color: rgba(0, 123, 255, 0.15);
+            color: white;
+            margin-right: 0.75rem;
+        }
+
+        .chapter-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.3rem;
+            margin-top: 0.3rem;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 999px;
+            background-color: rgba(0, 123, 255, 0.15);
+            color: var(--primary);
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            opacity: 0.75;
+        }
+
+        .completion-toggle {
+            display: flex;
+            align-items: center;
+        }
+
+        .completion-toggle-label {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background-color: #ccc;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: background-color 0.25s ease;
+        }
+
+        [data-theme="dark"] .toggle-switch {
+            background-color: #555;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background-color: white;
+            transition: all 0.25s ease;
+        }
+
+        .toggle-switch input:checked+.toggle-slider {
+            transform: translateX(20px);
+            background-color: #00c6ff;
+        }
+
+        .progress-bar {
+            height: 6px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+            margin-top: 0.3rem;
+            margin-bottom: 0.5rem;
+            overflow: hidden;
+        }
+
+        [data-theme="dark"] .progress-bar {
+            background-color: #333;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--gradient-start), var(--gradient-end));
+            width: 40%;
+        }
+
+        .view-btn {
+            padding: 0.5rem 1rem;
+            border-radius: 999px;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .view-btn:hover {
+            background-color: var(--primary-dark);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="top-bar">
+                <div class="subject-title" id="subjectTitle">Subject: Polity</div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search chapters..." id="searchInput" />
+                </div>
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="completed">Completed</button>
+                <button class="filter-btn" data-filter="pending">Pending</button>
+            </div>
+        </header>
+
+        <div style="display: flex; flex-wrap: wrap;">
+            <div class="sidebar">
+                <div class="sidebar-title">Quick Nav</div>
+                <ul class="sidebar-nav">
+                    <li><a href="#" class="nav-link active" data-chapter="1">Chapter 1: Historical Background</a></li>
+                    <li><a href="#" class="nav-link" data-chapter="2">Chapter 2: Making of Constitution</a></li>
+                    <li><a href="#" class="nav-link" data-chapter="3">Chapter 3: Fundamental Rights</a></li>
+                    <li><a href="#" class="nav-link" data-chapter="4">Chapter 4: Directive Principles</a></li>
+                    <li><a href="#" class="nav-link" data-chapter="5">Chapter 5: Union Executive</a></li>
+                </ul>
+            </div>
+
+            <div class="main">
+                <div class="chapter-list" id="chapterList">
+                    <!-- SKELETON LOADER -->
+                    <div class="chapter-card">
+                        <div class="chapter-header">
+                            <div class="chapter-header-left">
+                                <div class="chapter-number skeleton" style="width: 40px; height: 20px;"></div>
+                                <div class="chapter-title skeleton" style="width: 180px; height: 20px;"></div>
+                            </div>
+                            <div class="chapter-meta skeleton" style="width: 120px; height: 16px;"></div>
+                        </div>
+                        <div class="tags skeleton"
+                            style="height: 16px; margin-top: 8px; margin-bottom: 8px; width: 200px;"></div>
+                        <div class="progress-bar skeleton" style="width: 100%; height: 6px; margin-bottom: 8px;"></div>
+                    </div>
+                    <div class="chapter-card">
+                        <div class="chapter-header">
+                            <div class="chapter-header-left">
+                                <div class="chapter-number skeleton" style="width: 40px; height: 20px;"></div>
+                                <div class="chapter-title skeleton" style="width: 200px; height: 20px;"></div>
+                            </div>
+                            <div class="chapter-meta skeleton" style="width: 120px; height: 16px;"></div>
+                        </div>
+                        <div class="tags skeleton"
+                            style="height: 16px; margin-top: 8px; margin-bottom: 8px; width: 220px;"></div>
+                        <div class="progress-bar skeleton" style="width: 100%; height: 6px; margin-bottom: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c",
+            measurementId: "G-33F0XSLP53"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const toast = document.getElementById("toast");
+
+        function showNotification(text) {
+            toast.textContent = text;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+        }
+
+        function toggleTheme() {
+            const theme = localStorage.getItem("theme") || "light";
+            applyTheme(theme === "dark" ? "light" : "dark");
+        }
+
+        document.getElementById("themeToggle").onclick = toggleTheme;
+
+        const savedTheme = localStorage.getItem("theme") || "light";
+        applyTheme(savedTheme);
+
+        const subjectName = localStorage.getItem("currentSubjectName") || "Polity";
+        document.getElementById("subjectTitle").textContent = `Subject: ${subjectName}`;
+
+        const chapterList = document.getElementById("chapterList");
+        const searchInput = document.getElementById("searchInput");
+        const filterButtons = document.querySelectorAll(".filter-btn");
+        let currentFilter = "all";
+
+        // Mock chapter data
+        const chapters = [
+            {
+                id: "1",
+                number: 1,
+                name: "Historical Background",
+                tags: ["Foundation", "Constitution"],
+                resources: 12,
+                lastUpdated: "May 10, 2026",
+                completed: false
+            },
+            {
+                id: "2",
+                number: 2,
+                name: "Making of Constitution",
+                tags: ["Constituent Assembly", "Drafting"],
+                resources: 15,
+                lastUpdated: "May 12, 2026",
+                completed: true
+            },
+            {
+                id: "3",
+                number: 3,
+                name: "Fundamental Rights",
+                tags: ["Rights", "Justice"],
+                resources: 18,
+                lastUpdated: "May 15, 2026",
+                completed: false
+            },
+            {
+                id: "4",
+                number: 4,
+                name: "Directive Principles",
+                tags: ["DPSP", "Governance"],
+                resources: 14,
+                lastUpdated: "May 14, 2026",
+                completed: true
+            }
+        ];
+
+        function renderChapters(filter = "all", search = "") {
+            chapterList.innerHTML = "";
+
+            const filtered = chapters.filter(chap => {
+                const matchesSearch = !search || chap.name.toLowerCase().includes(search.toLowerCase());
+                const matchesFilter =
+                    filter === "all" ||
+                    (filter === "completed" && chap.completed) ||
+                    (filter === "pending" && !chap.completed);
+                return matchesSearch && matchesFilter;
+            });
+
+            if (filtered.length === 0) {
+                chapterList.innerHTML = "<p>No chapters found.</p>";
+                return;
+            }
+
+            const progress = chapters.length > 0 ? (chapters.filter(c => c.completed).length / chapters.length) * 100 : 0;
+
+            filtered.forEach(chap => {
+                const card = document.createElement("div");
+                card.className = "chapter-card";
+
+                card.innerHTML = `
+          <div class="chapter-header">
+            <div class="chapter-header-left">
+              <div class="chapter-number">${chap.number}</div>
+              <div class="chapter-title">${chap.name}</div>
+            </div>
+            <div class="chapter-meta">
+              Updated ${chap.lastUpdated}
+            </div>
+          </div>
+          <div class="tags">
+            ${chap.tags.map(t => `<span class="tag">${t}</span>`).join("")}
+          </div>
+          <div class="meta-row">
+            <div>Resources: ${chap.resources} PDFs</div>
+            <div class="completion-toggle">
+              <span class="completion-toggle-label">Completed</span>
+              <label class="toggle-switch">
+                <input type="checkbox" ${chap.completed ? "checked" : ""} data-chapter="${chap.id}">
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${progress}%"></div>
+          </div>
+          <button class="view-btn" data-chapter="${chap.id}">View Resources</button>
+        `;
+                chapterList.appendChild(card);
+
+                const toggle = card.querySelector("input[type='checkbox']");
+                toggle.addEventListener("change", () => {
+                    const chapterId = toggle.dataset.chapter;
+                    const completed = toggle.checked;
+                    // In real app: update Firestore user.completedChapters
+                    showNotification(`Chapter ${chapterId} marked ${completed ? "complete" : "pending"}.`);
+                });
+
+                const viewBtn = card.querySelector(".view-btn");
+                viewBtn.addEventListener("click", () => {
+                    localStorage.setItem("currentChapterId", chap.id);
+                    localStorage.setItem("currentChapterName", chap.name);
+                    showNotification(`Opening resources for ${chap.name}...`);
+                    setTimeout(() => window.location.href = "resources.html", 1000);
+                });
+            });
+        }
+
+        window.addEventListener("DOMContentLoaded", () => {
+            renderChapters();
+        });
+
+        searchInput.addEventListener("input", () => {
+            renderChapters(currentFilter, searchInput.value);
+        });
+
+        filterButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                currentFilter = btn.dataset.filter;
+                filterButtons.forEach(b => b.classList.toggle("active", b.dataset.filter === currentFilter));
+                renderChapters(currentFilter, searchInput.value);
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                showNotification("Session expired. Redirecting to login...");
+                setTimeout(() => window.location.href = "index.html", 1500);
+            }
+        });
+    </script>
+</body>
+
+</html>

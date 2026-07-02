@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Resources | UPSChub Datasheet</title>
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --primary: #007bff;
+            --primary-dark: #0056b3;
+            --secondary: #6c757d;
+            --border: #dee2e6;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --gradient-start: #007bff;
+            --gradient-end: #00c6ff;
+            --accent: #28a745;
+            --accent-light: #d4edda;
+            --danger: #dc3545;
+        }
+
+        [data-theme="dark"] {
+            --bg: #121212;
+            --card: #1e1e1e;
+            --text: #e0e0e0;
+            --border: #333333;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0.5rem 1rem 1rem;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            background-color: var(--bg);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 0;
+            margin-bottom: 1rem;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .chapter-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .theme-toggle {
+            padding: 0.5rem;
+            background-color: var(--card);
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            cursor: pointer;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 500px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            background-color: var(--card);
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            margin-right: 0.25rem;
+            margin-bottom: -1px;
+            cursor: pointer;
+            background: none;
+            font-weight: 500;
+        }
+
+        .tab-btn.active {
+            border-color: var(--border);
+            border-bottom: none;
+            background-color: var(--card);
+            box-shadow: 0 -1px 0 var(--border);
+        }
+
+        [data-theme="dark"] .tab-btn {
+            color: var(--text);
+        }
+
+        .tab-btn[data-type="dpp"] {
+            color: #007bff;
+        }
+
+        .tab-btn[data-type="mindmap"] {
+            color: #ff6b6b;
+        }
+
+        .tab-btn[data-type="notes"] {
+            color: #ffca28;
+        }
+
+        .tab-btn[data-type="pyq"] {
+            color: #2ecc71;
+        }
+
+        .tab-btn[data-type="extra"] {
+            color: #9c27b0;
+        }
+
+        .resource-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .resource-card {
+            background: var(--card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            box-shadow: 0 4px 12px var(--shadow);
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        [data-theme="dark"] .resource-card {
+            background: var(--card);
+            border-color: #333;
+        }
+
+        .resource-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
+        .thumbnail {
+            width: 100%;
+            height: 150px;
+            background-color: #f0f0f0;
+            border-radius: 8px;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: var(--accent-light);
+        }
+
+        [data-theme="dark"] .thumbnail {
+            background: rgba(40, 167, 69, 0.2);
+        }
+
+        .resource-title {
+            font-size: 1rem;
+            font-weight: 550;
+            margin-bottom: 0.3rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .resource-meta {
+            font-size: 0.85rem;
+            opacity: 0.75;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-right: 0.3rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .badge-dpp {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .badge-mindmap {
+            background-color: #ff6b6b;
+            color: #fff;
+        }
+
+        .badge-notes {
+            background-color: #ffca28;
+            color: #000;
+        }
+
+        .badge-pyq {
+            background-color: #2ecc71;
+            color: #fff;
+        }
+
+        .badge-extra {
+            background-color: #9c27b0;
+            color: #fff;
+        }
+
+        .actions {
+            margin-top: 0.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 0.875rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        [data-theme="dark"] .btn-outline {
+            border-color: #333;
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(0, 123, 255, 0.15);
+            color: var(--primary);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        /* PDF viewer overlay */
+        .pdf-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.95);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+        .pdf-header {
+            padding: 0.75rem 1rem;
+            background-color: #111;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pdf-title {
+            color: white;
+            font-size: 1rem;
+            font-weight: 550;
+        }
+
+        .pdf-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .pdf-btn {
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.5rem 0.875rem;
+            border-radius: 999px;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .pdf-btn:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .pdf-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+
+        .pdf-iframe {
+            width: 95%;
+            height: 95%;
+            border: none;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 1rem;
+            max-width: 300px;
+            padding: 0.875rem 1rem;
+            border-radius: 12px;
+            background-color: #333;
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            opacity: 0;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <div class="top-bar">
+                <div class="chapter-title" id="chapterTitle">Chapter 1: Historical Background</div>
+                <div class="search-bar">
+                    <input type="text" placeholder="Search resources..." id="searchInput" />
+                </div>
+                <button class="theme-toggle" id="themeToggle">🌓</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab-btn active" data-type="all">All</button>
+                <button class="tab-btn" data-type="dpp">DPP PDFs</button>
+                <button class="tab-btn" data-type="mindmap">Mindmaps</button>
+                <button class="tab-btn" data-type="notes">Summary Notes</button>
+                <button class="tab-btn" data-type="pyq">PYQs</button>
+                <button class="tab-btn" data-type="extra">Extra Notes</button>
+                <button class="tab-btn" data-type="videos">Video Links</button>
+            </div>
+        </header>
+
+        <div class="resource-list" id="resourceList">
+            <!-- SKELETON LOADER -->
+            <div class="resource-card">
+                <div class="thumbnail skeleton" style="height: 150px;"></div>
+                <div class="resource-title skeleton" style="height: 16px; width: 100%; margin-top: 8px;"></div>
+                <div class="resource-meta skeleton" style="height: 12px; width: 60%; margin-top: 6px;"></div>
+            </div>
+            <div class="resource-card">
+                <div class="thumbnail skeleton" style="height: 150px;"></div>
+                <div class="resource-title skeleton" style="height: 16px; width: 100%; margin-top: 8px;"></div>
+                <div class="resource-meta skeleton" style="height: 12px; width: 70%; margin-top: 6px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- PDF Viewer Overlay -->
+    <div class="pdf-overlay" id="pdfViewer">
+        <div class="pdf-header">
+            <div class="pdf-title" id="pdfTitle"></div>
+            <div class="pdf-actions">
+                <button class="pdf-btn" id="pdfClose">Close</button>
+                <button class="pdf-btn" id="pdfDownload">Download</button>
+            </div>
+        </div>
+        <div class="pdf-container">
+            <iframe class="pdf-iframe" id="pdfIframe" title="PDF Viewer"></iframe>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+            authDomain: "upscstudyhub-github.firebaseapp.com",
+            databaseURL: "https://upscstudyhub-github-default-rtdb.firebaseio.com",
+            projectId: "upscstudyhub-github",
+            storageBucket: "upscstudyhub-github.firebasestorage.app",
+            messagingSenderId: "451692540885",
+            appId: "1:451692540885:web:b425e85128e5de97c7c35c",
+            measurementId: "G-33F0XSLP53"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        const toast = document.getElementById("toast");
+        const pdfViewer = document.getElementById("pdfViewer");
+        const pdfTitleEl = document.getElementById("pdfTitle");
+        const pdfIframe = document.getElementById("pdfIframe");
+        const pdfDownloadBtn = document.getElementById("pdfDownload");
+        const pdfCloseBtn = document.getElementById("pdfClose");
+
+        function showNotification(text) {
+            toast.textContent = text;
+            toast.classList.add("show");
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+        }
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute("data-theme", theme);
+            localStorage.setItem("theme", theme);
+        }
+
+        function toggleTheme() {
+            const theme = localStorage.getItem("theme") || "light";
+            applyTheme(theme === "dark" ? "light" : "dark");
+        }
+
+        document.getElementById("themeToggle").onclick = toggleTheme;
+
+        const savedTheme = localStorage.getItem("theme") || "light";
+        applyTheme(savedTheme);
+
+        const chapterName = localStorage.getItem("currentChapterName") || "Chapter 1: Historical Background";
+        document.getElementById("chapterTitle").textContent = chapterName;
+
+        const resourceList = document.getElementById("resourceList");
+        const searchInput = document.getElementById("searchInput");
+        const tabButtons = document.querySelectorAll(".tab-btn");
+        let currentTab = "all";
+
+        // Mock resources (in real app: fetch from Firestore Chapter → resources)
+        const currentSubject = localStorage.getItem("currentSubject");
+        const currentChapterId = localStorage.getItem("currentChapterId");
+
+        if (!currentChapterId) {
+            showNotification("Chapter not set. Go back to subjects.");
+            // redirect or show empty state
+            return;
+        }
+
+        try {
+            const chapterRef = db.collection("chapters").doc(currentChapterId);
+            const resourceSnapshot = await chapterRef.collection("resources").get();
+            const firestoreResources = resourceSnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            renderResources("all", "", firestoreResources);
+        } catch (err) {
+            showNotification("Failed to load resources. Check console.");
+            console.error(err);
+        }
+
+        function renderResources(tab = "all", search = "") {
+            resourceList.innerHTML = "";
+
+            const filtered = resources.filter(r => {
+                const matchesSearch = !search || r.title.toLowerCase().includes(search.toLowerCase());
+                const matchesTab = tab === "all" || r.type === tab;
+                return matchesSearch && matchesTab;
+            });
+
+            if (filtered.length === 0) {
+                resourceList.innerHTML = "<p class='no-results' style='grid-column: 1 / -1; text-align: center; padding: 2rem; opacity: 0.75;'>No resources found for this filter.</p>";
+                return;
+            }
+
+            filtered.forEach(r => {
+                const card = document.createElement("div");
+                card.className = "resource-card";
+
+                // Build badge
+                const typeBadge = type => {
+                    if (type === "dpp") return "dpp";
+                    if (type === "mindmap") return "mindmap";
+                    if (type === "notes") return "notes";
+                    if (type === "pyq") return "pyq";
+                    if (type === "extra") return "extra";
+                    if (type === "videos") return "extra";
+                    return "other";
+                };
+
+                const badgeClass = "badge-" + typeBadge(r.type);
+
+                card.innerHTML = `
+          <div class="thumbnail">${r.thumbnail}</div>
+          <div class="resource-title">${r.title}</div>
+          <div class="resource-meta">
+            <span class="file-size">${r.size || "—"}</span>
+            <span class="sep">&nbsp;•&nbsp;</span>
+            <span class="upload-date">Uploaded ${r.uploadedAt}</span>
+          </div>
+          <div class="badges">
+            <span class="badge ${badgeClass}">${r.type.toUpperCase()}</span>
+          </div>
+          <div class="actions">
+            <button class="btn-icon btn-primary view-btn" data-id="${r.id}" data-url="${r.pdfUrl}">
+              <span>View</span>
+            </button>
+            <button class="btn-icon btn-outline bookmark-btn" data-id="${r.id}">
+              <span>Bookmark</span>
+            </button>
+            ${r.type === "videos"
+                        ? `<button class="btn-icon btn-outline" onclick="window.open('${r.pdfUrl}', '_blank');">
+                   <span>Watch</span>
+                 </button>`
+                        : `<button class="btn-icon btn-outline download-btn" data-id="${r.id}" data-url="${r.pdfUrl}">
+                   <span>Download</span>
+                 </button>`
+                    }
+            <button class="btn-icon btn-outline share-btn" data-id="${r.id}" data-url="${r.pdfUrl}">
+              <span>Share</span>
+            </button>
+          </div>
+        `;
+
+                resourceList.appendChild(card);
+
+                // View button – open PDF viewer
+                const viewBtn = card.querySelector(".view-btn");
+                viewBtn.addEventListener("click", () => {
+                    const url = viewBtn.dataset.url;
+                    const id = viewBtn.dataset.id;
+
+                    if (!url) {
+                        showNotification("No file URL available.");
+                        return;
+                    }
+
+                    // For PDFs, show PDF viewer
+                    if (r.type !== "videos") {
+                        pdfViewer.style.display = "flex";
+                        pdfTitleEl.textContent = r.title;
+                        pdfIframe.src = url + "#toolbar=1&zoom=page-width";
+                    } else {
+                        // For videos, open in new tab
+                        window.open(url, "_blank");
+                    }
+                });
+
+                // Download button
+                const downloadBtn = card.querySelector(".download-btn");
+                if (downloadBtn) {
+                    downloadBtn.addEventListener("click", async () => {
+                        const url = downloadBtn.dataset.url;
+                        const id = downloadBtn.dataset.id;
+
+                        if (!url) {
+                            showNotification("No file URL available.");
+                            return;
+                        }
+
+                        // Simulate download; in real app you may:
+                        // - Create a temporary anchor + click
+                        // - Or use backend / signed URL
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.target = "_blank";
+                        a.download = r.title.replace(/\s+/g, "_") + ".pdf";
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+
+                        showNotification(`Downloading ${r.title}...`);
+                    });
+                }
+
+                // Bookmark button
+                const bookmarkBtn = card.querySelector(".bookmark-btn");
+                bookmarkBtn.addEventListener("click", () => {
+                    const id = bookmarkBtn.dataset.id;
+
+                    // In real app, you would:
+                    // - Write to Firebase: users / bookmarks
+                    // - Toggle a Firestore boolean flag
+                    // Here, mock UI behavior:
+
+                    const isBookmarked = bookmarkBtn.classList.toggle("bookmarked");
+
+                    bookmarkBtn.style.background = "rgba(40, 167, 69, 0.8)";
+                    bookmarkBtn.style.color = "white";
+                    bookmarkBtn.firstElementChild.textContent = isBookmarked ? "Bookmarked" : "Bookmark";
+                    showNotification(isBookmarked ? "Added to bookmarks." : "Removed from bookmarks.");
+                });
+
+                // Share button
+                const shareBtn = card.querySelector(".share-btn");
+                shareBtn.addEventListener("click", () => {
+                    const id = shareBtn.dataset.id;
+                    const url = shareBtn.dataset.url;
+
+                    if (!navigator.share) {
+                        showNotification("Sharing not supported on this device.");
+                        return;
+                    }
+
+                    navigator.share({
+                        title: r.title,
+                        text: `Check out this resource from UPSChub Datasheet: ${r.title}`,
+                        url: url
+                    }).catch(err => {
+                        showNotification("Error sharing.");
+                    });
+                });
+            });
+        }
+
+        // Called on page load
+        window.addEventListener("DOMContentLoaded", () => {
+            renderResources();
+        });
+
+        // Search bar
+        searchInput.addEventListener("input", () => {
+            renderResources(currentTab, searchInput.value);
+        });
+
+        // Tab buttons
+        tabButtons.forEach(btn => {
+            btn.addEventListener("click", () => {
+                currentTab = btn.dataset.type;
+                tabButtons.forEach(b => b.classList.toggle("active", b.dataset.type === currentTab));
+                renderResources(currentTab, searchInput.value);
+            });
+        });
+
+        // PDF viewer close
+        pdfCloseBtn.addEventListener("click", () => {
+            pdfViewer.style.display = "none";
+            pdfIframe.src = "";
+        });
+
+        // PDF download from viewer
+        pdfDownloadBtn.addEventListener("click", () => {
+            const url = pdfIframe.src;
+            if (!url || !pdfTitleEl.textContent) {
+                showNotification("No file available.");
+                return;
+            }
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.target = "_blank";
+            a.download = pdfTitleEl.textContent.replace(/\s+/g, "_") + ".pdf";
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            showNotification(`Downloading ${pdfTitleEl.textContent}...`);
+        });
+
+        // Mobile‑friendly: close viewer on outside click
+        pdfViewer.addEventListener("click", (e) => {
+            if (e.target === pdfViewer) {
+                pdfCloseBtn.click();
+            }
+        });
+
+        // Auth check
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                showNotification("Session expired. Redirecting to home...");
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1500);
+            }
+        });
+    </script>
+</body>
+
+</html>
