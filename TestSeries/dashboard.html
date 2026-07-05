@@ -2,6 +2,7 @@
 <html lang="en" class="light">
 
 <head>
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Test Series Dashboard - UPSChub</title>
@@ -935,7 +936,11 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signOut, onAuthStateChanged, updateProfile, reauthenticateWithCredential, EmailAuthProvider, updatePassword, deleteUser } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, updateDoc, deleteDoc, getDoc, setDoc, collection, query, getDocs, orderBy, serverTimestamp, where, limit } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
         // --- FIREBASE CONFIG ---
         // For Firebase JS SDK v7.20.0 and later, measurementId is optional
         const firebaseConfig = {
@@ -1460,34 +1465,30 @@
 
 
 
-async function loadRandomWelcomeMessage() {
-  try {
-    const snapshot = await db.collection('welcomeMessages')
-      .where('active', '==', true)
-      .get();
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js";
 
-    const messageEl = document.getElementById('welcome-message');
+async function loadRandomWelcomeMessage() {
+  const messageEl = document.getElementById("welcome-message");
+
+  try {
+    const welcomeCol = collection(db, "welcomeMessages");
+    const q = query(welcomeCol, where("active", "==", true));
+    const snapshot = await getDocs(q);
 
     if (snapshot.empty) {
-      messageEl.textContent = "Keep pushing towards your goal. You've got this!";
+      messageEl.textContent = "Keep pushing towards your goal!";
       return;
     }
 
     const messages = snapshot.docs.map(doc => doc.data().message);
     const randomMsg = messages[Math.floor(Math.random() * messages.length)];
-    
     messageEl.textContent = randomMsg;
 
   } catch (error) {
-    console.error("Error loading message:", error);
-    document.getElementById('welcome-message').textContent = 
-      "Stay consistent. Success is coming your way!";
+    console.error("Error:", error);
+    messageEl.textContent = "Stay consistent. Success is coming your way!";
   }
 }
-
-// Run when page loads
-document.addEventListener('DOMContentLoaded', loadRandomWelcomeMessage);
-
 
 
 
