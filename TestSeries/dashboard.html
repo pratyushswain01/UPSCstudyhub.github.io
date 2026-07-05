@@ -1459,6 +1459,29 @@
             }
         }
 
+
+
+        // Fetch random welcome message
+const getRandomWelcomeMessage = async () => {
+  const snapshot = await db.collection('welcomeMessages')
+    .where('active', '==', true)
+    .get();
+
+  if (snapshot.empty) return "Welcome to the Test! Best of luck!";
+
+  const messages = snapshot.docs.map(doc => doc.data().message);
+  const randomIndex = Math.floor(Math.random() * messages.length);
+  
+  return messages[randomIndex];
+};
+
+// Use it when loading test page
+const welcomeMsg = await getRandomWelcomeMessage();
+console.log(welcomeMsg);
+// Show it on UI
+
+
+        
         // **FIX 2: Corrected Stat Cards** (with toFixed(2) for Avg. %)
         function updateStatCards(results) {
             const testsTaken = results.length;
