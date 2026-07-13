@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Electoral Reforms in India - UPSChub Notes</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+
+        .watermark-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            opacity: 0.02; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png');
+            background-repeat: no-repeat; background-position: center;
+            background-size: 400px; pointer-events: none;
+        }
+
+        .notes-content h3 { 
+            color: #1e3a8a; font-weight: 800; font-size: 1.85rem; 
+            margin-top: 3rem; margin-bottom: 1.5rem; display: flex; align-items: center;
+        }
+        .notes-content h3::before {
+            content: ''; width: 8px; height: 32px; background: #3b82f6; 
+            border-radius: 4px; margin-right: 12px; display: inline-block;
+        }
+        
+        .notes-content h4 {
+            color: #1e40af; font-weight: 700; font-size: 1.35rem; 
+            margin-top: 2rem; margin-bottom: 1rem;
+        }
+
+        .notes-content p, .notes-content li { line-height: 1.8; color: #334155; margin-bottom: 1rem; }
+
+        .icon-list { list-style: none; padding-left: 0; }
+        .icon-list li { 
+            display: flex; align-items: flex-start; margin-bottom: 1.25rem; 
+            padding: 14px; background: #ffffff; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+            transition: all 0.3s ease; line-height: 1.7; color: #334155;
+        }
+        .icon-list li:hover { transform: translateX(6px); border-color: #3b82f6; background-color: #f8fafc; }
+        .icon-list i { 
+            margin-top: 0.25em; margin-right: 1.25rem; flex-shrink: 0; 
+            color: #2563eb; font-size: 1.2rem; 
+        }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2rem 0; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        th { background-color: #1e3a8a; color: white; padding: 15px; text-align: left; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        td { padding: 15px; border-bottom: 1px solid #e2e8f0; background: white; font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background-color: #f8fafc; }
+
+        .highlight-card {
+            border-left: 4px solid #3b82f6; background: white; padding: 1.25rem;
+            border-radius: 0 12px 12px 0; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .custom-way-forward {
+            background-color: #ffffff !important;
+            border: 2px solid #1e3a8a !important;
+            border-radius: 20px !important;
+            padding: 2.5rem !important;
+            margin: 3rem 0 !important;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.1) !important;
+        }
+        .custom-way-forward h4 { color: #1e3a8a !important; font-weight: 800 !important; font-size: 1.4rem !important; margin-top: 0 !important; margin-bottom: 1rem !important; }
+
+        .premium-feedback-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 24px !important;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08) !important;
+            transition: all 0.4s ease !important;
+        }
+        .reaction-btn {
+            width: 56px !important; height: 56px !important; border-radius: 50% !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            color: white !important; font-size: 1.4rem !important; cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+        .reaction-btn:hover { transform: scale(1.18) translateY(-6px) !important; box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important; }
+
+        /* Interactive MCQ Styles */
+        .mcq-option {
+            cursor: pointer;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            background: white;
+            font-weight: 500;
+            color: #334155;
+        }
+        .mcq-option:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .mcq-option.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .mcq-option.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .mcq-feedback {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <div class="watermark-bg"></div>
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">UPSChub <span class="text-blue-600">Polity</span></h1>
+            </div>
+            <div class="text-right hidden sm:block">
+                <div class="font-bold text-sm text-slate-600" id="time-display">--:--:-- --</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5" id="date-display">--------</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-10 relative z-10">
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <div class="bg-slate-900 p-10 md:p-14 text-center">
+                <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">Indian Polity & Governance</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight mt-0">Electoral Reforms in India</h2>
+                <p class="text-blue-400 mt-4 font-medium italic">A Comprehensive Guide to the Electoral Process and Challenges</p>
+            </div>
+
+            <div class="p-6 md:p-14">
+                <article class="notes-content">
+                    
+                    <div class="highlight-card mb-8">
+                        <strong class="text-blue-900 block mb-2">Topic Relevance</strong>
+                        <p class="text-sm mb-1"><strong>For Prelims:</strong> Election Commission of India (ECI), Electors Photo Identity Card (EPIC), RPA 1951, EVM, VVPAT, ERONET, Star Campaigners, Totaliser Machines, Model Code of Conduct (MCC), Law Commission, ARC.</p>
+                        <p class="text-sm mb-0"><strong>For Mains:</strong> The need for electoral reforms and ways to address them.</p>
+                    </div>
+
+                    <h3>What are Electoral Reforms?</h3>
+                    <p><strong>Definition:</strong> Electoral reforms refer to systematic changes aimed at enhancing the efficiency, transparency, and fairness of the electoral process in a country.</p>
+                    
+                    <h4 class="mt-6">Need for Reforms:</h4>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-landmark"></i><span>In a democracy like India, elections are a cornerstone of political legitimacy and citizen participation. Conducting free and fair elections is fundamental for sustaining democratic governance.</span></li>
+                        <li><i class="fas fa-exclamation-triangle"></i><span>Over time, the electoral process may face challenges such as the misuse of money and muscle power, criminalization of politics, lack of internal democracy in political parties, and low voter turnout.</span></li>
+                        <li><i class="fas fa-tools"></i><span>To overcome these issues and uphold the sanctity of the democratic process, electoral reforms become imperative. These aim to strengthen the legal framework, improve institutional mechanisms, and restore public faith.</span></li>
+                    </ul>
+
+                    <h3>Constitutional & Legislative Framework</h3>
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr><th>Provision / Act</th><th>Key Features & Mandate</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Article 324</strong></td><td>Grants the Election Commission (EC) authority over the preparation of electoral rolls and the conduct of elections for both Parliament and State legislatures.</td></tr>
+                                <tr><td><strong>RPA, 1950</strong></td><td>Includes provisions for election officers (chief electoral officers, district election officers, electoral registration officers) and electoral rolls for Parliamentary, Assembly, and Council constituencies.</td></tr>
+                                <tr><td><strong>RPA, 1951</strong></td><td>Deals with the pre-election process, mainly the preparation and maintenance of electoral rolls.</td></tr>
+                                <tr><td><strong>Registration of Electors Rules, 1960</strong></td><td>Lays down detailed procedures for the implementation of electoral roll-related provisions under RPA, 1951 (e.g., guidelines for inclusion, correction, or deletion of names).</td></tr>
+                                <tr><td><strong>Delimitation Act, 2002</strong></td><td>Enacted to redraw the boundaries of parliamentary and assembly constituencies based on the latest Census data.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Key Electoral Reforms in India</h3>
+                    
+                    <h4>Electoral Reforms Before 1996</h4>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-user-graduate"></i><span><strong>Voting Age Reduced:</strong> The 61st Amendment Act, 1988 reduced the voting age from 21 to 18 years, allowing more youth to participate in the democratic process.</span></li>
+                        <li><i class="fas fa-users"></i><span><strong>Proposers Increased:</strong> To prevent fake candidates, proposers for Rajya Sabha and State Legislative Council elections were raised to 10% of electors or 10 such electors, whichever is less.</span></li>
+                        <li><i class="fas fa-hdd"></i><span><strong>EVMs Introduced:</strong> Electronic Voting Machines (EVMs) modernized the process. First used in 1998 (Rajasthan, MP, Delhi) and fully in 1999 (Goa Assembly).</span></li>
+                        <li><i class="fas fa-ban"></i><span><strong>Booth Capturing:</strong> Special laws were made to cancel or stop elections if booth capturing (forcible take-over) happens.</span></li>
+                        <li><i class="fas fa-id-card"></i><span><strong>Photo Identity Cards:</strong> EC started issuing EPICs (Elector’s Photo Identity Cards) to stop fake voting.</span></li>
+                    </ul>
+
+                    <h4>Electoral Reforms Post 1996</h4>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-list"></i><span><strong>Listing of Candidates:</strong> Candidates listed in three categories: recognized parties, registered unrecognized parties, and independents.</span></li>
+                        <li><i class="fas fa-gavel"></i><span><strong>Disqualification:</strong> A person convicted of insulting the National Flag, Constitution, or preventing the National Anthem is disqualified for 6 years.</span></li>
+                        <li><i class="fas fa-wine-bottle"></i><span><strong>Sale of Liquor Prohibited:</strong> Banned within 48 hours before polling in a polling area.</span></li>
+                        <li><i class="fas fa-user-plus"></i><span><strong>Number of Proposers:</strong> 10 proposers needed if not backed by a recognized party. Only 1 is needed if supported by a recognized party.</span></li>
+                        <li><i class="fas fa-cross"></i><span><strong>Death of a Candidate:</strong> Previously canceled, now recognized parties can propose a replacement candidate within 7 days.</span></li>
+                        <li><i class="fas fa-calendar-check"></i><span><strong>By-Elections:</strong> Must be held within six months of a vacancy.</span></li>
+                        <li><i class="fas fa-map-marker-alt"></i><span><strong>Two Constituencies Rule:</strong> Candidates restricted to contesting in only two constituencies during general elections.</span></li>
+                        <li><i class="fas fa-hourglass-half"></i><span><strong>Campaigning Period:</strong> Gap between withdrawal date and polling day reduced from 20 days to 14 days.</span></li>
+                    </ul>
+
+                    <h4>Electoral Reforms between 1997-2009</h4>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-user-tie"></i><span><strong>President/VP Elections:</strong> Increased proposers for President (10 to 50) and Vice-President (5 to 20).</span></li>
+                        <li><i class="fas fa-envelope"></i><span><strong>Postal & Proxy Voting:</strong> Postal ballot for notified categories. Proxy voting for armed forces introduced in 2003.</span></li>
+                        <li><i class="fas fa-file-signature"></i><span><strong>Mandatory Declarations:</strong> Candidates must declare past criminal cases, assets, liabilities, and educational qualifications.</span></li>
+                        <li><i class="fas fa-vote-yea"></i><span><strong>Rajya Sabha Reforms (2003):</strong> Removed domicile requirement and introduced the open ballot system to prevent cross-voting.</span></li>
+                        <li><i class="fas fa-rupee-sign"></i><span><strong>Funding:</strong> Donations over ₹20,000 require details. Companies donating get tax relief. Recognized parties get free electoral rolls.</span></li>
+                        <li><i class="fas fa-blind"></i><span><strong>EVM Braille Features:</strong> Added for visually impaired voters.</span></li>
+                        <li><i class="fas fa-chart-bar"></i><span><strong>Exit Polls Ban:</strong> Cannot be conducted/shared until the EC’s allowed period ends.</span></li>
+                        <li><i class="fas fa-money-bill-alt"></i><span><strong>Security Deposit Raised:</strong> Increased to ₹25,000 (General) and ₹12,500 (SC/ST) for Lok Sabha.</span></li>
+                    </ul>
+
+                    <h4>Electoral Reforms Since 2010</h4>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-plane-arrival"></i><span><strong>NRI Voting Rights (2010):</strong> Indian citizens abroad (non-dual citizens) can vote in their home constituency.</span></li>
+                        <li><i class="fas fa-mouse-pointer"></i><span><strong>Online Registration (2013):</strong> Citizens can apply online to register as voters.</span></li>
+                        <li><i class="fas fa-times-circle"></i><span><strong>NOTA (None of the Above):</strong> Option added. Even if NOTA gets the most votes, the candidate with the highest valid votes wins.</span></li>
+                        <li><i class="fas fa-receipt"></i><span><strong>VVPAT Implementation:</strong> Voter Verifiable Paper Audit Trail implemented to reduce fraud by providing a printed slip.</span></li>
+                        <li><i class="fas fa-unlock-alt"></i><span><strong>Contesting from Custody:</strong> SC allowed persons in jail or police custody to contest elections.</span></li>
+                        <li><i class="fas fa-gavel"></i><span><strong>Immediate Disqualification:</strong> Convicted MPs/MLAs disqualified immediately; Sec 8(4) of RP Act, 1951 struck down.</span></li>
+                        <li><i class="fas fa-chart-line"></i><span><strong>Spending Limits Increased:</strong> ₹70 lakhs for Lok Sabha in big states, ₹28 lakhs for Assembly elections.</span></li>
+                        <li><i class="fas fa-university"></i><span><strong>Electoral Bonds:</strong> Introduced in 2018 for anonymous donations. <strong>Struck down as unconstitutional by SC in 2024.</strong></span></li>
+                    </ul>
+
+                    <div class="my-10 text-center bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <img src="image.elt_refo.png" alt="Evolution in voting process" class="w-full max-w-2xl mx-auto rounded-lg shadow-sm" />
+                        <p class="text-sm text-slate-500 mt-3 italic font-medium">Standard EVM and VVPAT setup used by the Election Commission of India for modern polling.</p>
+                    </div>
+
+                    <h3>Committees Related to Electoral Reforms</h3>
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr><th>Committee / Report</th><th>Key Focus / Recommendations</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Tarkunde Committee (1974)</strong></td><td>Recommended ECs be appointed on the advice of a Committee comprising PM, Lok Sabha Opposition Leader, and CJI.</td></tr>
+                                <tr><td><strong>Dinesh Goswami Committee (1990)</strong></td><td>Formed to suggest electoral reforms (recommendations implemented in 1996).</td></tr>
+                                <tr><td><strong>Vohra Committee (1993)</strong></td><td>Investigated the nexus between crime and politics.</td></tr>
+                                <tr><td><strong>Indrajit Gupta Committee (1998)</strong></td><td>Focused on the idea of state funding for elections.</td></tr>
+                                <tr><td><strong>Law Commission 170th Report (1999)</strong></td><td>Suggested comprehensive reforms in India’s electoral laws.</td></tr>
+                                <tr><td><strong>Tankha Committee (2010)</strong></td><td>Core committee to review and recommend changes to election laws.</td></tr>
+                                <tr><td><strong>Law Commission 255th Report (2015)</strong></td><td>Proposed comprehensive electoral reforms to improve the election process.</td></tr>
+                                <tr><td><strong>High-Level Committee on Simultaneous Elections (Recent)</strong></td><td>Led by Ram Nath Kovind. Recommended phased simultaneous elections (Lok Sabha + Assemblies first, local bodies within 100 days) and a Single Electoral Roll/EPIC.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Key Concerns in the Electoral Process</h3>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-microchip"></i><span><strong>EVM Tampering Concerns:</strong> Demands for return to paper ballots and full matching of VVPAT slips. The SC rejected full matching, instead permitting verification of memory chips of 5% of EVMs on suspicion.</span></li>
+                        <li><i class="fas fa-users-cog"></i><span><strong>Electoral Roll Manipulation:</strong> Allegations of fake voters. EC notes duplication was due to the previous decentralized EPIC system, now centralized in ERONET.</span></li>
+                        <li><i class="fas fa-id-badge"></i><span><strong>Duplicate EPIC Numbers:</strong> Allegations raised in states like West Bengal, Gujarat, Haryana, and Punjab.</span></li>
+                        <li><i class="fas fa-bullhorn"></i><span><strong>MCC Violations:</strong> Star campaigners frequently using inappropriate language, making caste/communal appeals, or spreading unverified allegations.</span></li>
+                        <li><i class="fas fa-wallet"></i><span><strong>Election Expenditure:</strong> Candidates exceeding limits while parties face no limits. 2024 Lok Sabha election expenditure was estimated at ₹1,00,000 crore.</span></li>
+                        <li><i class="fas fa-user-secret"></i><span><strong>Criminalization of Politics:</strong> ADR analysis revealed 46% of elected MPs in 2024 have criminal cases, with 31% facing serious charges.</span></li>
+                    </ul>
+
+                    <div class="custom-way-forward">
+                        <h4><i class="fas fa-lightbulb mr-2"></i>Way Forward: Necessary Reforms</h4>
+                        
+                        <p class="font-bold text-slate-900 mt-4 mb-2">Campaign Process Reforms:</p>
+                        <ul class="list-disc pl-5 mb-4 text-slate-800 space-y-1">
+                            <li>Empower the EC to revoke ‘Star Campaigner’ status for serious MCC violations.</li>
+                            <li>Amend laws to ensure political party funding stays within candidate expenditure limits.</li>
+                            <li>Bring political parties under the Right to Information (RTI) Act, 2005.</li>
+                            <li>Strict enforcement of the Supreme Court's directive for candidates to declare criminal antecedents.</li>
+                        </ul>
+
+                        <p class="font-bold text-slate-900 mt-4 mb-2">Electoral Roll Integrity:</p>
+                        <ul class="list-disc pl-5 mb-4 text-slate-800 space-y-1">
+                            <li>Link Aadhaar to EPIC cards to eliminate duplicate voter IDs (after adequately addressing privacy concerns).</li>
+                        </ul>
+
+                        <p class="font-bold text-slate-900 mt-4 mb-2">Voting and Counting Process:</p>
+                        <ul class="list-disc pl-5 mb-4 text-slate-800 space-y-1">
+                            <li>Determine the sample size for VVPAT-EVM matching scientifically.</li>
+                            <li>Introduce ‘totaliser’ machines (aggregates votes from 14 booths before revealing results) to add transparency and protect voter anonymity.</li>
+                            <li>Allow candidates to request verification of 5% of EVMs in case of suspected tampering.</li>
+                        </ul>
+
+                        <p class="font-bold text-slate-900 mt-4 mb-2">Voter Awareness:</p>
+                        <ul class="list-disc pl-5 mb-0 text-slate-800 space-y-1">
+                            <li>Support media and civil society in monitoring elections and implement ethical training programs for political leaders.</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="mt-12">UPSC Civil Services Examination PYQs</h3>
+                    
+                    <!-- Prelims Practice Block -->
+                    <div class="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 shadow-sm">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                                <i class="fas fa-check-double text-lg"></i>
+                            </div>
+                            <h4 class="text-slate-800 my-0 text-xl font-bold">Prelims Practice Test</h4>
+                        </div>
+                        
+                        <p class="font-semibold text-slate-700 mb-4 text-lg">Q. Consider the following statements: (2021)</p>
+                        <ol class="list-decimal pl-6 mb-6 text-slate-600 space-y-3 font-medium">
+                            <li>In India, there is no law restricting the candidates from contesting in one Lok Sabha election from three constituencies.</li>
+                            <li>In the 1991 Lok Sabha Election, Shri Devi Lal contested from three Lok Sabha constituencies.</li>
+                            <li>As per the existing rules, if a candidate contests in one Lok Sabha election from many constituencies, his/her party should bear the cost of bye-elections to the constituencies vacated by him/her winning in all the constituencies.</li>
+                        </ol>
+                        <p class="font-bold text-slate-800 mb-4">Which of the statements given above is/are correct?</p>
+                        
+                        <div class="mcq-options flex flex-col space-y-3">
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(a) 1 only</div>
+                            <div class="mcq-option" data-correct="true" onclick="checkAnswer(this, true)">(b) 2 only</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(c) 1 and 3</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(d) 2 and 3</div>
+                        </div>
+                        <div class="mcq-feedback bg-slate-50 border border-slate-200 mt-4"></div>
+                    </div>
+
+                    <!-- Mains Practice Block -->
+                    <div class="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 shadow-sm">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-4">
+                                <i class="fas fa-pen-nib text-lg"></i>
+                            </div>
+                            <h4 class="text-slate-800 my-0 text-xl font-bold">Mains Answer Writing</h4>
+                        </div>
+                        
+                        <div class="mb-6 border-l-4 border-indigo-500 pl-5 py-2 bg-indigo-50/30 rounded-r-lg">
+                            <p class="font-extrabold text-indigo-900 mb-2 uppercase text-xs tracking-wider">Mains 2024</p>
+                            <p class="text-slate-700 font-medium leading-relaxed m-0">Q1. Examine the need for electoral reforms as suggested by various committees with particular reference to "one nation - one election" principle.</p>
+                        </div>
+                        
+                        <div class="border-l-4 border-indigo-500 pl-5 py-2 bg-indigo-50/30 rounded-r-lg">
+                            <p class="font-extrabold text-indigo-900 mb-2 uppercase text-xs tracking-wider">Mains 2022</p>
+                            <p class="text-slate-700 font-medium leading-relaxed m-0">Q2. Discuss the procedures to decide the disputes arising out of the election of a Member of the Parliament or State Legislature under The Representation of the People Act, 1951. What are the grounds on which the election of any returned candidate may be declared void? What remedy is available to the aggrieved party against the decision? Refer to the case laws.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Feedback Footer -->
+                    <div id="feedback-section" class="premium-feedback-card mt-16 p-8 flex flex-col md:flex-row items-center justify-between">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <h4 class="text-blue-900 mt-0 font-extrabold text-xl mb-1">Helpful for your Revision?</h4>
+                            <p class="text-slate-500 text-sm mb-0">Your interaction updates the core performance matrix of UPSChub modules.</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="handleFeedback('happy')" class="reaction-btn bg-emerald-500 hover:bg-emerald-600" title="Excellent"><i class="fas fa-smile"></i></button>
+                            <button onclick="handleFeedback('neutral')" class="reaction-btn bg-slate-400 hover:bg-slate-500" title="Good"><i class="fas fa-meh"></i></button>
+                            <button onclick="handleFeedback('sad')" class="reaction-btn bg-rose-500 hover:bg-rose-600" title="Need Improvement"><i class="fas fa-frown"></i></button>
+                        </div>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-white font-bold mb-2 uppercase text-xs tracking-wider">UPSChub: Empowering Future Civil Servants</p>
+            <p class="text-sm">&copy; 2026 UPSChub. Content generated for UPSC Civil Services Examination.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Date and Time Script
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // MCQ Interactive Logic
+        function checkAnswer(element, isCorrect) {
+            // Disable all options in the current question
+            const optionsContainer = element.parentElement;
+            const options = optionsContainer.querySelectorAll('.mcq-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            // Display Feedback
+            const feedback = optionsContainer.nextElementSibling;
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.innerHTML = '<div class="text-green-700 font-bold"><i class="fas fa-check-circle mr-2"></i> Correct! Option (b) is the right answer.</div>';
+                feedback.style.backgroundColor = '#dcfce7';
+                feedback.style.borderColor = '#bbf7d0';
+            } else {
+                element.classList.add('incorrect');
+                feedback.innerHTML = '<div class="text-red-700 font-bold"><i class="fas fa-times-circle mr-2"></i> Incorrect. The right answer is (b).</div><p class="text-slate-600 text-sm mt-2 font-normal">Statement 1 is incorrect: Section 33(7) of RPA 1951 restricts a candidate from contesting from more than two constituencies. Statement 3 is incorrect: No such rule exists requiring the party to bear bye-election costs.</p>';
+                feedback.style.backgroundColor = '#fee2e2';
+                feedback.style.borderColor = '#fecaca';
+                
+                // Highlight the correct answer for the user
+                options.forEach(opt => {
+                    if(opt.getAttribute('data-correct') === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+
+        // Feedback Logic
+        function handleFeedback(type) {
+            const section = document.getElementById('feedback-section');
+            if(section) {
+                section.innerHTML = `<div class="w-full text-center py-6 font-extrabold text-blue-900 text-lg animate-pulse"><i class="fas fa-check-circle mr-2 text-emerald-500"></i>Thank you for your response! Continuity in revision leads to success.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
