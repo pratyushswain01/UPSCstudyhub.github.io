@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Voting Behaviour - UPSChub Notes</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+
+        .watermark-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            opacity: 0.02; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png');
+            background-repeat: no-repeat; background-position: center;
+            background-size: 400px; pointer-events: none;
+        }
+
+        .notes-content h2 {
+            color: #0f172a; font-weight: 800; font-size: 2.5rem; line-height: 1.2;
+            margin-top: 3rem; margin-bottom: 1.5rem;
+        }
+
+        .notes-content h3 { 
+            color: #1e3a8a; font-weight: 800; font-size: 1.85rem; 
+            margin-top: 3rem; margin-bottom: 1.5rem; display: flex; align-items: center;
+        }
+        .notes-content h3::before {
+            content: ''; width: 8px; height: 32px; background: #3b82f6; 
+            border-radius: 4px; margin-right: 12px; display: inline-block;
+        }
+
+        .notes-content h4 {
+            color: #1e40af; font-weight: 700; font-size: 1.35rem; 
+            margin-top: 2rem; margin-bottom: 1rem;
+        }
+        
+        .notes-content p { line-height: 1.8; color: #334155; margin-bottom: 1rem; }
+
+        .icon-list { list-style: none; padding-left: 0; }
+        .icon-list li { 
+            display: flex; align-items: flex-start; margin-bottom: 1.25rem; 
+            padding: 14px; background: #ffffff; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+            transition: all 0.3s ease; line-height: 1.7; color: #334155;
+        }
+        .icon-list li:hover { transform: translateX(6px); border-color: #3b82f6; background-color: #f8fafc; }
+        .icon-list i { 
+            margin-top: 0.25em; margin-right: 1.25rem; flex-shrink: 0; 
+            color: #2563eb; font-size: 1.2rem; 
+        }
+
+        .grid-list {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;
+        }
+
+        .img-container {
+            width: 100%; border-radius: 16px; overflow: hidden; margin: 2.5rem 0;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
+        }
+        .img-container img { width: 100%; height: auto; object-fit: cover; }
+
+        .party-tag {
+            display: inline-block; background-color: #e0f2fe; color: #1e40af; 
+            padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 600; font-size: 0.875rem;
+            margin: 0.25rem; border: 1px solid #bae6fd;
+        }
+
+        .custom-way-forward {
+            background-color: #ffffff !important;
+            border: 2px solid #1e3a8a !important;
+            border-radius: 20px !important;
+            padding: 2.5rem !important;
+            margin: 3rem 0 !important;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.1) !important;
+        }
+        .custom-way-forward h4 { color: #1e3a8a !important; font-weight: 800 !important; font-size: 1.4rem !important; margin-top: 0 !important; margin-bottom: 1rem !important; }
+
+        .premium-feedback-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 24px !important;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08) !important;
+            transition: all 0.4s ease !important;
+        }
+        .reaction-btn {
+            width: 56px !important; height: 56px !important; border-radius: 50% !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            color: white !important; font-size: 1.4rem !important; cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+        .reaction-btn:hover { transform: scale(1.18) translateY(-6px) !important; box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important; }
+
+        /* Highlight Box */
+        .def-box {
+            background-color: #f0fdf4; border-left: 5px solid #22c55e;
+            padding: 1.5rem; border-radius: 0 12px 12px 0; margin: 1.5rem 0;
+            color: #166534; font-weight: 500; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        /* MCQ Section Styles */
+        .mcq-container {
+            background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px;
+            padding: 2rem; margin: 3rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .mcq-question {
+            margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #e2e8f0;
+        }
+        .mcq-question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .mcq-q-text { font-weight: 700; color: #0f172a; margin-bottom: 0.75rem; font-size: 1.1rem; }
+        .mcq-options { list-style-type: lower-alpha; padding-left: 1.5rem; color: #475569; margin-bottom: 0.75rem; }
+        .mcq-options li { margin-bottom: 0.25rem; }
+        .mcq-answer { 
+            display: inline-block; background: #eff6ff; color: #1d4ed8; 
+            padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; 
+        }
+
+        /* Answer Writing Framework Styles */
+        .aw-card {
+            background: #ffffff; border-left: 4px solid #f59e0b;
+            border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .aw-card h5 { color: #b45309; font-weight: 800; margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1rem; }
+        .aw-question { font-style: italic; color: #334155; font-weight: 600; margin-bottom: 1rem; }
+        .aw-steps { padding-left: 1.25rem; }
+        .aw-steps li { margin-bottom: 0.5rem; color: #475569; }
+        .aw-steps li strong { color: #0f172a; }
+
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <div class="watermark-bg"></div>
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">UPSChub <span class="text-blue-600">Polity</span></h1>
+            </div>
+            <div class="text-right hidden sm:block">
+                <div class="font-bold text-sm text-slate-600" id="time-display">--:--:-- --</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5" id="date-display">--------</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-10 relative z-10">
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <div class="bg-slate-900 p-10 md:p-14 text-center">
+                <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">Indian Polity Notes</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight mt-0">Voting Behaviour</h2>
+                <p class="text-blue-400 mt-4 font-medium italic">Determinants, Media Influence, and Electoral Dynamics</p>
+            </div>
+
+            <div class="p-6 md:p-14">
+                <article class="notes-content">
+                    
+                    <p>Voting behaviour refers to actions or decisions taken by the electors while voting. It involves the study of human political behaviour in the context of voting in elections. It encompasses a wide range of factors that influence how people choose their preferred candidates or political parties.</p>
+                    <p>Voting behaviour is not limited to the mere examination of voting statistics, records and calculations of electoral shifts and swings. It also involves an analysis of individual psychological processes such as perception, emotion and motivation and their relation to political action and institutional patterns.</p>
+                    <p>Understanding voting behaviour is crucial for political analysts, researchers, and policymakers to comprehend the dynamics of elections and the preferences of the electorate.</p>
+
+                    <div class="def-box">
+                        <strong>Psephology:</strong> It is a scientific study of elections and voting behaviour. It involves the analysis of electoral trends and voting patterns and the examination of factors influencing voters’ choices.
+                    </div>
+
+                    <h3>Significance of studying voting behaviour</h3>
+                    <p>The study of voting behaviour holds significant importance for the following reasons:</p>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-brain"></i><span><strong>Internalisation of democratic values:</strong> Helps analysts and researchers to understand the level of internalisation of democratic value among the masses as well as elites.</span></li>
+                        <li><i class="fas fa-users"></i><span><strong>Public participation:</strong> By understanding the reasons behind voter participation or abstention, efforts can be made to enhance overall democratic participation. It can address the issue of low voter turnout.</span></li>
+                        <li><i class="fas fa-file-signature"></i><span><strong>Role in policymaking:</strong> Studying voting behaviour provides insights into the preferences and priorities of the voters, which can be used by policymakers to make policies that align with the needs and desires of the population.</span></li>
+                        <li><i class="fas fa-balance-scale"></i><span><strong>Political representation:</strong> The study of voting behaviour also helps understand if a particular community is politically represented in a fair manner.</span></li>
+                        <li><i class="fas fa-chart-line"></i><span><strong>Tracks shift in electoral politics:</strong> Analysis of voting behaviour helps understand the changing patterns in electoral politics. For example, how does a particular demographic group vote? What are the issues that dominate the elections? Long-term analysis also helps understand the structural changes in electoral politics.</span></li>
+                        <li><i class="fas fa-bullhorn"></i><span><strong>Campaign strategy:</strong> Political parties can benefit from the study of voting behaviour by organising their campaign effectively. By identifying the issues that resonate with specific demographics, candidates can communicate more persuasively.</span></li>
+                        <li><i class="fas fa-eye"></i><span><strong>Electoral Predictions:</strong> Psephologists use voting patterns to predict election outcomes.</span></li>
+                    </ul>
+
+                    <h3>Determinants of Voting Behaviour</h3>
+                    <p>Voting behaviour is influenced by several factors such as caste, community, religion, ideology, money, political wave, etc. The political parties exploit these determinants to attract voters. The following socio-economic and political factors act as determinants of voting behaviour in the Indian electoral landscape:</p>
+
+                    <h4>Caste</h4>
+                    <p>Caste has deep roots in Indian society and is an important basis for social relations; hence, caste is one of the most significant determinants of voting behaviour in the Indian electoral system.</p>
+                    <p>The politicisation of caste and the role of caste in elections is a well-known reality in India. So much so that it is said, <em>“Indians do not cast their votes; rather, they vote their caste”</em>.</p>
+                    <p>The caste factor invariably comes into play when political parties and governments formulate policies and programmes and when they decide on election candidates. The rise of regional parties also has a role in increasing the role of caste in Indian politics. Today, there are several regional political parties associated with a particular caste or caste group. For example, SP in Uttar Pradesh, RJD in Bihar is generally associated with OBCs and BSP in Uttar Pradesh is associated with Scheduled castes.</p>
+                    <p>This has been emphasised by political scientist Rajni Kothari, <strong>“Indian politics is casteist, and caste is politicised”</strong>. Paul Brass has also observed that in the countryside (rural areas), caste remains the most significant factor in voting behaviour.</p>
+
+                    <h4>Religion</h4>
+                    <p>Even though India established itself as a secular state, it has not been able to prevent the role of religion as a determinant of political and electoral behaviour.</p>
+                    <p>Political parties tend to appeal to the religious passions of the masses to gain electorally. They also strive for the polarisation of voters on the basis of religion so that they can gain votes for a particular community in bulk. One of the reasons behind the continuing role of religion in electoral politics is the presence of religion-based political parties such as the Indian Union Muslim League, Shiv Sena, Akali Dal, and All India Majlis-e-Ittehadul Muslimeen.</p>
+
+                    <div class="img-container">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Voters_waiting_in_a_queue_to_cast_their_votes%2C_at_a_polling_booth%2C_during_the_Assembly_Election_in_Punjab_on_February_04%2C_2017.jpg/800px-Voters_waiting_in_a_queue_to_cast_their_votes%2C_at_a_polling_booth%2C_during_the_Assembly_Election_in_Punjab_on_February_04%2C_2017.jpg" alt="Indian voters waiting in a queue to cast their votes">
+                    </div>
+
+                    <h4>Charisma/Political Parties</h4>
+                    <p>The charismatic personality of a political leader is also an important determinant of voting behaviour. Charisma in a leader means exceptional and compelling qualities that elicit admiration, reverence, trust and enthusiastic support from the public. Such a person possesses unique and inspirational charm generally due to their exceptional communication and oratory skills and their ability to empathise and relate with the masses.</p>
+
+                    <h4>Language</h4>
+                    <p>In a multi-lingual state like India, language is a considerable factor as a determinant of voting behaviour. It is evident from the history of language-based agitations across India post-independence.</p>
+                    <p>Linguistic aspirations and passions are often exploited by political parties to arouse voters and influence their decision-making. The rise of DMK in Tamil Nadu and TDP in Andhra Pradesh can be attributed to language-based identity politics. Further, language is one of the factors behind national parties not being able to make inroads in much of South India.</p>
+
+                    <h4>Class</h4>
+                    <p>Class as a determinant of voting behaviour is reflected in the economic issues of employment, inflation, subsidies, loan waivers, etc.</p>
+                    <p>For example, the “Garibi hatao” campaign of the Indira Gandhi government was taken quite well by the masses. Similarly, the welfare schemes of the present NDA government and campaigning around it have benefited the BJP in the elections.</p>
+
+                    <!-- MID-POINT: INTERACTIVE MCQ SECTION -->
+                    <div class="mcq-container">
+                        <h4 class="text-center text-blue-800 mt-0 mb-6"><i class="fas fa-clipboard-check mr-2"></i> Mid-Point Knowledge Check</h4>
+                        
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">1. What is the scientific study of elections and voting behaviour called?</div>
+                            <ul class="mcq-options">
+                                <li>a) Epistemology</li>
+                                <li>b) Psephology</li>
+                                <li>c) Demography</li>
+                                <li>d) Sociology</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: b) Psephology</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">2. Which political scientist observed that "Indian politics is casteist, and caste is politicised"?</div>
+                            <ul class="mcq-options">
+                                <li>a) Paul Brass</li>
+                                <li>b) Christophe Jaffrelot</li>
+                                <li>c) Rajni Kothari</li>
+                                <li>d) B.R. Ambedkar</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: c) Rajni Kothari</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">3. The success of the "Garibi Hatao" campaign reflects which determinant of voting behaviour?</div>
+                            <ul class="mcq-options">
+                                <li>a) Class</li>
+                                <li>b) Caste</li>
+                                <li>c) Religion</li>
+                                <li>d) Regionalism</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: a) Class</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">4. The rise of DMK in Tamil Nadu and TDP in Andhra Pradesh is primarily attributed to:</div>
+                            <ul class="mcq-options">
+                                <li>a) Religious polarization</li>
+                                <li>b) Class conflict</li>
+                                <li>c) Language-based identity politics</li>
+                                <li>d) Nationalistic wave</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: c) Language-based identity politics</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">5. Who among the following is most likely to be influenced by appeals to parochial identities like caste or religion?</div>
+                            <ul class="mcq-options">
+                                <li>a) Swing voters</li>
+                                <li>b) Ideologically committed voters</li>
+                                <li>c) Illiterate and less educated people</li>
+                                <li>d) The political elites</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: c) Illiterate and less educated people</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">6. A political leader possessing exceptional qualities that elicit admiration and trust is an example of which determinant?</div>
+                            <ul class="mcq-options">
+                                <li>a) Ideology</li>
+                                <li>b) Charisma</li>
+                                <li>c) Political lineage</li>
+                                <li>d) Factionalism</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: b) Charisma</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">7. The performance of the party in power most heavily influences which group of voters?</div>
+                            <ul class="mcq-options">
+                                <li>a) Core base voters</li>
+                                <li>b) Factional voters</li>
+                                <li>c) Swing voters</li>
+                                <li>d) Regional party members</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: c) Swing voters</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">8. Which factor is responsible for voters becoming disenchanted with a party's internal management?</div>
+                            <ul class="mcq-options">
+                                <li>a) Sub-nationalism</li>
+                                <li>b) Factionalism</li>
+                                <li>c) Secularism</li>
+                                <li>d) Charisma</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: b) Factionalism</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">9. Despite limitations on election expenditure, which factor frequently influences elections in favor of wealthy candidates?</div>
+                            <ul class="mcq-options">
+                                <li>a) Ideology</li>
+                                <li>b) Factionalism</li>
+                                <li>c) Money</li>
+                                <li>d) Political lineage</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: c) Money</div>
+                        </div>
+
+                        <div class="mcq-question">
+                            <div class="mcq-q-text">10. How does the study of voting behaviour directly assist the Election Commission?</div>
+                            <ul class="mcq-options">
+                                <li>a) By helping them write election manifestos</li>
+                                <li>b) By helping them predict the winning party</li>
+                                <li>c) By helping them understand reasons behind voter abstention to address low turnout</li>
+                                <li>d) By helping them select candidates for regional parties</li>
+                            </ul>
+                            <div class="mcq-answer">Answer: c) By helping them understand reasons behind voter abstention...</div>
+                        </div>
+                    </div>
+                    <!-- END OF MCQ SECTION -->
+
+                    <h4>Regionalism/Sub-nationalism</h4>
+                    <p>The phenomenon of regionalism and sub-nationalism is a harsh reality of Indian society. These feelings have given rise to the regional parties, which appeal to the regional identities and sentiments of the masses.</p>
+                    <p>Some regional parties, particularly in Jammu and Kashmir and North-East, have also raised secessionist slogans, which have had adverse effects on the peace and security in the region.</p>
+
+                    <h4>Money</h4>
+                    <p>Given India’s status as a comparatively relatively poor nation, monetary considerations are likely to influence voting patterns. It has been observed that rich candidates are more likely to win elections. Despite the limitation on election expenditure, it is a known fact that cash and other items are distributed among voters to influence elections in one’s favour.</p>
+
+                    <h4>Ideology & Performance</h4>
+                    <p><strong>Ideology:</strong> The ideologies associated with a political party also have a bearing on the elections. Voters who are committed to a particular ideology, such as communism, capitalism, or secularism, are more likely to vote for the party that professes those ideologies.</p>
+                    <p><strong>Performance of the party in power:</strong> Political parties contest elections on the basis of an election manifesto, which contains the vision and promises made by the party. After coming to power, the ruling party or the ruling coalition is expected to fulfil those promises. Hence, the performance of the ruling party is a significant factor in influencing the voters, especially the swing voters, who are more likely to shift their votes on the basis of their performance.</p>
+
+                    <h4>Other Factors</h4>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-book-open"></i><span><strong>Literacy/Education:</strong> The illiterates and less educated people form the bulk of the electorate. Such voters are more likely to be influenced by appeals to parochial identities like caste, religion, regionalism, etc.</span></li>
+                        <li><i class="fas fa-user-clock"></i><span><strong>Age:</strong> Difference in age groups means difference in priorities and interests, which are reflected in voting pattern.</span></li>
+                        <li><i class="fas fa-users-slash"></i><span><strong>Factionalism in political parties:</strong> Almost no political party is free from factionalism within the party. Voters are likely to be disenchanted by the party’s inability to manage factional tendencies.</span></li>
+                        <li><i class="fas fa-sitemap"></i><span><strong>Political lineage:</strong> It has been observed in Indian politics that legitimacy enjoyed by a charismatic leader also benefits the kin.</span></li>
+                    </ul>
+
+                    <h3>Role of Media in influencing voting behaviour</h3>
+                    <p>The media plays a pivotal role in shaping how the electorate perceives elections, candidates, and issues:</p>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-info-circle"></i><span><strong>Information dissemination:</strong> Information provided by the media regarding the election, candidates, political parties, and issues helps electors to make informed decisions about whom to vote.</span></li>
+                        <li><i class="fas fa-ad"></i><span><strong>Political advertising:</strong> Political parties and candidates use media to disseminate information regarding their election campaign.</span></li>
+                        <li><i class="fas fa-bullseye"></i><span><strong>Narrative setting:</strong> The media serves as an important instrument in shaping the narrative during an election. It has the ability to bring certain issues to the forefront while simultaneously downplaying others, thus influencing public choice.</span></li>
+                        <li><i class="fas fa-comments"></i><span><strong>Political debates and discussions:</strong> Debates and discussions between candidates of different political parties help electors understand their views. These discussions also bring out the competence of the candidates and their suitability for the office.</span></li>
+                        <li><i class="fas fa-poll"></i><span><strong>Public opinion polls:</strong> Media coverage of public opinion not only shapes public mood but also provides political parties and candidates with valuable insights to design their campaign strategies accordingly.</span></li>
+                        <li><i class="fas fa-hashtag"></i><span><strong>Social Media Influence:</strong> Social media platforms have become an important source of political discussions and information. They also allow the candidates to connect directly with their electorate.</span></li>
+                    </ul>
+
+                    <div class="img-container">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/A_massive_crowd_at_the_election_rally_of_the_Prime_Minister%2C_Shri_Narendra_Modi%2C_at_Kharagpur%2C_in_West_Bengal_on_March_27%2C_2016.jpg/800px-A_massive_crowd_at_the_election_rally_of_the_Prime_Minister%2C_Shri_Narendra_Modi%2C_at_Kharagpur%2C_in_West_Bengal_on_March_27%2C_2016.jpg" alt="A massive crowd at an Indian election campaign rally">
+                    </div>
+
+                    <h3>Important UPSC PYQs (Answer Writing Frameworks)</h3>
+                    <p>While UPSC frequently twists questions to test current affairs, the core thematic focus remains consistent. Use these structured hints to draft your Mains answers.</p>
+
+                    <div class="aw-card">
+                        <h5>PYQ 1 Framework</h5>
+                        <p class="aw-question">"Electoral behaviour of voters is governed more by the social and economic factors than the political factors. Explain."</p>
+                        <ul class="aw-steps">
+                            <li><strong>Introduction:</strong> Define voting behaviour. Introduce the premise that elections in India often reflect socio-economic censuses.</li>
+                            <li><strong>Body 1 (Socio-Economic Dominance):</strong> Discuss social factors (caste arithmetic, religious polarization, linguistic identity) and economic factors (class-based voting, subsidies, 'Garibi Hatao', welfare schemes).</li>
+                            <li><strong>Body 2 (The Political Counter-Weight):</strong> Explain how political factors can override the above. Mention charismatic leadership (Modi wave, Indira Gandhi), anti-incumbency, and national security narratives.</li>
+                            <li><strong>Conclusion:</strong> Summarize that while socio-economic factors form the base, the Indian voter is maturing towards issue-based and performance-driven political voting.</li>
+                        </ul>
+                    </div>
+
+                    <div class="aw-card">
+                        <h5>PYQ 2 Framework</h5>
+                        <p class="aw-question">"In the light of the recent controversy regarding the use of Electronic Voting Machines (EVM), what are the challenges before the Election Commission of India to ensure the trustworthiness of elections in India?"</p>
+                        <ul class="aw-steps">
+                            <li><strong>Introduction:</strong> State that trustworthiness is the bedrock of democracy. Briefly note the context of EVM tampering allegations by political parties.</li>
+                            <li><strong>Body 1 (Challenges):</strong> Detail technological skepticism (fears of source-code manipulation), logistical vulnerabilities (strong room security), misinformation on social media, and partisan attacks undermining institutional neutrality.</li>
+                            <li><strong>Body 2 (Measures):</strong> Highlight the ECI's responses: 100% deployment of VVPATs, rigorous mock polls, multi-tier security for EVM storage, and transparent auditing processes.</li>
+                            <li><strong>Conclusion:</strong> Conclude that trust is psychological; the ECI must rely on radical transparency to ensure the democratic mandate remains unquestioned.</li>
+                        </ul>
+                    </div>
+
+                    <div class="aw-card">
+                        <h5>PYQ 3 Framework</h5>
+                        <p class="aw-question">"Discuss the role of money power and criminalization in Indian elections, and their impact on the voting behaviour of the electorate."</p>
+                        <ul class="aw-steps">
+                            <li><strong>Introduction:</strong> Introduce the nexus between crime, money, and politics. Cite ADR data on rising percentages of MPs with criminal cases and massive assets.</li>
+                            <li><strong>Body 1 (Mechanisms):</strong> Explain how money (vote-buying, bypassing expenditure limits) and muscle (voter intimidation, projecting a 'Robin Hood' image for winnability) operate.</li>
+                            <li><strong>Body 2 (Impact on Behaviour):</strong> Discuss how it subverts free choice, causes urban apathy by alienating honest voters, and forces voters to choose the "lesser evil."</li>
+                            <li><strong>Conclusion:</strong> Suggest reforms like state funding of elections, stricter enforcement of RPA, fast-track courts, and increasing voter awareness.</li>
+                        </ul>
+                    </div>
+
+                    <div class="custom-way-forward">
+                        <h4><i class="fas fa-balance-scale mr-2"></i>The Maturing Electorate</h4>
+                        <p class="font-medium text-slate-900 mb-0">The determinants of voting behaviour in India encompass various factors, including religion, caste, community, language, money, and ideology. While these factors are often exploited by political parties—raising concerns about electoral fairness—the political system in India is gradually, yet visibly, shifting away from these traditional determinants towards fairer, more pragmatic, and issue-based politics driven by performance and governance.</p>
+                    </div>
+
+                    <div id="feedback-section" class="premium-feedback-card mt-16 p-8 flex flex-col md:flex-row items-center justify-between">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <h4 class="text-blue-900 mt-0 font-extrabold text-xl mb-1">Helpful for your Revision?</h4>
+                            <p class="text-slate-500 text-sm mb-0">Your interaction updates the core performance matrix of UPSChub modules.</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="handleFeedback('happy')" class="reaction-btn bg-emerald-500 hover:bg-emerald-600" title="Excellent"><i class="fas fa-smile"></i></button>
+                            <button onclick="handleFeedback('neutral')" class="reaction-btn bg-slate-400 hover:bg-slate-500" title="Good"><i class="fas fa-meh"></i></button>
+                            <button onclick="handleFeedback('sad')" class="reaction-btn bg-rose-500 hover:bg-rose-600" title="Need Improvement"><i class="fas fa-frown"></i></button>
+                        </div>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-white font-bold mb-2 uppercase text-xs tracking-wider">UPSChub: Empowering Future Civil Servants</p>
+            <p class="text-sm">&copy; 2026 UPSChub. Content strictly generated from constitutional source transcripts.</p>
+        </div>
+    </footer>
+
+    <script>
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        function handleFeedback(type) {
+            const section = document.getElementById('feedback-section');
+            if(section) {
+                section.innerHTML = `<div class="w-full text-center py-6 font-extrabold text-blue-900 text-lg animate-pulse">Thank you for your response! Continuity in revision leads to success.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
