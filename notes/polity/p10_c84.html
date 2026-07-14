@@ -15,7 +15,7 @@
 
         .watermark-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
-            opacity: 0.02; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png');
+            opacity: 0.02;
             background-repeat: no-repeat; background-position: center;
             background-size: 400px; pointer-events: none;
         }
@@ -58,12 +58,6 @@
             display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;
         }
 
-        .img-container {
-            width: 100%; border-radius: 16px; overflow: hidden; margin: 2.5rem 0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0;
-        }
-        .img-container img { width: 100%; height: auto; object-fit: cover; }
-
         .party-tag {
             display: inline-block; background-color: #e0f2fe; color: #1e40af; 
             padding: 0.5rem 1rem; border-radius: 9999px; font-weight: 600; font-size: 0.875rem;
@@ -102,22 +96,49 @@
             color: #166534; font-weight: 500; box-shadow: 0 2px 10px rgba(0,0,0,0.02);
         }
 
-        /* MCQ Section Styles */
+        /* Interactive MCQ Section Styles */
         .mcq-container {
             background: #ffffff; border: 1px solid #cbd5e1; border-radius: 16px;
             padding: 2rem; margin: 3rem 0; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
         .mcq-question {
-            margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px dashed #e2e8f0;
+            margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px dashed #e2e8f0;
         }
         .mcq-question:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .mcq-q-text { font-weight: 700; color: #0f172a; margin-bottom: 0.75rem; font-size: 1.1rem; }
-        .mcq-options { list-style-type: lower-alpha; padding-left: 1.5rem; color: #475569; margin-bottom: 0.75rem; }
-        .mcq-options li { margin-bottom: 0.25rem; }
-        .mcq-answer { 
-            display: inline-block; background: #eff6ff; color: #1d4ed8; 
-            padding: 0.25rem 0.75rem; border-radius: 6px; font-weight: 600; font-size: 0.9rem; 
+        .mcq-q-text { font-weight: 700; color: #0f172a; margin-bottom: 1rem; font-size: 1.1rem; }
+        
+        .mcq-options { list-style: none; padding: 0; margin: 0; }
+        .mcq-options li { 
+            cursor: pointer; padding: 12px 18px; border-radius: 8px;
+            border: 2px solid #f1f5f9; background-color: #ffffff;
+            margin-bottom: 10px; font-weight: 500; color: #334155;
+            transition: all 0.2s ease; position: relative;
         }
+        .mcq-options li:hover { background-color: #f8fafc; border-color: #cbd5e1; transform: translateX(4px); }
+        
+        /* MCQ States */
+        .mcq-options li.correct { 
+            background-color: #f0fdf4; border-color: #22c55e; color: #15803d; 
+            pointer-events: none; transform: none;
+        }
+        .mcq-options li.incorrect { 
+            background-color: #fef2f2; border-color: #ef4444; color: #b91c1c; 
+            pointer-events: none; transform: none;
+        }
+        .mcq-options li.disabled { pointer-events: none; opacity: 0.6; hover: none; }
+        
+        .mcq-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); font-size: 1.2rem; display: none; }
+        .mcq-options li.correct .mcq-icon { display: block; color: #22c55e; }
+        .mcq-options li.incorrect .mcq-icon { display: block; color: #ef4444; }
+
+        .mcq-explanation { 
+            display: none; margin-top: 15px; padding: 12px 16px; 
+            background: #eff6ff; border-left: 4px solid #3b82f6; 
+            color: #1e3a8a; border-radius: 0 8px 8px 0; font-weight: 600; font-size: 0.95rem; 
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Answer Writing Framework Styles */
         .aw-card {
@@ -194,10 +215,6 @@
                     <p>Even though India established itself as a secular state, it has not been able to prevent the role of religion as a determinant of political and electoral behaviour.</p>
                     <p>Political parties tend to appeal to the religious passions of the masses to gain electorally. They also strive for the polarisation of voters on the basis of religion so that they can gain votes for a particular community in bulk. One of the reasons behind the continuing role of religion in electoral politics is the presence of religion-based political parties such as the Indian Union Muslim League, Shiv Sena, Akali Dal, and All India Majlis-e-Ittehadul Muslimeen.</p>
 
-                    <div class="img-container">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Voters_waiting_in_a_queue_to_cast_their_votes%2C_at_a_polling_booth%2C_during_the_Assembly_Election_in_Punjab_on_February_04%2C_2017.jpg/800px-Voters_waiting_in_a_queue_to_cast_their_votes%2C_at_a_polling_booth%2C_during_the_Assembly_Election_in_Punjab_on_February_04%2C_2017.jpg" alt="Indian voters waiting in a queue to cast their votes">
-                    </div>
-
                     <h4>Charisma/Political Parties</h4>
                     <p>The charismatic personality of a political leader is also an important determinant of voting behaviour. Charisma in a leader means exceptional and compelling qualities that elicit admiration, reverence, trust and enthusiastic support from the public. Such a person possesses unique and inspirational charm generally due to their exceptional communication and oratory skills and their ability to empathise and relate with the masses.</p>
 
@@ -209,121 +226,122 @@
                     <p>Class as a determinant of voting behaviour is reflected in the economic issues of employment, inflation, subsidies, loan waivers, etc.</p>
                     <p>For example, the “Garibi hatao” campaign of the Indira Gandhi government was taken quite well by the masses. Similarly, the welfare schemes of the present NDA government and campaigning around it have benefited the BJP in the elections.</p>
 
-                    <!-- MID-POINT: INTERACTIVE MCQ SECTION -->
+                    <!-- INTERACTIVE MCQ SECTION -->
                     <div class="mcq-container">
                         <h4 class="text-center text-blue-800 mt-0 mb-6"><i class="fas fa-clipboard-check mr-2"></i> Mid-Point Knowledge Check</h4>
+                        <p class="text-center text-slate-500 mb-8 text-sm">Click on an option to check your answer.</p>
                         
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="1">
                             <div class="mcq-q-text">1. What is the scientific study of elections and voting behaviour called?</div>
                             <ul class="mcq-options">
-                                <li>a) Epistemology</li>
-                                <li>b) Psephology</li>
-                                <li>c) Demography</li>
-                                <li>d) Sociology</li>
+                                <li data-index="0">a) Epistemology <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Psephology <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Demography <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Sociology <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: b) Psephology</div>
+                            <div class="mcq-explanation">Psephology focuses specifically on elections, voting patterns, and electoral trends.</div>
                         </div>
 
-                        <div class="mcq-question">
-                            <div class="mcq-q-text">2. Which political scientist observed that "Indian politics is casteist, and caste is politicised"?</div>
+                        <div class="mcq-question" data-correct="2">
+                            <div class="mcq-q-text">2. Which political scientist famously observed that "Indian politics is casteist, and caste is politicised"?</div>
                             <ul class="mcq-options">
-                                <li>a) Paul Brass</li>
-                                <li>b) Christophe Jaffrelot</li>
-                                <li>c) Rajni Kothari</li>
-                                <li>d) B.R. Ambedkar</li>
+                                <li data-index="0">a) Paul Brass <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Christophe Jaffrelot <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Rajni Kothari <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="3">d) B.R. Ambedkar <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: c) Rajni Kothari</div>
+                            <div class="mcq-explanation">Rajni Kothari extensively documented how caste identity transforms and solidifies through electoral politics in India.</div>
                         </div>
 
-                        <div class="mcq-question">
-                            <div class="mcq-q-text">3. The success of the "Garibi Hatao" campaign reflects which determinant of voting behaviour?</div>
+                        <div class="mcq-question" data-correct="0">
+                            <div class="mcq-q-text">3. The electoral success of the "Garibi Hatao" campaign reflects which determinant of voting behaviour?</div>
                             <ul class="mcq-options">
-                                <li>a) Class</li>
-                                <li>b) Caste</li>
-                                <li>c) Religion</li>
-                                <li>d) Regionalism</li>
+                                <li data-index="0">a) Class/Economic <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Caste <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Religion <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Regionalism <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: a) Class</div>
+                            <div class="mcq-explanation">"Garibi Hatao" appealed directly to economic anxieties and class divides, promising poverty alleviation.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="2">
                             <div class="mcq-q-text">4. The rise of DMK in Tamil Nadu and TDP in Andhra Pradesh is primarily attributed to:</div>
                             <ul class="mcq-options">
-                                <li>a) Religious polarization</li>
-                                <li>b) Class conflict</li>
-                                <li>c) Language-based identity politics</li>
-                                <li>d) Nationalistic wave</li>
+                                <li data-index="0">a) Religious polarization <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Class conflict <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Language-based identity politics <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Nationalistic wave <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: c) Language-based identity politics</div>
+                            <div class="mcq-explanation">Both parties rose to prominence by fiercely championing regional linguistic pride and autonomy.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="2">
                             <div class="mcq-q-text">5. Who among the following is most likely to be influenced by appeals to parochial identities like caste or religion?</div>
                             <ul class="mcq-options">
-                                <li>a) Swing voters</li>
-                                <li>b) Ideologically committed voters</li>
-                                <li>c) Illiterate and less educated people</li>
-                                <li>d) The political elites</li>
+                                <li data-index="0">a) Swing voters <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Ideologically committed voters <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Illiterate and less educated people <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="3">d) The political elites <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: c) Illiterate and less educated people</div>
+                            <div class="mcq-explanation">Studies suggest illiterates and less educated voters often rely on traditional parochial identities like caste and religion when voting.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="1">
                             <div class="mcq-q-text">6. A political leader possessing exceptional qualities that elicit admiration and trust is an example of which determinant?</div>
                             <ul class="mcq-options">
-                                <li>a) Ideology</li>
-                                <li>b) Charisma</li>
-                                <li>c) Political lineage</li>
-                                <li>d) Factionalism</li>
+                                <li data-index="0">a) Ideology <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Charisma <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Political lineage <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Factionalism <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: b) Charisma</div>
+                            <div class="mcq-explanation">Charisma involves exceptional communication skills and personal charm that can override other voting determinants.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="2">
                             <div class="mcq-q-text">7. The performance of the party in power most heavily influences which group of voters?</div>
                             <ul class="mcq-options">
-                                <li>a) Core base voters</li>
-                                <li>b) Factional voters</li>
-                                <li>c) Swing voters</li>
-                                <li>d) Regional party members</li>
+                                <li data-index="0">a) Core base voters <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Factional voters <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Swing voters <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Regional party members <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: c) Swing voters</div>
+                            <div class="mcq-explanation">Swing voters are not ideologically bound and base their decisions largely on the incumbent government's performance and service delivery.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="1">
                             <div class="mcq-q-text">8. Which factor is responsible for voters becoming disenchanted with a party's internal management?</div>
                             <ul class="mcq-options">
-                                <li>a) Sub-nationalism</li>
-                                <li>b) Factionalism</li>
-                                <li>c) Secularism</li>
-                                <li>d) Charisma</li>
+                                <li data-index="0">a) Sub-nationalism <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Factionalism <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Secularism <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Charisma <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: b) Factionalism</div>
+                            <div class="mcq-explanation">Factionalism (infighting) projects instability, causing voters to lose trust in the party's governance capabilities.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="2">
                             <div class="mcq-q-text">9. Despite limitations on election expenditure, which factor frequently influences elections in favor of wealthy candidates?</div>
                             <ul class="mcq-options">
-                                <li>a) Ideology</li>
-                                <li>b) Factionalism</li>
-                                <li>c) Money</li>
-                                <li>d) Political lineage</li>
+                                <li data-index="0">a) Ideology <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) Factionalism <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) Money <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="3">d) Political lineage <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: c) Money</div>
+                            <div class="mcq-explanation">Covert use of money for distribution of goods and cash remains a significant illegal determinant in elections.</div>
                         </div>
 
-                        <div class="mcq-question">
+                        <div class="mcq-question" data-correct="2">
                             <div class="mcq-q-text">10. How does the study of voting behaviour directly assist the Election Commission?</div>
                             <ul class="mcq-options">
-                                <li>a) By helping them write election manifestos</li>
-                                <li>b) By helping them predict the winning party</li>
-                                <li>c) By helping them understand reasons behind voter abstention to address low turnout</li>
-                                <li>d) By helping them select candidates for regional parties</li>
+                                <li data-index="0">a) By helping them write election manifestos <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="1">b) By helping them predict the winning party <i class="fas fa-times-circle mcq-icon"></i></li>
+                                <li data-index="2">c) By helping them understand reasons behind voter abstention <i class="fas fa-check-circle mcq-icon"></i></li>
+                                <li data-index="3">d) By helping them select candidates <i class="fas fa-times-circle mcq-icon"></i></li>
                             </ul>
-                            <div class="mcq-answer">Answer: c) By helping them understand reasons behind voter abstention...</div>
+                            <div class="mcq-explanation">Understanding why people don't vote helps the EC design targeted campaigns (like SVEEP) to improve overall voter turnout.</div>
                         </div>
                     </div>
-                    <!-- END OF MCQ SECTION -->
+                    <!-- END OF INTERACTIVE MCQ SECTION -->
 
                     <h4>Regionalism/Sub-nationalism</h4>
                     <p>The phenomenon of regionalism and sub-nationalism is a harsh reality of Indian society. These feelings have given rise to the regional parties, which appeal to the regional identities and sentiments of the masses.</p>
@@ -354,10 +372,6 @@
                         <li><i class="fas fa-poll"></i><span><strong>Public opinion polls:</strong> Media coverage of public opinion not only shapes public mood but also provides political parties and candidates with valuable insights to design their campaign strategies accordingly.</span></li>
                         <li><i class="fas fa-hashtag"></i><span><strong>Social Media Influence:</strong> Social media platforms have become an important source of political discussions and information. They also allow the candidates to connect directly with their electorate.</span></li>
                     </ul>
-
-                    <div class="img-container">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/A_massive_crowd_at_the_election_rally_of_the_Prime_Minister%2C_Shri_Narendra_Modi%2C_at_Kharagpur%2C_in_West_Bengal_on_March_27%2C_2016.jpg/800px-A_massive_crowd_at_the_election_rally_of_the_Prime_Minister%2C_Shri_Narendra_Modi%2C_at_Kharagpur%2C_in_West_Bengal_on_March_27%2C_2016.jpg" alt="A massive crowd at an Indian election campaign rally">
-                    </div>
 
                     <h3>Important UPSC PYQs (Answer Writing Frameworks)</h3>
                     <p>While UPSC frequently twists questions to test current affairs, the core thematic focus remains consistent. Use these structured hints to draft your Mains answers.</p>
@@ -439,6 +453,38 @@
                 section.innerHTML = `<div class="w-full text-center py-6 font-extrabold text-blue-900 text-lg animate-pulse">Thank you for your response! Continuity in revision leads to success.</div>`;
             }
         }
+
+        // MCQ Interactive Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const questions = document.querySelectorAll('.mcq-question');
+            
+            questions.forEach(question => {
+                const options = question.querySelectorAll('.mcq-options li');
+                const explanation = question.querySelector('.mcq-explanation');
+                const correctIndex = parseInt(question.getAttribute('data-correct'));
+
+                options.forEach((option, index) => {
+                    option.addEventListener('click', () => {
+                        // Prevent multiple clicks by disabling all options in this question
+                        options.forEach(opt => opt.classList.add('disabled'));
+
+                        if (index === correctIndex) {
+                            option.classList.add('correct');
+                            option.classList.remove('disabled');
+                        } else {
+                            option.classList.add('incorrect');
+                            option.classList.remove('disabled');
+                            // Highlight the correct option as well
+                            options[correctIndex].classList.add('correct');
+                            options[correctIndex].classList.remove('disabled');
+                        }
+
+                        // Show explanation
+                        explanation.style.display = 'block';
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
