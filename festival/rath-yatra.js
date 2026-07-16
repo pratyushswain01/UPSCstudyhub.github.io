@@ -76,8 +76,8 @@
         style.id = "rathYatraStyles";
 
         style.innerHTML = `
-.rath-overlay{position:fixed;inset:0;z-index:80;pointer-events:none;overflow:hidden;}
-.rath-flowers{position:absolute;inset:0;}
+.rath-overlay{position:fixed;inset:0;z-index:80;pointer-events:none;}
+.rath-flowers{position:absolute;inset:0;overflow:hidden;}
 
 .rath-banner{position:fixed;top:0;left:0;right:0;z-index:90;padding:8px 16px;
     color:#fff;background:linear-gradient(to right,#ea580c,#dc2626,#f59e0b);
@@ -101,13 +101,13 @@
 @media(min-width:1024px){.rath-chariot{width:230px;}}
 
 .rath-jagannath-wrap{position:fixed;top:64px;left:50%;transform:translateX(-50%);
-    z-index:45;pointer-events:none;}
+    z-index:99999;pointer-events:none;}
 .rath-jagannath-glow{position:absolute;inset:0;border-radius:16px;filter:blur(20px);
     background:rgba(251,191,36,.4);animation:jagannathGlowPulse 3.2s ease-in-out infinite;}
-.rath-jagannath-img{position:relative;display:block;width:92px;height:auto;
+.rath-jagannath-img{position:relative;display:block;width:140px;height:auto;
     border-radius:16px;border:2px solid #fff;box-shadow:0 14px 30px rgba(0,0,0,.35);
     animation:jagannathFloat 3.2s ease-in-out infinite;}
-@media(min-width:768px){.rath-jagannath-img{width:110px;}}
+@media(min-width:768px){.rath-jagannath-img{width:170px;}}
 
 @keyframes fall{
     0%{ transform:translateY(-30px) rotate(0deg); }
