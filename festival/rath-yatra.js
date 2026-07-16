@@ -27,14 +27,14 @@ function loadRathYatra() {
             <!-- Big Animated Chariot -->
             <div class="fixed bottom-24 left-0 right-0 flex justify-center z-20 pointer-events-auto">
                 <img id="bigChariot" 
-                     src="images/rath-chariot.png" 
+                     src="festival/images/rath-chariot.png"" 
                      alt="Rath Yatra Chariot" 
                      class="max-w-[90%] md:max-w-[72%] drop-shadow-2xl">
             </div>
 
             <!-- Three Lords -->
             <div class="fixed bottom-8 left-0 right-0 flex justify-center z-30 pointer-events-auto">
-                <img src="images/jagannath-balabhadra-subhadra.png" 
+                <img src="festival/images/jagannath-balabhadra-subhadra.png"
                      alt="Jagannath Balabhadra Subhadra" 
                      class="w-80 md:w-96 h-auto rounded-3xl border-4 border-white shadow-2xl">
             </div>
