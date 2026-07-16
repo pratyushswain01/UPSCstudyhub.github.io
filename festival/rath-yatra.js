@@ -1,4 +1,4 @@
-// festival/rath-yatra.js - Fixed Header Issue
+// festival/rath-yatra.js - Pushes Header Down
 
 function loadRathYatra() {
     const today = new Date().toDateString();
@@ -10,7 +10,7 @@ function loadRathYatra() {
             <div id="fallingFlowers" class="absolute inset-0"></div>
 
             <!-- Top Banner -->
-            <div class="fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-600 via-red-600 to-amber-500 text-white py-5 shadow-2xl pointer-events-auto z-[81]">
+            <div id="rathBanner" class="fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-600 via-red-600 to-amber-500 text-white py-5 shadow-2xl pointer-events-auto z-[81]">
                 <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     <div class="flex items-center gap-5">
                         <span class="text-5xl">🚩</span>
@@ -32,7 +32,7 @@ function loadRathYatra() {
                      class="max-w-[90%] md:max-w-[72%] drop-shadow-2xl">
             </div>
 
-            <!-- Three Lords Combined -->
+            <!-- Three Lords -->
             <div class="fixed bottom-8 left-0 right-0 flex justify-center z-30 pointer-events-auto">
                 <img src="images/jagannath-balabhadra-subhadra.png" 
                      alt="Jagannath Balabhadra Subhadra" 
@@ -45,11 +45,22 @@ function loadRathYatra() {
     container.innerHTML = festiveHTML;
     document.body.appendChild(container.firstElementChild);
 
+    // Push down the main header
+    pushDownHeader();
+
     startFallingFlowers();
     animateBigChariot();
 }
 
-// Falling Flowers
+// Push Main Header Down
+function pushDownHeader() {
+    const header = document.querySelector('header'); // Change selector if your header has different tag/class
+    if (header) {
+        header.style.transition = 'top 0.4s ease';
+        header.style.top = '80px'; // Adjust this value according to your banner height
+    }
+}
+
 function startFallingFlowers() {
     const container = document.getElementById('fallingFlowers');
     if (!container) return;
@@ -85,6 +96,11 @@ function animateBigChariot() {
 window.closeRathYatra = function() {
     const today = new Date().toDateString();
     localStorage.setItem('rathYatraClosedDate', today);
+    
+    // Restore header position
+    const header = document.querySelector('header');
+    if (header) header.style.top = '0px';
+
     const wrapper = document.getElementById('rathFestiveWrapper');
     if (wrapper) wrapper.remove();
 };
