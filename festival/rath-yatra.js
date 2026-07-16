@@ -1,10 +1,12 @@
-// =============================================
-// Final Rath Yatra Festival Script
-// Place this file in: festival/rath-yatra.js
-// =============================================
+// festival/rath-yatra.js - Shows Today Only
 
 function loadRathYatra() {
-    if (localStorage.getItem('rathYatraClosed') === 'true') return;
+    const today = new Date().toDateString(); // e.g., "Thu Jul 16 2026"
+    
+    // Check if already closed today
+    if (localStorage.getItem('rathYatraClosedDate') === today) {
+        return;
+    }
 
     const festiveHTML = `
         <div class="fixed inset-0 z-[9999] pointer-events-none" id="rathFestiveWrapper">
@@ -27,40 +29,23 @@ function loadRathYatra() {
                 </div>
             </div>
 
-            <!-- Three SVG Chariots -->
-            <div class="fixed bottom-8 left-0 right-0 flex justify-center gap-12 md:gap-20 z-20 pointer-events-auto">
-                
-                <!-- Balabhadra -->
+            <!-- Three Lords -->
+            <div class="fixed bottom-8 left-0 right-0 flex justify-center gap-8 md:gap-16 z-20 pointer-events-auto">
                 <div class="text-center">
-                    <svg width="100" height="110" viewBox="0 0 100 110" class="chariot-svg">
-                        <rect x="18" y="55" width="64" height="28" rx="6" fill="#f59e0b" stroke="#b45309" stroke-width="4"/>
-                        <circle cx="32" cy="85" r="9" fill="#1f2937"/>
-                        <circle cx="68" cy="85" r="9" fill="#1f2937"/>
-                        <polygon points="25,48 50,28 75,48" fill="#dc2626"/>
-                    </svg>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Balabhadra.jpg/220px-Balabhadra.jpg" 
+                         alt="Balabhadra" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover border-4 border-white shadow-lg">
                     <p class="text-white text-xs font-medium mt-2">Balabhadra</p>
                 </div>
 
-                <!-- Lord Jagannath (Main) -->
                 <div class="text-center scale-125">
-                    <svg width="130" height="130" viewBox="0 0 100 120" class="chariot-svg">
-                        <rect x="12" y="52" width="76" height="32" rx="8" fill="#b45309" stroke="#854d0e" stroke-width="5"/>
-                        <circle cx="28" cy="87" r="10" fill="#1f2937"/>
-                        <circle cx="72" cy="87" r="10" fill="#1f2937"/>
-                        <polygon points="20,45 50,18 80,45" fill="#dc2626"/>
-                        <circle cx="50" cy="38" r="14" fill="#fcd34d"/>
-                    </svg>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Jagannath_Puri.jpg/220px-Jagannath_Puri.jpg" 
+                         alt="Lord Jagannath" class="w-28 h-28 md:w-32 md:h-32 rounded-2xl object-cover border-4 border-white shadow-xl">
                     <p class="text-white font-bold mt-2">Lord Jagannath</p>
                 </div>
 
-                <!-- Subhadra -->
                 <div class="text-center">
-                    <svg width="100" height="110" viewBox="0 0 100 110" class="chariot-svg">
-                        <rect x="18" y="55" width="64" height="28" rx="6" fill="#f59e0b" stroke="#b45309" stroke-width="4"/>
-                        <circle cx="32" cy="85" r="9" fill="#1f2937"/>
-                        <circle cx="68" cy="85" r="9" fill="#1f2937"/>
-                        <polygon points="25,48 50,28 75,48" fill="#dc2626"/>
-                    </svg>
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Subhadra.jpg/220px-Subhadra.jpg" 
+                         alt="Subhadra" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover border-4 border-white shadow-lg">
                     <p class="text-white text-xs font-medium mt-2">Subhadra</p>
                 </div>
             </div>
@@ -72,7 +57,6 @@ function loadRathYatra() {
     document.body.appendChild(container.firstElementChild);
 
     startFallingFlowers();
-    animateChariots();
 }
 
 // Falling Flowers
@@ -85,37 +69,30 @@ function startFallingFlowers() {
         flower.textContent = ['🌸','🌺','🌼','🪷','🌷','🍃'][Math.floor(Math.random() * 6)];
         flower.style.position = 'absolute';
         flower.style.left = Math.random() * 100 + 'vw';
-        flower.style.fontSize = '20px';
+        flower.style.fontSize = '22px';
         flower.style.opacity = Math.random() * 0.7 + 0.4;
         flower.style.animation = `fall ${Math.random() * 5 + 6}s linear forwards`;
         container.appendChild(flower);
-
         setTimeout(() => flower.remove(), 16000);
     }, 220);
 }
 
-// Chariot Animation
-function animateChariots() {
-    const style = document.createElement('style');
-    style.innerHTML = `
-        @keyframes fall { to { transform: translateY(110vh) rotate(720deg); } }
-        .chariot-svg {
-            animation: chariotPull 4s ease-in-out infinite alternate;
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
-        }
-        @keyframes chariotPull {
-            from { transform: translateY(0) rotate(-3deg); }
-            to   { transform: translateY(-12px) rotate(3deg); }
-        }
-    `;
-    document.head.appendChild(style);
-}
-
 window.closeRathYatra = function() {
-    localStorage.setItem('rathYatraClosed', 'true');
+    const today = new Date().toDateString();
+    localStorage.setItem('rathYatraClosedDate', today);
+    
     const wrapper = document.getElementById('rathFestiveWrapper');
     if (wrapper) wrapper.remove();
 };
+
+// Animation Styles
+const style = document.createElement('style');
+style.innerHTML = `
+    @keyframes fall { 
+        to { transform: translateY(110vh) rotate(720deg); } 
+    }
+`;
+document.head.appendChild(style);
 
 // Auto Load
 window.addEventListener('load', loadRathYatra);
