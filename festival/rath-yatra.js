@@ -32,7 +32,6 @@ function loadRathYatra() {
                      alt="Rath Yatra Chariot" 
                      class="max-w-[90%] md:max-w-[72%] drop-shadow-2xl">
             </div>
-
             <!-- One Single Image of 3 Lords -->
             <div class="fixed bottom-8 left-0 right-0 flex justify-center z-30 pointer-events-auto">
                 <img src="https://stock.adobe.com/in/images/divine-trio-n-lord-jagannath-balabhadra-and-subhadra/1985398798" 
