@@ -93,15 +93,15 @@
 
 .rath-chariot-track{position:fixed;bottom:64px;left:0;width:100%;height:0;pointer-events:none;}
 .rath-chariot{position:absolute;bottom:0;left:0;width:150px;will-change:transform;
-    animation:chariotRun 16s ease-in-out infinite;}
+    animation:chariotRun 10s linear infinite;}
 .rath-chariot img{display:block;width:100%;height:auto;
     filter:drop-shadow(0 14px 20px rgba(0,0,0,.35));}
 .rath-dust{position:absolute;left:-8px;right:-8px;bottom:4px;height:8px;}
 @media(min-width:768px){.rath-chariot{width:190px;}}
 @media(min-width:1024px){.rath-chariot{width:230px;}}
 
-.rath-jagannath-wrap{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-    z-index:40;pointer-events:none;}
+.rath-jagannath-wrap{position:fixed;top:64px;left:50%;transform:translateX(-50%);
+    z-index:45;pointer-events:none;}
 .rath-jagannath-glow{position:absolute;inset:0;border-radius:16px;filter:blur(20px);
     background:rgba(251,191,36,.4);animation:jagannathGlowPulse 3.2s ease-in-out infinite;}
 .rath-jagannath-img{position:relative;display:block;width:92px;height:auto;
@@ -115,20 +115,16 @@
 }
 
 @keyframes chariotRun{
-    0%{   transform:translateX(-8vw)  scaleX(1)  translateY(0); }
-    5%{   transform:translateX(-8vw)  scaleX(1)  translateY(-4px); }
-    45%{  transform:translateX(94vw)  scaleX(1)  translateY(0); }
-    50%{  transform:translateX(97vw)  scaleX(1)  translateY(-6px); }
-    52%{  transform:translateX(97vw)  scaleX(-1) translateY(-6px); }
-    55%{  transform:translateX(94vw)  scaleX(-1) translateY(0); }
-    95%{  transform:translateX(-8vw)  scaleX(-1) translateY(0); }
-    98%{  transform:translateX(-8vw)  scaleX(-1) translateY(-4px); }
-    100%{ transform:translateX(-8vw)  scaleX(1)  translateY(0); }
+    0%{   transform:translateX(-15vw) translateY(0); }
+    5%{   transform:translateX(-12vw) translateY(-4px); }
+    50%{  transform:translateX(45vw)  translateY(0); }
+    95%{  transform:translateX(102vw) translateY(-4px); }
+    100%{ transform:translateX(105vw) translateY(0); }
 }
 
 @keyframes jagannathFloat{
     0%,100%{ transform:translateY(0); }
-    50%{ transform:translateY(-10px); }
+    50%{ transform:translateY(10px); }
 }
 
 @keyframes jagannathGlowPulse{
