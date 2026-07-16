@@ -1,16 +1,16 @@
-// festival/rath-yatra.js - Using Local Images
+// festival/rath-yatra.js - Fixed Header Issue
 
 function loadRathYatra() {
     const today = new Date().toDateString();
     if (localStorage.getItem('rathYatraClosedDate') === today) return;
 
     const festiveHTML = `
-        <div class="fixed inset-0 z-[9999] pointer-events-none overflow-hidden" id="rathFestiveWrapper">
+        <div class="fixed inset-0 z-[80] pointer-events-none overflow-hidden" id="rathFestiveWrapper">
             
             <div id="fallingFlowers" class="absolute inset-0"></div>
 
             <!-- Top Banner -->
-            <div class="fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-600 via-red-600 to-amber-500 text-white py-5 shadow-2xl pointer-events-auto">
+            <div class="fixed top-0 left-0 right-0 bg-gradient-to-r from-orange-600 via-red-600 to-amber-500 text-white py-5 shadow-2xl pointer-events-auto z-[81]">
                 <div class="max-w-7xl mx-auto px-6 flex items-center justify-between">
                     <div class="flex items-center gap-5">
                         <span class="text-5xl">🚩</span>
@@ -49,7 +49,7 @@ function loadRathYatra() {
     animateBigChariot();
 }
 
-// Falling Flowers (Reduced)
+// Falling Flowers
 function startFallingFlowers() {
     const container = document.getElementById('fallingFlowers');
     if (!container) return;
