@@ -54,28 +54,28 @@ function loadRathYatra() {
 
     </div>
 
-    <!-- Small Moving Rath -->
-    <div class="fixed bottom-20 left-3 z-30 pointer-events-none">
+    <!-- Moving Rath (Larger and travels full screen) -->
+    <div class="fixed bottom-12 left-0 z-30 pointer-events-none">
 
         <img
             id="bigChariot"
             src="festival/images/rath-chariot.png"
             alt="Rath Yatra"
-            class="w-20 md:w-24 h-auto drop-shadow-xl">
+            class="w-40 md:w-56 h-auto drop-shadow-xl">
 
     </div>
 
-    <!-- Small Lord Jagannath -->
-    <div class="fixed bottom-5 right-5 z-40 pointer-events-none">
+    <!-- Centered Lord Jagannath (Larger and positioned in the middle) -->
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
 
         <img
             src="festival/images/jagannath-balabhadra-subhadra.png"
             alt="Jagannath"
-            class="w-20 md:w-24 h-auto
+            class="w-32 md:w-48 h-auto
                    rounded-xl
                    border-2
                    border-white
-                   shadow-xl">
+                   shadow-2xl">
 
     </div>
 
@@ -95,22 +95,17 @@ function loadRathYatra() {
 /* Push Header */
 
 function pushDownHeader() {
-
     const header = document.querySelector("header");
 
     if (header) {
-
         header.style.transition = "top .35s ease";
         header.style.top = "48px";
-
     }
-
 }
 
 /* Falling Flowers */
 
 function startFallingFlowers() {
-
     const container = document.getElementById("fallingFlowers");
 
     if (!container) return;
@@ -118,108 +113,78 @@ function startFallingFlowers() {
     const flowers = ["🌸","🌺","🌼","🪷","🌷"];
 
     setInterval(() => {
-
         const flower = document.createElement("div");
 
-        flower.innerText =
-            flowers[Math.floor(Math.random()*flowers.length)];
+        flower.innerText = flowers[Math.floor(Math.random() * flowers.length)];
 
-        flower.style.position="absolute";
-        flower.style.left=Math.random()*100+"vw";
-        flower.style.top="-40px";
-        flower.style.fontSize="16px";
-        flower.style.opacity=Math.random()*0.5+0.5;
-        flower.style.animation=`fall ${Math.random()*4+7}s linear forwards`;
+        flower.style.position = "absolute";
+        flower.style.left = Math.random() * 100 + "vw";
+        flower.style.top = "-40px";
+        flower.style.fontSize = "16px";
+        flower.style.opacity = Math.random() * 0.5 + 0.5;
+        flower.style.animation = `fall ${Math.random() * 4 + 7}s linear forwards`;
 
         container.appendChild(flower);
 
-        setTimeout(()=>{
+        setTimeout(() => {
             flower.remove();
-        },12000);
+        }, 12000);
 
-    },700);
-
+    }, 700);
 }
 
 /* Rath Animation */
 
-function animateBigChariot(){
+function animateBigChariot() {
+    const chariot = document.getElementById("bigChariot");
 
-    const chariot=document.getElementById("bigChariot");
-
-    if(chariot){
-
-        chariot.style.animation="chariotMove 18s linear infinite";
-
+    if (chariot) {
+        // Increased speed and covers full screen (12s instead of 18s)
+        chariot.style.animation = "chariotMove 12s linear infinite";
     }
 
-    const style=document.createElement("style");
+    const style = document.createElement("style");
 
-    style.innerHTML=`
-
-@keyframes fall{
-
-0%{
-
-transform:translateY(-30px) rotate(0deg);
-
+    style.innerHTML = `
+@keyframes fall {
+    0% {
+        transform: translateY(-30px) rotate(0deg);
+    }
+    100% {
+        transform: translateY(110vh) rotate(720deg);
+    }
 }
 
-100%{
-
-transform:translateY(110vh) rotate(720deg);
-
+@keyframes chariotMove {
+    0% {
+        /* Starts completely off-screen on the left */
+        transform: translateX(-100%);
+    }
+    100% {
+        /* Travels all the way off-screen to the right */
+        transform: translateX(110vw);
+    }
 }
-
-}
-
-@keyframes chariotMove{
-
-0%{
-
-transform:translateX(-20px);
-
-}
-
-50%{
-
-transform:translateX(18px);
-
-}
-
-100%{
-
-transform:translateX(-20px);
-
-}
-
-}
-
 `;
 
     document.head.appendChild(style);
-
 }
 
 /* Close */
 
-window.closeRathYatra=function(){
-
+window.closeRathYatra = function() {
     localStorage.setItem(
         "rathYatraClosedDate",
         new Date().toDateString()
     );
 
-    const header=document.querySelector("header");
+    const header = document.querySelector("header");
 
-    if(header){
-
-        header.style.top="0";
-
+    if (header) {
+        header.style.top = "0";
     }
 
     document.getElementById("rathFestiveWrapper")?.remove();
-
 }
 
-window.addEventListener("load",loadRathYatra);
+window.addEventListener("load", loadRathYatra);
