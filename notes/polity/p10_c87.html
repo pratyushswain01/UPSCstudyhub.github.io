@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Pressure Groups - UPSChub Notes</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+
+        .watermark-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            opacity: 0.02; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png');
+            background-repeat: no-repeat; background-position: center;
+            background-size: 400px; pointer-events: none;
+        }
+
+        .notes-content h3 { 
+            color: #1e3a8a; font-weight: 800; font-size: 1.85rem; 
+            margin-top: 3rem; margin-bottom: 1.5rem; display: flex; align-items: center;
+        }
+        .notes-content h3::before {
+            content: ''; width: 8px; height: 32px; background: #3b82f6; 
+            border-radius: 4px; margin-right: 12px; display: inline-block;
+        }
+        
+        .notes-content h4 {
+            color: #1e40af; font-weight: 700; font-size: 1.35rem; 
+            margin-top: 2rem; margin-bottom: 1rem;
+        }
+
+        .notes-content p, .notes-content li { line-height: 1.8; color: #334155; margin-bottom: 1rem; }
+
+        .icon-list { list-style: none; padding-left: 0; }
+        .icon-list li { 
+            display: flex; align-items: flex-start; margin-bottom: 1.25rem; 
+            padding: 14px; background: #ffffff; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+            transition: all 0.3s ease; line-height: 1.7; color: #334155;
+        }
+        .icon-list li:hover { transform: translateX(6px); border-color: #3b82f6; background-color: #f8fafc; }
+        .icon-list i { 
+            margin-top: 0.25em; margin-right: 1.25rem; flex-shrink: 0; 
+            color: #2563eb; font-size: 1.2rem; 
+        }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2rem 0; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        th { background-color: #1e3a8a; color: white; padding: 15px; text-align: left; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        td { padding: 15px; border-bottom: 1px solid #e2e8f0; background: white; font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background-color: #f8fafc; }
+
+        .highlight-card {
+            border-left: 4px solid #3b82f6; background: white; padding: 1.25rem;
+            border-radius: 0 12px 12px 0; margin-bottom: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .custom-way-forward {
+            background-color: #ffffff !important;
+            border: 2px solid #1e3a8a !important;
+            border-radius: 20px !important;
+            padding: 2.5rem !important;
+            margin: 3rem 0 !important;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.1) !important;
+        }
+        .custom-way-forward h4 { color: #1e3a8a !important; font-weight: 800 !important; font-size: 1.4rem !important; margin-top: 0 !important; margin-bottom: 1rem !important; }
+
+        .premium-feedback-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 24px !important;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08) !important;
+            transition: all 0.4s ease !important;
+        }
+        .reaction-btn {
+            width: 56px !important; height: 56px !important; border-radius: 50% !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            color: white !important; font-size: 1.4rem !important; cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+        .reaction-btn:hover { transform: scale(1.18) translateY(-6px) !important; box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important; }
+
+        /* Interactive MCQ Styles */
+        .mcq-option {
+            cursor: pointer;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            background: white;
+            font-weight: 500;
+            color: #334155;
+        }
+        .mcq-option:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .mcq-option.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .mcq-option.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .mcq-feedback {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <div class="watermark-bg"></div>
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">UPSChub <span class="text-blue-600">Polity</span></h1>
+            </div>
+            <div class="text-right hidden sm:block">
+                <div class="font-bold text-sm text-slate-600" id="time-display">--:--:-- --</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5" id="date-display">--------</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-10 relative z-10">
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <div class="bg-slate-900 p-10 md:p-14 text-center">
+                <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">Indian Polity & Governance</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight mt-0">Pressure Groups</h2>
+                <p class="text-blue-400 mt-4 font-medium italic">A Comprehensive Guide to Interest Articulation and Democratic Processes</p>
+            </div>
+
+            <div class="p-6 md:p-14">
+                <article class="notes-content">
+                    
+                    <h3>Introduction</h3>
+                    <p>A pressure group is a group of people who are organised actively for promoting and defending their common interest. It is called so, as it attempts to bring a change in public policy by exerting pressure on the government. It acts as a liaison between the government and its members.</p>
+                    <p>The pressure groups are also called interest groups or vested groups. They are different from the political parties, as they neither contest elections nor try to capture political power. They are concerned with specific programmes and issues and their activities are confined to the protection and promotion of the interests of their members by influencing the government.</p>
+                    <p>The pressure groups influence the policy-making and policy implementation in the government through legal and legitimate methods like lobbying, correspondence, publicity, propagandising, petitioning, public debating, maintaining contacts with their legislators and so forth.</p>
+
+                    <h3>Techniques Used By Pressure Groups</h3>
+                    <p>Pressure groups resort to three different techniques in securing their purposes.</p>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-vote-yea"></i><span><strong>Electioneering:</strong> Placing in public office persons who are favourably disposed towards the interests the concerned pressure group seeks to promote.</span></li>
+                        <li><i class="fas fa-handshake"></i><span><strong>Lobbying:</strong> Persuading public officers, whether they are initially favourably disposed toward them or not, to adopt and enforce the policies that they think will prove most beneficial to their interests.</span></li>
+                        <li><i class="fas fa-bullhorn"></i><span><strong>Propagandizing:</strong> Influencing public opinion and thereby gaining an indirect influence over government, since the government in a democracy is substantially affected by public opinion.</span></li>
+                    </ul>
+
+                    <h3>Characteristics of Pressure Groups</h3>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-crosshairs"></i><span><strong>Based on Certain Interests:</strong> Each pressure group organises itself keeping in view certain interests and thus tries to adopt the structure of power in the political systems.</span></li>
+                        <li><i class="fas fa-tools"></i><span><strong>Use of Modern as well as Traditional Means:</strong> They adopt techniques like financing of political parties, sponsoring their close candidates at the time of elections and keeping the bureaucracy also satisfied. Their traditional means include exploitation of caste, creed and religious feelings to promote their interests.</span></li>
+                        <li><i class="fas fa-chart-pie"></i><span><strong>Resulting Out of Increasing Pressure and Demands on Resources:</strong> Scarcity of resources, claims and counterclaims on the resources from different and competing sections of the society leads to the rise of pressure groups.</span></li>
+                        <li><i class="fas fa-exclamation-circle"></i><span><strong>Inadequacies of Political Parties:</strong> Pressure groups are primarily a consequence of inadequacies of the political parties.</span></li>
+                        <li><i class="fas fa-brain"></i><span><strong>Represent Changing Consciousness:</strong> For instance the increase in the food production or industrial goods does bring a change in the way individuals and groups look at the world. The stagnation in production leads to fatalism but increase in production leads to demands, protests and formation of new pressure groups.</span></li>
+                    </ul>
+
+                    <h3>Types of Pressure Groups</h3>
+                    
+                    <div class="highlight-card">
+                        <strong class="text-blue-900 block mb-2 text-lg">Institutional Interest Groups</strong>
+                        <p class="text-sm mb-2">These groups are formally organised which consist of professionally employed persons. They are a part of government machinery and try to exert their influence. These groups include political parties, legislatures, armies, bureaucracies, etc. Whenever such an association raises protest it does so by constitutional means and in accordance with the rules and regulations.</p>
+                        <p class="text-sm mb-0 font-semibold italic text-slate-700">Example: IAS Association, IPS Association, State civil services association, etc.</p>
+                    </div>
+
+                    <div class="highlight-card">
+                        <strong class="text-blue-900 block mb-2 text-lg">Associational Interest Groups</strong>
+                        <p class="text-sm mb-2">These are organised specialised groups formed for interest articulation, but to pursue limited goals. These include trade unions, organisations of businessmen and industrialists and civic groups.</p>
+                        <p class="text-sm mb-0 font-semibold italic text-slate-700">Some examples of Associational Interest Groups in India are Bengal Chamber of Commerce and Industry, Indian Chamber of Commerce, Trade Unions such as AITUC (All India Trade Union Congress), Teachers Associations, Students Associations such as National Students Union of India (NSUI) etc.</p>
+                    </div>
+
+                    <div class="highlight-card">
+                        <strong class="text-blue-900 block mb-2 text-lg">Anomic Interest Groups</strong>
+                        <p class="text-sm mb-0">By anomic pressure groups we mean more or less a spontaneous breakthrough into the political system from the society such as riots, demonstrations, assassinations and the like.</p>
+                    </div>
+
+                    <div class="highlight-card">
+                        <strong class="text-blue-900 block mb-2 text-lg">Non-Associational Interest Groups</strong>
+                        <p class="text-sm mb-2">These are the kinship and lineage groups and ethnic, regional, status and class groups that articulate interests on the basis of individuals, family and religious heads. These groups have informal structure. These include caste groups, language groups, etc.</p>
+                    </div>
+
+                    <h3>Pressure Groups in India</h3>
+                    <div class="overflow-x-auto">
+                        <table>
+                            <thead>
+                                <tr><th>Category</th><th>Examples in India</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr><td><strong>Business Groups</strong></td><td>Federation of Indian Chamber of Commerce and Industry (FICCI), Associated Chamber of Commerce and Industry of India (ASSOCHAM), Federation of All India Foodgrain Dealers Association (FAIFDA), etc</td></tr>
+                                <tr><td><strong>Trade Unions</strong></td><td>All-India Trade Union Congress (AITUC), Indian National Trade Union Congress (INTUC), Hind Mazdoor Sabha (HMS), Bharatiya Mazdoor Sangh (BMS)</td></tr>
+                                <tr><td><strong>Professional Groups</strong></td><td>Indian Medical Association (IMA), Bar Council of India (BCI), All India Federation of University and College Teachers (AIFUCT)</td></tr>
+                                <tr><td><strong>Agrarian Groups</strong></td><td>All India Kisan Sabha, Bharatiya Kisan Union, etc</td></tr>
+                                <tr><td><strong>Student’s Organisations</strong></td><td>Akhila Bhartiya Vidyarthi Parishad (ABVP), All India Students Federation (AISF), National Students Union of India (NSUI)</td></tr>
+                                <tr><td><strong>Religious Groups</strong></td><td>Rashtriya Swayam Sevak Sangh (RSS), Vishwa Hindu Parishad (VHP), Jamaat-e-Islami, etc.</td></tr>
+                                <tr><td><strong>Caste Groups</strong></td><td>Harijan Sevak Sangh, Nadar Caste Association, etc</td></tr>
+                                <tr><td><strong>Linguistic Groups</strong></td><td>Tamil Sangh, Andhra Maha Sabha, etc</td></tr>
+                                <tr><td><strong>Tribal Groups</strong></td><td>National Socialist Council of Nagaland (NSCN), Tribal National Volunteers (TNU) in Tripura, United Mizo federal org, Tribal League of Assam, etc.</td></tr>
+                                <tr><td><strong>Ideology based Groups</strong></td><td>Narmada Bachao Andolan, Chipko Movement, Women's Rights Organisation, India Against Corruption etc.</td></tr>
+                                <tr><td><strong>Anomic Groups</strong></td><td>Naxalite Groups, Jammu and Kashmir Liberation Front (JKLF), United Liberation Front of Assam (ULFA), Dal Khalsa, etc.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h3>Functions, Role & Importance of Pressure Groups</h3>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-bullseye"></i><span><strong>Interest Articulation:</strong> Pressure Groups bring the demands and needs of the people to the notice of the decision-makers. The process by which the claims of the people get crystallized and articulated is called interest articulation.</span></li>
+                        <li><i class="fas fa-users-cog"></i><span><strong>Agents of Political Socialisation:</strong> Pressure groups are agents of political socialisation in so far as they influence the orientations of the people towards the political process. These groups play a vital role as two-way communication links between the people and the government.</span></li>
+                        <li><i class="fas fa-gavel"></i><span><strong>Role in Legislative Process:</strong> Pressure groups play a vital role in the legislative process, not only as important structures of interest articulation, but also as active agencies engaged in lobbying with the legislators for securing desired laws or amendments in laws and policies of the government. Right from the time of preparation of election manifestos of various political parties to the passing of laws by the legislators, the pressure groups remain associated with the process of rule-making.</span></li>
+                        <li><i class="fas fa-landmark"></i><span><strong>Pressure Groups and Administration:</strong> Pressure Groups are actively involved with the process of administration. Through lobbying with the bureaucracy, the pressure groups are usually in a position to influence the process of policy implementation.</span></li>
+                        <li><i class="fas fa-balance-scale"></i><span><strong>Role in Judicial Administration:</strong> Pressure Groups try to use the judicial system for securing and safeguarding their interests. Interest groups often seek access to the court for redressal of their grievances against the government as well as for getting declared a particular decision or policy as unconstitutional.</span></li>
+                        <li><i class="fas fa-comments"></i><span><strong>Formulation of Public Opinion:</strong> Pressure groups play a leading role in the formulation of public opinion. Each pressure group is continuously engaged in evaluating all such laws, rules, decisions and policies which have a direct or indirect bearing on the interests it represents. It always places the pros and cons not only before its members but also before the general public for eliciting popular support as well as for catching the attention of the government. They try to gain public support and sympathy for their goals and their activity by carrying out information campaigns, organising meetings, file petitions, etc. Most of these groups try to influence the media into giving attention to these issues.</span></li>
+                        <li><i class="fas fa-cogs"></i><span><strong>Improving Quality of Government:</strong> Pressure groups help in improving the quality of government. Consultation with affected groups is the rational way to make decisions in a free society. It makes government more efficient by enhancing the quality of the decision making process – the information and advice provided by these groups helps to improve the quality of government policy and legislation.</span></li>
+                    </ul>
+
+                    <div class="custom-way-forward">
+                        <h4><i class="fas fa-shield-alt mr-2"></i>The Democratic Imperative</h4>
+                        <p class="font-medium text-slate-900 mb-4">Freely operating pressure groups are essential to the effective functioning of liberal democracy.</p>
+                        <ul class="list-disc pl-5 mb-0 text-slate-800 space-y-2">
+                            <li>They serve as a vital intermediary institutions between government and society;</li>
+                            <li>They assist in the dispersal of political power;</li>
+                            <li>They provide important counterweights to balance the concentration of power.</li>
+                            <li>Pressure groups enable new concerns and issues to reach the political agenda, thereby facilitating social progress and preventing social stagnation. For example, the women’s and environmentalist movements.</li>
+                            <li>Pressure groups increase social cohesion and political stability by providing a ‘safety-valve’ outlet for individual and collective grievances and demands.</li>
+                            <li>Pressure groups complement the work of opposition political parties by exposing the bad policies and wrongdoings of the government. Pressure groups thereby improve the accountability of decision makers to electorates.</li>
+                            <li>Pressure groups help to educate people, compile data and provide specific information to policy makers, thus they work as an informal source of information. Active constructive participation of numerous groups in polity helps to reconcile general interest with individual group interests.</li>
+                        </ul>
+                    </div>
+
+                    <h3>Shortcomings of Pressure Groups</h3>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-exclamation-triangle"></i><span><strong>Narrow selfish interests:</strong> Unlike the pressure groups in the developed countries of the West, where these are invariably organised to safeguard economic, social, cultural interests, etc. in India these groups are organised around religious, regional and ethnic issues. Many a time factors of caste and religion eclipse the socioeconomic interests. The result is that instead of serving a useful purpose in the political administrative process, they are reduced to work for narrow selfish interests.</span></li>
+                        <li><i class="fas fa-ban"></i><span><strong>Misuse of power:</strong> Instead of the pressure groups exerting influence on political process, they become tools and implements to subserve political interests.</span></li>
+                        <li><i class="fas fa-water"></i><span><strong>Instability:</strong> Most pressure groups do not have autonomous existence; they are unstable and lack commitment, their loyalties shift with political situations which threatens general welfare. They many a times resort to unconstitutional means like violence. Naxalite movement started in 1967 in West Bengal is one such example.</span></li>
+                        <li><i class="fas fa-fire"></i><span><strong>Propagating extremism:</strong> Pressure groups can allow too much influence over the government from unelected extremist minority groups, which in turn could lead to unpopular consequences.</span></li>
+                    </ul>
+
+                    <h3>Conclusion</h3>
+                    <p>Pressure groups are now considered as an indispensable and helpful element of the democratic process. The society has become highly complex and individuals cannot pursue their interests on their own. They need the support of other fellow beings in order to gain greater bargaining power; this gives rise to pressure groups based on common interests.</p>
+                    <p>Democratic politics has to be politics through consultation, through negotiation and some amount of bargaining is also involved. Thus, it is very essential for the government to consult these organised groups at the time of policy formulation and implementation.</p>
+
+                    <h3 class="mt-12">UPSC Civil Services Examination PYQs</h3>
+                    
+                    <!-- Prelims Practice Block -->
+                    <div class="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 shadow-sm">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                                <i class="fas fa-check-double text-lg"></i>
+                            </div>
+                            <h4 class="text-slate-800 my-0 text-xl font-bold">Prelims Practice Test</h4>
+                        </div>
+                        
+                        <p class="font-semibold text-slate-700 mb-4 text-lg">Q. Consider the following statements regarding Pressure Groups in India:</p>
+                        <ol class="list-decimal pl-6 mb-6 text-slate-600 space-y-3 font-medium">
+                            <li>Unlike political parties, pressure groups do not contest elections to capture political power.</li>
+                            <li>The All-India Trade Union Congress (AITUC) is an example of an Institutional Interest Group.</li>
+                            <li>Pressure groups rely solely on constitutional and peaceful methods to exert influence on the government.</li>
+                        </ol>
+                        <p class="font-bold text-slate-800 mb-4">Which of the statements given above is/are correct?</p>
+                        
+                        <div class="mcq-options flex flex-col space-y-3">
+                            <div class="mcq-option" data-correct="true" onclick="checkAnswer(this, true)">(a) 1 only</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(b) 1 and 2 only</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(c) 2 and 3 only</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(d) 1, 2 and 3</div>
+                        </div>
+                        <div class="mcq-feedback bg-slate-50 border border-slate-200 mt-4"></div>
+                    </div>
+
+                    <!-- Mains Practice Block -->
+                    <div class="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 shadow-sm">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-4">
+                                <i class="fas fa-pen-nib text-lg"></i>
+                            </div>
+                            <h4 class="text-slate-800 my-0 text-xl font-bold">Mains Answer Writing</h4>
+                        </div>
+                        
+                        <div class="mb-6 border-l-4 border-indigo-500 pl-5 py-2 bg-indigo-50/30 rounded-r-lg">
+                            <p class="font-extrabold text-indigo-900 mb-2 uppercase text-xs tracking-wider">Mains Model Question</p>
+                            <p class="text-slate-700 font-medium leading-relaxed m-0">Q1. "Pressure groups play an indispensable role in the democratic process by acting as a safety valve for public grievances." Discuss this statement highlighting the various techniques used by pressure groups and the challenges associated with them in the Indian context.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Feedback Footer -->
+                    <div id="feedback-section" class="premium-feedback-card mt-16 p-8 flex flex-col md:flex-row items-center justify-between">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <h4 class="text-blue-900 mt-0 font-extrabold text-xl mb-1">Helpful for your Revision?</h4>
+                            <p class="text-slate-500 text-sm mb-0">Your interaction updates the core performance matrix of UPSChub modules.</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="handleFeedback('happy')" class="reaction-btn bg-emerald-500 hover:bg-emerald-600" title="Excellent"><i class="fas fa-smile"></i></button>
+                            <button onclick="handleFeedback('neutral')" class="reaction-btn bg-slate-400 hover:bg-slate-500" title="Good"><i class="fas fa-meh"></i></button>
+                            <button onclick="handleFeedback('sad')" class="reaction-btn bg-rose-500 hover:bg-rose-600" title="Need Improvement"><i class="fas fa-frown"></i></button>
+                        </div>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-white font-bold mb-2 uppercase text-xs tracking-wider">UPSChub: Empowering Future Civil Servants</p>
+            <p class="text-sm">&copy; 2026 UPSChub. Content generated for UPSC Civil Services Examination.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Date and Time Script
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // MCQ Interactive Logic
+        function checkAnswer(element, isCorrect) {
+            // Disable all options in the current question
+            const optionsContainer = element.parentElement;
+            const options = optionsContainer.querySelectorAll('.mcq-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            // Display Feedback
+            const feedback = optionsContainer.nextElementSibling;
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.innerHTML = '<div class="text-green-700 font-bold"><i class="fas fa-check-circle mr-2"></i> Correct! Option (a) is the right answer.</div><p class="text-slate-600 text-sm mt-2 font-normal">Statement 1 is correct. Statement 2 is incorrect because AITUC is an Associational Interest Group. Statement 3 is incorrect as Anomic groups often resort to spontaneous or unconstitutional means like riots/strikes.</p>';
+                feedback.style.backgroundColor = '#dcfce7';
+                feedback.style.borderColor = '#bbf7d0';
+            } else {
+                element.classList.add('incorrect');
+                feedback.innerHTML = '<div class="text-red-700 font-bold"><i class="fas fa-times-circle mr-2"></i> Incorrect. The right answer is (a).</div><p class="text-slate-600 text-sm mt-2 font-normal">Statement 2 is incorrect (AITUC is an Associational Interest Group). Statement 3 is incorrect (Anomic groups may use unconstitutional means).</p>';
+                feedback.style.backgroundColor = '#fee2e2';
+                feedback.style.borderColor = '#fecaca';
+                
+                // Highlight the correct answer for the user
+                options.forEach(opt => {
+                    if(opt.getAttribute('data-correct') === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+
+        // Feedback Logic
+        function handleFeedback(type) {
+            const section = document.getElementById('feedback-section');
+            if(section) {
+                section.innerHTML = `<div class="w-full text-center py-6 font-extrabold text-blue-900 text-lg animate-pulse"><i class="fas fa-check-circle mr-2 text-emerald-500"></i>Thank you for your response! Continuity in revision leads to success.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
