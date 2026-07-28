@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>NCRWC - UPSChub Notes</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+
+        .watermark-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            opacity: 0.02; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png');
+            background-repeat: no-repeat; background-position: center;
+            background-size: 400px; pointer-events: none;
+        }
+
+        .notes-content h3 { 
+            color: #1e3a8a; font-weight: 800; font-size: 1.85rem; 
+            margin-top: 3rem; margin-bottom: 1.5rem; display: flex; align-items: center;
+        }
+        .notes-content h3::before {
+            content: ''; width: 8px; height: 32px; background: #3b82f6; 
+            border-radius: 4px; margin-right: 12px; display: inline-block;
+        }
+        
+        .notes-content h4 {
+            color: #1e40af; font-weight: 700; font-size: 1.35rem; 
+            margin-top: 2rem; margin-bottom: 1rem;
+        }
+        
+        .notes-content h5 {
+            color: #334155; font-weight: 700; font-size: 1.15rem; 
+            margin-top: 1.5rem; margin-bottom: 0.75rem;
+        }
+
+        .notes-content p, .notes-content li { line-height: 1.8; color: #334155; margin-bottom: 1rem; }
+
+        .icon-list { list-style: none; padding-left: 0; }
+        .icon-list li { 
+            display: flex; align-items: flex-start; margin-bottom: 1.25rem; 
+            padding: 14px; background: #ffffff; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+            transition: all 0.3s ease; line-height: 1.7; color: #334155;
+        }
+        .icon-list li:hover { transform: translateX(6px); border-color: #3b82f6; background-color: #f8fafc; }
+        .icon-list i { 
+            margin-top: 0.25em; margin-right: 1.25rem; flex-shrink: 0; 
+            color: #2563eb; font-size: 1.2rem; 
+        }
+
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin: 2rem 0; border-radius: 12px; overflow: hidden; border: 1px solid #e2e8f0; }
+        th { background-color: #1e3a8a; color: white; padding: 15px; text-align: left; font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.05em; }
+        td { padding: 15px; border-bottom: 1px solid #e2e8f0; background: white; font-size: 0.95rem; }
+        tr:last-child td { border-bottom: none; }
+        tr:nth-child(even) td { background-color: #f8fafc; }
+
+        .highlight-card {
+            border-left: 4px solid #3b82f6; background: white; padding: 1.25rem;
+            border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .custom-way-forward {
+            background-color: #ffffff !important;
+            border: 2px solid #1e3a8a !important;
+            border-radius: 20px !important;
+            padding: 2.5rem !important;
+            margin: 3rem 0 !important;
+            box-shadow: 0 10px 25px -5px rgba(30, 58, 138, 0.1) !important;
+        }
+        .custom-way-forward h4 { color: #1e3a8a !important; font-weight: 800 !important; font-size: 1.4rem !important; margin-top: 0 !important; margin-bottom: 1rem !important; }
+
+        .premium-feedback-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 24px !important;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08) !important;
+            transition: all 0.4s ease !important;
+        }
+        .reaction-btn {
+            width: 56px !important; height: 56px !important; border-radius: 50% !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            color: white !important; font-size: 1.4rem !important; cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+        .reaction-btn:hover { transform: scale(1.18) translateY(-6px) !important; box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important; }
+
+        /* Interactive MCQ Styles */
+        .mcq-option {
+            cursor: pointer;
+            padding: 14px 18px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            transition: all 0.2s ease;
+            background: white;
+            font-weight: 500;
+            color: #334155;
+        }
+        .mcq-option:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .mcq-option.correct {
+            background: #dcfce7;
+            border-color: #22c55e;
+            color: #166534;
+        }
+        .mcq-option.incorrect {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+        .mcq-feedback {
+            display: none;
+            margin-top: 15px;
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <div class="watermark-bg"></div>
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">UPSChub <span class="text-blue-600">Polity</span></h1>
+            </div>
+            <div class="text-right hidden sm:block">
+                <div class="font-bold text-sm text-slate-600" id="time-display">--:--:-- --</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5" id="date-display">--------</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-10 relative z-10">
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <div class="bg-slate-900 p-10 md:p-14 text-center">
+                <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">Indian Polity</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight mt-0">National Commission to Review the Working of the Constitution</h2>
+                <p class="text-blue-400 mt-4 font-medium italic">Comprehensive Notes on NCRWC (2000-2002)</p>
+            </div>
+
+            <div class="p-6 md:p-14">
+                <article class="notes-content">
+                    
+                    <div class="highlight-card">
+                        <strong class="text-blue-900 block mb-2 text-lg">Introduction to NCRWC</strong>
+                        <p class="text-sm mb-2">The National Commission to Review the Working of the Constitution (NCRWC) was set up by a resolution of the Government of India in <strong>2000</strong>, and was asked to submit its recommendations within one year.</p>
+                        <p class="text-sm mb-2">The <strong>11-member Commission</strong> was headed by <strong>M.N. Venkatachaliah</strong>, the former Chief Justice of India.</p>
+                        <p class="text-sm mb-0">The Commission submitted its comprehensive report in <strong>2002</strong>.</p>
+                    </div>
+
+                    <h3>Terms of Reference of the Commission</h3>
+                    <p>According to the terms of reference, the commission was required to examine, in the light of the experience of the past fifty years, as to how far the existing provisions of the Constitution are capable of responding to the needs of efficient, smooth and effective system of governance and socioeconomic development of modern India and to recommend changes, if any.</p>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-landmark"></i><span><strong>Basic Structure Framework:</strong> The terms clearly specified that the commission should recommend changes within the framework of parliamentary democracy and <strong>without interfering with the ‘basic structure’</strong> or ‘basic features’ of the Constitution.</span></li>
+                        <li><i class="fas fa-clipboard-list"></i><span><strong>Recommendatory Nature:</strong> The commission clarified that its task was to review the working of the Constitution and not to rewrite it. Its function was only recommendatory and advisory in nature. It was left to Parliament to accept or reject any recommendations.</span></li>
+                    </ul>
+
+                    <p class="font-bold text-slate-800 mt-6">The 11 Areas of Study Identified by the Commission:</p>
+                    <div class="grid md:grid-cols-2 gap-4 mt-4 mb-6">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <ul class="list-disc pl-5 text-sm space-y-2 text-slate-700">
+                                <li>Strengthening of the institutions of parliamentary democracy (Legislature, Executive, Judiciary).</li>
+                                <li>Electoral reforms; standards in political life.</li>
+                                <li>Pace of socio-economic change and development (assurance of social and economic rights).</li>
+                                <li>Promoting literacy; generating employment; ensuring social security; alleviation of poverty.</li>
+                                <li>Union-State relations.</li>
+                                <li>Decentralization and devolution; empowerment of Panchayati Raj Institutions.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                            <ul class="list-disc pl-5 text-sm space-y-2 text-slate-700">
+                                <li>Enlargement of Fundamental Rights.</li>
+                                <li>Effectuation of Fundamental Duties.</li>
+                                <li>Effectuation of Directive Principles and achievement of Preambular objectives.</li>
+                                <li>Legal control of fiscal and monetary policies; public audit mechanism.</li>
+                                <li>Administrative system and standards in public life.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <h3>Fifty Years of Working of the Constitution (1950-2000)</h3>
+                    <p>The Commission made several observations on the working of the Constitution, categorizing them into accomplishments and failures.</p>
+
+                    <h4><i class="fas fa-check-circle text-green-600 mr-2"></i>Accomplishments</h4>
+                    
+                    <h5>Political Accomplishments</h5>
+                    <ul class="list-disc pl-6 mb-4 text-slate-700 space-y-2">
+                        <li>India’s democratic base has stabilized as a working federal polity.</li>
+                        <li>With the 73rd and 74th Constitutional amendments, the base of democratic debate widened with greater push towards non-centralisation.</li>
+                        <li>General Elections held with regularity; orderly and peaceful transfers of power.</li>
+                        <li>Educational qualifications of MPs and MLAs have shown marked improvements. Legislatures are increasingly more representative of the society.</li>
+                    </ul>
+
+                    <h5>Economic & Social Infrastructure</h5>
+                    <ul class="list-disc pl-6 mb-4 text-slate-700 space-y-2">
+                        <li><strong>Agriculture:</strong> Index increased from 46.2 to 176.8. Wheat production up from 11m to 75.6m tonnes; Rice from 35m to 89.5m tonnes.</li>
+                        <li><strong>Industry & Services:</strong> Industrial production index went from 7.9 to 154.7. Electricity generation increased from 5.1b KWH to 480.7b KWH. 6-8% annual growth of GNP achieved between 1994-2000.</li>
+                        <li><strong>IT & NNP:</strong> IT revenues grew from $150m (1990) to $4b (1999). Per capita NNP is more than 2.75 times that of 1951.</li>
+                        <li><strong>Health & Life:</strong> Infant mortality halved to 72/1000. Life expectancy grew from 32 years to 63 years. (Life expectancy of women in Kerala is 75 years). Primary health centers grew from 725 to over 1,50,000.</li>
+                        <li><strong>Education:</strong> Primary schools increased from 2.1L to 5.9L. 95% of villages have a primary school within 1 km.</li>
+                    </ul>
+
+                    <h4><i class="fas fa-times-circle text-red-600 mr-2"></i>Failures & Deficits</h4>
+                    
+                    <h5>Political & Administrative Failures</h5>
+                    <ul class="list-disc pl-6 mb-4 text-slate-700 space-y-2">
+                        <li><strong>Electoral Decay:</strong> Inept electoral process unable to keep out criminal and anti-social elements. Enormity of election costs and corruption pollutes the process.</li>
+                        <li><strong>Criminalization:</strong> Increasing criminal-politician-bureaucratic nexus. No legal instrumentalities to regulate political parties, fund-raising, or inner-party democracy.</li>
+                        <li><strong>Administration:</strong> Corruption, insensitivity, and inefficiency led to extra-legal systems and parallel economies. Constitutional protection under Article 311 exploited by dishonest officials.</li>
+                        <li><strong>Fraternity Unrealized:</strong> People are more divided amongst themselves than at independence. Crisis of confidence and leadership.</li>
+                    </ul>
+
+                    <h5>Socio-Economic & Justice Failures</h5>
+                    <ul class="list-disc pl-6 mb-4 text-slate-700 space-y-2">
+                        <li><strong>Economic Inequality:</strong> Top quintile holds 85% of income; poorest quintile holds only 1.5%. 260 million live below the poverty line.</li>
+                        <li><strong>Health Crisis:</strong> Maternal mortality at 407/100,000 (100x western levels). 53% children under five malnourished. 33% low birth weight babies. Dismal immunization rates (e.g., Bihar 11%, Rajasthan 17%).</li>
+                        <li><strong>Social Welfare:</strong> Promise to 270 million SC/STs unredeemed. 100 million Dalit children out of 380 million children below 14 lack effective mainstreaming. Population control failed in northern States.</li>
+                        <li><strong>Gender Inequality:</strong> Missing women phenomenon (933 women per 1000 men). Overall representation in public services just 4.9%. Poor political and judicial representation.</li>
+                        <li><strong>Judicial Breakdown:</strong> Delays, high costs, and uncertain processes push people toward extra-legal methods. Trial system has utterly broken down.</li>
+                    </ul>
+                    
+                    <div class="highlight-card bg-red-50 border-red-500">
+                        <p class="text-sm mb-0 text-red-900 font-medium">On an overall assessment, there are more failures than success stories, making the inference inescapable that the fifty years of the working of the Constitution is substantially a saga of missed opportunities.</p>
+                    </div>
+
+                    <h3>Areas of Concern: Commission's Perception</h3>
+                    <ul class="icon-list">
+                        <li><i class="fas fa-users-slash"></i><span><strong>Breach of Faith:</strong> Fundamental breach of constitutional faith by governments neglecting the people. Loss of faith in institutions.</span></li>
+                        <li><i class="fas fa-chart-line"></i><span><strong>Fiscal Deficit:</strong> Increasing cost of government and alarming fiscal deficits. India is on its way to a debt-trap.</span></li>
+                        <li><i class="fas fa-skull-crossbones"></i><span><strong>Criminalization:</strong> Unprecedented levels of political corruption and criminalization.</span></li>
+                        <li><i class="fas fa-shield-alt"></i><span><strong>National Security:</strong> Inadequate mechanisms for assessing early warning symptoms of social unrest and disaster management.</span></li>
+                        <li><i class="fas fa-balance-scale-right"></i><span><strong>Electoral Representation:</strong> Parliaments fail to acquire adequate representative character. (e.g., 13th Lok Sabha represented only 27.9% of total electorate).</span></li>
+                        <li><i class="fas fa-exchange-alt"></i><span><strong>Instability:</strong> Opportunistic politics and unprincipled defections cause high economic and administrative costs.</span></li>
+                        <li><i class="fas fa-book-reader"></i><span><strong>Education & Justice:</strong> Unthinking educational disarmament. Criminal justice system on the verge of collapse.</span></li>
+                        <li><i class="fas fa-praying-hands"></i><span><strong>Communal Harmony:</strong> Inter-group riots are collective behavioural disorders needing legal/administrative measures to integrate minorities.</span></li>
+                    </ul>
+
+                    <h3>Key Recommendations of the Commission</h3>
+                    <p class="mb-6">The Commission made <strong>249 recommendations</strong> in total: 58 involved constitutional amendments, 86 involved legislative measures, and 105 required executive action.</p>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                        <h4 class="mt-0 text-blue-800">1. On Fundamental Rights & Duties</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><strong>Discrimination:</strong> Extend Articles 15 and 16 to include 'ethnic or social origin, political or other opinion, property or birth'.</li>
+                            <li><strong>Speech & Expression:</strong> Expand Article 19 to explicitly include freedom of press, media, and right to seek/receive/impart information.</li>
+                            <li><strong>New Rights:</strong> Add rights against torture; compensation for illegal deprivation of life/liberty; right to leave/return to India; privacy; rural wage employment (min 80 days); access to speedy justice; equal justice/free legal aid; care for children; and safe drinking water/ecology.</li>
+                            <li><strong>Education (21-A):</strong> Enlarge to free education until 14 years, and up to 18 years for girls and SC/STs.</li>
+                            <li><strong>Preventive Detention:</strong> Max period restricted to 6 months; Advisory board to have serving HC judges.</li>
+                            <li><strong>Religion:</strong> Sikhism, Jainism, and Buddhism should be treated as separate from Hinduism under Article 25.</li>
+                            <li><strong>Ninth Schedule:</strong> Restrict Article 31-B protection only to agrarian reforms, reservations, and DPSPs under Article 39(b)/(c).</li>
+                            <li><strong>Emergencies:</strong> No suspension of Articles 17, 23, 24, 25, and 32 during national emergency (in addition to 20 & 21).</li>
+                            <li><strong>Duties (51-A):</strong> Implement Justice Verma Committee report. Add duties to vote, pay taxes, foster family values, and industrial organizations to educate employees' children.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                        <h4 class="mt-0 text-blue-800">2. On Right to Property & DPSPs</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><strong>Article 300-A Recast:</strong> Deprivation only for public purpose. No arbitrary deprivation. Crucially, acquisition of agricultural/forest land of SC/STs must provide a suitable rehabilitation scheme prior to taking possession.</li>
+                            <li><strong>DPSP Heading:</strong> Amend Part-IV to read ‘Directive Principles of State Policy <em>and Action</em>’.</li>
+                            <li><strong>New Additions:</strong> Add a directive on population control. Set up National Education Commission every 5 years. Establish Inter-Faith Commission. Create high-status body to review DPSP implementation.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                        <h4 class="mt-0 text-blue-800">3. On Parliament, Executive & Administration</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><strong>Parliamentary Privileges:</strong> Define and delimit privileges. Amend Art 105/194 to clarify immunity does not cover corrupt acts. Require Speaker's sanction for court cognizance.</li>
+                            <li><strong>Rajya Sabha:</strong> Maintain the domiciliary requirement to ensure federal character.</li>
+                            <li><strong>MPLADS:</strong> Discontinue the MP local area development scheme.</li>
+                            <li><strong>Committees:</strong> Establish Nodal Standing Committee on National Economy and a Constitution Committee for amendment scrutiny. Discontinue Estimates, PU, and Subordinate Legislation committees.</li>
+                            <li><strong>Sittings:</strong> Minimum days fixed (Lok Sabha: 120, Rajya Sabha: 100, States: 90 or 50 based on size).</li>
+                            <li><strong>Prime Minister & Ministry:</strong> Lok Sabha may elect Leader of House (PM). Implement <strong>'constructive vote of no confidence'</strong> (must propose alternative leader simultaneously). Limit ministry size to 10% of lower house.</li>
+                            <li><strong>Administration:</strong> Setup Lokpal (PM outside purview) and Lokayuktas. Allow lateral entry above JS level. Amend Art 311 to penalize corrupt officials. Enact Whistle-blower Acts and law to forfeit benami properties. Discard oath of secrecy for oath of transparency.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                        <h4 class="mt-0 text-blue-800">4. On Centre-State Relations & Judiciary</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><strong>Centre-State:</strong> Include Disaster Management in Concurrent List. Establish statutory Inter-State Trade and Commerce Commission. Appoint Governor only after consulting CM.</li>
+                            <li><strong>Article 356:</strong> Use sparingly as last resort. Floor test is mandatory to prove majority. Do not dissolve Assembly before Parliament approves proclamation.</li>
+                            <li><strong>River Waters:</strong> Disputes heard by a Supreme Court bench (3-5 judges). Replace River Boards Act 1956.</li>
+                            <li><strong>Judiciary:</strong> Establish <strong>National Judicial Commission</strong> for SC/HC appointments. Increase retirement age to 65 (HC) and 68 (SC). Only SC/HC can punish for contempt and declare laws ultra vires. Judgments within 90 days. Introduce plea-bargaining. Make subordinate courts a two-tier system.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                        <h4 class="mt-0 text-blue-800">5. On Electoral Processes & Political Parties</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><strong>Disqualifications:</strong> Bar persons charged with offences punishable by 5+ years. Permanently debar those convicted of heinous crimes. Expedite trials via Special Courts.</li>
+                            <li><strong>Elections:</strong> Candidates should not contest from more than one constituency simultaneously. Give Model Code of Conduct the sanctity of law. Examine run-off system (50% + 1 vote). Increase deposit forfeiture threshold to 25% valid votes.</li>
+                            <li><strong>ECI Appointments:</strong> CEC and ECs to be appointed by a collegium (PM, LoP LS, LoP RS, Speaker, Deputy Chairman RS).</li>
+                            <li><strong>Political Parties:</strong> Enact comprehensive law for registration. Compulsory account maintenance, asset declaration, and transparent funding. Ban tickets to convicted/charged criminals.</li>
+                            <li><strong>Anti-Defection:</strong> Defectors must resign and contest fresh elections. Debarred from minister posts. Defector's vote to topple government treated as invalid. Vest disqualification decision power in the Election Commission, not the Speaker.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-6 rounded-xl border border-slate-200 mb-8">
+                        <h4 class="mt-0 text-blue-800">6. On Socio-Economic Change, Panchayats & NE India</h4>
+                        <ul class="list-disc pl-5 space-y-2 text-sm text-slate-700">
+                            <li><strong>Marginalized:</strong> Bring reservation under a statute; set up Arakshan Nyaya Adalats. Transfer 5th Schedule areas to 6th Schedule. Strictly enforce manual scavenging ban.</li>
+                            <li><strong>Decentralization:</strong> Restructure 11th/12th Schedules for separate fiscal domains. State panchayat council under CM. ECI to issue directions to SECs. Empower CAG to audit Panchayats. Vest delimitation/reservation in a Delimitation Commission, not SEC.</li>
+                            <li><strong>North-East:</strong> Extend 73rd/74th amendments with regard to unique traditions. Setup National Immigration Council. Extend 6th schedule to Bodoland, Manipur hill districts. Create village governance tiers in Meghalaya.</li>
+                        </ul>
+                    </div>
+
+                    <div class="highlight-card bg-gray-100 border-gray-400 mt-10">
+                        <strong class="text-gray-700 block mb-2"><i class="fas fa-info-circle mr-2"></i>Notes & References</strong>
+                        <p class="text-xs mb-2 text-gray-600">The Commission was set up by the Ministry of Law and Justice resolution in February 2000. Other key members included: B.P. Jeevan Reddy, R.S. Sarkaria, K. Punnayya, Soli Sorabjee, K. Parasaran, Subhash Kashyap, C.R. Irani, Abid Hussain, Sumitra Kulkarni, and P.A. Sangma (resigned early).</p>
+                        <p class="text-xs mb-0 text-gray-600">After three extensions, the 1979-page, two-volume report was submitted on March 31, 2002. Volume I contained recommendations; Volume II contained consultation papers and drafts.</p>
+                    </div>
+
+                    <h3 class="mt-12">UPSC Civil Services Examination PYQs & Practice</h3>
+                    
+                    <!-- Prelims Practice Block -->
+                    <div class="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 shadow-sm">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mr-4">
+                                <i class="fas fa-check-double text-lg"></i>
+                            </div>
+                            <h4 class="text-slate-800 my-0 text-xl font-bold">Prelims Practice Test</h4>
+                        </div>
+                        
+                        <p class="font-semibold text-slate-700 mb-4 text-lg">Q. Consider the following statements regarding the recommendations of the National Commission to Review the Working of the Constitution (NCRWC):</p>
+                        <ol class="list-decimal pl-6 mb-6 text-slate-600 space-y-3 font-medium">
+                            <li>It recommended that the power to decide questions regarding disqualification on grounds of defection should vest in the Election Commission instead of the Speaker.</li>
+                            <li>It suggested the abolition of the MP Local Area Development Scheme (MPLADS).</li>
+                            <li>It recommended rewriting the basic structure of the Constitution to accommodate modern socio-economic challenges.</li>
+                        </ol>
+                        <p class="font-bold text-slate-800 mb-4">Which of the statements given above is/are correct?</p>
+                        
+                        <div class="mcq-options flex flex-col space-y-3">
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(a) 1 only</div>
+                            <div class="mcq-option" data-correct="true" onclick="checkAnswer(this, true)">(b) 1 and 2 only</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(c) 2 and 3 only</div>
+                            <div class="mcq-option" data-correct="false" onclick="checkAnswer(this, false)">(d) 1, 2, and 3</div>
+                        </div>
+                        <div class="mcq-feedback bg-slate-50 border border-slate-200 mt-4"></div>
+                    </div>
+
+                    <!-- Mains Practice Block -->
+                    <div class="bg-white border-2 border-slate-100 rounded-2xl p-8 mb-8 shadow-sm">
+                        <div class="flex items-center mb-6">
+                            <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 mr-4">
+                                <i class="fas fa-pen-nib text-lg"></i>
+                            </div>
+                            <h4 class="text-slate-800 my-0 text-xl font-bold">Mains Answer Writing</h4>
+                        </div>
+                        
+                        <div class="mb-6 border-l-4 border-indigo-500 pl-5 py-2 bg-indigo-50/30 rounded-r-lg">
+                            <p class="font-extrabold text-indigo-900 mb-2 uppercase text-xs tracking-wider">Practice Question</p>
+                            <p class="text-slate-700 font-medium leading-relaxed m-0">"The fifty years of the working of the Constitution is substantially a saga of missed opportunities." Discuss this observation made by the NCRWC in the context of India's political and socio-economic failures, and highlight key constitutional recommendations made by the Commission to rectify them.</p>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Feedback Footer -->
+                    <div id="feedback-section" class="premium-feedback-card mt-16 p-8 flex flex-col md:flex-row items-center justify-between">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <h4 class="text-blue-900 mt-0 font-extrabold text-xl mb-1">Helpful for your Revision?</h4>
+                            <p class="text-slate-500 text-sm mb-0">Your interaction updates the core performance matrix of UPSChub modules.</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="handleFeedback('happy')" class="reaction-btn bg-emerald-500 hover:bg-emerald-600" title="Excellent"><i class="fas fa-smile"></i></button>
+                            <button onclick="handleFeedback('neutral')" class="reaction-btn bg-slate-400 hover:bg-slate-500" title="Good"><i class="fas fa-meh"></i></button>
+                            <button onclick="handleFeedback('sad')" class="reaction-btn bg-rose-500 hover:bg-rose-600" title="Need Improvement"><i class="fas fa-frown"></i></button>
+                        </div>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-white font-bold mb-2 uppercase text-xs tracking-wider">UPSChub: Empowering Future Civil Servants</p>
+            <p class="text-sm">&copy; 2026 UPSChub. Content curated for comprehensive UPSC preparation.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Date and Time Script
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // MCQ Interactive Logic
+        function checkAnswer(element, isCorrect) {
+            const optionsContainer = element.parentElement;
+            const options = optionsContainer.querySelectorAll('.mcq-option');
+            options.forEach(opt => {
+                opt.style.pointerEvents = 'none';
+            });
+
+            const feedback = optionsContainer.nextElementSibling;
+            feedback.style.display = 'block';
+
+            if (isCorrect) {
+                element.classList.add('correct');
+                feedback.innerHTML = '<div class="text-green-700 font-bold"><i class="fas fa-check-circle mr-2"></i> Correct! Option (b) is the right answer.</div><p class="text-slate-600 text-sm mt-2 font-normal">Statements 1 and 2 are correct recommendations of the NCRWC. Statement 3 is incorrect because the Commission was explicitly directed to recommend changes <strong>without</strong> interfering with the \'basic structure\' or \'basic features\' of the Constitution.</p>';
+                feedback.style.backgroundColor = '#dcfce7';
+                feedback.style.borderColor = '#bbf7d0';
+            } else {
+                element.classList.add('incorrect');
+                feedback.innerHTML = '<div class="text-red-700 font-bold"><i class="fas fa-times-circle mr-2"></i> Incorrect. The right answer is (b).</div><p class="text-slate-600 text-sm mt-2 font-normal">Statements 1 and 2 are correct. Statement 3 is wrong as the Terms of Reference strictly forbade interfering with the basic structure.</p>';
+                feedback.style.backgroundColor = '#fee2e2';
+                feedback.style.borderColor = '#fecaca';
+                
+                options.forEach(opt => {
+                    if(opt.getAttribute('data-correct') === 'true') {
+                        opt.classList.add('correct');
+                    }
+                });
+            }
+        }
+
+        // Feedback Logic
+        function handleFeedback(type) {
+            const section = document.getElementById('feedback-section');
+            if(section) {
+                section.innerHTML = `<div class="w-full text-center py-6 font-extrabold text-blue-900 text-lg animate-pulse"><i class="fas fa-check-circle mr-2 text-emerald-500"></i>Thank you for your response! Continuity in revision leads to success.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
