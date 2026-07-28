@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Article 21 - UPSChub Notes</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+
+        .watermark-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;
+            opacity: 0.02; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Emblem_of_India.svg/800px-Emblem_of_India.svg.png');
+            background-repeat: no-repeat; background-position: center;
+            background-size: 400px; pointer-events: none;
+        }
+
+        .notes-content h3 { 
+            color: #1e3a8a; font-weight: 800; font-size: 1.85rem; 
+            margin-top: 3rem; margin-bottom: 1.5rem; display: flex; align-items: center;
+        }
+        .notes-content h3::before {
+            content: ''; width: 8px; height: 32px; background: #3b82f6; 
+            border-radius: 4px; margin-right: 12px; display: inline-block;
+        }
+        
+        .notes-content h4 {
+            color: #1e40af; font-weight: 700; font-size: 1.35rem; 
+            margin-top: 2rem; margin-bottom: 1rem;
+        }
+
+        .notes-content p, .notes-content li { line-height: 1.8; color: #334155; margin-bottom: 1rem; }
+
+        .icon-list { list-style: none; padding-left: 0; }
+        .icon-list li { 
+            display: flex; align-items: flex-start; margin-bottom: 1.25rem; 
+            padding: 14px; background: #ffffff; border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f1f5f9;
+            transition: all 0.3s ease; line-height: 1.7; color: #334155;
+        }
+        .icon-list li:hover { transform: translateX(6px); border-color: #3b82f6; background-color: #f8fafc; }
+        .icon-list i { 
+            margin-top: 0.25em; margin-right: 1.25rem; flex-shrink: 0; 
+            color: #2563eb; font-size: 1.2rem; 
+        }
+
+        .highlight-card {
+            border-left: 4px solid #3b82f6; background: white; padding: 1.25rem;
+            border-radius: 0 12px 12px 0; margin-bottom: 1.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .premium-feedback-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+            border: 1px solid #e2e8f0 !important;
+            border-radius: 24px !important;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.08) !important;
+            transition: all 0.4s ease !important;
+        }
+        .reaction-btn {
+            width: 56px !important; height: 56px !important; border-radius: 50% !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
+            color: white !important; font-size: 1.4rem !important; cursor: pointer !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05) !important;
+        }
+        .reaction-btn:hover { transform: scale(1.18) translateY(-6px) !important; box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15) !important; }
+
+        .faq-box {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .faq-box strong {
+            color: #1e3a8a;
+            display: block;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+
+<body class="flex flex-col min-h-screen">
+    <div class="watermark-bg"></div>
+
+    <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-50 border-b border-slate-100">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <h1 class="text-xl font-extrabold text-slate-900 tracking-tight">UPSChub <span class="text-blue-600">Polity</span></h1>
+            </div>
+            <div class="text-right hidden sm:block">
+                <div class="font-bold text-sm text-slate-600" id="time-display">--:--:-- --</div>
+                <div class="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-0.5" id="date-display">--------</div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 sm:px-6 py-10 relative z-10">
+        <div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 overflow-hidden">
+            
+            <div class="bg-slate-900 p-10 md:p-14 text-center">
+                <span class="bg-blue-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest mb-6 inline-block">Fundamental Rights</span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white leading-tight mt-0">Article 21 of the Indian Constitution</h2>
+                <p class="text-blue-400 mt-4 font-medium italic">Right to Life and Personal Liberty</p>
+            </div>
+
+            <div class="p-6 md:p-14">
+                <article class="notes-content">
+                    
+                    <p class="text-lg font-medium text-slate-700">Article 21 of the Indian Constitution protects the right to life and personal liberty. Over time, this article has grown to cover more aspects of life, making it a key part of India’s legal framework. This article will look at the history, important court cases, and future directions of Article 21.</p>
+
+                    <div class="highlight-card mt-8 bg-blue-50/50">
+                        <strong class="text-blue-900 block mb-4 text-xl"><i class="fas fa-key mr-2"></i>Key Takeaways</strong>
+                        <ul class="list-disc pl-5 space-y-2 text-slate-700 font-medium">
+                            <li>Article 21 has evolved significantly since its inception, expanding to cover various rights beyond mere survival.</li>
+                            <li>The right to life now includes the right to live with dignity, access to healthcare, education, and a clean environment.</li>
+                            <li>Personal liberty encompasses privacy, freedom of movement, and protection from arbitrary detention.</li>
+                            <li>Landmark court cases like the Maneka Gandhi case have shaped the interpretation and scope of Article 21.</li>
+                            <li>Future challenges include balancing national security with personal liberty and addressing emerging digital and environmental rights.</li>
+                        </ul>
+                    </div>
+
+                    <h3>Historical Context and Evolution of Article 21</h3>
+                    
+                    <h4>British Rule and the Making of the Indian Constitution</h4>
+                    <p>During British rule, India experienced significant political and social changes. The struggle for independence led to the creation of the Indian Constitution. Article 21 was included to ensure that no person would be deprived of life and personal liberty except according to the procedure established by law. This was a direct response to the arbitrary actions taken by the British authorities.</p>
+                    
+                    <h4>Key Amendments and Judicial Interpretations</h4>
+                    <p>Over the years, Article 21 has been interpreted in various ways by the judiciary. Initially, it was understood narrowly, but landmark judgments have expanded its scope. The evolution of Article 21 reflects India’s journey towards a more inclusive and just society. Judicial intervention has ensured that the scope of Article 21 is not narrow and restricted. It has been widening by several landmark judgments.</p>
+                    
+                    <h4>Comparison with Other Democracies</h4>
+                    <p>When compared to other democracies, India’s Article 21 stands out for its broad interpretation. While many countries have similar provisions, the Indian judiciary has attributed a wider connotation and meaning to Article 21, extending beyond the Constitution makers’ imagination. This transformative character of the Constitution of India makes Article 21 unique.</p>
+
+                    <h3>Right to Life: Beyond Mere Survival</h3>
+                    
+                    <h4>Right to Live with Human Dignity</h4>
+                    <p>Article 21’s mandate transcends mere existence; it ensures the holistic well-being and development of every individual, irrespective of the circumstances. The right to life includes living with human dignity. This means having access to basic needs like food, clothing, and shelter. It also includes the ability to read, write, and express oneself freely. Living with dignity means being able to move around and interact with others.</p>
+                    
+                    <h4>Right to Health and Education</h4>
+                    <p>The right to life also covers the right to good health and education. Everyone should have access to proper healthcare and medicine. Education is equally important, as it helps individuals grow and contribute to society. Ensuring these rights helps people lead fulfilling lives.</p>
+                    
+                    <h4>Right to a Clean Environment</h4>
+                    <p>A clean environment is essential for a healthy life. The right to life includes the right to live in a pollution-free environment. This means having clean air, water, and surroundings. Protecting the environment is crucial for the well-being of current and future generations.</p>
+                    
+                    <div class="border-l-4 border-indigo-500 pl-4 py-2 my-4 bg-indigo-50 italic text-indigo-900 font-medium">
+                        The right to life is not just about surviving; it’s about living a life of quality and dignity.
+                    </div>
+
+                    <h3>Personal Liberty: Expanding Definitions</h3>
+                    
+                    <h4>Right to Privacy</h4>
+                    <p>The right to privacy is a key part of personal liberty. It means that people have the right to keep their personal matters and relationships private. This right was strongly supported in the Maneka Gandhi v. Union of India case, where the Supreme Court expanded the meaning of personal liberty. Privacy is essential for personal freedom and helps protect individuals from unwarranted government intrusion.</p>
+                    
+                    <h4>Freedom of Movement and Residence</h4>
+                    <p>Freedom of movement and residence allows people to travel and live anywhere within the country. This freedom is crucial for personal development and economic opportunities. It ensures that individuals can seek better living conditions and job prospects without unnecessary restrictions.</p>
+                    
+                    <h4>Protection from Arbitrary Arrest and Detention</h4>
+                    <p>Protection from arbitrary arrest and detention means that no one can be taken into custody without a fair reason. This protection ensures that the law is followed properly and that people are not unfairly deprived of their liberty. It is a safeguard against misuse of power by authorities.</p>
+                    
+                    <p class="font-medium text-slate-700 mt-4">The scope of personal liberty has grown over time, including various rights that ensure a person’s freedom and dignity. This evolution reflects the changing needs and values of society.</p>
+
+                    <h3>Landmark Judicial Decisions Shaping Article 21</h3>
+                    
+                    <ul class="icon-list mt-6">
+                        <li>
+                            <i class="fas fa-gavel"></i>
+                            <div>
+                                <strong class="text-blue-900 text-lg block mb-1">Maneka Gandhi Case and Due Process</strong>
+                                <span>The Maneka Gandhi case was a turning point for Article 21. The court emphasized that despite the wording “procedure established by law” in Article 21 instead of “due process of law,” the procedure must be free from arbitrariness. This case marked the beginning of a new era of constitutional interpretation. It broadened the scope of personal liberty and ensured that laws must be just, fair, and reasonable.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-balance-scale"></i>
+                            <div>
+                                <strong class="text-blue-900 text-lg block mb-1">Vishakha Guidelines and Workplace Safety</strong>
+                                <span>The Vishakha case was another significant verdict. It led to the creation of guidelines to protect women from sexual harassment at the workplace. These guidelines were later codified into law, ensuring a safer work environment for women. The court’s decision highlighted the importance of a safe and dignified workplace as part of the right to life.</span>
+                            </div>
+                        </li>
+                        <li>
+                            <i class="fas fa-fingerprint"></i>
+                            <div>
+                                <strong class="text-blue-900 text-lg block mb-1">Puttaswamy Case and Right to Privacy</strong>
+                                <span>The Puttaswamy case was a landmark decision that recognized the right to privacy as a fundamental right under Article 21. The court ruled that privacy is intrinsic to life and liberty, thus expanding the horizon of personal freedoms. This verdict has had far-reaching implications, especially in the digital age, where data privacy is a growing concern.</span>
+                            </div>
+                        </li>
+                    </ul>
+                    
+                    <p class="font-medium text-slate-700 mt-4">The judiciary has played a crucial role in expanding the scope of Article 21, ensuring that it adapts to the changing needs of society.</p>
+
+                    <h3>Challenges and Criticisms</h3>
+                    
+                    <h4>Balancing National Security and Personal Liberty</h4>
+                    <p>One of the main challenges is finding a balance between national security and personal liberty. Governments often face tough choices when they need to protect the country while also respecting individual freedoms. Striking this balance is crucial to ensure that security measures do not infringe on personal rights.</p>
+                    
+                    <h4>Issues of Implementation and Enforcement</h4>
+                    <p>Implementing and enforcing Article 21 can be difficult due to a lack of resources and infrastructure. Corruption and the slow pace of justice delivery also pose significant hurdles. These issues make it hard to ensure that everyone enjoys their right to life and personal liberty.</p>
+                    
+                    <h4>Debates on the Death Penalty and Euthanasia</h4>
+                    <p>There are ongoing debates about the death penalty and euthanasia. Some argue that these practices violate the right to life, while others believe they are necessary in certain situations. This debate highlights the complexity of interpreting Article 21 in modern times.</p>
+                    
+                    <p class="font-medium text-slate-700 mt-4">The challenges in implementing Article 21 show the need for continuous efforts to adapt and improve the legal framework to meet the changing needs of society.</p>
+
+                    <h3>Future Directions and Emerging Rights</h3>
+                    <p>As we look towards the future, Article 21 is set to continue its key role in shaping India’s legal and social landscape. Its interpretations by the judiciary will adapt to new challenges, ensuring that the fundamental right to life and personal liberty remains strong and meaningful in an ever-changing world.</p>
+                    <p>As we look ahead, the future holds exciting possibilities for new rights and advancements. It’s crucial to stay informed and prepared for these changes. Our platform offers a wealth of resources to help you navigate these emerging trends. Don’t miss out on the opportunity to stay ahead. Visit our website today to explore our comprehensive courses and expert guidance.</p>
+
+                    <h3>Conclusion</h3>
+                    <p>The Right to Life and Personal Liberty under Article 21 of the Indian Constitution is a cornerstone of human rights in India. Over the years, its scope has expanded significantly, encompassing various facets of life that contribute to human dignity and freedom. This right is not just about survival but about living a meaningful and fulfilling life. The judiciary has played a crucial role in interpreting and broadening the horizons of Article 21, ensuring that it adapts to the changing needs of society. As we move forward, it is essential to continue safeguarding these rights and addressing new challenges to uphold the essence of human dignity and liberty.</p>
+
+                    <h3 class="mt-12 mb-6 border-b pb-2 border-slate-200">Frequently Asked Questions</h3>
+                    
+                    <div class="faq-box">
+                        <strong><i class="fas fa-question-circle text-blue-500 mr-2"></i>What is Article 21 of the Indian Constitution?</strong>
+                        <p class="mb-0 text-slate-600">Article 21 of the Indian Constitution guarantees the right to life and personal liberty. It states that no person shall be deprived of their life or personal liberty except according to the procedure established by law.</p>
+                    </div>
+
+                    <div class="faq-box">
+                        <strong><i class="fas fa-question-circle text-blue-500 mr-2"></i>How has Article 21 evolved over time?</strong>
+                        <p class="mb-0 text-slate-600">Article 21 has evolved significantly through various judicial interpretations and amendments. It now includes rights such as the right to live with dignity, the right to health, and the right to a clean environment.</p>
+                    </div>
+
+                    <div class="faq-box">
+                        <strong><i class="fas fa-question-circle text-blue-500 mr-2"></i>What does the right to life include?</strong>
+                        <p class="mb-0 text-slate-600">The right to life under Article 21 goes beyond mere survival. It includes living with human dignity, access to health care, education, and a clean environment.</p>
+                    </div>
+
+                    <div class="faq-box">
+                        <strong><i class="fas fa-question-circle text-blue-500 mr-2"></i>What is the significance of the Maneka Gandhi case?</strong>
+                        <p class="mb-0 text-slate-600">The Maneka Gandhi case was a landmark decision that expanded the interpretation of Article 21. The Supreme Court ruled that the procedure established by law must be fair, just, and reasonable.</p>
+                    </div>
+
+                    <div class="faq-box">
+                        <strong><i class="fas fa-question-circle text-blue-500 mr-2"></i>How does Article 21 compare with similar rights in other countries?</strong>
+                        <p class="mb-0 text-slate-600">Article 21 is similar to provisions in other democracies like the United States and the United Kingdom. However, its interpretation in India has been broader, covering emerging rights like privacy and environmental protection.</p>
+                    </div>
+
+                    <div class="faq-box">
+                        <strong><i class="fas fa-question-circle text-blue-500 mr-2"></i>What are some challenges related to Article 21?</strong>
+                        <p class="mb-0 text-slate-600">Challenges include balancing national security with personal liberty, effective implementation and enforcement of the rights, and debates over issues like the death penalty and euthanasia.</p>
+                    </div>
+
+                    <!-- Interactive Feedback Footer -->
+                    <div id="feedback-section" class="premium-feedback-card mt-16 p-8 flex flex-col md:flex-row items-center justify-between">
+                        <div class="text-center md:text-left mb-6 md:mb-0">
+                            <h4 class="text-blue-900 mt-0 font-extrabold text-xl mb-1">Helpful for your Revision?</h4>
+                            <p class="text-slate-500 text-sm mb-0">Your interaction updates the core performance matrix of UPSChub modules.</p>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <button onclick="handleFeedback('happy')" class="reaction-btn bg-emerald-500 hover:bg-emerald-600" title="Excellent"><i class="fas fa-smile"></i></button>
+                            <button onclick="handleFeedback('neutral')" class="reaction-btn bg-slate-400 hover:bg-slate-500" title="Good"><i class="fas fa-meh"></i></button>
+                            <button onclick="handleFeedback('sad')" class="reaction-btn bg-rose-500 hover:bg-rose-600" title="Need Improvement"><i class="fas fa-frown"></i></button>
+                        </div>
+                    </div>
+
+                </article>
+            </div>
+        </div>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-12">
+        <div class="container mx-auto px-6 text-center">
+            <p class="text-white font-bold mb-2 uppercase text-xs tracking-wider">UPSChub: Empowering Future Civil Servants</p>
+            <p class="text-sm">&copy; 2026 UPSChub. Content curated for comprehensive UPSC preparation.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Date and Time Script
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('time-display').textContent = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+            document.getElementById('date-display').textContent = now.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+        }
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Feedback Logic
+        function handleFeedback(type) {
+            const section = document.getElementById('feedback-section');
+            if(section) {
+                section.innerHTML = `<div class="w-full text-center py-6 font-extrabold text-blue-900 text-lg animate-pulse"><i class="fas fa-check-circle mr-2 text-emerald-500"></i>Thank you for your response! Continuity in revision leads to success.</div>`;
+            }
+        }
+    </script>
+</body>
+</html>
