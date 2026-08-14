@@ -1,6 +1,6 @@
 /**
  * UPSChub — Independence Day 2026 Festival Module
- * Self-contained • Fully isolated • Production-ready
+ * Final Stable Version
  * Prefix: id26-
  */
 
@@ -13,21 +13,21 @@
   const IndependenceDayConfig = {
     enabled: true,
     eventYear: 2026,
-    eventDate: new Date(2026, 7, 15, 0, 0, 0), // 15 Aug 2026 00:00 local
+    eventDate: new Date(2026, 7, 15, 0, 0, 0), // 15 Aug 2026
     showOnLoad: true,
     autoOpen: true,
     storageKey: 'upschub_id26_closed',
-    storageDays: 1,                 // re-show after N days
-    quizUrl: '',                    // set to your quiz page URL if available
-    polityUrl: '/polity',           // change if your Polity page path is different
-    forceShow: false                // set true only for testing
+    storageDays: 1,
+    quizUrl: '',
+    polityUrl: '/polity',
+    forceShow: false
   };
+
+  if (!IndependenceDayConfig.enabled) return;
 
   /* =========================================================
      SAFETY + EARLY EXIT
      ========================================================= */
-  if (!IndependenceDayConfig.enabled) return;
-
   function safeInit() {
     try {
       if (document.readyState === 'loading') {
@@ -71,28 +71,35 @@
   /* =========================================================
      MAIN INIT
      ========================================================= */
-  function initIndependenceDay() {
-    if (!shouldShowFestival()) return;
+  function initIndependenceDay(force = false) {
+    // If forced (from reminder), ignore storage check
+    if (!force && !shouldShowFestival()) return;
     if (document.getElementById('id26-root')) return;
 
     injectStyles();
     createOverlay();
     startCountdown();
     bindEvents();
+
     requestAnimationFrame(() => {
       const root = document.getElementById('id26-root');
-      if (root) root.classList.add('id26-visible');
+      if (root) {
+        root.classList.add('id26-visible');
+        document.body.style.overflow = 'hidden';
+      }
     });
   }
 
+  // Make it available globally for the reminder bar
+  window.initIndependenceDay = initIndependenceDay;
+
   /* =========================================================
-     STYLES (fully scoped under #id26-root)
+     STYLES
      ========================================================= */
   function injectStyles() {
     if (document.getElementById('id26-styles')) return;
 
     const css = `
-/* ========== ID26 COMPLETE STYLES ========== */
 #id26-root {
   --saffron: #FF9933;
   --white: #FFFFFF;
@@ -104,7 +111,6 @@
   --muted: #a0aec0;
   --card: rgba(15, 23, 42, 0.72);
   --radius: 16px;
-  --shadow: 0 20px 50px rgba(0,0,0,0.45);
   --transition: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   position: fixed;
@@ -119,10 +125,9 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.5s ease, visibility 0.5s ease;
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--text);
   line-height: 1.55;
-  -webkit-font-smoothing: antialiased;
 }
 
 #id26-root.id26-visible {
@@ -130,13 +135,8 @@
   visibility: visible;
 }
 
-#id26-root * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+#id26-root * { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Background layers */
 #id26-root .id26-bg {
   position: fixed;
   inset: 0;
@@ -155,10 +155,7 @@
     linear-gradient(180deg, #070b14 0%, #0a1220 40%, #071018 100%);
 }
 
-#id26-root .id26-particles {
-  position: absolute;
-  inset: 0;
-}
+#id26-root .id26-particles { position: absolute; inset: 0; }
 
 #id26-root .id26-particle {
   position: absolute;
@@ -170,9 +167,9 @@
 }
 
 @keyframes id26-float {
-  0%   { transform: translateY(0) scale(1); opacity: 0; }
-  10%  { opacity: 0.7; }
-  90%  { opacity: 0.5; }
+  0% { transform: translateY(0) scale(1); opacity: 0; }
+  10% { opacity: 0.7; }
+  90% { opacity: 0.5; }
   100% { transform: translateY(-100vh) scale(0.6); opacity: 0; }
 }
 
@@ -189,10 +186,9 @@
 
 @keyframes id26-spin {
   from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
+  to { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
-/* Close button */
 #id26-root .id26-close {
   position: fixed;
   top: 18px;
@@ -204,30 +200,21 @@
   border: 1px solid rgba(255,255,255,0.25);
   background: rgba(10,15,28,0.75);
   backdrop-filter: blur(10px);
-  color: var(--white);
+  color: white;
   font-size: 26px;
-  line-height: 1;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: all var(--transition);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  transition: all 0.25s;
 }
 
-#id26-root .id26-close:hover,
-#id26-root .id26-close:focus-visible {
+#id26-root .id26-close:hover {
   background: rgba(255,153,51,0.25);
-  border-color: var(--saffron);
+  border-color: #FF9933;
   transform: scale(1.08);
-  outline: none;
 }
 
-#id26-root .id26-close:active {
-  transform: scale(0.96);
-}
-
-/* Content container */
 #id26-root .id26-content {
   position: relative;
   z-index: 10;
@@ -237,25 +224,22 @@
   padding: 70px 20px 80px;
 }
 
-/* ========== HERO ========== */
 #id26-root .id26-hero {
   text-align: center;
   padding: 20px 0 50px;
-  position: relative;
 }
 
 #id26-root .id26-flag-wrap {
   width: 120px;
   height: 80px;
   margin: 0 auto 28px;
-  position: relative;
   filter: drop-shadow(0 8px 20px rgba(0,0,0,0.4));
   animation: id26-flag-sway 5s ease-in-out infinite;
 }
 
 @keyframes id26-flag-sway {
   0%, 100% { transform: rotate(-1.5deg); }
-  50%      { transform: rotate(1.5deg); }
+  50% { transform: rotate(1.5deg); }
 }
 
 #id26-root .id26-flag {
@@ -263,14 +247,14 @@
   height: 100%;
   border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.35);
   display: flex;
   flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.35);
 }
 
-#id26-root .id26-flag-saffron { flex: 1; background: var(--saffron); }
-#id26-root .id26-flag-white   { flex: 1; background: var(--white); display: flex; align-items: center; justify-content: center; }
-#id26-root .id26-flag-green   { flex: 1; background: var(--green); }
+#id26-root .id26-flag-saffron { flex: 1; background: #FF9933; }
+#id26-root .id26-flag-white { flex: 1; background: white; display: flex; align-items: center; justify-content: center; }
+#id26-root .id26-flag-green { flex: 1; background: #138808; }
 
 #id26-root .id26-flag-chakra {
   width: 22px;
@@ -282,7 +266,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: var(--saffron);
+  color: #FF9933;
   font-weight: 600;
   margin-bottom: 12px;
 }
@@ -291,7 +275,6 @@
   font-size: clamp(2.1rem, 7vw, 3.6rem);
   font-weight: 800;
   letter-spacing: -0.02em;
-  line-height: 1.1;
   background: linear-gradient(135deg, #fff 0%, #f5d76e 40%, #FF9933 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -301,23 +284,18 @@
 
 #id26-root .id26-date {
   font-size: 1.15rem;
-  color: var(--muted);
-  font-weight: 500;
+  color: #a0aec0;
   margin-bottom: 18px;
-  letter-spacing: 0.08em;
 }
 
 #id26-root .id26-tagline {
   font-size: clamp(1.05rem, 2.8vw, 1.35rem);
-  color: var(--text);
-  max-width: 560px;
-  margin: 0 auto 10px;
-  font-weight: 500;
+  margin-bottom: 10px;
 }
 
 #id26-root .id26-subtag {
   font-size: 0.95rem;
-  color: var(--muted);
+  color: #a0aec0;
   margin-bottom: 28px;
 }
 
@@ -329,7 +307,6 @@
   margin-bottom: 32px;
 }
 
-/* Countdown */
 #id26-root .id26-countdown-wrap {
   margin: 28px auto 36px;
   max-width: 480px;
@@ -339,7 +316,7 @@
   font-size: 0.75rem;
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: var(--saffron);
+  color: #FF9933;
   margin-bottom: 14px;
   font-weight: 600;
 }
@@ -352,34 +329,29 @@
 }
 
 #id26-root .id26-cd-item {
-  background: var(--card);
+  background: rgba(15, 23, 42, 0.72);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 14px 16px;
   min-width: 78px;
-  backdrop-filter: blur(8px);
 }
 
 #id26-root .id26-cd-num {
   font-size: 1.7rem;
   font-weight: 700;
-  color: var(--white);
-  line-height: 1.1;
 }
 
 #id26-root .id26-cd-unit {
   font-size: 0.7rem;
-  color: var(--muted);
+  color: #a0aec0;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
   margin-top: 4px;
 }
 
 #id26-root .id26-celebration {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--gold);
-  letter-spacing: 0.04em;
+  color: #f5d76e;
   padding: 16px 24px;
   background: rgba(255,153,51,0.12);
   border: 1px solid rgba(255,153,51,0.3);
@@ -387,7 +359,6 @@
   display: inline-block;
 }
 
-/* Buttons */
 #id26-root .id26-btn-row {
   display: flex;
   flex-wrap: wrap;
@@ -400,46 +371,38 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   padding: 14px 26px;
   border-radius: 999px;
   font-size: 0.92rem;
   font-weight: 600;
-  letter-spacing: 0.03em;
   cursor: pointer;
   border: none;
-  transition: all var(--transition);
+  transition: all 0.25s;
   text-decoration: none;
-  white-space: nowrap;
 }
 
 #id26-root .id26-btn-primary {
-  background: linear-gradient(135deg, var(--saffron), #e67e22);
+  background: linear-gradient(135deg, #FF9933, #e67e22);
   color: #1a1200;
   box-shadow: 0 8px 25px rgba(255,153,51,0.35);
 }
 
-#id26-root .id26-btn-primary:hover,
-#id26-root .id26-btn-primary:focus-visible {
+#id26-root .id26-btn-primary:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 30px rgba(255,153,51,0.45);
-  outline: none;
 }
 
 #id26-root .id26-btn-secondary {
   background: transparent;
-  color: var(--white);
+  color: white;
   border: 1px solid rgba(255,255,255,0.3);
 }
 
-#id26-root .id26-btn-secondary:hover,
-#id26-root .id26-btn-secondary:focus-visible {
-  border-color: var(--saffron);
+#id26-root .id26-btn-secondary:hover {
+  border-color: #FF9933;
   background: rgba(255,153,51,0.1);
-  outline: none;
 }
 
-/* ========== SECTIONS ========== */
 #id26-root .id26-section {
   margin: 70px 0;
   opacity: 0;
@@ -457,18 +420,16 @@
   font-weight: 700;
   text-align: center;
   margin-bottom: 12px;
-  letter-spacing: -0.01em;
 }
 
 #id26-root .id26-section-sub {
   text-align: center;
-  color: var(--muted);
+  color: #a0aec0;
   max-width: 540px;
   margin: 0 auto 36px;
   font-size: 0.98rem;
 }
 
-/* Timeline */
 #id26-root .id26-timeline {
   position: relative;
   max-width: 820px;
@@ -482,7 +443,7 @@
   top: 8px;
   bottom: 8px;
   width: 2px;
-  background: linear-gradient(to bottom, var(--saffron), var(--green));
+  background: linear-gradient(to bottom, #FF9933, #138808);
   opacity: 0.5;
 }
 
@@ -499,16 +460,14 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: var(--navy);
-  border: 3px solid var(--saffron);
-  z-index: 2;
+  background: #0a0f1c;
+  border: 3px solid #FF9933;
 }
 
 #id26-root .id26-tl-year {
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--saffron);
-  letter-spacing: 0.06em;
+  color: #FF9933;
   margin-bottom: 4px;
 }
 
@@ -520,11 +479,9 @@
 
 #id26-root .id26-tl-desc {
   font-size: 0.92rem;
-  color: var(--muted);
-  line-height: 1.5;
+  color: #a0aec0;
 }
 
-/* Personality cards */
 #id26-root .id26-cards {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -532,34 +489,29 @@
 }
 
 #id26-root .id26-card {
-  background: var(--card);
+  background: rgba(15, 23, 42, 0.72);
   border: 1px solid rgba(255,255,255,0.07);
-  border-radius: var(--radius);
+  border-radius: 16px;
   padding: 22px 20px;
-  transition: all var(--transition);
-  backdrop-filter: blur(8px);
+  transition: all 0.25s;
 }
 
 #id26-root .id26-card:hover {
   border-color: rgba(255,153,51,0.35);
   transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
 }
 
 #id26-root .id26-card-name {
   font-size: 1.05rem;
   font-weight: 700;
   margin-bottom: 6px;
-  color: var(--white);
 }
 
 #id26-root .id26-card-role {
   font-size: 0.88rem;
-  color: var(--muted);
-  line-height: 1.5;
+  color: #a0aec0;
 }
 
-/* Constitution */
 #id26-root .id26-preamble {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -569,26 +521,20 @@
 }
 
 #id26-root .id26-value {
-  background: var(--card);
+  background: rgba(15, 23, 42, 0.72);
   border: 1px solid rgba(255,255,255,0.08);
   border-radius: 12px;
   padding: 18px 16px;
   text-align: center;
-  transition: all var(--transition);
-}
-
-#id26-root .id26-value:hover {
-  border-color: rgba(255,153,51,0.4);
 }
 
 #id26-root .id26-value-label {
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: var(--saffron);
+  color: #FF9933;
 }
 
-/* Contribution cards */
 #id26-root .id26-contrib {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -598,17 +544,11 @@
 }
 
 #id26-root .id26-contrib-card {
-  background: var(--card);
+  background: rgba(15, 23, 42, 0.72);
   border: 1px solid rgba(255,255,255,0.08);
-  border-radius: var(--radius);
+  border-radius: 16px;
   padding: 26px 20px;
   text-align: center;
-  transition: all var(--transition);
-}
-
-#id26-root .id26-contrib-card:hover {
-  border-color: rgba(19,136,8,0.4);
-  transform: translateY(-3px);
 }
 
 #id26-root .id26-contrib-icon {
@@ -620,15 +560,13 @@
   font-size: 1rem;
   font-weight: 700;
   margin-bottom: 8px;
-  letter-spacing: 0.04em;
 }
 
 #id26-root .id26-contrib-desc {
   font-size: 0.88rem;
-  color: var(--muted);
+  color: #a0aec0;
 }
 
-/* Quiz box */
 #id26-root .id26-quiz-box {
   background: linear-gradient(145deg, rgba(255,153,51,0.1), rgba(19,136,8,0.08));
   border: 1px solid rgba(255,153,51,0.25);
@@ -646,7 +584,7 @@
   justify-content: center;
   margin: 18px 0 26px;
   font-size: 0.85rem;
-  color: var(--muted);
+  color: #a0aec0;
 }
 
 #id26-root .id26-quiz-meta span {
@@ -655,7 +593,6 @@
   border-radius: 999px;
 }
 
-/* Quote */
 #id26-root .id26-quote {
   text-align: center;
   max-width: 640px;
@@ -666,18 +603,15 @@
 #id26-root .id26-quote-text {
   font-size: clamp(1.15rem, 3vw, 1.45rem);
   font-weight: 500;
-  line-height: 1.55;
-  color: var(--text);
-  margin-bottom: 16px;
   font-style: italic;
+  margin-bottom: 16px;
 }
 
 #id26-root .id26-quote-sub {
   font-size: 0.98rem;
-  color: var(--muted);
+  color: #a0aec0;
 }
 
-/* Final */
 #id26-root .id26-final {
   text-align: center;
   padding: 40px 20px 20px;
@@ -687,10 +621,9 @@
   font-size: clamp(1.6rem, 5vw, 2.2rem);
   font-weight: 800;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, #fff, var(--saffron));
+  background: linear-gradient(135deg, #fff, #FF9933);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 #id26-root .id26-final-flag {
@@ -700,7 +633,7 @@
 
 #id26-root .id26-final-text {
   font-size: 1.1rem;
-  color: var(--muted);
+  color: #a0aec0;
   margin-bottom: 8px;
 }
 
@@ -708,7 +641,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   letter-spacing: 0.2em;
-  color: var(--gold);
+  color: #f5d76e;
   margin: 24px 0 12px;
 }
 
@@ -717,7 +650,6 @@
   color: rgba(255,255,255,0.4);
 }
 
-/* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   #id26-root .id26-chakra-bg,
   #id26-root .id26-flag-wrap,
@@ -731,50 +663,21 @@
   }
 }
 
-/* ========== RESPONSIVE ========== */
 @media (max-width: 768px) {
-  #id26-root .id26-content {
-    padding: 60px 16px 60px;
-  }
-  #id26-root .id26-close {
-    top: 12px;
-    right: 12px;
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
-  }
-  #id26-root .id26-flag-wrap {
-    width: 96px;
-    height: 64px;
-  }
-  #id26-root .id26-contrib {
-    grid-template-columns: 1fr;
-  }
-  #id26-root .id26-preamble {
-    grid-template-columns: 1fr 1fr;
-  }
-  #id26-root .id26-cd-item {
-    min-width: 68px;
-    padding: 12px 10px;
-  }
-  #id26-root .id26-cd-num {
-    font-size: 1.4rem;
-  }
+  #id26-root .id26-content { padding: 60px 16px 60px; }
+  #id26-root .id26-close { top: 12px; right: 12px; width: 40px; height: 40px; font-size: 22px; }
+  #id26-root .id26-flag-wrap { width: 96px; height: 64px; }
+  #id26-root .id26-contrib { grid-template-columns: 1fr; }
+  #id26-root .id26-preamble { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 480px) {
-  #id26-root .id26-btn {
-    width: 100%;
-    max-width: 300px;
-  }
-  #id26-root .id26-preamble {
-    grid-template-columns: 1fr;
-  }
-  #id26-root .id26-cards {
-    grid-template-columns: 1fr;
-  }
+  #id26-root .id26-btn { width: 100%; max-width: 300px; }
+  #id26-root .id26-preamble { grid-template-columns: 1fr; }
+  #id26-root .id26-cards { grid-template-columns: 1fr; }
 }
 `;
+
     const style = document.createElement('style');
     style.id = 'id26-styles';
     style.textContent = css;
@@ -795,22 +698,17 @@
       <div class="id26-bg" aria-hidden="true">
         <div class="id26-bg-gradient"></div>
         <div class="id26-particles" id="id26-particles"></div>
-        <div class="id26-chakra-bg">
-          ${createChakraSVG(700)}
-        </div>
+        <div class="id26-chakra-bg">${createChakraSVG(700)}</div>
       </div>
 
-      <button class="id26-close" aria-label="Close Independence Day celebration" id="id26-close-btn">×</button>
+      <button class="id26-close" id="id26-close-btn" aria-label="Close Independence Day celebration">×</button>
 
       <div class="id26-content">
-        <!-- HERO -->
         <header class="id26-hero">
-          <div class="id26-flag-wrap" aria-hidden="true">
+          <div class="id26-flag-wrap">
             <div class="id26-flag">
               <div class="id26-flag-saffron"></div>
-              <div class="id26-flag-white">
-                ${createChakraSVG(22)}
-              </div>
+              <div class="id26-flag-white">${createChakraSVG(22)}</div>
               <div class="id26-flag-green"></div>
             </div>
           </div>
@@ -822,39 +720,26 @@
           <p class="id26-subtag">Learn. Prepare. Serve. Build the Nation.</p>
           <p class="id26-brand">UPSChub</p>
 
-          <div class="id26-countdown-wrap" id="id26-countdown-area">
-            <!-- filled by JS -->
-          </div>
+          <div class="id26-countdown-wrap" id="id26-countdown-area"></div>
 
           <div class="id26-btn-row">
-            <button class="id26-btn id26-btn-primary" id="id26-explore-btn">
-              Explore India's Journey
-            </button>
-            <button class="id26-btn id26-btn-secondary" id="id26-quiz-btn">
-              Independence Day Quiz
-            </button>
+            <button class="id26-btn id26-btn-primary" id="id26-explore-btn">Explore India's Journey</button>
+            <button class="id26-btn id26-btn-secondary" id="id26-quiz-btn">Independence Day Quiz</button>
           </div>
         </header>
 
-        <!-- TIMELINE -->
         <section class="id26-section" id="id26-timeline">
           <h2 class="id26-section-title">From Freedom to Nation Building</h2>
           <p class="id26-section-sub">Key milestones that shaped modern India</p>
-          <div class="id26-timeline">
-            ${createTimeline()}
-          </div>
+          <div class="id26-timeline">${createTimeline()}</div>
         </section>
 
-        <!-- PERSONALITIES -->
         <section class="id26-section">
           <h2 class="id26-section-title">The People Who Inspired a Nation</h2>
           <p class="id26-section-sub">Leaders whose vision and courage continue to guide us</p>
-          <div class="id26-cards">
-            ${createPersonalities()}
-          </div>
+          <div class="id26-cards">${createPersonalities()}</div>
         </section>
 
-        <!-- CONSTITUTION -->
         <section class="id26-section">
           <h2 class="id26-section-title">Freedom Found a Vision in the Constitution</h2>
           <p class="id26-section-sub">The ideals that define the Republic of India</p>
@@ -865,17 +750,14 @@
             <div class="id26-value"><div class="id26-value-label">FRATERNITY</div></div>
           </div>
           <div style="text-align:center;">
-            <a href="${IndependenceDayConfig.Polity.notes.html}" class="id26-btn id26-btn-secondary" id="id26-polity-btn">
-              Explore Indian Polity
-            </a>
+            <a href="${IndependenceDayConfig.polityUrl}" class="id26-btn id26-btn-secondary">Explore Indian Polity</a>
           </div>
         </section>
 
-        <!-- CONTRIBUTION -->
         <section class="id26-section">
           <h2 class="id26-section-title">Your Preparation is Also a Contribution</h2>
           <p class="id26-section-sub">
-            Every concept you learn, every answer you write, and every challenge you overcome 
+            Every concept you learn, every answer you write, and every challenge you overcome
             prepares you not just for an examination, but for the responsibility of serving the nation.
           </p>
           <div class="id26-contrib">
@@ -897,7 +779,6 @@
           </div>
         </section>
 
-        <!-- QUIZ -->
         <section class="id26-section">
           <div class="id26-quiz-box">
             <h2 class="id26-section-title" style="margin-bottom:8px;">🇮🇳 Independence Day Special Quiz</h2>
@@ -909,26 +790,18 @@
               <span>UPSC-Oriented</span>
               <span>History + Polity</span>
             </div>
-            <button class="id26-btn id26-btn-primary" id="id26-start-quiz">
-              Start Quiz
-            </button>
-            <p id="id26-quiz-msg" style="margin-top:16px;font-size:0.9rem;color:var(--muted);display:none;"></p>
+            <button class="id26-btn id26-btn-primary" id="id26-start-quiz">Start Quiz</button>
+            <p id="id26-quiz-msg" style="margin-top:16px;font-size:0.9rem;color:#a0aec0;display:none;"></p>
           </div>
         </section>
 
-        <!-- QUOTE -->
         <section class="id26-section">
           <div class="id26-quote">
-            <p class="id26-quote-text">
-              “The freedom we celebrate today is the responsibility we carry into tomorrow.”
-            </p>
-            <p class="id26-quote-sub">
-              The future of India will be shaped by what we learn, what we value and what we choose to serve.
-            </p>
+            <p class="id26-quote-text">“The freedom we celebrate today is the responsibility we carry into tomorrow.”</p>
+            <p class="id26-quote-sub">The future of India will be shaped by what we learn, what we value and what we choose to serve.</p>
           </div>
         </section>
 
-        <!-- FINAL -->
         <section class="id26-section id26-final">
           <h2 class="id26-final-title">Happy Independence Day</h2>
           <div class="id26-final-flag">🇮🇳</div>
@@ -951,7 +824,7 @@
   function createChakraSVG(size) {
     const s = size || 100;
     return `
-      <svg class="id26-flag-chakra" width="${s}" height="${s}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <svg class="id26-flag-chakra" width="${s}" height="${s}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
         <circle cx="50" cy="50" r="45" stroke="#000080" stroke-width="3" fill="none"/>
         <circle cx="50" cy="50" r="8" fill="#000080"/>
         ${Array.from({length: 24}, (_, i) => {
@@ -1023,7 +896,7 @@
   }
 
   /* =========================================================
-     COUNTDOWN LOGIC
+     COUNTDOWN
      ========================================================= */
   let countdownInterval = null;
 
@@ -1037,25 +910,14 @@
       const diff = target - now;
 
       if (diff <= 0 && now.getFullYear() === 2026 && now.getMonth() === 7 && now.getDate() === 15) {
-        // Today is Independence Day
-        area.innerHTML = `
-          <div class="id26-celebration">
-            TODAY, INDIA CELEBRATES<br>80 YEARS OF INDEPENDENCE
-          </div>
-        `;
-        if (countdownInterval) clearInterval(countdownInterval);
+        area.innerHTML = `<div class="id26-celebration">TODAY, INDIA CELEBRATES<br>80 YEARS OF INDEPENDENCE</div>`;
+        clearInterval(countdownInterval);
         return;
       }
 
       if (diff <= 0) {
-        // After the day
-        area.innerHTML = `
-          <div class="id26-celebration" style="font-size:1.1rem;">
-            80 Years of Independence<br>
-            <span style="font-size:0.9rem;opacity:0.8;">The journey continues</span>
-          </div>
-        `;
-        if (countdownInterval) clearInterval(countdownInterval);
+        area.innerHTML = `<div class="id26-celebration" style="font-size:1.1rem;">80 Years of Independence<br><span style="font-size:0.9rem;opacity:0.8;">The journey continues</span></div>`;
+        clearInterval(countdownInterval);
         return;
       }
 
@@ -1067,22 +929,10 @@
       area.innerHTML = `
         <p class="id26-countdown-label">India Celebrates In</p>
         <div class="id26-countdown">
-          <div class="id26-cd-item">
-            <div class="id26-cd-num">${String(days).padStart(2,'0')}</div>
-            <div class="id26-cd-unit">Days</div>
-          </div>
-          <div class="id26-cd-item">
-            <div class="id26-cd-num">${String(hours).padStart(2,'0')}</div>
-            <div class="id26-cd-unit">Hours</div>
-          </div>
-          <div class="id26-cd-item">
-            <div class="id26-cd-num">${String(mins).padStart(2,'0')}</div>
-            <div class="id26-cd-unit">Minutes</div>
-          </div>
-          <div class="id26-cd-item">
-            <div class="id26-cd-num">${String(secs).padStart(2,'0')}</div>
-            <div class="id26-cd-unit">Seconds</div>
-          </div>
+          <div class="id26-cd-item"><div class="id26-cd-num">${String(days).padStart(2,'0')}</div><div class="id26-cd-unit">Days</div></div>
+          <div class="id26-cd-item"><div class="id26-cd-num">${String(hours).padStart(2,'0')}</div><div class="id26-cd-unit">Hours</div></div>
+          <div class="id26-cd-item"><div class="id26-cd-num">${String(mins).padStart(2,'0')}</div><div class="id26-cd-unit">Minutes</div></div>
+          <div class="id26-cd-item"><div class="id26-cd-num">${String(secs).padStart(2,'0')}</div><div class="id26-cd-unit">Seconds</div></div>
         </div>
       `;
     }
@@ -1092,7 +942,7 @@
   }
 
   /* =========================================================
-     EVENTS + INTERACTION
+     EVENTS
      ========================================================= */
   function bindEvents() {
     const root = document.getElementById('id26-root');
@@ -1107,19 +957,15 @@
       root.classList.remove('id26-visible');
       setTimeout(() => {
         root.remove();
-        const styles = document.getElementById('id26-styles');
-        if (styles) styles.remove();
+        document.getElementById('id26-styles')?.remove();
         if (countdownInterval) clearInterval(countdownInterval);
       }, 500);
       markClosed();
       document.body.style.overflow = '';
     }
 
-    if (closeBtn) {
-      closeBtn.addEventListener('click', closeFestival);
-    }
+    if (closeBtn) closeBtn.addEventListener('click', closeFestival);
 
-    // Escape key
     document.addEventListener('keydown', function onKey(e) {
       if (e.key === 'Escape' && document.getElementById('id26-root')) {
         closeFestival();
@@ -1127,24 +973,18 @@
       }
     });
 
-    // Prevent body scroll while open
-    document.body.style.overflow = 'hidden';
-
     if (exploreBtn) {
       exploreBtn.addEventListener('click', () => {
-        const target = document.getElementById('id26-timeline');
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        document.getElementById('id26-timeline')?.scrollIntoView({ behavior: 'smooth' });
       });
     }
 
     function handleQuiz() {
-      if (IndependenceDayConfig.quizUrl && IndependenceDayConfig.quizUrl.trim() !== '') {
+      if (IndependenceDayConfig.quizUrl) {
         window.location.href = IndependenceDayConfig.quizUrl;
-      } else {
-        if (quizMsg) {
-          quizMsg.style.display = 'block';
-          quizMsg.textContent = 'Quiz coming soon. Stay tuned on UPSChub!';
-        }
+      } else if (quizMsg) {
+        quizMsg.style.display = 'block';
+        quizMsg.textContent = 'Quiz coming soon. Stay tuned on UPSChub!';
       }
     }
 
@@ -1160,39 +1000,35 @@
     }
     const io = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('id26-inview');
-        }
+        if (entry.isIntersecting) entry.target.classList.add('id26-inview');
       });
     }, { threshold: 0.15 });
     sections.forEach(s => io.observe(s));
   }
 
-/* =========================================================
-   LISTEN FOR REMINDER BAR (OPEN CELEBRATION button)
-   ========================================================= */
-window.addEventListener('upsChub:openIndependenceDay', () => {
-  console.log('[ID26] Force opening Independence Day banner');
+  /* =========================================================
+     LISTEN FOR REMINDER BAR
+     ========================================================= */
+  window.addEventListener('upsChub:openIndependenceDay', function () {
+    console.log('[ID26] Received open request from reminder bar');
 
-  // Clear storage
-  try {
-    localStorage.removeItem(IndependenceDayConfig.storageKey);
-  } catch (e) {}
+    // Clear closed state
+    try {
+      localStorage.removeItem(IndependenceDayConfig.storageKey);
+    } catch (e) {}
 
-  // Remove existing banner if present
-  const existing = document.getElementById('id26-root');
-  if (existing) existing.remove();
+    // Remove existing if any
+    const existing = document.getElementById('id26-root');
+    if (existing) existing.remove();
+    document.getElementById('id26-styles')?.remove();
 
-  const styles = document.getElementById('id26-styles');
-  if (styles) styles.remove();
+    // Force open
+    initIndependenceDay(true);
+  });
 
-  // Force open
-  initIndependenceDay();
-});
-
-/* =========================================================
-   BOOT
-   ========================================================= */
-safeInit();
+  /* =========================================================
+     BOOT
+     ========================================================= */
+  safeInit();
 
 })();
