@@ -1172,12 +1172,21 @@
    LISTEN FOR REMINDER BAR (OPEN CELEBRATION button)
    ========================================================= */
 window.addEventListener('upsChub:openIndependenceDay', () => {
-  // Force show the large banner even if user closed it earlier
+  console.log('[ID26] Force opening Independence Day banner');
+
+  // Clear storage
   try {
     localStorage.removeItem(IndependenceDayConfig.storageKey);
   } catch (e) {}
 
-  // Re-initialize / open the large overlay
+  // Remove existing banner if present
+  const existing = document.getElementById('id26-root');
+  if (existing) existing.remove();
+
+  const styles = document.getElementById('id26-styles');
+  if (styles) styles.remove();
+
+  // Force open
   initIndependenceDay();
 });
 
