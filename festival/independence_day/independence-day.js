@@ -1168,9 +1168,22 @@
     sections.forEach(s => io.observe(s));
   }
 
-  /* =========================================================
-     BOOT
-     ========================================================= */
-  safeInit();
+/* =========================================================
+   LISTEN FOR REMINDER BAR (OPEN CELEBRATION button)
+   ========================================================= */
+window.addEventListener('upsChub:openIndependenceDay', () => {
+  // Force show the large banner even if user closed it earlier
+  try {
+    localStorage.removeItem(IndependenceDayConfig.storageKey);
+  } catch (e) {}
+
+  // Re-initialize / open the large overlay
+  initIndependenceDay();
+});
+
+/* =========================================================
+   BOOT
+   ========================================================= */
+safeInit();
 
 })();
