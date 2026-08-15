@@ -2,8 +2,8 @@
  * UPSChub — Independence Day 2026 Top Reminder Bar
  * Final Ready-to-Use Version
  * Optimized for Laptop + Tablet + Mobile
+ * Stronger openLargeBanner with script reload fallback
  */
-
 (function () {
   'use strict';
 
@@ -31,7 +31,6 @@
 
   function init() {
     if (document.getElementById('id26-reminder-root')) return;
-
     injectStyles();
     createReminder();
     bindEvents();
@@ -52,18 +51,15 @@
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   pointer-events: none;
 }
-
 #id26-reminder-root.id26-reminder-visible {
   transform: translateY(0);
   pointer-events: auto;
 }
-
 #id26-reminder-root * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
-
 #id26-reminder-root .id26-reminder-bar {
   position: relative;
   display: flex;
@@ -79,7 +75,6 @@
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   color: #f1f5f9;
 }
-
 #id26-reminder-root .id26-reminder-bar::before {
   content: '';
   position: absolute;
@@ -89,7 +84,6 @@
   width: 4px;
   background: linear-gradient(to bottom, #FF9933, #ffffff, #138808);
 }
-
 #id26-reminder-root .id26-reminder-left {
   display: flex;
   align-items: center;
@@ -97,13 +91,11 @@
   min-width: 0;
   flex: 1;
 }
-
 #id26-reminder-root .id26-reminder-flag {
   font-size: 1.4rem;
   flex-shrink: 0;
   line-height: 1;
 }
-
 #id26-reminder-root .id26-reminder-title {
   font-size: 0.95rem;
   font-weight: 700;
@@ -112,7 +104,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 #id26-reminder-root .id26-reminder-sub {
   font-size: 0.78rem;
   color: #94a3b8;
@@ -121,14 +112,12 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
-
 #id26-reminder-root .id26-reminder-actions {
   display: flex;
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
 }
-
 /* Strong button for tablet */
 #id26-reminder-root .id26-reminder-open {
   display: inline-flex;
@@ -150,12 +139,10 @@
   touch-action: manipulation;
   user-select: none;
 }
-
 #id26-reminder-root .id26-reminder-open:active {
   transform: scale(0.96);
   opacity: 0.9;
 }
-
 #id26-reminder-root .id26-reminder-close {
   width: 40px;
   height: 40px;
@@ -171,11 +158,9 @@
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
-
 #id26-reminder-root .id26-reminder-close:active {
   background: rgba(255,153,51,0.4);
 }
-
 /* Tablet & Mobile */
 @media (max-width: 768px) {
   #id26-reminder-root .id26-reminder-bar {
@@ -184,16 +169,13 @@
     flex-wrap: wrap;
     gap: 10px;
   }
-
   #id26-reminder-root .id26-reminder-left {
     width: 100%;
   }
-
   #id26-reminder-root .id26-reminder-actions {
     width: 100%;
     justify-content: space-between;
   }
-
   #id26-reminder-root .id26-reminder-open {
     flex: 1;
     justify-content: center;
@@ -202,7 +184,6 @@
     min-height: 50px;
   }
 }
-
 @media (max-width: 400px) {
   #id26-reminder-root .id26-reminder-sub {
     display: none;
@@ -238,7 +219,6 @@
         </div>
       </div>
     `;
-
     document.body.appendChild(root);
 
     // Show animation
@@ -250,22 +230,43 @@
   }
 
   function openLargeBanner() {
-    console.log('%c[ID26] Opening large Independence Day banner...', 'color: #FF9933; font-weight: bold');
+    console.log('%c[ID26] Trying to open large banner...', 'color: orange; font-weight: bold');
 
-    // Clear closed state
+    // Clear storage
     try {
       localStorage.removeItem('upschub_id26_closed');
     } catch (e) {}
 
-    // Trigger custom event
+    // Method 1: Custom Event
     window.dispatchEvent(new CustomEvent('upsChub:openIndependenceDay'));
 
-    // Direct call (most reliable)
+    // Method 2: Direct call
     if (typeof window.initIndependenceDay === 'function') {
+      console.log('[ID26] Calling initIndependenceDay(true)');
       window.initIndependenceDay(true);
+      return;
+    }
+
+    // Method 3: Force reload the large banner script (last option)
+    console.warn('[ID26] initIndependenceDay not found. Trying to reload script...');
+
+    const oldScript = document.querySelector('script[src*="independence-day.js"]');
+    if (oldScript) {
+      const newScript = document.createElement('script');
+      newScript.src = oldScript.src + (oldScript.src.includes('?') ? '&' : '?') + 't=' + Date.now(); // force reload
+      newScript.onload = function () {
+        if (typeof window.initIndependenceDay === 'function') {
+          window.initIndependenceDay(true);
+        } else {
+          alert('Independence Day banner failed to load. Please refresh the page.');
+        }
+      };
+      newScript.onerror = function () {
+        alert('Failed to load Independence Day script. Please refresh the page.');
+      };
+      document.body.appendChild(newScript);
     } else {
-      console.warn('[ID26] initIndependenceDay not found. Check if independence-day.js is loaded.');
-      alert('Independence Day celebration is loading... Please try again in a second.');
+      alert('independence-day.js not found on the page.');
     }
   }
 
@@ -284,7 +285,7 @@
 
       openBtn.addEventListener('click', handleOpen);
       openBtn.addEventListener('touchend', handleOpen, { passive: false });
-      openBtn.addEventListener('touchstart', function(e) {
+      openBtn.addEventListener('touchstart', function (e) {
         e.stopPropagation();
       }, { passive: true });
     }
@@ -294,9 +295,7 @@
       const handleClose = function (e) {
         e.preventDefault();
         e.stopPropagation();
-
         root.classList.remove('id26-reminder-visible');
-
         setTimeout(() => {
           root.remove();
           const styles = document.getElementById('id26-reminder-styles');
@@ -315,5 +314,4 @@
   } else {
     init();
   }
-
 })();
