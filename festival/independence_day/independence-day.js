@@ -19,11 +19,12 @@
     enabled: true,
     eventYear: 2026,
     eventDate: new Date(2026, 7, 15, 0, 0, 0), // 15 Aug 2026
-    storageKey: 'upschub_id26_closed',
+    
     storageDays: 1,                 // how many days to stay closed
     quizUrl: '',
-    polityUrl: '/polity',
+    polityUrl: '/Polity.notes.html',
     forceShow: false                // keep false
+    autoOpen: false
   };
 
   if (!IndependenceDayConfig.enabled) return;
@@ -31,19 +32,11 @@
   /* =========================================================
      SAFETY + EARLY EXIT
      ========================================================= */
-  function safeInit() {
-    try {
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', function () {
-          initIndependenceDay(false); // normal load (respect storage)
-        });
-      } else {
-        initIndependenceDay(false);
-      }
-    } catch (err) {
-      console.error('[ID26] Initialization failed:', err);
-    }
-  }
+function safeInit() {
+  // Do NOT auto open the large banner
+  // It will only open when reminder button is clicked
+  console.log('[ID26] Large banner ready. Waiting for reminder button...');
+}
 
   /* =========================================================
      LOCAL STORAGE LOGIC
@@ -1054,21 +1047,18 @@
      LISTEN FOR REMINDER BAR
      ========================================================= */
   window.addEventListener('upsChub:openIndependenceDay', function () {
-    console.log('[ID26] Opening from reminder button');
+  console.log('[ID26] Opening from reminder button');
 
-    // Clear closed state so it can open
-    try {
-      localStorage.removeItem(IndependenceDayConfig.storageKey);
-    } catch (e) {}
+  try {
+    localStorage.removeItem(IndependenceDayConfig.storageKey);
+  } catch (e) {}
 
-    // Remove existing if present
-    const existing = document.getElementById('id26-root');
-    if (existing) existing.remove();
-    document.getElementById('id26-styles')?.remove();
+  const existing = document.getElementById('id26-root');
+  if (existing) existing.remove();
+  document.getElementById('id26-styles')?.remove();
 
-    // Force open
-    initIndependenceDay(true);
-  });
+  initIndependenceDay(true); // force open
+});
 
   /* =========================================================
      BOOT
