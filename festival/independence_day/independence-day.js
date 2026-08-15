@@ -2,6 +2,11 @@
  * UPSChub — Independence Day 2026 Festival Module
  * Final Stable Version
  * Prefix: id26-
+ * 
+ * Behavior:
+ * - Opens automatically only on first visit
+ * - After closing → stays closed on refresh
+ * - Opens again only when reminder button is clicked
  */
 
 (function () {
@@ -14,13 +19,11 @@
     enabled: true,
     eventYear: 2026,
     eventDate: new Date(2026, 7, 15, 0, 0, 0), // 15 Aug 2026
-    showOnLoad: true,
-    autoOpen: true,
     storageKey: 'upschub_id26_closed',
-    storageDays: 1,
+    storageDays: 1,                 // how many days to stay closed
     quizUrl: '',
     polityUrl: '/polity',
-    forceShow: false
+    forceShow: false                // keep false
   };
 
   if (!IndependenceDayConfig.enabled) return;
@@ -31,9 +34,11 @@
   function safeInit() {
     try {
       if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initIndependenceDay);
+        document.addEventListener('DOMContentLoaded', function () {
+          initIndependenceDay(false); // normal load (respect storage)
+        });
       } else {
-        initIndependenceDay();
+        initIndependenceDay(false);
       }
     } catch (err) {
       console.error('[ID26] Initialization failed:', err);
@@ -48,11 +53,13 @@
 
     try {
       const raw = localStorage.getItem(IndependenceDayConfig.storageKey);
-      if (!raw) return true;
+      if (!raw) return true; // never closed before → show
 
       const data = JSON.parse(raw);
       const closedAt = data.closedAt || 0;
       const days = IndependenceDayConfig.storageDays * 24 * 60 * 60 * 1000;
+
+      // Show again only after X days
       return (Date.now() - closedAt) > days;
     } catch (e) {
       return true;
@@ -72,8 +79,12 @@
      MAIN INIT
      ========================================================= */
   function initIndependenceDay(force = false) {
-    // If forced (from reminder), ignore storage check
-    if (!force && !shouldShowFestival()) return;
+    // force = true → coming from reminder button
+    // force = false → normal page load
+    if (!force && !shouldShowFestival()) {
+      return; // already closed → do not open
+    }
+
     if (document.getElementById('id26-root')) return;
 
     injectStyles();
@@ -90,7 +101,7 @@
     });
   }
 
-  // Make it available globally for the reminder bar
+  // Make available for reminder bar
   window.initIndependenceDay = initIndependenceDay;
 
   /* =========================================================
@@ -320,6 +331,7 @@
   color: #a0aec0;
   margin-bottom: 18px;
 }
+
 #id26-root .id26-tagline {
   font-size: clamp(1.05rem, 2.8vw, 1.35rem);
   margin-bottom: 10px;
@@ -992,7 +1004,7 @@
         document.getElementById('id26-styles')?.remove();
         if (countdownInterval) clearInterval(countdownInterval);
       }, 500);
-      markClosed();
+      markClosed(); // important: mark as closed
       document.body.style.overflow = '';
     }
 
@@ -1042,14 +1054,14 @@
      LISTEN FOR REMINDER BAR
      ========================================================= */
   window.addEventListener('upsChub:openIndependenceDay', function () {
-    console.log('[ID26] Received open request from reminder bar');
+    console.log('[ID26] Opening from reminder button');
 
-    // Clear closed state
+    // Clear closed state so it can open
     try {
       localStorage.removeItem(IndependenceDayConfig.storageKey);
     } catch (e) {}
 
-    // Remove existing if any
+    // Remove existing if present
     const existing = document.getElementById('id26-root');
     if (existing) existing.remove();
     document.getElementById('id26-styles')?.remove();
