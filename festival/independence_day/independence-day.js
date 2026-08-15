@@ -794,7 +794,7 @@
             <div class="id26-value"><div class="id26-value-label">FRATERNITY</div></div>
           </div>
           <div style="text-align:center;">
-            <a href="${IndependenceDayConfig.polityUrl}" class="id26-btn id26-btn-secondary">Explore Indian Polity</a>
+            <a href="$IndependenceDayConfig.polityUrl = "/Polity.notes.html";" class="id26-btn id26-btn-secondary">Explore Indian Polity</a>
           </div>
         </section>
 
