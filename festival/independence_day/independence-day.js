@@ -253,13 +253,46 @@
 }
 
 #id26-root .id26-flag-saffron { flex: 1; background: #FF9933; }
-#id26-root .id26-flag-white { flex: 1; background: white; display: flex; align-items: center; justify-content: center; }
+
+#id26-root .id26-flag-white {
+  flex: 1;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
 #id26-root .id26-flag-green { flex: 1; background: #138808; }
 
 #id26-root .id26-flag-chakra {
   width: 22px;
   height: 22px;
+  display: block;
   animation: id26-spin 20s linear infinite;
+}
+
+/* Mobile fix for Ashoka Chakra */
+@media (max-width: 768px) {
+  #id26-root .id26-flag-wrap {
+    width: 100px;
+    height: 67px;
+  }
+  #id26-root .id26-flag-chakra {
+    width: 18px !important;
+    height: 18px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  #id26-root .id26-flag-wrap {
+    width: 90px;
+    height: 60px;
+  }
+  #id26-root .id26-flag-chakra {
+    width: 16px !important;
+    height: 16px !important;
+  }
 }
 
 #id26-root .id26-eyebrow {
@@ -287,7 +320,6 @@
   color: #a0aec0;
   margin-bottom: 18px;
 }
-
 #id26-root .id26-tagline {
   font-size: clamp(1.05rem, 2.8vw, 1.35rem);
   margin-bottom: 10px;
