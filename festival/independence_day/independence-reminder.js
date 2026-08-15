@@ -1,6 +1,6 @@
 /**
  * UPSChub — Independence Day 2026 Top Reminder Bar
- * Final Stable Version
+ * Shows on EVERY page load / refresh (even after closing)
  */
 
 (function () {
@@ -9,7 +9,6 @@
   const CONFIG = {
     enabled: true,
     eventDate: '2026-08-15',
-    storageKey: 'upsChubIndependenceReminderClosed',
     zIndex: 99990
   };
 
@@ -26,25 +25,11 @@
       return true;
     }
   }
+
   if (!isRelevantDate()) return;
 
-  // Reminder should appear again after refresh
-  function isReminderClosed() {
-    try {
-      return sessionStorage.getItem(CONFIG.storageKey) === 'true';
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function markReminderClosed() {
-    try {
-      sessionStorage.setItem(CONFIG.storageKey, 'true');
-    } catch (e) {}
-  }
-
   function init() {
-    if (isReminderClosed()) return;
+    // Always show — no storage check
     if (document.getElementById('id26-reminder-root')) return;
 
     injectStyles();
@@ -207,31 +192,23 @@
     });
   }
 
-  // ========== MOST IMPORTANT PART ==========
   function openLargeBanner() {
     console.log('%c[ID26] Opening large Independence Day banner...', 'color: #FF9933');
 
-    // 1. Clear closed state of large banner
     try {
       localStorage.removeItem('upschub_id26_closed');
     } catch (e) {}
 
-    // 2. Custom Event
     window.dispatchEvent(new CustomEvent('upsChub:openIndependenceDay'));
 
-    // 3. Direct function call (strongest method)
     if (typeof window.initIndependenceDay === 'function') {
-      window.initIndependenceDay();
+      window.initIndependenceDay(true);
       return;
     }
 
-    // 4. Try global object
     if (window.UPSChubIndependenceDay?.open) {
       window.UPSChubIndependenceDay.open();
-      return;
     }
-
-    console.warn('[ID26] Large banner function not found. Make sure independence-day.js is loaded BEFORE this file.');
   }
 
   function bindEvents() {
@@ -249,8 +226,8 @@
     if (closeBtn) {
       closeBtn.addEventListener('click', function () {
         root.classList.remove('id26-reminder-visible');
-        markReminderClosed();
 
+        // Only hide temporarily — will show again on next refresh
         setTimeout(() => {
           root.remove();
           document.getElementById('id26-reminder-styles')?.remove();
