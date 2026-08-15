@@ -1,7 +1,7 @@
 /**
  * UPSChub — Independence Day 2026 Top Reminder Bar
- * Final Stable Version
- * Works on Laptop + Tablet + Mobile
+ * Final Ready-to-Use Version
+ * Optimized for Laptop + Tablet + Mobile
  */
 
 (function () {
@@ -21,7 +21,7 @@
       const today = new Date();
       const event = new Date(CONFIG.eventDate + 'T00:00:00');
       const diff = Math.abs((today - event) / (1000 * 60 * 60 * 24));
-      return diff <= 4;
+      return diff <= 5;
     } catch (e) {
       return true;
     }
@@ -99,13 +99,13 @@
 }
 
 #id26-reminder-root .id26-reminder-flag {
-  font-size: 1.35rem;
+  font-size: 1.4rem;
   flex-shrink: 0;
   line-height: 1;
 }
 
 #id26-reminder-root .id26-reminder-title {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #ffffff;
   white-space: nowrap;
@@ -129,19 +129,19 @@
   flex-shrink: 0;
 }
 
-/* Better button for tablet & mobile */
+/* Strong button for tablet */
 #id26-reminder-root .id26-reminder-open {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 20px;
-  min-height: 46px;
-  min-width: 150px;
+  padding: 13px 22px;
+  min-height: 48px;
+  min-width: 160px;
   border-radius: 999px;
   border: none;
   background: linear-gradient(135deg, #FF9933, #e67e22);
   color: #1a1200;
-  font-size: 0.88rem;
+  font-size: 0.9rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
@@ -152,17 +152,18 @@
 }
 
 #id26-reminder-root .id26-reminder-open:active {
-  transform: scale(0.97);
+  transform: scale(0.96);
+  opacity: 0.9;
 }
 
 #id26-reminder-root .id26-reminder-close {
-  width: 38px;
-  height: 38px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.25);
-  background: rgba(255,255,255,0.08);
+  background: rgba(255,255,255,0.1);
   color: white;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -172,13 +173,13 @@
 }
 
 #id26-reminder-root .id26-reminder-close:active {
-  background: rgba(255,153,51,0.35);
+  background: rgba(255,153,51,0.4);
 }
 
 /* Tablet & Mobile */
 @media (max-width: 768px) {
   #id26-reminder-root .id26-reminder-bar {
-    min-height: 74px;
+    min-height: 76px;
     padding: 12px 14px;
     flex-wrap: wrap;
     gap: 10px;
@@ -197,7 +198,8 @@
     flex: 1;
     justify-content: center;
     padding: 14px 16px;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    min-height: 50px;
   }
 }
 
@@ -239,7 +241,7 @@
 
     document.body.appendChild(root);
 
-    // Animate in
+    // Show animation
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
         root.classList.add('id26-reminder-visible');
@@ -248,21 +250,22 @@
   }
 
   function openLargeBanner() {
-    console.log('%c[ID26 Reminder] Opening large banner...', 'color: #FF9933; font-weight: bold;');
+    console.log('%c[ID26] Opening large Independence Day banner...', 'color: #FF9933; font-weight: bold');
 
     // Clear closed state
     try {
       localStorage.removeItem('upschub_id26_closed');
     } catch (e) {}
 
-    // Method 1: Custom Event
+    // Trigger custom event
     window.dispatchEvent(new CustomEvent('upsChub:openIndependenceDay'));
 
-    // Method 2: Direct function call (most reliable)
+    // Direct call (most reliable)
     if (typeof window.initIndependenceDay === 'function') {
       window.initIndependenceDay(true);
     } else {
-      console.warn('[ID26] initIndependenceDay function not found. Make sure independence-day.js is loaded correctly.');
+      console.warn('[ID26] initIndependenceDay not found. Check if independence-day.js is loaded.');
+      alert('Independence Day celebration is loading... Please try again in a second.');
     }
   }
 
@@ -271,7 +274,7 @@
     const closeBtn = document.getElementById('id26-reminder-close-btn');
     const root = document.getElementById('id26-reminder-root');
 
-    // OPEN button - support both click and touch
+    // OPEN button - strong support for tablet
     if (openBtn) {
       const handleOpen = function (e) {
         e.preventDefault();
@@ -281,6 +284,9 @@
 
       openBtn.addEventListener('click', handleOpen);
       openBtn.addEventListener('touchend', handleOpen, { passive: false });
+      openBtn.addEventListener('touchstart', function(e) {
+        e.stopPropagation();
+      }, { passive: true });
     }
 
     // CLOSE button
