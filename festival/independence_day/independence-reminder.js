@@ -1,6 +1,7 @@
 /**
  * UPSChub — Independence Day 2026 Top Reminder Bar
- * Stable Version (Works on Laptop + Tablet + Mobile)
+ * Final Stable Version
+ * Works on Laptop + Tablet + Mobile
  */
 
 (function () {
@@ -14,6 +15,7 @@
 
   if (!CONFIG.enabled) return;
 
+  // Show only around Independence Day
   function isRelevantDate() {
     try {
       const today = new Date();
@@ -68,10 +70,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  min-height: 56px;
+  min-height: 58px;
   padding: 10px 16px;
   background: linear-gradient(90deg, rgba(255,153,51,0.18) 0%, rgba(15,23,42,0.95) 20%, rgba(15,23,42,0.95) 80%, rgba(19,136,8,0.18) 100%);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,153,51,0.3);
   box-shadow: 0 4px 20px rgba(0,0,0,0.3);
   color: #f1f5f9;
@@ -98,6 +101,7 @@
 #id26-reminder-root .id26-reminder-flag {
   font-size: 1.35rem;
   flex-shrink: 0;
+  line-height: 1;
 }
 
 #id26-reminder-root .id26-reminder-title {
@@ -112,7 +116,7 @@
 #id26-reminder-root .id26-reminder-sub {
   font-size: 0.78rem;
   color: #94a3b8;
-  margin-top: 1px;
+  margin-top: 2px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -125,68 +129,79 @@
   flex-shrink: 0;
 }
 
+/* Better button for tablet & mobile */
 #id26-reminder-root .id26-reminder-open {
-  padding: 10px 18px;
-  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  min-height: 46px;
+  min-width: 150px;
   border-radius: 999px;
   border: none;
   background: linear-gradient(135deg, #FF9933, #e67e22);
   color: #1a1200;
-  font-size: 0.84rem;
+  font-size: 0.88rem;
   font-weight: 700;
   cursor: pointer;
   white-space: nowrap;
-  transition: 0.2s;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  user-select: none;
 }
 
-#id26-reminder-root .id26-reminder-open:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(255,153,51,0.4);
+#id26-reminder-root .id26-reminder-open:active {
+  transform: scale(0.97);
 }
 
 #id26-reminder-root .id26-reminder-close {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   border: 1px solid rgba(255,255,255,0.25);
   background: rgba(255,255,255,0.08);
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
 }
 
-#id26-reminder-root .id26-reminder-close:hover {
-  background: rgba(255,153,51,0.3);
-  border-color: #FF9933;
+#id26-reminder-root .id26-reminder-close:active {
+  background: rgba(255,153,51,0.35);
 }
 
-@media (max-width: 640px) {
+/* Tablet & Mobile */
+@media (max-width: 768px) {
   #id26-reminder-root .id26-reminder-bar {
-    min-height: 70px;
+    min-height: 74px;
     padding: 12px 14px;
     flex-wrap: wrap;
     gap: 10px;
   }
+
   #id26-reminder-root .id26-reminder-left {
     width: 100%;
   }
+
   #id26-reminder-root .id26-reminder-actions {
     width: 100%;
     justify-content: space-between;
   }
+
   #id26-reminder-root .id26-reminder-open {
     flex: 1;
     justify-content: center;
+    padding: 14px 16px;
+    font-size: 0.9rem;
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 400px) {
   #id26-reminder-root .id26-reminder-sub {
     display: none;
   }
@@ -212,34 +227,42 @@
           </div>
         </div>
         <div class="id26-reminder-actions">
-          <button class="id26-reminder-open" id="id26-reminder-open-btn">OPEN CELEBRATION →</button>
-          <button class="id26-reminder-close" id="id26-reminder-close-btn" aria-label="Close">×</button>
+          <button class="id26-reminder-open" id="id26-reminder-open-btn" type="button">
+            OPEN CELEBRATION →
+          </button>
+          <button class="id26-reminder-close" id="id26-reminder-close-btn" type="button" aria-label="Close">
+            ×
+          </button>
         </div>
       </div>
     `;
+
     document.body.appendChild(root);
 
+    // Animate in
     requestAnimationFrame(() => {
-      root.classList.add('id26-reminder-visible');
+      requestAnimationFrame(() => {
+        root.classList.add('id26-reminder-visible');
+      });
     });
   }
 
   function openLargeBanner() {
-    console.log('[ID26 Reminder] Button clicked - Opening large banner');
+    console.log('%c[ID26 Reminder] Opening large banner...', 'color: #FF9933; font-weight: bold;');
 
-    // Clear storage so large banner can open
+    // Clear closed state
     try {
       localStorage.removeItem('upschub_id26_closed');
     } catch (e) {}
 
-    // Trigger event
+    // Method 1: Custom Event
     window.dispatchEvent(new CustomEvent('upsChub:openIndependenceDay'));
 
-    // Direct call (most reliable)
+    // Method 2: Direct function call (most reliable)
     if (typeof window.initIndependenceDay === 'function') {
       window.initIndependenceDay(true);
     } else {
-      console.warn('[ID26] initIndependenceDay function not found. Check independence-day.js');
+      console.warn('[ID26] initIndependenceDay function not found. Make sure independence-day.js is loaded correctly.');
     }
   }
 
@@ -248,22 +271,35 @@
     const closeBtn = document.getElementById('id26-reminder-close-btn');
     const root = document.getElementById('id26-reminder-root');
 
+    // OPEN button - support both click and touch
     if (openBtn) {
-      openBtn.onclick = function (e) {
+      const handleOpen = function (e) {
         e.preventDefault();
+        e.stopPropagation();
         openLargeBanner();
       };
+
+      openBtn.addEventListener('click', handleOpen);
+      openBtn.addEventListener('touchend', handleOpen, { passive: false });
     }
 
+    // CLOSE button
     if (closeBtn) {
-      closeBtn.onclick = function () {
+      const handleClose = function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
         root.classList.remove('id26-reminder-visible');
+
         setTimeout(() => {
           root.remove();
-          const style = document.getElementById('id26-reminder-styles');
-          if (style) style.remove();
+          const styles = document.getElementById('id26-reminder-styles');
+          if (styles) styles.remove();
         }, 400);
       };
+
+      closeBtn.addEventListener('click', handleClose);
+      closeBtn.addEventListener('touchend', handleClose, { passive: false });
     }
   }
 
