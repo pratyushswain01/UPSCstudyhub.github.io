@@ -1,6 +1,7 @@
 /**
  * UPSChub — Independence Day 2026 Top Reminder Bar
- * Shows on EVERY page load / refresh (even after closing)
+ * Shows on every refresh
+ * Only opens large banner when user clicks the button
  */
 
 (function () {
@@ -14,7 +15,6 @@
 
   if (!CONFIG.enabled) return;
 
-  // Show only around Independence Day
   function isRelevantDate() {
     try {
       const today = new Date();
@@ -29,7 +29,6 @@
   if (!isRelevantDate()) return;
 
   function init() {
-    // Always show — no storage check
     if (document.getElementById('id26-reminder-root')) return;
 
     injectStyles();
@@ -193,21 +192,16 @@
   }
 
   function openLargeBanner() {
-    console.log('%c[ID26] Opening large Independence Day banner...', 'color: #FF9933');
-
+    // Clear closed state so large banner can open
     try {
       localStorage.removeItem('upschub_id26_closed');
     } catch (e) {}
 
+    // Trigger the large banner
     window.dispatchEvent(new CustomEvent('upsChub:openIndependenceDay'));
 
     if (typeof window.initIndependenceDay === 'function') {
-      window.initIndependenceDay(true);
-      return;
-    }
-
-    if (window.UPSChubIndependenceDay?.open) {
-      window.UPSChubIndependenceDay.open();
+      window.initIndependenceDay(true); // force = true
     }
   }
 
@@ -226,8 +220,6 @@
     if (closeBtn) {
       closeBtn.addEventListener('click', function () {
         root.classList.remove('id26-reminder-visible');
-
-        // Only hide temporarily — will show again on next refresh
         setTimeout(() => {
           root.remove();
           document.getElementById('id26-reminder-styles')?.remove();
@@ -236,7 +228,6 @@
     }
   }
 
-  // Start
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
