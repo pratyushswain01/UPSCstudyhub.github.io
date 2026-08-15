@@ -1,12 +1,11 @@
 /**
  * UPSChub — Independence Day 2026 Festival Module
- * Final Stable Version
+ * Final Clean Version
  * Prefix: id26-
- * 
+ *
  * Behavior:
- * - Opens automatically only on first visit
- * - After closing → stays closed on refresh
- * - Opens again only when reminder button is clicked
+ * - Does NOT open automatically on page load
+ * - Opens only when user clicks "OPEN CELEBRATION" on the reminder bar
  */
 
 (function () {
@@ -18,13 +17,12 @@
   const IndependenceDayConfig = {
     enabled: true,
     eventYear: 2026,
-    eventDate: new Date(2026, 7, 15, 0, 0, 0), // 15 Aug 2026
-    
-    storageDays: 1,                 // how many days to stay closed
+    eventDate: new Date(2026, 7, 15, 0, 0, 0),
+    storageKey: 'upschub_id26_closed',
+    storageDays: 1,
     quizUrl: '',
     polityUrl: '/Polity.notes.html',
-    forceShow: false                // keep false
-    autoOpen: false
+    forceShow: false
   };
 
   if (!IndependenceDayConfig.enabled) return;
@@ -32,11 +30,11 @@
   /* =========================================================
      SAFETY + EARLY EXIT
      ========================================================= */
-function safeInit() {
-  // Do NOT auto open the large banner
-  // It will only open when reminder button is clicked
-  console.log('[ID26] Large banner ready. Waiting for reminder button...');
-}
+  function safeInit() {
+    // Do NOT auto open the large banner
+    // It will only open when reminder button is clicked
+    console.log('[ID26] Large banner ready. Waiting for reminder button...');
+  }
 
   /* =========================================================
      LOCAL STORAGE LOGIC
@@ -46,13 +44,12 @@ function safeInit() {
 
     try {
       const raw = localStorage.getItem(IndependenceDayConfig.storageKey);
-      if (!raw) return true; // never closed before → show
+      if (!raw) return true;
 
       const data = JSON.parse(raw);
       const closedAt = data.closedAt || 0;
       const days = IndependenceDayConfig.storageDays * 24 * 60 * 60 * 1000;
 
-      // Show again only after X days
       return (Date.now() - closedAt) > days;
     } catch (e) {
       return true;
@@ -73,9 +70,8 @@ function safeInit() {
      ========================================================= */
   function initIndependenceDay(force = false) {
     // force = true → coming from reminder button
-    // force = false → normal page load
     if (!force && !shouldShowFestival()) {
-      return; // already closed → do not open
+      return;
     }
 
     if (document.getElementById('id26-root')) return;
@@ -276,7 +272,6 @@ function safeInit() {
   animation: id26-spin 20s linear infinite;
 }
 
-/* Mobile fix for Ashoka Chakra */
 @media (max-width: 768px) {
   #id26-root .id26-flag-wrap {
     width: 100px;
@@ -787,7 +782,7 @@ function safeInit() {
             <div class="id26-value"><div class="id26-value-label">FRATERNITY</div></div>
           </div>
           <div style="text-align:center;">
-            <a href="$IndependenceDayConfig.polityUrl = "/Polity.notes.html";" class="id26-btn id26-btn-secondary">Explore Indian Polity</a>
+            <a href="${IndependenceDayConfig.polityUrl}" class="id26-btn id26-btn-secondary">Explore Indian Polity</a>
           </div>
         </section>
 
@@ -997,7 +992,7 @@ function safeInit() {
         document.getElementById('id26-styles')?.remove();
         if (countdownInterval) clearInterval(countdownInterval);
       }, 500);
-      markClosed(); // important: mark as closed
+      markClosed();
       document.body.style.overflow = '';
     }
 
@@ -1047,18 +1042,18 @@ function safeInit() {
      LISTEN FOR REMINDER BAR
      ========================================================= */
   window.addEventListener('upsChub:openIndependenceDay', function () {
-  console.log('[ID26] Opening from reminder button');
+    console.log('[ID26] Opening from reminder button');
 
-  try {
-    localStorage.removeItem(IndependenceDayConfig.storageKey);
-  } catch (e) {}
+    try {
+      localStorage.removeItem(IndependenceDayConfig.storageKey);
+    } catch (e) {}
 
-  const existing = document.getElementById('id26-root');
-  if (existing) existing.remove();
-  document.getElementById('id26-styles')?.remove();
+    const existing = document.getElementById('id26-root');
+    if (existing) existing.remove();
+    document.getElementById('id26-styles')?.remove();
 
-  initIndependenceDay(true); // force open
-});
+    initIndependenceDay(true);
+  });
 
   /* =========================================================
      BOOT
