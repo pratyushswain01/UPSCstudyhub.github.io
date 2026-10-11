@@ -627,6 +627,43 @@
 </style>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#101a32">
+
+<!-- HIDE_GURUKUL_BANNER_IN_INSTALLED_APP -->
+<style>
+  @media (display-mode: standalone) {
+    #gurukul-app-banner { display: none !important; }
+  }
+  @media (display-mode: fullscreen) {
+    #gurukul-app-banner { display: none !important; }
+  }
+</style>
+<script>
+(function () {
+  function hideInstalledAppBanner() {
+    var referrer = document.referrer || "";
+    var standalone = false;
+
+    try {
+      standalone =
+        window.matchMedia("(display-mode: standalone)").matches ||
+        window.matchMedia("(display-mode: fullscreen)").matches ||
+        window.navigator.standalone === true ||
+        referrer.indexOf("android-app://online.upscgurukul.twa") === 0;
+    } catch (e) {}
+
+    if (standalone) {
+      var banner = document.getElementById("gurukul-app-banner");
+      if (banner) banner.style.setProperty("display", "none", "important");
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", hideInstalledAppBanner);
+  } else {
+    hideInstalledAppBanner();
+  }
+})();
+</script>
 </head>
 
 <body class="font-body">
@@ -834,7 +871,7 @@
                     <div class="quick-action-icon"><i class="fas fa-newspaper"></i></div>
                     <span class="label">Daily News</span>
                 </a>
-                <a href="./TestSeries/TestSeries_UPSC गुरुकुल.html" class="quick-action-item">
+                <a href="./TestSeries/TestSeries_UPSChub.html" class="quick-action-item">
                     <div class="quick-action-icon"><i class="fas fa-tasks"></i></div>
                     <span class="label">Mock Tests</span>
                 </a>
