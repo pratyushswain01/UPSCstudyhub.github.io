@@ -625,6 +625,8 @@
   .gurukul-banner-button { transition:none; }
 }
 </style>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101a32">
 </head>
 
 <body class="font-body">
@@ -1173,6 +1175,54 @@
   var dismissed=false;
   try{dismissed=sessionStorage.getItem('upschub-apk-popup-dismissed-v31')==='1'}catch(e){}
   if(!dismissed){setTimeout(function(){overlay.classList.add('is-visible');overlay.setAttribute('aria-hidden','false')},1800)}
+})();
+</script>
+<div id="gurukul-pwa-install" style="max-width:1100px;margin:16px auto;padding:0 16px;font-family:inherit">
+  <button id="gurukul-install-button" type="button" hidden
+    style="border:0;border-radius:10px;padding:13px 20px;background:#d9b45f;color:#101a32;font-weight:800;cursor:pointer">
+    Install UPSC गुरुकुल
+  </button>
+  <p id="gurukul-install-help" hidden style="font-size:13px;line-height:1.6;color:inherit">
+    To install UPSC गुरुकुल, open your browser menu and choose
+    <strong>Install app</strong> or <strong>Add to Home screen</strong>, if available.
+  </p>
+</div>
+<script id="gurukul-pwa-install-script">
+(function () {
+  let deferredPrompt = null;
+  const button = document.getElementById('gurukul-install-button');
+  const help = document.getElementById('gurukul-install-help');
+  if (!button || !help) return;
+
+  window.addEventListener('beforeinstallprompt', function (event) {
+    event.preventDefault();
+    deferredPrompt = event;
+    button.hidden = false;
+    help.hidden = true;
+  });
+
+  button.addEventListener('click', async function () {
+    if (!deferredPrompt) {
+      help.hidden = false;
+      return;
+    }
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    button.hidden = true;
+  });
+
+  window.addEventListener('appinstalled', function () {
+    button.hidden = true;
+    help.hidden = true;
+  });
+
+  // A native prompt may not be available on every browser or visit.
+  setTimeout(function () {
+    if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
+      help.hidden = false;
+    }
+  }, 2500);
 })();
 </script>
 </body>
