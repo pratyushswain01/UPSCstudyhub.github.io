@@ -1269,7 +1269,7 @@
 <!-- UPSCGURUKUL_UPDATE_CHECKER_V1 -->
 <script>
 (() => {
-  const CURRENT_VERSION = '3.1';
+  const CURRENT_VERSION = '3.2';
   const API = 'https://api.github.com/repos/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
   const RELEASES = 'https://github.com/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
   const compare = (a,b) => {
@@ -1285,8 +1285,9 @@
       const release=await r.json();
       const latest=String(release.tag_name||'').replace(/^v/i,'');
       if(!latest||compare(latest,CURRENT_VERSION)<=0)return;
-      const asset=(release.assets||[]).find(a=>a.name==='app-release.apk'&&a.browser_download_url);
-      const link=asset?asset.browser_download_url:RELEASES;
+      const asset=(release.assets||[]).find(a=>/\.apk$/i.test(a.name)&&a.browser_download_url);
+      if(!asset)return;
+      const link=asset.browser_download_url;
       const css=document.createElement('style');
       css.textContent='#upscg-update{position:fixed;z-index:2147483647;left:16px;right:16px;bottom:16px;max-width:520px;margin:auto;padding:18px;border:1px solid #d9e4f5;border-radius:18px;background:#fff;color:#152238;box-shadow:0 12px 40px #0003;font:15px/1.45 system-ui}#upscg-update h3{margin:0 0 6px}#upscg-update p{margin:0 0 14px}#upscg-update a,#upscg-update button{display:inline-block;border:0;border-radius:10px;padding:11px 14px;font-weight:700;text-decoration:none;cursor:pointer}#upscg-update a{background:#173ea5;color:white}#upscg-update button{background:#eef2f8;color:#23324b;margin-left:8px}';
       document.head.appendChild(css);
