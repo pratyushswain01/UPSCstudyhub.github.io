@@ -26,11 +26,14 @@
   window.addEventListener("message", async event => {
     if (event.origin !== location.origin) return;
     if (event.data?.type !== "UG_PRIVATE_DEBUG_UNLOCK") return;
-    if (!(await enabled())) { location.reload(); return; }
+    if (!(await enabled())) {
+      sessionStorage.removeItem("ugPrivateDebugSession");
+      removeScreen();
+      return;
+    }
     sessionStorage.setItem("ugPrivateDebugSession", "active");
     removeScreen();
-    location.reload();
-  });
+});
 
   if (await enabled()) {
     if (sessionStorage.getItem("ugPrivateDebugSession") !== "active") showScreen();
@@ -47,5 +50,6 @@
     }
   }, 5000);
 })();
+
 
 
