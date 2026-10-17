@@ -2,6 +2,44 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<script id="ug-early-lockdown">
+(function(){
+  var id="ug-early-lockdown-cover";
+  var style="position:fixed;inset:0;z-index:2147483646;background:#0b1424;color:#f5f7fb;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font:14px system-ui,sans-serif";
+  var cover=document.createElement("div");
+  cover.id=id;
+  cover.setAttribute("style",style);
+  cover.innerHTML='<div><div style="font-size:12px;letter-spacing:3px;color:#d8b477">UPSC GURUKUL</div><div style="font-size:25px;font-weight:700;margin:18px 0 10px">Preparing your experience</div><div style="color:#9aabc1">Checking platform status…</div><div style="font-size:11px;color:#718198;margin-top:28px">2026 @ Pratyush.dev inc</div></div>';
+
+  function mount(){
+    if(!document.getElementById(id)){
+      (document.body||document.documentElement).appendChild(cover);
+    }
+  }
+  mount();
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",mount,{once:true});
+  }
+
+  fetch("/debug-mode.json?t="+Date.now(),{cache:"no-store"})
+    .then(function(r){if(!r.ok)throw Error("status");return r.json();})
+    .then(function(data){
+      if(data.enabled===true){
+        // Keep the cover until the lockdown script displays base.html.
+        cover.querySelector("div div:nth-child(2)").textContent="Development environment";
+        cover.querySelector("div div:nth-child(3)").textContent="Loading official development portal…";
+      }else{
+        cover.remove();
+      }
+    })
+    .catch(function(){
+      // Fail closed: do not briefly reveal the production homepage
+      // if the mode file cannot be checked.
+      cover.querySelector("div div:nth-child(2)").textContent="Checking platform availability";
+      cover.querySelector("div div:nth-child(3)").textContent="Please wait…";
+    });
+})();
+</script>
   <!-- Basic Meta -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -270,11 +308,13 @@ document.addEventListener("keydown", function(e) {
 window.enablePratyushDebug = openDebugPanel;
 </script>
 <script src="/upscgurukul-debug.js?v=1"></script>
-<script src="/upscgurukul-dev-lockdown.js?v=5"></script>
+<script src="/upscgurukul-dev-lockdown.js?v=6"></script>
 </body>
 </html>
 
 <!-- GitHub Pages root refresh -->
+
+
 
 
 
