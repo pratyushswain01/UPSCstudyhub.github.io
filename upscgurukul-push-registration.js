@@ -11,7 +11,7 @@ const firebaseConfig = {
   appId: "1:451692540885:web:b425e85128e5de97c7c35c"
 };
 
-const VAPID_KEY = "BGkEpaujSsPlAOnayTs--9Ko5ge5RrlckfeYXunCD54fNNHl1RKk8x9eXIlDWLRp8djIIRfCtVuX9LcTYQ0V6Fo";
+const VAPID_KEY = "BAH-ScLXAlvU4Ug9tpLCgxjqdyNkjmUlql5G6EF_71xk5t0sHHMTKO6-Yn8R8GzThiXEmrosiGlfWASXwLjbnsU";
 
 function getVisitorId() {
   let id = localStorage.getItem("visitorId");
@@ -145,4 +145,5 @@ function init() {
     addEnableButton();
   }
 }
+
 
