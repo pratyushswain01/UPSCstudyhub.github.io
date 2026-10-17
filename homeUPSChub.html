@@ -1422,8 +1422,121 @@
 <script src="/latest-release.js?v=1" defer></script>  <script type="module" src="/upscgurukul-push-registration.js"></script>
 <script src="/upscgurukul-debug.js?v=1"></script>
 <script src="/upscgurukul-dev-lockdown.js?v=6"></script>
+<!-- UG-WAVE-CONSTRUCTION-START -->
+<style id="ug-wave-construction-style">
+#ug-wave-construction {
+  position:fixed;inset:0;z-index:2147483646;display:none;
+  overflow:hidden;align-items:center;justify-content:center;
+  padding:22px;background:#06162c;color:#f5f7ff;
+  font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+#ug-wave-construction.ug-show {display:flex}
+#ug-wave-construction:before {
+  content:"";position:absolute;inset:0;opacity:.2;
+  background:linear-gradient(#4e8dc51a 1px,transparent 1px),
+    linear-gradient(90deg,#4e8dc51a 1px,transparent 1px);
+  background-size:38px 38px;
+}
+#ug-wave-construction .ug-wave-card {
+  position:relative;width:min(720px,100%);text-align:center;
+  border:1px solid #365576;border-radius:24px;padding:clamp(25px,6vw,54px);
+  background:linear-gradient(145deg,#0b2039f5,#041329f7);
+  box-shadow:0 24px 90px #0008;overflow:hidden;
+}
+#ug-wave-construction .ug-construction-tag {
+  display:inline-flex;align-items:center;gap:9px;padding:9px 14px;
+  border:1px solid #ffc45c77;border-radius:999px;color:#ffcf75;
+  font-size:11px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;
+}
+#ug-wave-construction .ug-live-dot {
+  width:8px;height:8px;border-radius:50%;background:#ffc45c;
+  box-shadow:0 0 13px #ffc45c;animation:ug-wave-pulse 1.5s infinite;
+}
+#ug-wave-construction h2 {
+  margin:24px 0 12px;font-size:clamp(37px,8vw,72px);
+  font-weight:950;line-height:.98;letter-spacing:-.055em;text-transform:uppercase;
+}
+#ug-wave-construction h2 span {display:block;color:#ffc45c}
+#ug-wave-construction .ug-copy {
+  max-width:490px;margin:0 auto;color:#b9cbe1;font-size:15px;line-height:1.8;
+}
+#ug-wave-construction .ug-board {
+  position:relative;margin:27px auto 0;padding:16px 18px;
+  border:1px solid #ffc45c65;border-radius:13px;background:#07172bbd;
+  text-align:left;overflow:hidden;
+}
+#ug-wave-construction .ug-board-top {
+  display:flex;align-items:center;gap:12px;font-weight:750;font-size:14px;
+}
+#ug-wave-construction .ug-board-top span:last-child {
+  margin-left:auto;color:#ffcf75;font-size:10px;letter-spacing:.14em;
+}
+#ug-wave-construction .ug-progress {
+  height:7px;margin-top:15px;border-radius:20px;background:#1a3048;overflow:hidden;
+}
+#ug-wave-construction .ug-progress span {
+  display:block;width:65%;height:100%;border-radius:20px;
+  background:linear-gradient(90deg,#e6a53a,#ffe5a0,#ffc45c);
+  background-size:200% 100%;animation:ug-wave-shimmer 3s linear infinite;
+}
+#ug-wave-construction .ug-wave-art {
+  position:absolute;bottom:0;left:0;width:100%;height:78px;opacity:.32;
+  pointer-events:none;
+}
+#ug-wave-construction .ug-wave-art path {animation:ug-wave-drift 8s linear infinite}
+#ug-wave-construction .ug-wave-art path:nth-child(2) {animation-delay:-3s;opacity:.65}
+#ug-wave-construction .ug-wave-art path:nth-child(3) {animation-delay:-5s;opacity:.4}
+@keyframes ug-wave-pulse {50%{opacity:.4;transform:scale(.8)}}
+@keyframes ug-wave-shimmer {to{background-position:200% 0}}
+@keyframes ug-wave-drift {to{transform:translateX(-45px)}}
+@media(max-width:480px) {
+  #ug-wave-construction .ug-wave-card {border-radius:18px;padding:27px 18px}
+  #ug-wave-construction .ug-board-top {font-size:12px}
+  #ug-wave-construction .ug-copy {font-size:14px}
+}
+@media(prefers-reduced-motion:reduce) {
+  #ug-wave-construction * {animation:none!important}
+}
+</style>
+<div id="ug-wave-construction" role="status" aria-live="polite">
+  <div class="ug-wave-card">
+    <div class="ug-construction-tag"><i class="ug-live-dot"></i> Site development in progress</div>
+    <h2>Under <span>Construction</span></h2>
+    <p class="ug-copy">We’re building a better UPSC Gurukul. We’re improving the learning experience, performance and platform tools. Thank you for your patience.</p>
+    <div class="ug-board">
+      <div class="ug-board-top"><span>Platform upgrade underway</span><span>IN PROGRESS</span></div>
+      <div class="ug-progress"><span></span></div>
+    </div>
+    <svg class="ug-wave-art" viewBox="0 0 800 100" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 35 Q100 0 200 35 T400 35 T600 35 T800 35 V100 H0Z" fill="#1b6a9d" opacity=".6"/>
+      <path d="M0 48 Q100 13 200 48 T400 48 T600 48 T800 48 V100 H0Z" fill="#ffc45c" opacity=".35"/>
+      <path d="M0 60 Q100 25 200 60 T400 60 T600 60 T800 60 V100 H0Z" fill="#1a4c75" opacity=".8"/>
+    </svg>
+  </div>
+</div>
+<script>
+(function(){
+  var board=document.getElementById('ug-wave-construction');
+  if(!board)return;
+  function check(){
+    // Show only when the existing early-lockdown cover is visible.
+    var cover=document.querySelector(
+      '#ug-early-lockdown-cover, #ug-lockdown-cover, #ug-dev-lockdown-cover'
+    );
+    if(cover){
+      var s=getComputedStyle(cover);
+      board.classList.toggle('ug-show',s.display!=='none'&&s.visibility!=='hidden'&&s.opacity!=='0');
+    }
+  }
+  var observer=new MutationObserver(check);
+  observer.observe(document.documentElement,{subtree:true,childList:true,attributes:true,attributeFilter:['style','class']});
+  check();
+})();
+</script>
+<!-- UG-WAVE-CONSTRUCTION-END -->
 </body>
 </html>
+
 
 
 
