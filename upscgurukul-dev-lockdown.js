@@ -34,6 +34,69 @@
 <title>UPSC Gurukul — Under Construction</title>
 <style>
 :root{color-scheme:dark;--gold:#e8c47a;--muted:#a8b6ca;--panel:#111f33}
+/* UG-CINEMATIC-SCENERY */
+.sky-scene{position:absolute;inset:0;z-index:-3;overflow:hidden;
+background:linear-gradient(180deg,#07152c 0%,#183c60 44%,#e59a75 100%);
+animation:sky-cycle 36s ease-in-out infinite alternate}
+.sky-stars{position:absolute;inset:0;opacity:.85;
+background-image:radial-gradient(2px 2px at 12% 20%,#fff 98%,transparent),
+radial-gradient(1.5px 1.5px at 25% 34%,#fff 98%,transparent),
+radial-gradient(2px 2px at 43% 14%,#fff 98%,transparent),
+radial-gradient(1px 1px at 58% 27%,#fff 98%,transparent),
+radial-gradient(2px 2px at 76% 17%,#fff 98%,transparent),
+radial-gradient(1.5px 1.5px at 89% 36%,#fff 98%,transparent),
+radial-gradient(1px 1px at 68% 42%,#fff 98%,transparent);
+animation:stars-cycle 36s ease-in-out infinite alternate}
+.orbit{position:absolute;left:50%;top:69%;width:min(92vw,780px);
+height:min(92vw,780px);transform:translate(-50%,-50%);
+animation:celestial-orbit 36s linear infinite}
+.celestial{position:absolute;left:50%;display:block;border-radius:50%;
+transform:translateX(-50%)}
+.sun{top:0;width:clamp(48px,8vw,78px);height:clamp(48px,8vw,78px);
+background:radial-gradient(circle at 35% 32%,#fff9d8,#ffdc86 48%,#ff9f58);
+box-shadow:0 0 28px 9px rgba(255,193,105,.26),0 0 90px 25px rgba(255,164,91,.17)}
+.moon{bottom:0;width:clamp(38px,6vw,58px);height:clamp(38px,6vw,58px);
+background:#f5f1dc;box-shadow:0 0 25px 7px rgba(204,224,255,.2)}
+.moon:after{content:"";position:absolute;left:12px;top:-4px;width:100%;height:100%;
+border-radius:50%;background:#243b59}
+.cloud{position:absolute;width:130px;height:28px;border-radius:50px;
+background:rgba(255,225,205,.12);filter:blur(1px);
+animation:cloud-drift 30s linear infinite}
+.cloud:before,.cloud:after{content:"";position:absolute;bottom:8px;
+border-radius:50%;background:inherit}
+.cloud:before{left:20px;width:47px;height:44px}
+.cloud:after{left:57px;width:61px;height:55px}
+.cloud.c1{top:23%;left:-150px;transform:scale(.8)}
+.cloud.c2{top:37%;left:-200px;animation-delay:-14s;transform:scale(1.15);opacity:.65}
+.mountain{position:absolute;left:-8%;width:116%;bottom:0;pointer-events:none}
+.mountain.back{height:43%;background:#253c58;
+clip-path:polygon(0 70%,13% 35%,23% 60%,39% 13%,53% 57%,68% 25%,82% 62%,93% 39%,100% 63%,100% 100%,0 100%);
+opacity:.68;animation:mountain-back 36s ease-in-out infinite alternate}
+.mountain.mid{height:32%;background:#172f49;
+clip-path:polygon(0 55%,16% 25%,29% 58%,44% 20%,58% 52%,76% 14%,90% 50%,100% 35%,100% 100%,0 100%);
+animation:mountain-mid 36s ease-in-out infinite alternate}
+.mountain.front{height:20%;background:#0b1d31;
+clip-path:polygon(0 35%,17% 50%,31% 24%,47% 48%,66% 20%,82% 43%,100% 25%,100% 100%,0 100%)}
+@keyframes sky-cycle{
+0%,10%{background:linear-gradient(180deg,#101b43 0%,#354f80 48%,#ed9b85 100%)}
+25%{background:linear-gradient(180deg,#427fbd 0%,#86c7dc 55%,#f6d19b 100%)}
+48%{background:linear-gradient(180deg,#2587c7 0%,#75c5dd 56%,#f6dba5 100%)}
+65%{background:linear-gradient(180deg,#4a427d 0%,#d47f91 55%,#f8bc87 100%)}
+82%,100%{background:linear-gradient(180deg,#050d24 0%,#142b50 56%,#594d76 100%)}
+}
+@keyframes stars-cycle{0%,22%,48%{opacity:0}65%{opacity:.25}82%,100%{opacity:.95}}
+@keyframes celestial-orbit{from{rotate:0deg}to{rotate:360deg}}
+@keyframes cloud-drift{from{margin-left:0}to{margin-left:calc(100vw + 350px)}}
+@keyframes mountain-back{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(28deg)}}
+@keyframes mountain-mid{from{filter:brightness(1)}to{filter:brightness(1.35)}}
+@media(max-width:480px){
+.orbit{top:66%;width:95vw;height:95vw}
+.mountain.back{height:34%}.mountain.mid{height:26%}.mountain.front{height:18%}
+.cloud{opacity:.65}
+}
+@media(prefers-reduced-motion:reduce){
+.sky-scene,.sky-stars,.orbit,.cloud,.mountain{animation:none!important}
+}
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,
 Segoe UI,sans-serif;background:#081321;color:#f5f7fb}
@@ -134,6 +197,18 @@ scroll-behavior:auto!important;transition:none!important}
 </head>
 <body>
 <main class="page">
+<div class="sky-scene" aria-hidden="true">
+  <div class="sky-stars"></div>
+  <div class="cloud c1"></div>
+  <div class="cloud c2"></div>
+  <div class="orbit">
+    <span class="celestial sun"></span>
+    <span class="celestial moon"></span>
+  </div>
+  <div class="mountain back"></div>
+  <div class="mountain mid"></div>
+  <div class="mountain front"></div>
+</div>
 <div class="glow"></div><div class="grid"></div>
 <button class="info-btn" id="infoBtn" type="button" aria-label="Information about this page"
 title="About this page">i</button>
@@ -235,3 +310,4 @@ public site is ready, this temporary screen can be removed by the site administr
     }
   }, 5000);
 })();
+
