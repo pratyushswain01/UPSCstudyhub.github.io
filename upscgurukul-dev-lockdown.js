@@ -1,259 +1,292 @@
 ﻿(async function () {
   "use strict";
 
-  const ID = "ug-construction-lockdown-frame";
+  const FRAME_ID = "ug-construction-lockdown-frame";
+  const SWITCH_URL = "/debug-mode.json?t=" + Date.now();
 
-  async function enabled() {
+  async function debugEnabled() {
     try {
-      const r = await fetch("/debug-mode.json?t=" + Date.now(), {
-        cache: "no-store"
-      });
-      return r.ok && (await r.json()).enabled === true;
+      const response = await fetch(
+        "/debug-mode.json?t=" + Date.now(),
+        { cache: "no-store" }
+      );
+      if (!response.ok) return false;
+      const data = await response.json();
+      return data.enabled === true;
     } catch (_) {
       return false;
     }
   }
 
-  function showScreen() {
-    if (document.getElementById(ID)) return;
+  function removeScreen() {
+    const frame = document.getElementById(FRAME_ID);
+    if (frame) frame.remove();
+  }
+
+  function buildScreen() {
+    if (document.getElementById(FRAME_ID)) return;
 
     const frame = document.createElement("iframe");
-    frame.id = ID;
+    frame.id = FRAME_ID;
     frame.title = "UPSC Gurukul Development Status";
     frame.setAttribute("allow", "fullscreen");
+    frame.setAttribute("referrerpolicy", "same-origin");
     frame.style.cssText =
       "position:fixed;inset:0;width:100%;height:100%;border:0;" +
       "z-index:2147483647;background:#081321";
 
-    frame.srcdoc = `<!doctype html>
+    frame.srcdoc = String.raw`<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="color-scheme" content="dark">
 <title>UPSC Gurukul — Under Construction</title>
 <style>
-:root{color-scheme:dark;--gold:#e8c47a;--muted:#a8b6ca;--panel:#111f33}
-/* UG-CINEMATIC-SCENERY */
-.sky-scene{position:absolute;inset:0;z-index:0;overflow:hidden;
-background:linear-gradient(180deg,#07152c 0%,#183c60 44%,#e59a75 100%);
-animation:sky-cycle 36s ease-in-out infinite alternate}
-.sky-stars{position:absolute;inset:0;opacity:.85;
-background-image:radial-gradient(2px 2px at 12% 20%,#fff 98%,transparent),
-radial-gradient(1.5px 1.5px at 25% 34%,#fff 98%,transparent),
-radial-gradient(2px 2px at 43% 14%,#fff 98%,transparent),
-radial-gradient(1px 1px at 58% 27%,#fff 98%,transparent),
-radial-gradient(2px 2px at 76% 17%,#fff 98%,transparent),
-radial-gradient(1.5px 1.5px at 89% 36%,#fff 98%,transparent),
-radial-gradient(1px 1px at 68% 42%,#fff 98%,transparent);
-animation:stars-cycle 36s ease-in-out infinite alternate}
-.orbit{position:absolute;left:50%;top:69%;width:min(92vw,780px);
-height:min(92vw,780px);transform:translate(-50%,-50%);
-animation:celestial-orbit 36s linear infinite}
-.celestial{position:absolute;left:50%;display:block;border-radius:50%;
-transform:translateX(-50%)}
-.sun{top:0;width:clamp(48px,8vw,78px);height:clamp(48px,8vw,78px);
-background:radial-gradient(circle at 35% 32%,#fff9d8,#ffdc86 48%,#ff9f58);
-box-shadow:0 0 28px 9px rgba(255,193,105,.26),0 0 90px 25px rgba(255,164,91,.17)}
-.moon{bottom:0;width:clamp(38px,6vw,58px);height:clamp(38px,6vw,58px);
-background:#f5f1dc;box-shadow:0 0 25px 7px rgba(204,224,255,.2)}
-.moon:after{content:"";position:absolute;left:12px;top:-4px;width:100%;height:100%;
-border-radius:50%;background:#243b59}
-.cloud{position:absolute;width:130px;height:28px;border-radius:50px;
-background:rgba(255,225,205,.12);filter:blur(1px);
-animation:cloud-drift 30s linear infinite}
-.cloud:before,.cloud:after{content:"";position:absolute;bottom:8px;
-border-radius:50%;background:inherit}
-.cloud:before{left:20px;width:47px;height:44px}
-.cloud:after{left:57px;width:61px;height:55px}
-.cloud.c1{top:23%;left:-150px;transform:scale(.8)}
-.cloud.c2{top:37%;left:-200px;animation-delay:-14s;transform:scale(1.15);opacity:.65}
-.mountain{position:absolute;left:-8%;width:116%;bottom:0;pointer-events:none}
-.mountain.back{height:43%;background:#253c58;
-clip-path:polygon(0 70%,13% 35%,23% 60%,39% 13%,53% 57%,68% 25%,82% 62%,93% 39%,100% 63%,100% 100%,0 100%);
-opacity:.68;animation:mountain-back 36s ease-in-out infinite alternate}
-.mountain.mid{height:32%;background:#172f49;
-clip-path:polygon(0 55%,16% 25%,29% 58%,44% 20%,58% 52%,76% 14%,90% 50%,100% 35%,100% 100%,0 100%);
-animation:mountain-mid 36s ease-in-out infinite alternate}
-.mountain.front{height:20%;background:#0b1d31;
-clip-path:polygon(0 35%,17% 50%,31% 24%,47% 48%,66% 20%,82% 43%,100% 25%,100% 100%,0 100%)}
-@keyframes sky-cycle{
-0%,10%{background:linear-gradient(180deg,#101b43 0%,#354f80 48%,#ed9b85 100%)}
-25%{background:linear-gradient(180deg,#427fbd 0%,#86c7dc 55%,#f6d19b 100%)}
-48%{background:linear-gradient(180deg,#2587c7 0%,#75c5dd 56%,#f6dba5 100%)}
-65%{background:linear-gradient(180deg,#4a427d 0%,#d47f91 55%,#f8bc87 100%)}
-82%,100%{background:linear-gradient(180deg,#050d24 0%,#142b50 56%,#594d76 100%)}
-}
-@keyframes stars-cycle{0%,22%,48%{opacity:0}65%{opacity:.25}82%,100%{opacity:.95}}
-@keyframes celestial-orbit{from{rotate:0deg}to{rotate:360deg}}
-@keyframes cloud-drift{from{margin-left:0}to{margin-left:calc(100vw + 350px)}}
-@keyframes mountain-back{from{filter:hue-rotate(0deg)}to{filter:hue-rotate(28deg)}}
-@keyframes mountain-mid{from{filter:brightness(1)}to{filter:brightness(1.35)}}
-@media(max-width:480px){
-.orbit{top:66%;width:95vw;height:95vw}
-.mountain.back{height:34%}.mountain.mid{height:26%}.mountain.front{height:18%}
-.cloud{opacity:.65}
-}
-@media(prefers-reduced-motion:reduce){
-.sky-scene,.sky-stars,.orbit,.cloud,.mountain{animation:none!important}
+:root{
+  color-scheme:dark;
+  --gold:#edc878;
+  --ink:#091426;
+  --muted:#b7c5d8;
+  --cycle:72s;
 }
 *{box-sizing:border-box}
 html,body{margin:0;min-height:100%;font-family:Inter,system-ui,-apple-system,
-Segoe UI,sans-serif;background:#081321;color:#f5f7fb}
-body{min-height:100vh;min-height:100dvh;overflow:auto}
+"Segoe UI",sans-serif;background:var(--ink);color:#f7f8fc}
+body{min-height:100vh;min-height:100dvh;overflow:hidden}
 button{font:inherit}
-.page{position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;
-display:flex;align-items:center;justify-content:center;overflow:hidden;
-padding:76px 20px 38px}
-.glow{position:absolute;z-index:-2;width:75vw;height:75vw;max-width:760px;
-max-height:760px;left:50%;top:47%;transform:translate(-50%,-50%);
-background:radial-gradient(circle,rgba(40,92,139,.23),transparent 68%);
-pointer-events:none}
-.grid{position:absolute;inset:0;z-index:-2;opacity:.14;
-background-image:linear-gradient(rgba(155,187,222,.13) 1px,transparent 1px),
-linear-gradient(90deg,rgba(155,187,222,.13) 1px,transparent 1px);
-background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
-.info-btn{position:absolute;z-index:4;right:20px;top:20px;width:46px;height:46px;
-border-radius:50%;border:1px solid rgba(232,196,122,.65);
-background:rgba(17,31,51,.9);color:var(--gold);font-size:23px;font-weight:700;
-cursor:pointer;display:grid;place-items:center;transition:.2s}
-.info-btn:hover{background:#263b56;transform:translateY(-2px)}
-.content{position:relative;z-index:2;width:min(720px,100%);text-align:center;padding:22px 0 12px}
-.brand{display:inline-flex;align-items:center;gap:10px;color:var(--gold);
-font-size:12px;font-weight:800;letter-spacing:3px}
-.brand-mark{width:35px;height:35px;border:1px solid rgba(232,196,122,.6);
-border-radius:11px;display:grid;place-items:center;font-size:19px;
-background:linear-gradient(145deg,#1a304a,#0b1728)}
-.eyebrow{margin:29px 0 12px;color:#a8bdd5;font-size:11px;font-weight:800;
-letter-spacing:3px;text-transform:uppercase}
-h1{font-size:clamp(38px,7.4vw,70px);line-height:1.03;letter-spacing:-2px;
-margin:0;font-weight:850}
-h1 span{display:block;color:var(--gold)}
-.rule{width:66px;height:3px;margin:25px auto 20px;border-radius:5px;
-background:linear-gradient(90deg,#b98a45,#ffe5a7,#b98a45)}
-.description{max-width:540px;margin:0 auto;color:var(--muted);
-font-size:clamp(14px,2.2vw,17px);line-height:1.8}
-.status{display:inline-flex;align-items:center;gap:9px;margin:25px 0 0;
-padding:10px 15px;border:1px solid rgba(232,196,122,.24);
-border-radius:999px;background:rgba(232,196,122,.06);
-font-size:12px;color:#ead8b2}
-.dot{width:7px;height:7px;background:var(--gold);border-radius:50%;
-box-shadow:0 0 0 5px rgba(232,196,122,.1);animation:pulse 1.8s infinite}
-.progress{max-width:310px;height:4px;margin:22px auto 0;border-radius:8px;
-background:#1b2b40;overflow:hidden}
-.progress:after{content:"";display:block;width:38%;height:100%;
-background:linear-gradient(90deg,#a87837,#ffe5a7);
-border-radius:8px;animation:progress 2.8s ease-in-out infinite alternate}
-.waves{position:absolute;z-index:1;left:0;right:0;bottom:-2px;height:190px;
-overflow:hidden;pointer-events:none;opacity:.82}
-.wave{position:absolute;left:-30%;width:160%;height:150px;bottom:-42px;
-border-radius:44% 56% 0 0 / 23% 28% 0 0;transform:rotate(-3deg)}
-.wave.one{background:linear-gradient(180deg,rgba(31,76,117,.32),#102641);
-animation:wave 12s ease-in-out infinite alternate}
-.wave.two{bottom:-62px;background:linear-gradient(180deg,rgba(27,62,99,.42),#0c1b2e);
-animation:wave 9s ease-in-out infinite alternate-reverse}
-.wave.three{bottom:-88px;background:linear-gradient(180deg,rgba(20,47,76,.6),#081321);
-animation:wave 14s ease-in-out infinite alternate}
-.footer{position:absolute;z-index:3;bottom:16px;left:15px;right:15px;text-align:center;
-font-size:11px;letter-spacing:.4px;color:#71849d}
-.dev-btn{margin-top:21px;padding:10px 16px;border:1px solid #344a65;
-border-radius:10px;color:#d8e4f3;background:rgba(15,29,47,.82);
-font-size:12px;cursor:pointer;transition:.2s}
-.dev-btn:hover{border-color:var(--gold);color:var(--gold)}
-.modal-backdrop{position:fixed;inset:0;z-index:5;display:none;align-items:center;
-justify-content:center;padding:18px;background:rgba(2,8,17,.78);
-backdrop-filter:blur(9px)}
+.page{
+  position:relative;isolation:isolate;min-height:100vh;min-height:100dvh;
+  display:flex;align-items:center;justify-content:center;overflow:hidden;
+  padding:76px 20px 60px;background:#091426
+}
+.scene{position:absolute;inset:0;z-index:-1;overflow:hidden;
+  background:linear-gradient(180deg,#07142c 0%,#1c355a 58%,#e08c79 100%);
+  animation:sky-cycle var(--cycle) linear infinite}
+.scene:after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(4,10,24,.12),transparent 40%,
+  rgba(3,12,25,.12))}
+.stars{position:absolute;inset:0;opacity:0;
+  background-image:
+  radial-gradient(2px 2px at 12% 17%,#fff 98%,transparent),
+  radial-gradient(1.5px 1.5px at 25% 30%,#fff 98%,transparent),
+  radial-gradient(2px 2px at 43% 12%,#fff 98%,transparent),
+  radial-gradient(1.5px 1.5px at 58% 23%,#fff 98%,transparent),
+  radial-gradient(2px 2px at 76% 16%,#fff 98%,transparent),
+  radial-gradient(1px 1px at 88% 34%,#fff 98%,transparent),
+  radial-gradient(1.5px 1.5px at 67% 39%,#fff 98%,transparent),
+  radial-gradient(1px 1px at 35% 44%,#fff 98%,transparent);
+  animation:star-cycle var(--cycle) linear infinite}
+.orbit{
+  position:absolute;left:50%;top:67%;
+  width:min(90vw,760px);height:min(90vw,760px);
+  transform:translate(-50%,-50%);
+  animation:orbit-cycle var(--cycle) linear infinite;
+  pointer-events:none
+}
+.sun{
+  position:absolute;left:50%;top:0;transform:translateX(-50%);
+  width:clamp(48px,7vw,76px);height:clamp(48px,7vw,76px);
+  border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#fffbe3 0%,#ffe6a0 37%,#ffad63 72%,#ed8157 100%);
+  box-shadow:0 0 28px 10px rgba(255,197,115,.3),0 0 90px 24px rgba(255,158,89,.2)
+}
+.moon{
+  position:absolute;left:50%;bottom:0;transform:translateX(-50%);
+  width:clamp(38px,5.5vw,57px);height:clamp(38px,5.5vw,57px);
+  border-radius:50%;background:#f5f0d9;
+  box-shadow:0 0 26px 7px rgba(210,228,255,.25)
+}
+.moon:after{content:"";position:absolute;left:13px;top:-5px;
+  width:100%;height:100%;border-radius:50%;background:#263d60}
+.cloud{
+  position:absolute;width:130px;height:25px;border-radius:50px;
+  background:rgba(255,235,221,.18);filter:blur(1px);
+  animation:cloud-drift 38s linear infinite
+}
+.cloud:before,.cloud:after{content:"";position:absolute;bottom:7px;
+  border-radius:50%;background:inherit}
+.cloud:before{left:20px;width:45px;height:39px}
+.cloud:after{left:57px;width:61px;height:49px}
+.cloud.a{top:23%;left:-180px;animation-delay:-11s}
+.cloud.b{top:37%;left:-200px;transform:scale(.8);animation-delay:-28s}
+.cloud.c{top:16%;left:-250px;transform:scale(.65);animation-delay:-19s;opacity:.6}
+.hills{position:absolute;inset:0;pointer-events:none}
+.mountain{position:absolute;left:-5%;width:110%;bottom:0}
+.mountain.far{height:44%;background:#52627b;opacity:.57;
+  clip-path:polygon(0 73%,12% 43%,21% 62%,37% 12%,50% 55%,67% 22%,
+  81% 59%,92% 36%,100% 59%,100% 100%,0 100%)}
+.mountain.middle{height:33%;background:#263e5b;
+  clip-path:polygon(0 58%,14% 27%,27% 57%,42% 18%,58% 53%,75% 14%,
+  88% 50%,100% 32%,100% 100%,0 100%)}
+.mountain.near{height:21%;background:#0b1c31;
+  clip-path:polygon(0 38%,17% 52%,31% 23%,48% 47%,65% 20%,
+  82% 44%,100% 26%,100% 100%,0 100%)}
+.content{
+  position:relative;z-index:2;width:min(710px,100%);
+  text-align:center;padding:18px 0
+}
+.brand{display:inline-flex;align-items:center;justify-content:center;gap:11px;
+  color:var(--gold);font-size:12px;font-weight:800;letter-spacing:3px}
+.logo{width:42px;height:42px;border:1px solid rgba(237,200,120,.75);
+  border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(145deg,rgba(24,45,71,.92),rgba(7,20,38,.92));
+  box-shadow:0 7px 24px rgba(0,0,0,.12)}
+.kicker{margin:27px 0 13px;font-size:11px;letter-spacing:3px;
+  text-transform:uppercase;font-weight:800;color:#f0dfc7}
+h1{margin:0;font-size:clamp(38px,7.4vw,70px);line-height:1.04;
+  letter-spacing:-2px;font-weight:850;text-shadow:0 4px 24px rgba(0,0,0,.15)}
+h1 span{display:block;color:#ffe0a0}
+.rule{width:66px;height:3px;border-radius:9px;margin:24px auto 19px;
+  background:linear-gradient(90deg,#b98a45,#ffe5a7,#b98a45)}
+.description{max-width:540px;margin:0 auto;color:#eef1f7;
+  font-size:clamp(14px,2.2vw,17px);line-height:1.8;
+  text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.status{display:inline-flex;align-items:center;gap:9px;margin-top:23px;
+  padding:10px 15px;border:1px solid rgba(255,231,184,.38);
+  border-radius:999px;background:rgba(9,20,38,.36);
+  color:#fff1d0;font-size:12px;backdrop-filter:blur(8px)}
+.dot{width:7px;height:7px;border-radius:50%;background:#ffe0a0;
+  box-shadow:0 0 0 5px rgba(255,224,160,.12);animation:pulse 2s ease-in-out infinite}
+.progress{height:4px;width:min(300px,75%);overflow:hidden;border-radius:8px;
+  margin:21px auto 0;background:rgba(9,20,38,.38)}
+.progress:after{content:"";display:block;width:35%;height:100%;
+  border-radius:8px;background:linear-gradient(90deg,#b98a45,#fff0b9);
+  animation:progress 3.4s ease-in-out infinite alternate}
+.info-btn{position:absolute;z-index:5;right:20px;top:20px;width:46px;height:46px;
+  border:1px solid rgba(255,226,166,.8);border-radius:50%;
+  background:rgba(8,20,38,.7);color:#ffe1a0;font-size:23px;font-weight:800;
+  display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(8px);
+  transition:transform .2s,background .2s}
+.info-btn:hover{transform:translateY(-2px);background:rgba(26,46,72,.92)}
+.dev-btn{margin-top:22px;padding:11px 17px;border:1px solid rgba(255,226,166,.48);
+  border-radius:10px;color:#fff2d5;background:rgba(8,20,38,.48);
+  font-size:12px;cursor:pointer;backdrop-filter:blur(8px);transition:.2s}
+.dev-btn:hover{background:rgba(8,20,38,.75);border-color:#ffe1a0}
+.footer{position:absolute;z-index:4;bottom:15px;left:15px;right:15px;
+  text-align:center;font-size:11px;letter-spacing:.4px;color:rgba(239,241,248,.8)}
+.modal-backdrop{position:fixed;inset:0;z-index:10;display:none;align-items:center;
+  justify-content:center;padding:18px;background:rgba(2,8,18,.78);
+  backdrop-filter:blur(10px)}
 .modal-backdrop.open{display:flex}
 .modal{width:min(510px,100%);max-height:85vh;max-height:85dvh;overflow:auto;
-border:1px solid #344862;border-radius:20px;
-background:linear-gradient(155deg,#15263c,#0b1728 75%);
-box-shadow:0 25px 90px rgba(0,0,0,.5);padding:24px;text-align:left}
+  border:1px solid #40526b;border-radius:20px;
+  background:linear-gradient(155deg,#172b44,#091628 80%);
+  box-shadow:0 25px 90px rgba(0,0,0,.5);padding:24px;text-align:left}
 .modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .modal-kicker{color:var(--gold);font-size:10px;letter-spacing:2px;font-weight:800}
 .modal h2{font-size:25px;letter-spacing:-.5px;margin:8px 0 0}
-.close{width:36px;height:36px;flex:none;border:1px solid #344862;border-radius:50%;
-color:#e7edf5;background:#102038;font-size:22px;cursor:pointer}
+.close{width:36px;height:36px;flex:none;border:1px solid #40526b;
+  border-radius:50%;color:#e7edf5;background:#102038;font-size:22px;cursor:pointer}
 .modal-intro{color:#bdc9d9;line-height:1.75;font-size:14px;margin:17px 0 20px}
 .detail{padding:14px 0;border-top:1px solid rgba(145,169,198,.16)}
 .detail h3{font-size:13px;color:#f1d8a5;margin:0 0 7px}
-.detail p{font-size:13px;color:#aebdd0;line-height:1.75;margin:0}
-.modal-foot{margin-top:17px;color:#71849d;font-size:11px}
-@keyframes pulse{50%{opacity:.45;box-shadow:0 0 0 8px rgba(232,196,122,.02)}}
-@keyframes progress{from{transform:translateX(-10%)}to{transform:translateX(175%)}}
-@keyframes wave{from{transform:translateX(-2%) rotate(-3deg)}
-to{transform:translateX(5%) rotate(2deg)}}
-@media(max-width:480px){
-.page{padding:78px 20px 55px}.info-btn{right:15px;top:15px}
-.brand{font-size:10px;letter-spacing:2px}.brand-mark{width:31px;height:31px}
-.eyebrow{font-size:10px;letter-spacing:2px;margin-top:26px}
-h1{letter-spacing:-1.4px}.description{line-height:1.7}
-.waves{height:145px}.modal{padding:20px;border-radius:16px}
+.detail p{font-size:13px;color:#b8c6d8;line-height:1.75;margin:0}
+.modal-foot{margin-top:17px;color:#8294ab;font-size:11px}
+@keyframes sky-cycle{
+  0%,100%{background:linear-gradient(180deg,#07132b 0%,#182b50 54%,#4c456b 100%)}
+  12%{background:linear-gradient(180deg,#17264a 0%,#5b6082 48%,#e6a084 100%)}
+  25%{background:linear-gradient(180deg,#4386bd 0%,#8ecbdf 55%,#f4d4a4 100%)}
+  50%{background:linear-gradient(180deg,#2376b4 0%,#79c4e1 57%,#f3d49d 100%)}
+  68%{background:linear-gradient(180deg,#594b82 0%,#d78491 52%,#f4b27f 100%)}
+  82%{background:linear-gradient(180deg,#111a3c 0%,#29395f 54%,#7d607a 100%)}
+}
+@keyframes orbit-cycle{from{transform:translate(-50%,-50%) rotate(0deg)}
+  to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes star-cycle{0%,20%,50%{opacity:0}70%{opacity:.3}85%,100%{opacity:.95}}
+@keyframes cloud-drift{from{margin-left:0}to{margin-left:calc(100vw + 360px)}}
+@keyframes pulse{50%{opacity:.55;box-shadow:0 0 0 8px rgba(255,224,160,.03)}}
+@keyframes progress{from{transform:translateX(-5%)}to{transform:translateX(205%)}}
+@media(max-width:520px){
+  .page{padding:76px 20px 54px}
+  .brand{font-size:10px;letter-spacing:2px}
+  .logo{width:37px;height:37px}
+  .kicker{font-size:9px;letter-spacing:1.7px;margin-top:24px}
+  h1{letter-spacing:-1.3px}
+  .description{line-height:1.7}
+  .orbit{top:65%;width:95vw;height:95vw}
+  .mountain.far{height:36%}
+  .mountain.middle{height:27%}
+  .mountain.near{height:18%}
+  .info-btn{right:14px;top:14px;width:42px;height:42px}
+  .modal{padding:20px;border-radius:16px}
+}
+@media(max-height:600px) and (min-width:521px){
+  .page{padding-top:58px;padding-bottom:45px}
+  .kicker{margin-top:15px}
+  .rule{margin:15px auto}
+  .status{margin-top:15px}
+  .progress{margin-top:14px}
+  .dev-btn{margin-top:14px}
 }
 @media(prefers-reduced-motion:reduce){
-*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;
-scroll-behavior:auto!important;transition:none!important}
+  .scene,.stars,.orbit,.cloud,.dot,.progress:after{animation:none!important}
+  .scene{background:linear-gradient(180deg,#142342,#365779 58%,#b17e7d)}
 }
 </style>
 </head>
 <body>
 <main class="page">
-<div class="sky-scene" aria-hidden="true">
-  <div class="sky-stars"></div>
-  <div class="cloud c1"></div>
-  <div class="cloud c2"></div>
-  <div class="orbit">
-    <span class="celestial sun"></span>
-    <span class="celestial moon"></span>
+<div class="scene" aria-hidden="true">
+  <div class="stars"></div>
+  <div class="cloud a"></div><div class="cloud b"></div><div class="cloud c"></div>
+  <div class="orbit"><span class="sun"></span><span class="moon"></span></div>
+  <div class="hills">
+    <div class="mountain far"></div>
+    <div class="mountain middle"></div>
+    <div class="mountain near"></div>
   </div>
-  <div class="mountain back"></div>
-  <div class="mountain mid"></div>
-  <div class="mountain front"></div>
 </div>
-<div class="glow"></div><div class="grid"></div>
-<button class="info-btn" id="infoBtn" type="button" aria-label="Information about this page"
-title="About this page">i</button>
+<button class="info-btn" id="infoBtn" type="button"
+  aria-label="Information about this page" title="About this page">i</button>
 <section class="content" aria-labelledby="heading">
-<div class="brand"><span class="brand-mark" role="img" aria-label="UPSC Gurukul logo">
-<svg viewBox="0 0 48 48" width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-<path d="M8 18 24 7 40 18" stroke="#E8C47A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M12 20H36M15 20V32M22 20V32M29 20V32M36 20V32M10 35H38" stroke="#E8C47A" stroke-width="2" stroke-linecap="round"/>
-<path d="M24 13C19 17 20 22 24 24C28 22 29 17 24 13Z" fill="#FFE6A5"/>
-<path d="M18 39H30" stroke="#E8C47A" stroke-width="2" stroke-linecap="round"/>
-</svg>
-</span><span>UPSC GURUKUL</span></div>
-<p class="eyebrow">A better learning experience is being prepared</p>
-<h1 id="heading">Under <span>Construction</span></h1>
-<div class="rule"></div>
-<p class="description">We’re working behind the scenes to prepare this page.
-The public experience is temporarily unavailable while development is in progress.</p>
-<div class="status"><span class="dot"></span><span>Development in progress</span></div>
-<div class="progress" aria-hidden="true"></div>
-<button class="dev-btn" id="devBtn" type="button">Developer Access ↗</button>
+  <div class="brand">
+    <span class="logo" role="img" aria-label="UPSC Gurukul logo">
+      <svg viewBox="0 0 48 48" width="30" height="30" fill="none"
+        xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M7 18 24 6 41 18" stroke="#EDC878" stroke-width="2.3"
+          stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M11 20H37M14 20V32M21 20V32M28 20V32M35 20V32M9 35H39"
+          stroke="#EDC878" stroke-width="2" stroke-linecap="round"/>
+        <path d="M24 12C19 17 20 22 24 24C28 22 29 17 24 12Z" fill="#FFE6A5"/>
+        <path d="M18 39H30" stroke="#EDC878" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span>UPSC GURUKUL</span>
+  </div>
+  <p class="kicker">A better learning experience is being prepared</p>
+  <h1 id="heading">Under <span>Construction</span></h1>
+  <div class="rule"></div>
+  <p class="description">We’re working behind the scenes to prepare this page.
+    The public experience is temporarily unavailable while development is in progress.</p>
+  <div class="status"><span class="dot"></span><span>Development in progress</span></div>
+  <div class="progress" aria-hidden="true"></div>
+  <button class="dev-btn" id="devBtn" type="button">Developer Access ↗</button>
 </section>
-<div class="waves" aria-hidden="true"><div class="wave one"></div>
-<div class="wave two"></div><div class="wave three"></div></div>
 <footer class="footer">2026 @ Pratyush.dev inc</footer>
 </main>
 <div class="modal-backdrop" id="infoModal" role="dialog" aria-modal="true"
-aria-labelledby="modalTitle">
-<section class="modal">
-<div class="modal-head"><div><div class="modal-kicker">PAGE INFORMATION</div>
-<h2 id="modalTitle">What does this page mean?</h2></div>
-<button class="close" id="closeModal" type="button" aria-label="Close information">×</button>
-</div>
-<p class="modal-intro">You are viewing the temporary development screen for UPSC Gurukul.
-This screen appears instead of the normal page while the website is being worked on.</p>
-<div class="detail"><h3>Why am I seeing this?</h3>
-<p>The website is currently in development mode. The regular public page is being
-kept out of view during this period.</p></div>
-<div class="detail"><h3>What is happening now?</h3>
-<p>Development work and checks are in progress. Some features or pages may not yet
-be available, and the finished experience may look different from this screen.</p></div>
-<div class="detail"><h3>What should I do?</h3>
-<p>You can close this information panel and remain on this status page. When the
-public site is ready, this temporary screen can be removed by the site administrator.</p></div>
-<div class="modal-foot">UPSC Gurukul · Development status · 2026 @ Pratyush.dev inc</div>
-</section>
+  aria-labelledby="modalTitle">
+  <section class="modal">
+    <div class="modal-head"><div>
+      <div class="modal-kicker">PAGE INFORMATION</div>
+      <h2 id="modalTitle">What does this page mean?</h2>
+    </div><button class="close" id="closeModal" type="button"
+      aria-label="Close information">×</button></div>
+    <p class="modal-intro">You are viewing the temporary development screen for
+      UPSC Gurukul. It appears instead of the normal page while this website is
+      being worked on.</p>
+    <div class="detail"><h3>Why am I seeing this?</h3>
+      <p>The website is currently in development mode. The regular public page is
+        being kept out of view during this period.</p></div>
+    <div class="detail"><h3>What is happening now?</h3>
+      <p>Development work and checks are in progress. Some pages or features may
+        not yet be available, and the finished experience may change.</p></div>
+    <div class="detail"><h3>What should I do?</h3>
+      <p>You can close this panel and remain on this status screen. The site
+        administrator can restore the public experience when the site is ready.</p></div>
+    <div class="modal-foot">UPSC Gurukul · Development status · 2026 @ Pratyush.dev inc</div>
+  </section>
 </div>
 <script>
 (function(){
@@ -271,8 +304,13 @@ public site is ready, this temporary screen can be removed by the site administr
   });
   dev.addEventListener("click",function(){
     dev.disabled=true;
-    dev.textContent="Opening developer portal…";
-    window.location.replace("/base.html?v=4");
+    dev.textContent="Checking developer access…";
+    try{
+      parent.postMessage({type:"UG_PRIVATE_DEBUG_UNLOCK"},location.origin);
+    }catch(_){
+      dev.disabled=false;
+      dev.textContent="Developer Access ↗";
+    }
   });
 })();
 <\/script>
@@ -282,15 +320,11 @@ public site is ready, this temporary screen can be removed by the site administr
     document.documentElement.appendChild(frame);
   }
 
-  function removeScreen() {
-    document.getElementById(ID)?.remove();
-  }
-
-  window.addEventListener("message", async event => {
+  window.addEventListener("message", async function (event) {
     if (event.origin !== location.origin) return;
     if (event.data?.type !== "UG_PRIVATE_DEBUG_UNLOCK") return;
 
-    if (!(await enabled())) {
+    if (!(await debugEnabled())) {
       sessionStorage.removeItem("ugPrivateDebugSession");
       removeScreen();
       return;
@@ -298,24 +332,27 @@ public site is ready, this temporary screen can be removed by the site administr
 
     sessionStorage.setItem("ugPrivateDebugSession", "active");
     removeScreen();
+
+    // Release the early loading cover only after access is verified.
+    document.getElementById("ug-early-lockdown-cover")?.remove();
   });
 
-  if (await enabled()) {
+  if (await debugEnabled()) {
     if (sessionStorage.getItem("ugPrivateDebugSession") !== "active") {
-      showScreen();
+      buildScreen();
+    } else {
+      document.getElementById("ug-early-lockdown-cover")?.remove();
     }
   } else {
     sessionStorage.removeItem("ugPrivateDebugSession");
     removeScreen();
   }
 
-  // Re-check the public switch periodically, as before.
-  setInterval(async () => {
-    if (!(await enabled())) {
+  // Re-check the public switch. If it is turned off, revoke the debug session.
+  setInterval(async function () {
+    if (!(await debugEnabled())) {
       sessionStorage.removeItem("ugPrivateDebugSession");
       removeScreen();
     }
   }, 5000);
 })();
-
-
