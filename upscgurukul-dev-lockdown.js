@@ -35,7 +35,7 @@
 <style>
 :root{color-scheme:dark;--gold:#e8c47a;--muted:#a8b6ca;--panel:#111f33}
 /* UG-CINEMATIC-SCENERY */
-.sky-scene{position:absolute;inset:0;z-index:-3;overflow:hidden;
+.sky-scene{position:absolute;inset:0;z-index:0;overflow:hidden;
 background:linear-gradient(180deg,#07152c 0%,#183c60 44%,#e59a75 100%);
 animation:sky-cycle 36s ease-in-out infinite alternate}
 .sky-stars{position:absolute;inset:0;opacity:.85;
@@ -113,12 +113,12 @@ pointer-events:none}
 background-image:linear-gradient(rgba(155,187,222,.13) 1px,transparent 1px),
 linear-gradient(90deg,rgba(155,187,222,.13) 1px,transparent 1px);
 background-size:42px 42px;mask-image:linear-gradient(to bottom,black,transparent 90%)}
-.info-btn{position:absolute;right:20px;top:20px;width:46px;height:46px;
+.info-btn{position:absolute;z-index:4;right:20px;top:20px;width:46px;height:46px;
 border-radius:50%;border:1px solid rgba(232,196,122,.65);
 background:rgba(17,31,51,.9);color:var(--gold);font-size:23px;font-weight:700;
 cursor:pointer;display:grid;place-items:center;transition:.2s}
 .info-btn:hover{background:#263b56;transform:translateY(-2px)}
-.content{width:min(720px,100%);text-align:center;padding:22px 0 12px}
+.content{position:relative;z-index:2;width:min(720px,100%);text-align:center;padding:22px 0 12px}
 .brand{display:inline-flex;align-items:center;gap:10px;color:var(--gold);
 font-size:12px;font-weight:800;letter-spacing:3px}
 .brand-mark{width:35px;height:35px;border:1px solid rgba(232,196,122,.6);
@@ -144,7 +144,7 @@ background:#1b2b40;overflow:hidden}
 .progress:after{content:"";display:block;width:38%;height:100%;
 background:linear-gradient(90deg,#a87837,#ffe5a7);
 border-radius:8px;animation:progress 2.8s ease-in-out infinite alternate}
-.waves{position:absolute;z-index:-1;left:0;right:0;bottom:-2px;height:190px;
+.waves{position:absolute;z-index:1;left:0;right:0;bottom:-2px;height:190px;
 overflow:hidden;pointer-events:none;opacity:.82}
 .wave{position:absolute;left:-30%;width:160%;height:150px;bottom:-42px;
 border-radius:44% 56% 0 0 / 23% 28% 0 0;transform:rotate(-3deg)}
@@ -154,7 +154,7 @@ animation:wave 12s ease-in-out infinite alternate}
 animation:wave 9s ease-in-out infinite alternate-reverse}
 .wave.three{bottom:-88px;background:linear-gradient(180deg,rgba(20,47,76,.6),#081321);
 animation:wave 14s ease-in-out infinite alternate}
-.footer{position:absolute;bottom:16px;left:15px;right:15px;text-align:center;
+.footer{position:absolute;z-index:3;bottom:16px;left:15px;right:15px;text-align:center;
 font-size:11px;letter-spacing:.4px;color:#71849d}
 .dev-btn{margin-top:21px;padding:10px 16px;border:1px solid #344a65;
 border-radius:10px;color:#d8e4f3;background:rgba(15,29,47,.82);
@@ -213,7 +213,14 @@ scroll-behavior:auto!important;transition:none!important}
 <button class="info-btn" id="infoBtn" type="button" aria-label="Information about this page"
 title="About this page">i</button>
 <section class="content" aria-labelledby="heading">
-<div class="brand"><span class="brand-mark">ग</span><span>UPSC GURUKUL</span></div>
+<div class="brand"><span class="brand-mark" role="img" aria-label="UPSC Gurukul logo">
+<svg viewBox="0 0 48 48" width="30" height="30" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<path d="M8 18 24 7 40 18" stroke="#E8C47A" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M12 20H36M15 20V32M22 20V32M29 20V32M36 20V32M10 35H38" stroke="#E8C47A" stroke-width="2" stroke-linecap="round"/>
+<path d="M24 13C19 17 20 22 24 24C28 22 29 17 24 13Z" fill="#FFE6A5"/>
+<path d="M18 39H30" stroke="#E8C47A" stroke-width="2" stroke-linecap="round"/>
+</svg>
+</span><span>UPSC GURUKUL</span></div>
 <p class="eyebrow">A better learning experience is being prepared</p>
 <h1 id="heading">Under <span>Construction</span></h1>
 <div class="rule"></div>
@@ -310,4 +317,5 @@ public site is ready, this temporary screen can be removed by the site administr
     }
   }, 5000);
 })();
+
 
