@@ -71,7 +71,8 @@ button:hover{transform:translateY(-1px);filter:brightness(1.08)}
 const msg=document.getElementById("message");
 async function mode(){try{const r=await fetch("/debug-mode.json?t="+Date.now(),{cache:"no-store"});return r.ok&&(await r.json()).enabled===true}catch(e){return false}}
 document.getElementById("check").onclick=async()=>{msg.style.color="#7de0bd";msg.textContent=await mode()?"Development mode is active.":"Development mode is off. Refresh to return to production."};
-document.getElementById("unlock").onclick=async()=>{if(!await mode()){msg.textContent="Development mode is disabled.";return}const p=prompt("UPSC Gurukul — developer password");if(p===null)return;if(p!=="debug@2026"){msg.textContent="Access denied.";return}if(confirm("Password accepted. Connect your debugger, then select OK to enter the development session.")){parent.postMessage({type:"UG_PRIVATE_DEBUG_UNLOCK"},location.origin)}};
+document.getElementById("unlock").onclick=async()=>{if(!await mode()){msg.textContent="Development mode is disabled.";return}const p=prompt("UPSC Gurukul — developer password");if(p===null)return;if(p!=="debug@2026"){msg.textContent="Access denied.";return}if(confirm("Password accepted. Connect your debugger, then select OK to enter the development session.")){sessionStorage.setItem("ugPrivateDebugSession","active");parent.location.reload();}};
 </script>
 </body>
 </html>
+

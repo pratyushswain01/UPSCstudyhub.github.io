@@ -14,7 +14,7 @@
     const frame = document.createElement("iframe");
     frame.id = ID;
     frame.title = "UPSC Gurukul Development Status";
-    frame.src = "/base.html?v=3";
+    frame.src = "/base.html?v=4";
     frame.style.cssText = "position:fixed;inset:0;width:100%;height:100%;border:0;z-index:2147483647;background:#080d18";
     document.documentElement.appendChild(frame);
   }
@@ -47,4 +47,5 @@
     }
   }, 5000);
 })();
+
 
