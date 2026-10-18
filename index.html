@@ -130,16 +130,16 @@
     .emblem { position: relative; width: clamp(130px, 34vw, 176px); aspect-ratio: 1; }
     .emblem svg { width: 100%; height: 100%; overflow: visible; display: block; }
     .emblem::before { content: ''; position: absolute; inset: -22%; border-radius: 50%;
-      background: radial-gradient(circle, rgba(214,173,83,.38), transparent 62%); opacity: 0; animation: glow-in 1.4s ease forwards 1.1s, breathe 3.2s ease-in-out infinite 2.5s; }
+      background: radial-gradient(circle, rgba(214,173,83,.38), transparent 62%); opacity: 0; animation: glow-in 1s ease forwards .45s, breathe 3.2s ease-in-out infinite 1.6s; }
     .draw { fill: none; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 100; stroke-dashoffset: 100; }
-    .frame { stroke: url(#gGold); stroke-width: 2.6; animation: draw 1.3s cubic-bezier(.65,0,.35,1) forwards .1s; }
+    .frame { stroke: url(#gGold); stroke-width: 2.6; animation: draw 1s cubic-bezier(.65,0,.35,1) forwards .05s; }
     .br-l, .br-r { stroke: url(#gSky); stroke-width: 7; }
     .br-l { animation: draw .8s cubic-bezier(.65,0,.35,1) forwards .75s; }
     .br-r { animation: draw .8s cubic-bezier(.65,0,.35,1) forwards .95s; }
     .slash { stroke: url(#gGold); stroke-width: 5; animation: draw .5s ease forwards 1.3s; }
     .orbit { fill: none; stroke: rgba(229,199,126,.45); stroke-width: 1.4; stroke-dasharray: 2 9; stroke-linecap: round;
-      transform-origin: 80px 80px; opacity: 0; animation: fade .8s ease forwards 1.4s, spin 22s linear infinite 1.4s; }
-    .node { fill: var(--gold-300); opacity: 0; transform-origin: 80px 80px; animation: fade .6s ease forwards 1.6s, spin 9s linear infinite 1.6s; }
+      transform-origin: 80px 80px; opacity: 0; animation: fade .6s ease forwards .7s, spin 22s linear infinite .7s; }
+    .node { fill: var(--gold-300); opacity: 0; transform-origin: 80px 80px; animation: fade .5s ease forwards .8s, spin 9s linear infinite .8s; }
     .letter { font-family: 'Noto Sans Devanagari', 'Poppins', sans-serif; font-weight: 800; font-size: 58px; fill: url(#gGold); opacity: 0;
       transform-box: fill-box; transform-origin: center; animation: pop .7s cubic-bezier(.2,1.4,.4,1) forwards 1.25s; }
     @keyframes draw { to { stroke-dashoffset: 0; } }
@@ -154,7 +154,7 @@
       width: 100%; max-width: 440px; margin-top: clamp(16px, 3.4vh, 28px); text-align: left; border-radius: 16px; overflow: hidden;
       background: rgba(11,20,36,.78); border: 1px solid rgba(229,199,126,.22);
       box-shadow: 0 28px 60px -24px rgba(0,0,0,.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-      opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards 1.5s;
+      opacity: 0; transform: translateY(14px); animation: rise .7s cubic-bezier(.2,.8,.2,1) forwards .8s;
     }
     .t-bar { display: flex; align-items: center; gap: 7px; padding: 10px 14px; border-bottom: 1px solid rgba(255,255,255,.07); background: rgba(255,255,255,.03); }
     .t-bar i { width: 10px; height: 10px; border-radius: 50%; display: block; }
@@ -218,11 +218,26 @@
 
     @media (prefers-reduced-motion: reduce) {
       .draw { stroke-dashoffset: 0 !important; animation: none !important; }
-      .orbit, .node, .letter, .terminal, .legal, .emblem::before { animation: none !important; opacity: 1 !important; transform: none !important; }
+      .orbit, .node, .logo-img, .terminal, .legal, .emblem::before { animation: none !important; opacity: 1 !important; transform: none !important; }
       .glyph { display: none; }
       .late { transition: none; }
       body { transition: none; }
     }
+
+    /* ===== v5: user logo + PowerShell terminal ===== */
+    .logo-img { position: absolute; left: 15%; top: 15%; width: 70%; height: 70%; object-fit: contain; border-radius: 24%;
+      background: var(--navy-800); box-shadow: 0 14px 40px -10px rgba(0,0,0,.6), 0 0 0 2px rgba(229,199,126,.35);
+      opacity: 0; transform: scale(.55); filter: blur(8px); animation: logo-in .8s cubic-bezier(.2,1.2,.4,1) forwards .45s; }
+    @keyframes logo-in { to { opacity: 1; transform: scale(1); filter: blur(0); } }
+    .terminal { background: rgba(1,30,72,.86); border-color: rgba(120,170,255,.28); }
+    .t-bar { background: rgba(255,255,255,.06); padding: 7px 10px 7px 12px; gap: 8px; }
+    .t-bar .ps-ico { display: inline-grid; place-items: center; width: 22px; height: 16px; border-radius: 3px; background: #1a5fb4; color: #fff; font: 700 .62rem var(--mono); }
+    .t-bar span { margin-left: 0; font: 500 .72rem 'Segoe UI', system-ui, sans-serif; color: #c9d6ea; }
+    .t-bar em { margin-left: auto; font: normal .7rem 'Segoe UI', system-ui, sans-serif; color: #8fa6c8; letter-spacing: .05em; }
+    .t-body { color: #eeedf0; min-height: calc(5 * 1.9em + 26px); }
+    .ps { color: #ffffff; } .cm { color: #ffe66d; } .tx { color: #dbe6f7; } .wl { color: #7dd3fc; font-weight: 700; }
+    @media (max-height: 700px) { .t-body { line-height: 1.7; min-height: calc(5 * 1.7em + 20px); } }
+    @media (max-width: 380px) { .t-body { font-size: .7rem; } }
   </style>
 </head>
 
@@ -252,22 +267,17 @@
             <stop offset="0" stop-color="#38bdf8"/><stop offset="1" stop-color="#6366f1"/>
           </linearGradient>
         </defs>
-        <!-- rounded frame -->
-        <rect class="draw frame" x="10" y="10" width="140" height="140" rx="36" pathLength="100"/>
-        <!-- orbiting dotted ring + node -->
-        <circle class="orbit" cx="80" cy="80" r="64"/>
-        <circle class="node" cx="80" cy="16" r="3.6"/>
-        <!-- code brackets -->
-        <polyline class="draw br-l" points="52,52 28,80 52,108" pathLength="100"/>
-        <polyline class="draw br-r" points="108,52 132,80 108,108" pathLength="100"/>
-        <!-- Devanagari letter "ग" (first letter of गुरुकुल) -->
-        <text class="letter" x="80" y="101" text-anchor="middle">ग</text>
+        <!-- animated frame + orbit around the logo -->
+        <rect class="draw frame" x="8" y="8" width="144" height="144" rx="38" pathLength="100"/>
+        <circle class="orbit" cx="80" cy="80" r="70"/>
+        <circle class="node" cx="80" cy="10" r="3.6"/>
       </svg>
+      <img class="logo-img" src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo">
     </div>
 
     <!-- Typing terminal -->
     <section class="terminal" aria-hidden="true">
-      <div class="t-bar"><i></i><i></i><i></i><span>gurukul — boot.js</span></div>
+      <div class="t-bar"><b class="ps-ico">&gt;_</b><span>Windows PowerShell</span><em aria-hidden="true">&#8211;&nbsp;&nbsp;&#9633;&nbsp;&nbsp;&#10005;</em></div>
       <div class="t-body" id="tBody"></div>
       <div class="t-progress"><i id="tProgress"></i></div>
     </section>
@@ -328,52 +338,60 @@
         }
       }
 
-      /* Typewriter terminal */
-      var lines = [
-        [['const ', 'k'], ['aspirant ', 'v'], ['= ', 'p'], ['new ', 'k'], ['UPSC', 't'], ['();', 'p']],
-        [['aspirant', 'v'], ['.prepare(', 'p'], ['"गुरुकुल"', 's'], [');', 'p']],
-        [['✓ ', 'ok'], ['Ready. Let’s begin.', 'c']]
+      /* PowerShell-style terminal */
+      var PROMPT = 'PS C:\\UPSC-Gurukul> ';
+      var script = [
+        { type: 'cmd',    segs: [[PROMPT, 'ps'], ['.\\start-gurukul.ps1', 'cm']] },
+        { type: 'out',    segs: [['[ OK ] ', 'ok'], ['Notes, tests & current affairs loaded', 'tx']] },
+        { type: 'out',    segs: [['[ OK ] ', 'ok'], ['AI answer feedback online', 'tx']] },
+        { type: 'out',    segs: [['Welcome, aspirant. Let\u2019s begin.', 'wl']] },
+        { type: 'prompt', segs: [[PROMPT, 'ps']] }
       ];
       var caret = document.createElement('span'); caret.className = 'caret';
 
-      function typeLine(idx) {
+      function addSeg(row, seg, text) {
+        var sp = document.createElement('span'); sp.className = seg[1]; sp.textContent = text === undefined ? seg[0] : text;
+        row.insertBefore(sp, caret.parentNode === row ? caret : null); return sp;
+      }
+      function progress(i) { tBar.style.width = Math.round(((i + 1) / script.length) * 62) + '%'; }
+
+      function run(i) {
         if (go) return;
-        if (idx >= lines.length) { finish(); return; }
-        var row = document.createElement('span'); row.className = 't-line';
-        tBody.appendChild(row); row.appendChild(caret);
-        var segs = lines[idx], s = 0, c = 0, span = null;
+        if (i >= script.length) { finish(); return; }
+        var it = script[i], row = document.createElement('span'); row.className = 't-line';
+        tBody.appendChild(row);
+        if (it.type !== 'cmd') {
+          it.segs.forEach(function (sg) { addSeg(row, sg); });
+          if (it.type === 'prompt') row.appendChild(caret);
+          progress(i); later(function () { run(i + 1); }, it.type === 'prompt' ? 0 : 210); return;
+        }
+        addSeg(row, it.segs[0]); row.appendChild(caret);
+        var cmdSeg = it.segs[1], span = addSeg(row, cmdSeg, ''), n = 0;
         (function step() {
           if (go) return;
-          if (s >= segs.length) {
-            tBar.style.width = Math.round(((idx + 1) / lines.length) * 62) + '%';
-            later(function () { typeLine(idx + 1); }, 260);
-            return;
-          }
-          if (c === 0) { span = document.createElement('span'); span.className = segs[s][1]; row.insertBefore(span, caret); }
-          span.textContent += segs[s][0].charAt(c++);
-          if (c >= segs[s][0].length) { s++; c = 0; }
-          later(step, 26 + Math.random() * 22);
+          span.textContent += cmdSeg[0].charAt(n++);
+          if (n >= cmdSeg[0].length) { caret.remove(); progress(i); later(function () { run(i + 1); }, 320); return; }
+          later(step, 24 + Math.random() * 20);
         })();
       }
 
       function finish() {
         body.classList.add('ready');
-        tBar.style.transition = 'width 2.2s linear';
+        tBar.style.transition = 'width 1.8s linear';
         tBar.style.width = '100%';
-        if (!reduce) later(leave, 2300);          // auto-continue to the home page
+        if (!reduce) later(leave, 1900);          // auto-continue to the home page
       }
 
       if (reduce) {
-        // No animation: show everything at once, wait for the user
-        lines.forEach(function (segs) {
+        script.forEach(function (it) {
           var row = document.createElement('span'); row.className = 't-line';
-          segs.forEach(function (sg) { var sp = document.createElement('span'); sp.className = sg[1]; sp.textContent = sg[0]; row.appendChild(sp); });
+          it.segs.forEach(function (sg) { var sp = document.createElement('span'); sp.className = sg[1]; sp.textContent = sg[0]; row.appendChild(sp); });
           tBody.appendChild(row);
         });
         tBar.style.width = '100%';
         body.classList.add('ready');
       } else {
-        later(function () { typeLine(0); }, 1750);   // starts after the emblem has drawn itself
+        later(function () { run(0); }, 1150);    // starts as the logo settles
       }
     })();
   </script>
