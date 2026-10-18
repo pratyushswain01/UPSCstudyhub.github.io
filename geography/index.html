@@ -195,7 +195,7 @@ html[data-rm="1"] *{transition:none!important;animation:none!important;scroll-be
 
 <nav class="top">
   <a class="brand" href="homeUPSChub.html"><img class="logo" src="https://upscgurukul.online/assets/upsc-gurukul-logo.png" alt="" onerror="this.remove()">UPSC गुरुकुल</a>
-  <a href="homeUPSChub.html">Home</a><a href="notes.html" class="on">Notes</a><a href="testinterface.html">Mock tests</a><a href="planner.html">Planner</a><a href="#/settings">Settings</a><a id="acct" class="btn" href="#/login">Log in</a>
+  <a href="upscgurukul.online/homeUPSChub.html">Home</a><a href="upscgurukul.online/notes.html" class="on">Notes</a><a href="testinterface.html">Mock tests</a><a href="planner.html">Planner</a><a href="#/settings">Settings</a><a id="acct" class="btn" href="#/login">Log in</a>
 </nav>
 <div class="appbar"><span class="brand"><img class="logo" src="https://upscgurukul.online/assets/upsc-gurukul-logo.png" alt="" onerror="this.remove()">Geography</span><a id="acct2" class="av" href="#/login" aria-label="Account">⏻</a></div>
 <div class="tick" id="tick"><div class="tk" id="tk"></div></div>
@@ -203,7 +203,7 @@ html[data-rm="1"] *{transition:none!important;animation:none!important;scroll-be
 <!-- LIST VIEW -->
 <main id="listView" class="wrap">
   <section class="hero">
-    <h1>Geography books, chapter by chapter</h1>
+    <h1>Geography Notes, chapter by chapter</h1>
     <p>NCERT Classes 8 to 11 and the two Majid Husain titles from McGraw Hill. Pick a book, choose a chapter, start reading.</p>
     <div class="tools">
       <input class="search" id="q" type="search" placeholder="Search a book or chapter, e.g. monsoon, drainage" aria-label="Search">
@@ -415,36 +415,268 @@ $('#setView').addEventListener('click',e=>{
   if(a&&a.dataset.act==='out')logout();
   if(a&&a.dataset.act==='reset'&&confirm('Clear all read marks on this device?')){try{localStorage.removeItem('geo-done');localStorage.removeItem('geo-last')}catch(x){}renderSettings()}});
 $('#setView').addEventListener('input',e=>{if(e.target.id==='fs'){SET.fs=+e.target.value;save();apply();e.target.closest('.srow').querySelector('small').textContent=SET.fs+'% of default'}});
-/* auth: paste your Firebase web config to switch on real accounts; empty = local demo mode */
-const FB={apiKey:'',authDomain:'',projectId:'',appId:''};
-let fb=null,user=null,mode='login';
-const ini=()=>user?esc(user.name[0].toUpperCase()):'';
-function paintAcct(){const a=$('#acct'),b=$('#acct2');
-  if(user){a.innerHTML=`<span class="av">${ini()}</span>`;a.className='';a.href='#/settings';b.textContent=ini();b.href='#/settings'}
-  else{a.textContent='Log in';a.className='btn';a.href='#/login';b.textContent='⏻';b.href='#/login'}}
-async function initAuth(){
-  if(FB.apiKey){try{const [A,U]=await Promise.all([import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js'),import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')]);
-    fb={U,auth:U.getAuth(A.initializeApp(FB))};U.onAuthStateChanged(fb.auth,u=>{user=u?{name:u.displayName||u.email.split('@')[0],email:u.email}:null;paintAcct()})}catch(e){}}
-  else{try{user=JSON.parse(localStorage.getItem('geo-user')||'null')}catch(e){}paintAcct()}
-  $('#dn').classList.toggle('hide',!!FB.apiKey)}
-async function logout(){try{if(fb)await fb.U.signOut(fb.auth);else localStorage.removeItem('geo-user')}catch(e){}user=null;paintAcct();renderSettings()}
-function setMode(m){mode=m;const L=m==='login';
-  document.querySelectorAll('#seg button').forEach(b=>b.classList.toggle('on',b.dataset.m===m));
-  $('#aT').textContent=L?'Welcome back':'Create your account';$('#aS').textContent=L?'Log in to continue your geography notes.':'Sign up to personalise your notes.';
-  $('#nmF').classList.toggle('hide',L);$('#go').textContent=L?'Log in':'Create account';$('#fgp').classList.toggle('hide',!L);$('#er').textContent=''}
-const err=m=>$('#er').textContent=m;
-const fr=x=>({'auth/invalid-credential':'Email or password is incorrect.','auth/email-already-in-use':'This email already has an account. Try logging in.','auth/weak-password':'Choose a stronger password.','auth/too-many-requests':'Too many attempts. Try again in a few minutes.'}[x&&x.code]||'Could not sign you in. Try again.');
-$('#seg').addEventListener('click',e=>{const b=e.target.closest('button');if(b)location.hash='#/'+b.dataset.m});
-$('#af').addEventListener('submit',async e=>{e.preventDefault();const f=new FormData(e.target),em=(f.get('email')||'').trim(),pw=f.get('pw')||'',nm=(f.get('name')||'').trim();err('');
-  if(!/^\S+@\S+\.\S+$/.test(em))return err('Enter a valid email address.');
-  if(pw.length<6)return err('Password must be at least 6 characters.');
-  try{if(fb){const U=fb.U;if(mode==='signup'){const c=await U.createUserWithEmailAndPassword(fb.auth,em,pw);if(nm)await U.updateProfile(c.user,{displayName:nm})}else await U.signInWithEmailAndPassword(fb.auth,em,pw)}
-    else{user={name:nm||em.split('@')[0],email:em};localStorage.setItem('geo-user',JSON.stringify(user));paintAcct()}
-    location.hash='#/'}catch(x){err(fr(x))}});
-$('#gb').onclick=async()=>{if(!fb)return err('Google sign-in needs your Firebase config.');try{await fb.U.signInWithPopup(fb.auth,new fb.U.GoogleAuthProvider());location.hash='#/'}catch(x){err(fr(x))}};
-$('#fgp').onclick=async()=>{const em=$('#af').email.value.trim();if(!/^\S+@\S+\.\S+$/.test(em))return err('Enter your email above first.');
-  if(!fb)return err('Password reset needs your Firebase config.');try{await fb.U.sendPasswordResetEmail(fb.auth,em);err('');alert('Password reset email sent.')}catch(x){err(fr(x))}};
-apply();initAuth();
+<script type="module">
+/* Firebase Authentication — UPSC Gurukul
+   Existing project: upscstudyhub-github
+*/
+import { initializeApp, getApps, getApp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+const FB = {
+  apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+  authDomain: "upscstudyhub-github.firebaseapp.com",
+  projectId: "upscstudyhub-github",
+  storageBucket: "upscstudyhub-github.firebasestorage.app",
+  messagingSenderId: "451692540885",
+  appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+};
+
+const app = getApps().length ? getApp() : initializeApp(FB);
+const auth = getAuth(app);
+
+let fb = { U: null, auth };
+let user = null;
+let mode = "login";
+
+fb.U = {
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup,
+  sendPasswordResetEmail,
+  sendEmailVerification,
+  signOut
+};
+
+const ini = () =>
+  user ? String(user.name || user.email || "U")[0].toUpperCase() : "";
+
+function paintAcct() {
+  const a = $("#acct");
+  const b = $("#acct2");
+
+  if (user) {
+    a.innerHTML = `<span class="av">${esc(ini())}</span>`;
+    a.className = "";
+    a.href = "#/settings";
+    b.textContent = ini();
+    b.href = "#/settings";
+  } else {
+    a.textContent = "Log in";
+    a.className = "btn";
+    a.href = "#/login";
+    b.textContent = "⏻";
+    b.href = "#/login";
+  }
+}
+
+function showAuthError(message) {
+  $("#er").textContent = message;
+}
+
+function firebaseError(error) {
+  const messages = {
+    "auth/invalid-credential":
+      "Incorrect email or password.",
+    "auth/user-not-found":
+      "No account found. Please sign up first.",
+    "auth/wrong-password":
+      "Incorrect email or password.",
+    "auth/email-already-in-use":
+      "This email already has an account. Please log in.",
+    "auth/weak-password":
+      "Choose a password with at least 6 characters.",
+    "auth/invalid-email":
+      "Please enter a valid email address.",
+    "auth/too-many-requests":
+      "Too many attempts. Please try again later.",
+    "auth/popup-closed-by-user":
+      "Google sign-in was cancelled.",
+    "auth/popup-blocked":
+      "Allow popups in your browser and try again.",
+    "auth/unauthorized-domain":
+      "Add this website to Firebase Authorized Domains.",
+    "auth/operation-not-allowed":
+      "Enable this sign-in method in Firebase Console.",
+    "auth/network-request-failed":
+      "Network error. Check your internet connection."
+  };
+
+  return messages[error?.code] ||
+    "Authentication failed. Please try again.";
+}
+
+async function initAuth() {
+  $("#dn").classList.add("hide");
+
+  onAuthStateChanged(auth, firebaseUser => {
+    user = firebaseUser
+      ? {
+          uid: firebaseUser.uid,
+          name: firebaseUser.displayName ||
+            firebaseUser.email?.split("@")[0] || "Aspirant",
+          email: firebaseUser.email,
+          emailVerified: firebaseUser.emailVerified
+        }
+      : null;
+
+    paintAcct();
+
+    if (location.hash === "#/settings") {
+      renderSettings();
+    }
+  });
+}
+
+async function logout() {
+  try {
+    await signOut(auth);
+    user = null;
+    paintAcct();
+    renderSettings();
+    location.hash = "#/";
+  } catch (error) {
+    alert(firebaseError(error));
+  }
+}
+
+function setMode(m) {
+  mode = m === "signup" ? "signup" : "login";
+  const login = mode === "login";
+
+  document.querySelectorAll("#seg button").forEach(button => {
+    button.classList.toggle("on", button.dataset.m === mode);
+  });
+
+  $("#aT").textContent =
+    login ? "Welcome back" : "Create your account";
+
+  $("#aS").textContent = login
+    ? "Log in to continue your geography notes."
+    : "Sign up to personalise your notes.";
+
+  $("#nmF").classList.toggle("hide", login);
+  $("#go").textContent = login ? "Log in" : "Create account";
+  $("#fgp").classList.toggle("hide", !login);
+  $("#er").textContent = "";
+}
+
+const err = showAuthError;
+
+$("#seg").addEventListener("click", event => {
+  const button = event.target.closest("button");
+  if (button) {
+    location.hash = "#/" + button.dataset.m;
+  }
+});
+
+$("#af").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  const form = new FormData(event.target);
+  const email = String(form.get("email") || "").trim();
+  const password = String(form.get("pw") || "");
+  const name = String(form.get("name") || "").trim();
+
+  err("");
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return err("Enter a valid email address.");
+  }
+
+  if (password.length < 6) {
+    return err("Password must contain at least 6 characters.");
+  }
+
+  const button = $("#go");
+  button.disabled = true;
+
+  try {
+    if (mode === "signup") {
+      const result = await createUserWithEmailAndPassword(
+        auth, email, password
+      );
+
+      if (name) {
+        await updateProfile(result.user, {
+          displayName: name
+        });
+      }
+
+      try {
+        await sendEmailVerification(result.user);
+        alert(
+          "Account created! Please check your email for verification."
+        );
+      } catch (verificationError) {
+        console.error("Verification email failed:", verificationError);
+        alert(
+          "Account created, but the verification email could not be sent. You can request it again later."
+        );
+      }
+    } else {
+      await signInWithEmailAndPassword(auth, email, password);
+    }
+
+    location.hash = "#/";
+  } catch (error) {
+    err(firebaseError(error));
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("#gb").addEventListener("click", async () => {
+  err("");
+
+  try {
+    const provider = new GoogleAuthProvider();
+    provider.setCustomParameters({
+      prompt: "select_account"
+    });
+
+    await signInWithPopup(auth, provider);
+    location.hash = "#/";
+  } catch (error) {
+    err(firebaseError(error));
+  }
+});
+
+$("#fgp").addEventListener("click", async () => {
+  const email = $("#af").elements.email.value.trim();
+
+  if (!/^\S+@\S+\.\S+$/.test(email)) {
+    return err("Enter your email address above first.");
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert(
+      "If an account exists for this address, a password-reset email will be sent."
+    );
+    err("");
+  } catch (error) {
+    err(firebaseError(error));
+  }
+});
+
+apply();
+initAuth();
 route();
 </script>
 </body>
