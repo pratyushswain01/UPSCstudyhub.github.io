@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   "use strict";
   if (window.__gurukulMitraLoaded) return;
   window.__gurukulMitraLoaded = true;
@@ -17,20 +17,20 @@
 
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = new URL("/gurukul-mitra.css", document.currentScript?.src || location.href).href;
+  css.href = new URL("/gurukul-mitra/gurukul-mitra.css", document.currentScript?.src || location.href).href;
   document.head.appendChild(css);
 
   const root = document.createElement("div");
   root.id = "gurukul-mitra-root";
   root.innerHTML = `
     <button class="gm-launcher" type="button" aria-label="Open Gurukul Mitra assistant" aria-expanded="false">
-      <span class="gm-mark" aria-hidden="true">âœ¦</span><span>Gurukul Mitra</span>
+      <span class="gm-mark" aria-hidden="true">Ã¢Å“Â¦</span><span>Gurukul Mitra</span>
     </button>
     <section class="gm-panel" role="dialog" aria-label="Gurukul Mitra AI assistant" aria-modal="false">
       <header class="gm-head">
-        <div class="gm-avatar" aria-hidden="true">âœ¦</div>
+        <div class="gm-avatar" aria-hidden="true">Ã¢Å“Â¦</div>
         <div class="gm-headcopy"><div class="gm-title">Gurukul Mitra</div><div class="gm-subtitle">Your UPSC study companion</div></div>
-        <button class="gm-close" type="button" aria-label="Close assistant">Ã—</button>
+        <button class="gm-close" type="button" aria-label="Close assistant">Ãƒâ€”</button>
       </header>
       <div class="gm-messages" aria-live="polite">
         <div class="gm-welcome"><strong>Namaste, Aspirant!</strong>Ask me about UPSC concepts, study strategy, or practise a quick quiz.</div>
@@ -42,8 +42,8 @@
         </div>
       </div>
       <form class="gm-compose">
-        <textarea class="gm-input" rows="1" maxlength="1800" placeholder="Ask your UPSC questionâ€¦" aria-label="Your question"></textarea>
-        <button class="gm-send" type="submit" aria-label="Send message">âž¤</button>
+        <textarea class="gm-input" rows="1" maxlength="1800" placeholder="Ask your UPSC questionÃ¢â‚¬Â¦" aria-label="Your question"></textarea>
+        <button class="gm-send" type="submit" aria-label="Send message">Ã¢Å¾Â¤</button>
       </form>
       <div class="gm-foot">AI answers can make mistakes. Verify important facts with trusted sources.</div>
     </section>`;
@@ -83,7 +83,7 @@
   function localFallback(text) {
     const q = text.toLowerCase();
     const found = fallbackAnswers.find(item => item.keys.some(k => q.includes(k)));
-    return found ? found.answer : "I can help with UPSC concepts, study plans, and practice quizzes. The AI service is currently unavailable. Try â€œmake a study planâ€, â€œCSAT tipsâ€, or â€œquiz meâ€.";
+    return found ? found.answer : "I can help with UPSC concepts, study plans, and practice quizzes. The AI service is currently unavailable. Try Ã¢â‚¬Å“make a study planÃ¢â‚¬Â, Ã¢â‚¬Å“CSAT tipsÃ¢â‚¬Â, or Ã¢â‚¬Å“quiz meÃ¢â‚¬Â.";
   }
   async function ask(text) {
     const message = text.trim();
@@ -92,7 +92,7 @@
     input.value = "";
     input.style.height = "auto";
     busy = true; send.disabled = true;
-    const pending = addMessage("assistant", "Thinkingâ€¦");
+    const pending = addMessage("assistant", "ThinkingÃ¢â‚¬Â¦");
     try {
       if (API_BASE.includes("REPLACE-WITH-YOUR-SUBDOMAIN")) throw new Error("AI endpoint not configured");
       const controller = new AbortController();
@@ -127,3 +127,4 @@
   input.addEventListener("input", () => { input.style.height = "auto"; input.style.height = `${Math.min(input.scrollHeight, 110)}px`; });
   root.querySelectorAll(".gm-suggestion").forEach(button => button.addEventListener("click", () => ask(button.textContent)));
 })();
+
