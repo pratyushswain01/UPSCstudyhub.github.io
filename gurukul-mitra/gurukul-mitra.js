@@ -22,11 +22,11 @@
       answer: "Practise comprehension, reasoning, and numeracy regularly. Track accuracy and time, then target the question types where you lose the most marks."
     },
     {
-      keys: ["study plan", "timetable", "schedule"],
+      keys: ["study plan", "timetable", "schedule", "build my study plan"],
       answer: "I can help make a realistic plan. Tell me your available hours, exam stage, and strongest and weakest subjects."
     },
     {
-      keys: ["quiz", "test me"],
+      keys: ["quiz", "test me", "test my knowledge"],
       answer: "Quick quiz: Fundamental Rights are in which part of the Indian Constitution? A) Part II  B) Part III  C) Part IV  D) Part IVA. Reply with A, B, C, or D."
     },
     {
@@ -34,7 +34,7 @@
       answer: "Effective revision uses spaced repetition, short notes, and active recall. Focus on weak areas first and interleave subjects rather than studying one topic for long stretches."
     },
     {
-      keys: ["concept", "explain"],
+      keys: ["concept", "explain", "learn a upsc concept"],
       answer: "Tell me the specific concept or topic you want explained, and I will break it down clearly with relevant examples for UPSC."
     }
   ];
@@ -69,20 +69,7 @@
         </div>
         <button class="gm-close" type="button" aria-label="Close assistant">×</button>
       </header>
-      <div class="gm-messages" aria-live="polite">
-        <div class="gm-welcome">
-          <strong>Namaste, Aspirant!</strong>
-          <p>Your learning companion for UPSC concepts, study strategy, revision, and practice.</p>
-        </div>
-        <div class="gm-suggestions">
-          <button class="gm-suggestion" type="button">Make a study plan</button>
-          <button class="gm-suggestion" type="button">Explain Prelims strategy</button>
-          <button class="gm-suggestion" type="button">Practise a quiz</button>
-          <button class="gm-suggestion" type="button">CSAT tips</button>
-          <button class="gm-suggestion" type="button">Explain a concept</button>
-          <button class="gm-suggestion" type="button">Help with revision</button>
-        </div>
-      </div>
+      <div class="gm-messages" aria-live="polite"></div>
       <form class="gm-compose">
         <textarea class="gm-input" rows="1" maxlength="1800" placeholder="Ask your UPSC question..." aria-label="Your question"></textarea>
         <button class="gm-send" type="submit" aria-label="Send message">↑</button>
@@ -107,11 +94,63 @@
   const messages = root.querySelector(".gm-messages");
 
   let busy = false;
+  let hasConversation = false; // tracks if any real user/assistant messages exist
+
+  // ---------- Welcome screen (first open only) ----------
+  function showWelcome() {
+    // Only show if no conversation has started
+    if (hasConversation || messages.querySelector(".gm-msg")) return;
+
+    // Clear any previous welcome (safety)
+    const existingWelcome = messages.querySelector(".gm-welcome");
+    if (existingWelcome) existingWelcome.remove();
+    const existingSuggestions = messages.querySelector(".gm-suggestions");
+    if (existingSuggestions) existingSuggestions.remove();
+
+    const welcome = document.createElement("div");
+    welcome.className = "gm-welcome";
+    welcome.innerHTML = `
+      <strong>Namaste, Aspirant!</strong>
+      <p>“Your journey to civil services starts with one good question. I'm Gurukul Mitra, your UPSC companion—here to help you learn, plan, practise, and move forward with confidence.”</p>
+      <p style="margin-top:10px;font-weight:600;color:var(--gm-accent-strong,#176b58);">What shall we work on today?</p>
+    `;
+
+    const suggestions = document.createElement("div");
+    suggestions.className = "gm-suggestions";
+
+    const chips = [
+      { label: "Learn a UPSC concept", prompt: "Explain an important UPSC concept clearly with examples." },
+      { label: "Build my study plan", prompt: "Help me build a realistic weekly study plan for UPSC." },
+      { label: "Test my knowledge", prompt: "Quiz me with a short UPSC-style question." },
+      { label: "Ask me anything", prompt: "I have a question about UPSC preparation." }
+    ];
+
+    chips.forEach((chip) => {
+      const btn = document.createElement("button");
+      btn.className = "gm-suggestion";
+      btn.type = "button";
+      btn.textContent = chip.label;
+      btn.addEventListener("click", () => {
+        // Remove welcome + chips once conversation starts
+        welcome.remove();
+        suggestions.remove();
+        ask(chip.prompt);
+      });
+      suggestions.appendChild(btn);
+    });
+
+    messages.appendChild(welcome);
+    messages.appendChild(suggestions);
+  }
 
   function setOpen(open) {
     panel.classList.toggle("gm-open", open);
     launcher.setAttribute("aria-expanded", String(open));
     if (open) {
+      // Show welcome only when panel opens and no conversation yet
+      if (!hasConversation) {
+        showWelcome();
+      }
       setTimeout(() => input.focus(), 80);
     }
   }
@@ -168,6 +207,15 @@
   async function ask(text) {
     const message = text.trim();
     if (!message || busy) return;
+
+    // Mark that a real conversation has started
+    hasConversation = true;
+
+    // Remove welcome screen if still present
+    const welcomeEl = messages.querySelector(".gm-welcome");
+    if (welcomeEl) welcomeEl.remove();
+    const suggestionsEl = messages.querySelector(".gm-suggestions");
+    if (suggestionsEl) suggestionsEl.remove();
 
     addMessage("user", message);
     input.value = "";
@@ -252,12 +300,5 @@
   input.addEventListener("input", () => {
     input.style.height = "auto";
     input.style.height = `${Math.min(input.scrollHeight, 110)}px`;
-  });
-
-  // Quick-action chips
-  root.querySelectorAll(".gm-suggestion").forEach((button) => {
-    button.addEventListener("click", () => {
-      ask(button.textContent);
-    });
   });
 })();
