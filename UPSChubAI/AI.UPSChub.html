@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#104d43" />
+  <meta name="description" content="Gurukul Mitra — Your AI-powered UPSC study companion for concepts, strategy, quizzes and revision." />
+  <title>Gurukul Mitra · UPSC गुरुकुल AI</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --ink: #172235;
+      --muted: #64748b;
+      --accent: #176b58;
+      --accent-dark: #104d43;
+      --soft: #eff8f4;
+      --border: #e3e8ef;
+      --gold: #d8b477;
+      --paper: #ffffff;
+      --bg: #f4f7f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      font-family: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+    }
+
+    /* ========== TOP BAR ========== */
+    .ai-topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 11px 18px;
+      background: linear-gradient(115deg, #176b58, #0f3c36);
+      color: #fff;
+      flex-shrink: 0;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+      position: relative;
+      z-index: 20;
+    }
+
+    .ai-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .ai-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.13);
+      border: 1px solid rgba(255,255,255,0.22);
+      display: grid;
+      place-items: center;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .ai-title {
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .ai-sub {
+      font-size: 11px;
+      opacity: 0.82;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #6ee7b7;
+      box-shadow: 0 0 0 2px rgba(110,231,183,0.35);
+    }
+
+    .ai-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .ai-btn {
+      color: #fff;
+      text-decoration: none;
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 7px 13px;
+      border-radius: 9px;
+      background: rgba(255,255,255,0.11);
+      border: 1px solid rgba(255,255,255,0.08);
+      transition: background 0.15s;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .ai-btn:hover {
+      background: rgba(255,255,255,0.20);
+    }
+
+    /* ========== LAYOUT ========== */
+    .ai-shell {
+      flex: 1;
+      display: flex;
+      max-width: 1100px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 16px 14px 12px;
+      gap: 16px;
+      min-height: 0;
+    }
+
+    /* Left sidebar (desktop) */
+    .ai-sidebar {
+      width: 240px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .side-card {
+      background: var(--paper);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 4px 18px rgba(15,23,42,0.04);
+    }
+
+    .side-card h3 {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--accent-dark);
+      margin-bottom: 12px;
+    }
+
+    .side-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .side-list button {
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      padding: 9px 11px;
+      font-size: 13px;
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+
+    .side-list button:hover {
+      background: var(--soft);
+      border-color: #cfe2da;
+      color: var(--accent-dark);
+    }
+
+    .tip-box {
+      background: linear-gradient(145deg, #eff8f4, #e8f5ef);
+      border: 1px solid #cfe2da;
+      border-radius: 14px;
+      padding: 14px;
+      font-size: 12.5px;
+      line-height: 1.55;
+      color: #1e4d3f;
+    }
+
+    .tip-box strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 13px;
+    }
+
+    /* Main chat column */
+    .ai-main {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    /* Force widget to fill the main area */
+    #gurukul-mitra-root {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    #gurukul-mitra-root .gm-launcher {
+      display: none !important;
+    }
+
+    #gurukul-mitra-root .gm-panel {
+      position: relative !important;
+      right: auto !important;
+      bottom: auto !important;
+      width: 100% !important;
+      height: 100% !important;
+      max-height: none !important;
+      min-height: 0 !important;
+      border-radius: 18px !important;
+      display: flex !important;
+      box-shadow: 0 10px 40px rgba(15,23,42,0.08) !important;
+      border: 1px solid var(--border) !important;
+      overflow: hidden;
+    }
+
+    #gurukul-mitra-root .gm-panel.gm-open {
+      display: flex !important;
+    }
+
+    /* Hide the original close button on dedicated page */
+    #gurukul-mitra-root .gm-close {
+      display: none !important;
+    }
+
+    /* ========== BOTTOM FOOTER ========== */
+    .ai-page-foot {
+      text-align: center;
+      padding: 8px 16px 14px;
+      font-size: 11px;
+      color: #788697;
+      flex-shrink: 0;
+    }
+
+    .ai-page-foot a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    /* ========== MOBILE ========== */
+    @media (max-width: 820px) {
+      .ai-sidebar {
+        display: none;
+      }
+
+      .ai-shell {
+        padding: 10px 10px 8px;
+      }
+
+      .ai-topbar {
+        padding: 10px 14px;
+      }
+
+      .ai-title {
+        font-size: 15px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .ai-btn span {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ========== TOP BAR ========== -->
+  <header class="ai-topbar">
+    <div class="ai-brand">
+      <div class="ai-logo">ॐ</div>
+      <div>
+        <div class="ai-title">Gurukul Mitra</div>
+        <div class="ai-sub">
+          <span class="status-dot"></span>
+          Online · UPSC Study Companion
+        </div>
+      </div>
+    </div>
+
+    <div class="ai-actions">
+      <button class="ai-btn" id="new-chat-btn" type="button" title="Start new conversation">
+        ✦ <span>New Chat</span>
+      </button>
+      <a class="ai-btn" href="/homeUPSChub.html">
+        ← <span>Hub</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ========== MAIN SHELL ========== -->
+  <div class="ai-shell">
+
+    <!-- Left Sidebar (desktop only) -->
+    <aside class="ai-sidebar">
+      <div class="side-card">
+        <h3>Quick Actions</h3>
+        <ul class="side-list">
+          <li><button type="button" data-prompt="Make a realistic weekly study plan for UPSC">Make a study plan</button></li>
+          <li><button type="button" data-prompt="Explain Prelims strategy in detail">Prelims strategy</button></li>
+          <li><button type="button" data-prompt="Give me CSAT preparation tips">CSAT tips</button></li>
+          <li><button type="button" data-prompt="Quiz me on Fundamental Rights">Quick quiz</button></li>
+          <li><button type="button" data-prompt="How should I revise for Mains effectively?">Revision help</button></li>
+          <li><button type="button" data-prompt="Explain the concept of Basic Structure Doctrine">Explain a concept</button></li>
+        </ul>
+      </div>
+
+      <div class="tip-box">
+        <strong>Pro Tip</strong>
+        Ask specific questions for better answers. Example: “Compare Article 32 and Article 226 with examples”.
+      </div>
+
+      <div class="side-card" style="font-size:12.5px; color:var(--muted); line-height:1.5;">
+        <strong style="color:var(--ink); font-size:13px;">What can I ask?</strong><br />
+        • Concepts & articles<br />
+        • Study plans & timetable<br />
+        • Prelims / Mains strategy<br />
+        • CSAT practice tips<br />
+        • Quick quizzes<br />
+        • Answer writing structure
+      </div>
+    </aside>
+
+    <!-- Chat Area -->
+    <main class="ai-main" id="chat-host">
+      <!-- Widget will be moved here -->
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer class="ai-page-foot">
+    Developed by <strong>Pratyush Swain</strong> · 
+    <a href="https://upscgurukul.online">UPSC गुरुकुल</a> · 
+    © <span id="year"></span> All rights reserved.
+  </footer>
+
+  <script>
+    // Dynamic year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Wait for the widget to load, then enhance it
+    const observer = new MutationObserver(() => {
+      const root = document.getElementById("gurukul-mitra-root");
+      const panel = root?.querySelector(".gm-panel");
+      const host = document.getElementById("chat-host");
+
+      if (root && panel && host) {
+        // Move widget into our main container
+        if (root.parentElement !== host) {
+          host.appendChild(root);
+        }
+
+        // Keep panel always open
+        panel.classList.add("gm-open");
+
+        // Wire up sidebar quick actions
+        document.querySelectorAll(".side-list button").forEach(btn => {
+          btn.addEventListener("click", () => {
+            const prompt = btn.getAttribute("data-prompt") || btn.textContent;
+            // Find the input and trigger the same way the widget does
+            const input = root.querySelector(".gm-input");
+            if (input) {
+              input.value = prompt;
+              // Trigger the form submit
+              const form = root.querySelector(".gm-compose");
+              if (form) {
+                form.dispatchEvent(new Event("submit", { cancelable: true }));
+              }
+            }
+          });
+        });
+
+        // New Chat button – clear conversation visually
+        document.getElementById("new-chat-btn")?.addEventListener("click", () => {
+          const messages = root.querySelector(".gm-messages");
+          if (messages) {
+            // Keep welcome + suggestions, remove only chat messages
+            const msgs = messages.querySelectorAll(".gm-msg");
+            msgs.forEach(m => m.remove());
+          }
+        });
+
+        observer.disconnect();
+      }
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true });
+  </script>
+
+  <!-- Load the redesigned Gurukul Mitra widget -->
+  <script src="/gurukul-mitra/gurukul-mitra.js"></script>
+</body>
+</html>
