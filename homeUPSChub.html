@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -25,7 +25,6 @@
     .then(function(r){if(!r.ok)throw Error("status");return r.json();})
     .then(function(data){
       if(data.enabled===true){
-        // Keep the cover until the lockdown script displays base.html.
         cover.querySelector("div div:nth-child(2)").textContent="Development environment";
         cover.querySelector("div div:nth-child(3)").textContent="Loading official development portal…";
       }else{
@@ -33,7 +32,6 @@
       }
     })
     .catch(function(){
-      // Never let a failed debug-mode check block the public website.
       cover.remove();
       console.warn("UPSC Gurukul: debug-mode check failed; continuing in public mode.");
     });
@@ -41,50 +39,22 @@
 </script>
 
     <meta charset="UTF-8">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-adsense-account" content="ca-pub-1102687898568560">
-    <meta name="keywords" content="UPSC à¤—à¥à¤°à¥à¤•à¥à¤², UPSC preparation, civil services, exam preparation">
-    <title>UPSC à¤—à¥à¤°à¥à¤•à¥à¤² - Your Preparation Dashboard</title>
+    <meta name="description" content="UPSC गुरुकुल – structured notes, mock tests, answer writing and AI tools for UPSC Civil Services preparation.">
+    <meta name="keywords" content="UPSC गुरुकुल, UPSC Gurukul, UPSC preparation, civil services, exam preparation">
+    <title>UPSC गुरुकुल – Your Preparation Dashboard</title>
     <link rel="icon" type="image/png" href="assets/upsc-gurukul-logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#101a32">
 
-    <!-- Tailwind CDN -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap"
-        rel="stylesheet">
 
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    fontFamily: {
-                        display: ['Sora', 'sans-serif'],
-                        body: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace']
-                    },
-                    colors: {
-                        ink: {
-                            950: '#0a0a1a',
-                            900: '#0f0e26',
-                            850: '#14133a',
-                            800: '#1a1948'
-                        },
-                        indigo: {
-                            650: '#4338ca'
-                        }
-                    },
-                    boxShadow: {
-                        'glow-blue': '0 0 40px -8px rgba(59,130,246,0.55)',
-                        'glow-teal': '0 0 40px -8px rgba(20,184,166,0.55)',
-                        'glow-amber': '0 0 40px -8px rgba(245,158,11,0.55)'
-                    }
-                }
-            }
-        }
+        tailwind.config = { darkMode: 'class' };
     </script>
 
     <style>
@@ -93,6 +63,7 @@
             --primary-mid: #4f46e5;
             --primary-end: #0ea5e9;
             --primary-gradient: linear-gradient(115deg, var(--primary-start), var(--primary-mid) 45%, var(--primary-end));
+            --gold: #d6ad53;
             --teal: #14b8a6;
             --amber: #f59e0b;
 
@@ -111,23 +82,24 @@
             --upsc-prelims: #3b82f6;
             --upsc-mains: #f43f5e;
             --upsc-interview: #14b8a6;
+            --header-h: 64px;
         }
 
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
             background-color: var(--bg-light);
             color: var(--text-primary-light);
             transition: background-color .4s ease, color .4s ease;
-            padding-top: 100px;
+            padding-top: var(--header-h);
             padding-bottom: 76px;
+            margin: 0;
             background-image:
                 radial-gradient(circle at 8% 0%, rgba(79,70,229,0.06), transparent 45%),
                 radial-gradient(circle at 92% 15%, rgba(14,165,233,0.07), transparent 45%);
         }
-
         body.dark-mode {
             background-color: var(--bg-dark);
             color: var(--text-primary-dark);
@@ -135,69 +107,106 @@
                 radial-gradient(circle at 8% 0%, rgba(79,70,229,0.18), transparent 45%),
                 radial-gradient(circle at 92% 15%, rgba(14,165,233,0.14), transparent 45%);
         }
+        h1, h2, h3, h4 { font-family: 'Sora', 'Noto Sans Devanagari', sans-serif; }
 
-        h1, h2, h3, h4 { font-family: 'Sora', sans-serif; }
-
-        .dotgrid {
-            background-image: radial-gradient(currentColor 1px, transparent 1px);
-            background-size: 22px 22px;
-            color: #94a3b8;
-            opacity: .25;
+        a:focus-visible, button:focus-visible, .icon-btn:focus-visible, .nav-item:focus-visible {
+            outline: 3px solid var(--primary-end); outline-offset: 2px;
         }
-        body.dark-mode .dotgrid { opacity: .15; }
 
         /* Header */
         .app-header {
-            position: fixed; top: 0; left: 0; right: 0; height: 64px;
-            display: flex; align-items: center; justify-content: space-between;
-            background: rgba(255,255,255,0.75);
+            position: fixed; top: 0; left: 0; right: 0; height: var(--header-h);
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.8);
             backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
             border-bottom: 1px solid var(--border-light);
             z-index: 1000; transition: all .4s ease;
         }
-        body.dark-mode .app-header {
-            background: rgba(10,10,26,0.7);
-            border-bottom-color: var(--border-dark);
-        }
+        body.dark-mode .app-header { background: rgba(10,10,26,0.75); border-bottom-color: var(--border-dark); }
         .header-content-wrapper {
             width: 100%; max-width: 1200px; margin: 0 auto;
             display: flex; justify-content: space-between; align-items: center; padding: 0 18px;
         }
         .app-header .logo {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
             font-family: 'Sora', 'Noto Sans Devanagari', sans-serif;
-            font-size: 22px; font-weight: 800; letter-spacing: -0.02em;
+            font-size: 21px; font-weight: 800; letter-spacing: -0.01em;
+        }
+        .app-header .logo img { width: 34px; height: 34px; border-radius: 9px; object-fit: contain; }
+        .app-header .logo span {
             background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
-        .header-right { display: flex; align-items: center; gap: 18px; }
+        .header-right { display: flex; align-items: center; gap: 14px; }
         #datetime-container {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: .72rem; color: var(--text-secondary-light); font-weight: 500;
-            white-space: nowrap; letter-spacing: .01em;
+            font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+            color: var(--text-secondary-light); font-weight: 500; white-space: nowrap;
         }
         body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
-
         .icon-btn {
-            font-size: 18px; color: var(--text-secondary-light); cursor: pointer;
+            font-size: 17px; color: var(--text-secondary-light); cursor: pointer; background: none;
             width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
             transition: all .2s; border: 1px solid var(--border-light);
         }
         body.dark-mode .icon-btn { color: var(--text-secondary-dark); border-color: var(--border-dark); }
         .icon-btn:hover { background-color: rgba(79,70,229,0.08); color: var(--primary-mid); }
+        @media (max-width: 560px) { #datetime-container { display: none; } }
 
-        /* Top sticky sub-nav */
+        /* App banner */
+        #gurukul-app-banner {
+            position: relative; width: 100%; color: #f8fafc;
+            background: radial-gradient(ellipse at 12% 0%, rgba(212,175,91,.20), transparent 38%),
+                        linear-gradient(105deg,#101a32 0%,#172b4d 58%,#102b35 100%);
+            border-bottom: 1px solid rgba(225,190,110,.5);
+        }
+        .gurukul-banner-inner {
+            max-width: 1240px; margin: 0 auto; padding: 14px 52px 14px 24px;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .gurukul-banner-logo { display: block; width: 60px; height: 60px; object-fit: contain; border-radius: 12px; }
+        .gurukul-banner-copy { display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0; }
+        .gurukul-banner-eyebrow { color: #e5c77e; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+        .gurukul-banner-copy strong { color: #fff; font-size: clamp(16px,2vw,20px); line-height: 1.3; font-family: 'Sora','Noto Sans Devanagari',sans-serif; }
+        .gurukul-banner-copy > span:last-child { color: #cbd5e1; font-size: 13px; }
+        .gurukul-banner-button {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0;
+            min-height: 44px; padding: 0 22px; color: #101a32 !important;
+            background: linear-gradient(135deg,#f0d58c,#d6ad53); border-radius: 10px;
+            text-decoration: none !important; font-weight: 800; font-size: 14px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.15); transition: transform .2s, box-shadow .2s;
+        }
+        .gurukul-banner-button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.24); }
+        .gurukul-banner-close {
+            position: absolute; top: 8px; right: 10px; width: 28px; height: 28px;
+            border: 1px solid rgba(255,255,255,.18); border-radius: 50%;
+            background: rgba(255,255,255,.08); color: #fff; font-size: 18px; line-height: 1; cursor: pointer;
+        }
+        @media (max-width: 650px) {
+            .gurukul-banner-inner { padding: 14px 40px 14px 14px; gap: 12px; flex-wrap: wrap; }
+            .gurukul-banner-logo { width: 46px; height: 46px; }
+            .gurukul-banner-button { width: 100%; }
+        }
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            #gurukul-app-banner { display: none !important; }
+        }
+
+        /* Sub nav */
         .subnav {
-            position: sticky; top: 64px; z-index: 999;
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(10px);
+            position: sticky; top: var(--header-h); z-index: 999;
+            background: rgba(255,255,255,0.88); backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-light);
         }
-        body.dark-mode .subnav { background: rgba(20,19,58,0.75); border-bottom-color: var(--border-dark); }
+        body.dark-mode .subnav { background: rgba(20,19,58,0.8); border-bottom-color: var(--border-dark); }
+        .subnav-inner {
+            max-width: 1200px; margin: auto; display: flex; justify-content: center;
+            gap: 36px; padding: 12px 16px; overflow-x: auto;
+        }
         .subnav a {
             text-decoration: none; color: var(--text-secondary-light); font-weight: 600; font-size: .88rem;
-            padding: 6px 4px; position: relative; transition: color .2s;
+            padding: 4px 2px; position: relative; transition: color .2s; white-space: nowrap;
         }
         body.dark-mode .subnav a { color: var(--text-secondary-dark); }
         .subnav a::after {
-            content: ''; position: absolute; left: 0; right: 0; bottom: -6px; height: 2px;
+            content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
             background: var(--primary-gradient); transform: scaleX(0); transition: transform .25s ease;
         }
         .subnav a:hover { color: var(--primary-mid); }
@@ -205,34 +214,23 @@
 
         /* Runner bar */
         .runner-bar {
-            position: fixed; top: 64px; left: 0; right: 0; z-index: 998;
             background: var(--primary-gradient); color: white; padding: 7px 0;
-            overflow: hidden; white-space: nowrap; box-shadow: 0 4px 16px rgba(67,56,202,0.25);
+            overflow: hidden; white-space: nowrap;
         }
-        .runner-bar .runner-text {
-            display: inline-block; padding-left: 100%; animation: scroll-left 32s linear infinite; font-size: .84rem; font-weight: 500;
-        }
-        .runner-bar .runner-text i { margin: 0 10px; opacity: .85; }
-        @keyframes scroll-left { 0% { transform: translateX(0%); } 100% { transform: translateX(-100%); } }
+        .runner-bar .runner-track { display: inline-flex; animation: scroll-left 40s linear infinite; }
+        .runner-bar .runner-track span { padding-right: 60px; font-size: .84rem; font-weight: 500; }
+        .runner-bar i { margin: 0 8px; opacity: .85; }
+        @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
 
-        /* Main */
         .main-content { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
 
-        /* Hero - Improved centering and spacing */
-        .hero-wrap {
-            position: relative;
-            padding: 56px 40px 40px;
-            overflow: hidden;
-            border-radius: 28px;
-            margin-top: 20px;
-            text-align: center;
-        }
+        /* Hero */
+        .hero-wrap { position: relative; padding: 56px 40px 44px; overflow: hidden; border-radius: 28px; margin-top: 24px; text-align: center; }
         .hero-glow {
             position: absolute; inset: 0; z-index: 0;
-            background:
-                radial-gradient(circle at 15% 20%, rgba(79,70,229,0.16), transparent 55%),
-                radial-gradient(circle at 85% 30%, rgba(14,165,233,0.14), transparent 50%),
-                radial-gradient(circle at 50% 90%, rgba(20,184,166,0.10), transparent 50%);
+            background: radial-gradient(circle at 15% 20%, rgba(79,70,229,0.16), transparent 55%),
+                        radial-gradient(circle at 85% 30%, rgba(14,165,233,0.14), transparent 50%),
+                        radial-gradient(circle at 50% 90%, rgba(20,184,166,0.10), transparent 50%);
         }
         .hero-badge {
             display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 700;
@@ -242,1162 +240,723 @@
         body.dark-mode .hero-badge { background: rgba(99,102,241,0.14); border-color: rgba(99,102,241,0.28); color: #a5b4fc; }
         .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px rgba(20,184,166,0.25); animation: pulse-dot 1.8s infinite; }
         @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
-
         .hero-section h1 {
-            font-size: clamp(2.2rem, 5.2vw, 3.6rem); font-weight: 800; line-height: 1.06; letter-spacing: -0.02em;
-            margin: 18px auto 14px;
-            max-width: 720px;
+            font-size: clamp(2.1rem, 5.2vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em;
+            margin: 18px auto 14px; max-width: 760px;
         }
-        .hero-section h1 .grad {
-            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .hero-section p.lead {
-            font-size: clamp(.95rem, 2vw, 1.12rem); color: var(--text-secondary-light); max-width: 560px; line-height: 1.6;
-            margin: 0 auto;
-        }
+        .grad { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-section p.lead { font-size: clamp(.95rem, 2vw, 1.1rem); color: var(--text-secondary-light); max-width: 580px; line-height: 1.65; margin: 0 auto; }
         body.dark-mode .hero-section p.lead { color: var(--text-secondary-dark); }
-
-        .hero-cta {
-            display: inline-flex; align-items: center; gap: 10px; margin-top: 26px; padding: 13px 26px; border-radius: 14px;
-            background: var(--primary-gradient); color: white; font-weight: 700; font-size: .92rem; text-decoration: none;
-            box-shadow: 0 10px 30px -8px rgba(67,56,202,0.55); transition: transform .2s ease, box-shadow .2s ease;
+        .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+        .hero-cta, .hero-cta-alt {
+            display: inline-flex; align-items: center; gap: 10px; padding: 13px 26px; border-radius: 14px;
+            font-weight: 700; font-size: .92rem; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease;
         }
+        .hero-cta { background: var(--primary-gradient); color: white; box-shadow: 0 10px 30px -8px rgba(67,56,202,0.55); }
         .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 36px -6px rgba(67,56,202,0.6); }
-        .hero-stats { display: flex; gap: 28px; margin-top: 34px; justify-content: center; flex-wrap: wrap; }
+        .hero-cta-alt { background: var(--card-bg-light); color: var(--text-primary-light); border: 1px solid var(--border-light); }
+        body.dark-mode .hero-cta-alt { background: var(--card-bg-dark); color: var(--text-primary-dark); border-color: var(--border-dark); }
+        .hero-cta-alt:hover { transform: translateY(-2px); border-color: var(--primary-mid); }
+        .hero-stats { display: flex; gap: 36px; margin-top: 34px; justify-content: center; flex-wrap: wrap; }
         .hero-stat b { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; display: block; }
-        .hero-stat span { font-size: .76rem; color: var(--text-secondary-light); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+        .hero-stat span { font-size: .74rem; color: var(--text-secondary-light); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
         body.dark-mode .hero-stat span { color: var(--text-secondary-dark); }
 
-        /* Section heading pill */
+        /* Section heading */
         .section-eyebrow {
             display: inline-flex; align-items: center; gap: 8px; background: var(--card-bg-light);
             padding: 7px 18px; border-radius: 999px; box-shadow: 0 4px 15px rgba(20,20,60,0.06), 0 0 0 1px var(--border-light);
-            font-size: .78rem; font-weight: 700; letter-spacing: .02em;
         }
         body.dark-mode .section-eyebrow { background: var(--card-bg-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 0 1px var(--border-dark); }
-        .eyebrow-icon {
-            width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: .68rem; color: white;
-            background: var(--primary-gradient);
-        }
-        .section-title { font-size: 1.05rem; font-weight: 700; }
+        .eyebrow-icon { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: .68rem; color: white; background: var(--primary-gradient); }
+        .section-title { font-size: 1rem; font-weight: 700; margin: 0; }
 
-        /* Journey / exam stages */
-        .journey-track {
-            position: relative; display: flex; justify-content: space-between; align-items: flex-start;
-            max-width: 760px; margin: 34px auto 0; padding: 0 8px;
-        }
-        .journey-line {
-            position: absolute; top: 27px; left: 6%; right: 6%; height: 3px;
-            background: linear-gradient(90deg, var(--upsc-prelims), var(--upsc-mains), var(--upsc-interview));
-            border-radius: 3px; opacity: .35;
-        }
-        .journey-line-anim {
-            position: absolute; top: 27px; left: 6%; width: 88%; height: 3px; border-radius: 3px;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
-            background-size: 40% 100%; animation: travel 3.2s linear infinite;
-        }
-        @keyframes travel { 0% { background-position: -40% 0; } 100% { background-position: 140% 0; } }
-
+        /* Journey */
+        .journey-track { position: relative; display: flex; justify-content: space-between; align-items: flex-start; max-width: 760px; margin: 34px auto 0; padding: 0 8px; }
+        .journey-line { position: absolute; top: 27px; left: 16%; right: 16%; height: 3px; background: linear-gradient(90deg, var(--upsc-prelims), var(--upsc-mains), var(--upsc-interview)); border-radius: 3px; opacity: .4; }
         .journey-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; width: 33%; text-align: center; }
         .journey-orb {
             width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 1.15rem; color: white;
-            box-shadow: 0 0 0 5px var(--bg-light), 0 0 24px -2px currentColor; transition: transform .3s ease;
+            box-shadow: 0 0 0 5px var(--bg-light), 0 0 24px -4px currentColor; transition: transform .3s ease;
         }
-        body.dark-mode .journey-orb { box-shadow: 0 0 0 5px var(--bg-dark), 0 0 24px -2px currentColor; }
+        body.dark-mode .journey-orb { box-shadow: 0 0 0 5px var(--bg-dark), 0 0 24px -4px currentColor; }
         .journey-node:hover .journey-orb { transform: scale(1.1); }
         .orb-prelims { background: var(--upsc-prelims); color: var(--upsc-prelims); }
         .orb-mains { background: var(--upsc-mains); color: var(--upsc-mains); }
         .orb-interview { background: var(--upsc-interview); color: var(--upsc-interview); }
-        .orb-prelims i, .orb-mains i, .orb-interview i { color: white; }
-        .journey-node h4 { font-size: .95rem; font-weight: 700; margin-top: 12px; }
-        .journey-node p { font-size: .76rem; color: var(--text-secondary-light); margin-top: 2px; max-width: 150px; }
+        .journey-orb i { color: white; }
+        .journey-node h4 { font-size: .95rem; font-weight: 700; margin: 12px 0 0; }
+        .journey-node p { font-size: .76rem; color: var(--text-secondary-light); margin: 2px 0 0; max-width: 150px; }
         body.dark-mode .journey-node p { color: var(--text-secondary-dark); }
-        .journey-node a.stage-link {
-            margin-top: 10px; font-size: .74rem; font-weight: 700; text-decoration: none; padding: 5px 14px; border-radius: 999px;
-            transition: all .2s;
-        }
+        .stage-link { margin-top: 10px; display: inline-block; font-size: .74rem; font-weight: 700; text-decoration: none; padding: 5px 14px; border-radius: 999px; transition: all .2s; }
         .link-prelims { color: var(--upsc-prelims); background: rgba(59,130,246,0.1); }
         .link-prelims:hover { background: var(--upsc-prelims); color: white; }
         .link-mains { color: var(--upsc-mains); background: rgba(244,63,94,0.1); }
         .link-mains:hover { background: var(--upsc-mains); color: white; }
         .link-interview { color: var(--upsc-interview); background: rgba(20,184,166,0.1); }
         .link-interview:hover { background: var(--upsc-interview); color: white; }
-
         @media (max-width: 640px) {
             .journey-track { flex-direction: column; gap: 24px; align-items: stretch; }
-            .journey-line, .journey-line-anim { display: none; }
-            .journey-node { width: 100%; flex-direction: row; text-align: left; gap: 14px; }
+            .journey-line { display: none; }
+            .journey-node { width: 100%; flex-direction: row; text-align: left; gap: 14px; align-items: center; }
             .journey-node > div:last-child { flex: 1; }
             .journey-node p { max-width: none; }
         }
 
-        /* 2028 Zone hero card */
+        /* 2028 zone */
         .zone-card {
-            position: relative; border-radius: 26px; overflow: hidden; margin-top: 34px;
+            position: relative; border-radius: 26px; overflow: hidden; margin-top: 40px;
             background: linear-gradient(135deg, #1a1948 0%, #312a70 45%, #0e3a52 100%);
-            box-shadow: 0 25px 60px -20px rgba(30,27,90,0.55);
-            padding: 40px 32px;
+            box-shadow: 0 25px 60px -20px rgba(30,27,90,0.55); padding: 40px 32px;
         }
         .zone-card::before {
             content: ''; position: absolute; inset: 0;
             background: radial-gradient(circle at 85% 0%, rgba(245,158,11,0.18), transparent 45%),
                         radial-gradient(circle at 10% 100%, rgba(14,165,233,0.2), transparent 45%);
         }
-        .zone-badge {
-            position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 7px; font-size: .72rem; font-weight: 800;
-            color: #fda4af; background: rgba(244,63,94,0.14); border: 1px solid rgba(244,63,94,0.35); padding: 5px 13px; border-radius: 999px;
-            letter-spacing: .03em; text-transform: uppercase;
-        }
+        .zone-card > * { position: relative; z-index: 1; }
+        .zone-badge { display: inline-flex; align-items: center; gap: 7px; font-size: .72rem; font-weight: 800; color: #fda4af; background: rgba(244,63,94,0.14); border: 1px solid rgba(244,63,94,0.35); padding: 5px 13px; border-radius: 999px; letter-spacing: .03em; text-transform: uppercase; }
         .zone-badge .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #f43f5e; animation: pulse-dot 1.2s infinite; }
-        .zone-marquee { position: relative; z-index: 1; overflow: hidden; white-space: nowrap; margin-top: 18px; opacity: .8; }
-        .zone-marquee span {
-            display: inline-block; padding-left: 100%; animation: scroll-left 26s linear infinite; font-size: .78rem; font-weight: 600; color: #cbd5f5;
-        }
-        .zone-title { position: relative; z-index: 1; font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 800; color: white; margin-top: 16px; letter-spacing: -0.01em; }
-        .zone-sub { position: relative; z-index: 1; color: #b7b9e8; font-size: .95rem; margin-top: 8px; max-width: 480px; }
-        .zone-cta {
-            position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 12px 26px; border-radius: 12px;
-            background: linear-gradient(120deg, var(--amber), #fb923c); color: #1a1408; font-weight: 800; font-size: .88rem; text-decoration: none;
-            box-shadow: 0 12px 28px -6px rgba(245,158,11,0.5); transition: transform .2s ease;
-        }
+        .zone-marquee { overflow: hidden; white-space: nowrap; margin-top: 18px; opacity: .8; }
+        .zone-marquee .zone-track { display: inline-flex; animation: scroll-left 30s linear infinite; }
+        .zone-marquee span { padding-right: 50px; font-size: .78rem; font-weight: 600; color: #cbd5f5; }
+        .zone-title { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 800; color: white; margin: 16px 0 0; }
+        .zone-sub { color: #b7b9e8; font-size: .95rem; margin-top: 8px; max-width: 520px; line-height: 1.6; }
+        .zone-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 12px 26px; border-radius: 12px; background: linear-gradient(120deg, var(--amber), #fb923c); color: #1a1408; font-weight: 800; font-size: .88rem; text-decoration: none; box-shadow: 0 12px 28px -6px rgba(245,158,11,0.5); transition: transform .2s ease; }
         .zone-cta:hover { transform: translateY(-2px); }
-        .zone-foot { position: relative; z-index: 1; margin-top: 18px; font-size: .72rem; color: #9294c4; font-weight: 600; }
+        .zone-foot { margin-top: 18px; font-size: .72rem; color: #9294c4; font-weight: 600; }
 
         /* Quick actions */
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; }
         .quick-action-item {
             display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: var(--text-primary-light);
-            padding: 20px 12px; background: var(--card-bg-light); border-radius: 16px; border: 1px solid var(--border-light);
-            transition: all .25s ease; position: relative; overflow: hidden;
+            padding: 20px 12px; background: var(--card-bg-light); border-radius: 16px; border: 1px solid var(--border-light); transition: all .25s ease;
         }
         body.dark-mode .quick-action-item { color: var(--text-primary-dark); background: var(--card-bg-dark); border-color: var(--border-dark); }
         .quick-action-item:hover { transform: translateY(-6px); border-color: transparent; box-shadow: 0 16px 32px -12px rgba(67,56,202,0.35); }
-        .quick-action-icon {
-            width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; color: white;
-            background: var(--primary-gradient);
+        .quick-action-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; color: white; background: var(--primary-gradient); }
+        .quick-action-item .label { font-size: .82rem; font-weight: 600; text-align: center; }
+        @media (max-width: 768px) { .quick-actions-grid { grid-template-columns: repeat(2,1fr); } }
+
+        /* Download section */
+        .download-section {
+            position: relative; border-radius: 26px; overflow: hidden; margin-top: 48px; padding: 36px 32px;
+            display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+            background: radial-gradient(ellipse at 100% 0%, rgba(214,173,83,.22), transparent 45%),
+                        linear-gradient(110deg,#101a32 0%,#172b4d 60%,#102b35 100%);
+            border: 1px solid rgba(225,190,110,.4); color: #f8fafc;
         }
-        .quick-action-item .label { font-size: .82rem; font-weight: 600; }
+        .download-logo { width: 84px; height: 84px; border-radius: 20px; object-fit: contain; background: rgba(255,255,255,.06); padding: 6px; }
+        .download-copy { flex: 1; min-width: 240px; }
+        .download-copy .eyebrow { color: #e5c77e; font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+        .download-copy h2 { font-size: clamp(1.4rem,3.2vw,1.9rem); font-weight: 800; margin: 6px 0 8px; color: #fff; }
+        .download-copy p { color: #cbd5e1; font-size: .92rem; line-height: 1.6; margin: 0; max-width: 460px; }
+        .download-meta { margin-top: 12px; font-size: .76rem; color: #9fb0c8; font-weight: 600; }
+        .download-actions { display: flex; flex-direction: column; gap: 10px; min-width: 220px; }
+        .btn-gold {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 0 24px; border: 0; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(135deg,#f0d58c,#d6ad53); color: #101a32; font-weight: 800; font-size: .95rem; text-decoration: none;
+            box-shadow: 0 10px 26px -8px rgba(214,173,83,.55); transition: transform .2s ease;
+        }
+        .btn-gold:hover { transform: translateY(-2px); }
+        .btn-ghost {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 12px; cursor: pointer;
+            background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.22); font-weight: 700; font-size: .86rem; text-decoration: none;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,.15); }
+        #gurukul-install-help { font-size: 12px; line-height: 1.6; color: #b7c3d6; margin: 0; }
 
         /* AI section */
-        .ai-section {
-            position: relative; border-radius: 26px; padding: 36px 30px; margin-top: 40px; overflow: hidden;
-            background: linear-gradient(135deg, var(--card-bg-light), #eef0ff);
-            border: 1px solid var(--border-light);
-        }
+        .ai-section { position: relative; border-radius: 26px; padding: 36px 30px; margin-top: 48px; overflow: hidden; background: linear-gradient(135deg, var(--card-bg-light), #eef0ff); border: 1px solid var(--border-light); }
         body.dark-mode .ai-section { background: linear-gradient(135deg, var(--card-bg-dark), #1c1a4d); border-color: var(--border-dark); }
-        .ai-section::after {
-            content: "\f0d0"; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute; right: -30px; top: 50%;
-            transform: translateY(-50%); font-size: 190px; color: var(--primary-mid); opacity: .05;
-        }
         .ai-collab-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-size: .84rem; font-weight: 600; color: var(--text-secondary-light); }
         body.dark-mode .ai-collab-header { color: var(--text-secondary-dark); }
         .ai-collab-header .logo-img { height: 22px; }
-        .ai-section-title { font-size: clamp(1.5rem, 3.6vw, 2.1rem); font-weight: 800; letter-spacing: -0.01em; }
-        .ai-tool-card {
-            background: var(--card-bg-light); border: 1px solid var(--border-light); padding: 22px; border-radius: 16px; text-decoration: none;
-            color: var(--text-primary-light); transition: all .3s ease; display: block; position: relative; z-index: 1;
-        }
+        .ai-section-title { font-size: clamp(1.5rem, 3.6vw, 2.1rem); font-weight: 800; margin: 0; }
+        .ai-tool-card { background: var(--card-bg-light); border: 1px solid var(--border-light); padding: 22px; border-radius: 16px; text-decoration: none; color: var(--text-primary-light); transition: all .3s ease; display: block; }
         body.dark-mode .ai-tool-card { background: var(--card-bg-dark); border-color: var(--border-dark); color: var(--text-primary-dark); }
         .ai-tool-card:hover { transform: translateY(-5px); box-shadow: 0 16px 34px -12px rgba(67,56,202,0.4); border-color: var(--primary-mid); }
         .ai-tool-card .action-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-weight: 700; color: var(--primary-mid); font-size: .86rem; }
 
-        /* Dashboard cards */
-        .card {
-            background: var(--card-bg-light); border: 1px solid var(--border-light); border-radius: 18px; padding: 24px;
-            display: flex; flex-direction: column; transition: all .3s ease; box-shadow: 0 6px 20px -12px rgba(20,20,60,0.12);
-            position: relative; overflow: hidden;
-        }
-        body.dark-mode .card { background: var(--card-bg-dark); border-color: var(--border-dark); box-shadow: 0 6px 20px -12px rgba(0,0,0,0.4); }
+        /* Cards */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 22px; margin-top: 48px; }
+        .card { background: var(--card-bg-light); border: 1px solid var(--border-light); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; transition: all .3s ease; box-shadow: 0 6px 20px -12px rgba(20,20,60,0.12); overflow: hidden; }
+        body.dark-mode .card { background: var(--card-bg-dark); border-color: var(--border-dark); }
         .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -16px rgba(67,56,202,0.3); border-color: rgba(79,70,229,0.3); }
-        .card-img { width: calc(100% + 48px); height: 150px; object-fit: cover; margin: -24px -24px 20px -24px; border-radius: 18px 18px 0 0; }
-        .card-icon-circle {
-            width: 46px; height: 46px; display: grid; place-items: center; border-radius: 13px; background: var(--primary-gradient);
-            color: white; font-size: 20px; flex-shrink: 0;
-        }
-        .card h3 { font-size: 1.08rem; font-weight: 700; }
+        .card-img { width: calc(100% + 48px); height: 150px; object-fit: cover; margin: -24px -24px 20px -24px; }
+        .card-head { display: flex; align-items: center; gap: 14px; }
+        .card-icon-circle { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 13px; background: var(--primary-gradient); color: white; font-size: 20px; flex-shrink: 0; }
+        .card h3 { font-size: 1.05rem; font-weight: 700; margin: 0; }
         .card p { font-size: .88rem; color: var(--text-secondary-light); margin: 12px 0 20px; flex-grow: 1; line-height: 1.55; }
         body.dark-mode .card p { color: var(--text-secondary-dark); }
-        .action-btn {
-            display: block; background: var(--primary-gradient); color: white; padding: 11px 18px; border-radius: 11px;
-            text-decoration: none; font-size: .86rem; font-weight: 700; text-align: center; margin-top: auto; transition: all .2s ease;
-        }
+        .action-btn { display: block; background: var(--primary-gradient); color: white; padding: 11px 18px; border-radius: 11px; text-decoration: none; font-size: .86rem; font-weight: 700; text-align: center; margin-top: auto; transition: all .2s ease; }
         .action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 20px -6px rgba(67,56,202,0.5); }
 
-        /* Sidebar - Improved logo & layout */
+        /* Sidebar */
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(6,6,20,0.55); backdrop-filter: blur(2px); z-index: 1001; display: none; }
         .sidebar-overlay.active { display: block; }
-        .side-bar {
-            position: fixed; top: 0; left: -320px; width: 300px; height: 100vh; background: var(--card-bg-light); z-index: 1002;
-            transition: left .4s cubic-bezier(.25,.46,.45,.94); display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,.15);
-        }
+        .side-bar { position: fixed; top: 0; left: -320px; width: 300px; max-width: 86vw; height: 100vh; background: var(--card-bg-light); z-index: 1002; transition: left .4s cubic-bezier(.25,.46,.45,.94); display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,.15); }
         body.dark-mode .side-bar { background: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none; }
         .side-bar.active { left: 0; }
         .sidebar-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); }
         body.dark-mode .sidebar-header { border-bottom-color: var(--border-dark); }
-        .sidebar-header .title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; }
-        #close-btn { font-size: 20px; cursor: pointer; color: var(--text-secondary-light); }
-
-        /* Sidebar Profile - Better logo placement */
-        .side-bar .profile {
-            padding: 28px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border-light);
-            background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(14,165,233,0.06));
-        }
+        .sidebar-header .title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; margin: 0; }
+        #close-btn { font-size: 20px; cursor: pointer; color: var(--text-secondary-light); background: none; border: 0; }
+        .side-bar .profile { padding: 22px 20px; border-bottom: 1px solid var(--border-light); background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(14,165,233,0.06)); }
         body.dark-mode .side-bar .profile { border-bottom-color: var(--border-dark); }
-        .side-bar .profile img {
-            width: 78px;
-            height: 78px;
-            border-radius: 50%;
-            border: 4px solid white;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.18);
-            object-fit: contain;
-        }
-        .side-bar .profile .name {
-            font-family:'Sora',sans-serif;
-            font-weight:700;
-            margin-top:12px;
-            font-size: 1.1rem;
-        }
-
-        .side-bar .navbar { flex-grow: 1; overflow-y: auto; }
+        .profile-row { display: flex; align-items: center; gap: 14px; }
+        .profile-row img { width: 62px; height: 62px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); object-fit: contain; background: #fff; }
+        .profile-row h3 { margin: 0; font-weight: 700; font-size: 1.2rem; }
+        .profile-row p { margin: 3px 0 0; font-size: .82rem; opacity: .75; }
+        .side-bar .navbar { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; }
         .sidebar-category { padding: 16px 25px 6px; }
-        .sidebar-category h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-secondary-light); font-weight: 800; }
+        .sidebar-category h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-secondary-light); font-weight: 800; margin: 0; }
         body.dark-mode .sidebar-category h4 { color: var(--text-secondary-dark); }
-        .side-bar .navbar a {
-            display: flex; align-items: center; padding: 12px 25px; color: var(--text-primary-light); text-decoration: none;
-            transition: all .2s ease; border-left: 3px solid transparent; font-size: .92rem; font-weight: 500;
-        }
+        .side-bar .navbar a { display: flex; align-items: center; padding: 11px 25px; color: var(--text-primary-light); text-decoration: none; transition: all .2s ease; border-left: 3px solid transparent; font-size: .92rem; font-weight: 500; }
         body.dark-mode .side-bar .navbar a { color: var(--text-primary-dark); }
         .side-bar .navbar a:hover { background: rgba(79,70,229,0.06); border-left-color: var(--primary-mid); color: var(--primary-mid); }
-        .side-bar .navbar a i { margin-right: 14px; font-size: 17px; width: 22px; text-align: center; color: var(--text-secondary-light); }
+        .side-bar .navbar a i { margin-right: 14px; font-size: 16px; width: 22px; text-align: center; color: var(--text-secondary-light); }
         body.dark-mode .side-bar .navbar a i { color: var(--text-secondary-dark); }
         .side-bar .navbar a:hover i { color: var(--primary-mid); }
 
         /* Footer */
-        .site-footer {
-            width: 100%; background: var(--card-bg-light); color: var(--text-secondary-light); padding: 50px 0 30px; margin-top: 50px;
-            border-top: 1px solid var(--border-light); transition: background-color .4s ease, color .4s ease;
-        }
+        .site-footer { width: 100%; background: var(--card-bg-light); color: var(--text-secondary-light); padding: 50px 0 30px; margin-top: 56px; border-top: 1px solid var(--border-light); }
         body.dark-mode .site-footer { background: var(--card-bg-dark); color: var(--text-secondary-dark); border-top-color: var(--border-dark); }
         .footer-content-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        .footer-title { font-size: 1rem; font-weight: 700; margin-bottom: 15px; color: var(--text-primary-light); }
+        .footer-container { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-title { font-size: 1rem; font-weight: 700; margin: 0 0 15px; color: var(--text-primary-light); }
         body.dark-mode .footer-title { color: var(--text-primary-dark); }
+        .footer-about p { line-height: 1.65; font-size: .9rem; margin: 0; }
         .footer-links ul { list-style: none; padding: 0; margin: 0; }
         .footer-links li { margin-bottom: 10px; }
         .footer-links a { text-decoration: none; color: inherit; transition: color .2s ease; }
         .footer-links a:hover { color: var(--primary-mid); }
-        .footer-social a {
-            display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%;
-            background: var(--primary-gradient); color: white; font-size: 1rem; margin-right: 10px; text-decoration: none;
-            transition: transform .2s ease, box-shadow .2s ease;
-        }
-        .footer-social a:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(67,56,202,0.35); }
-        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-light); margin-top: 20px; font-size: .85rem; }
+        .footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--primary-gradient); color: white; font-size: 1rem; margin-right: 10px; text-decoration: none; transition: transform .2s ease; }
+        .footer-social a:hover { transform: translateY(-3px); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-light); font-size: .85rem; }
         body.dark-mode .footer-bottom { border-top-color: var(--border-dark); }
+        .footer-bottom p { margin: 4px 0; }
         .footer-bottom a { color: inherit; font-weight: 600; text-decoration: none; }
         .footer-bottom a:hover { text-decoration: underline; color: var(--primary-mid); }
 
         /* Bottom nav */
-        .bottom-nav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 64px;
-            background: rgba(255,255,255,0.85); backdrop-filter: blur(14px);
-            border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; z-index: 1000;
-            transition: transform .4s cubic-bezier(.25,.46,.45,.94), background-color .4s ease, border-color .4s ease;
-        }
-        body.dark-mode .bottom-nav { background: rgba(10,10,26,0.85); border-top-color: var(--border-dark); }
-        .nav-item {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light);
-            text-decoration: none; flex-grow: 1; transition: color .2s, transform .2s; cursor: pointer;
-        }
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: rgba(255,255,255,0.88); backdrop-filter: blur(14px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; z-index: 1000; transition: transform .4s cubic-bezier(.25,.46,.45,.94); }
+        body.dark-mode .bottom-nav { background: rgba(10,10,26,0.88); border-top-color: var(--border-dark); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color .2s, transform .2s; cursor: pointer; background: none; border: 0; font-family: inherit; }
         body.dark-mode .nav-item { color: var(--text-secondary-dark); }
         .nav-item i { font-size: 19px; margin-bottom: 4px; }
         .nav-item span { font-size: 10.5px; font-weight: 600; }
         .nav-item.active { color: var(--primary-mid); }
         .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
 
-        /* Reveal animations */
+        /* Reveal */
         .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
-        .reveal.in-view { opacity: 1; transform: translateY(0); }
-        .card, .quick-action-item { animation: none; }
-
-        @keyframes popIn { from { transform: translateY(10px) scale(.98); opacity: 0; } to { transform: translateY(0) scale(1); opacity: 1; } }
-
-        @media (max-width: 768px) {
-            .quick-actions-grid, .ai-tools-grid { grid-template-columns: 1fr 1fr; }
-            .hero-wrap { padding: 48px 24px 36px; }
+        .reveal.in-view { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .reveal { opacity: 1; transform: none; transition: none; }
+            .runner-track, .zone-track, .hero-badge .dot, .live-dot { animation: none !important; }
+            html { scroll-behavior: auto; }
         }
-        @media (max-width: 480px) {
-            .quick-actions-grid { grid-template-columns: 1fr 1fr; }
+        @media (max-width: 768px) {
+            .hero-wrap { padding: 44px 20px 36px; }
+            .zone-card, .download-section { padding: 30px 22px; }
+            .download-actions { width: 100%; }
         }
     </style>
-<style id="upschub-apk-popup-v31-css">
-#upschub-apk-overlay-v31{position:fixed;inset:0;z-index:2147483000;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(12,18,45,.58);backdrop-filter:blur(7px);font-family:inherit}
-#upschub-apk-overlay-v31.is-visible{display:flex}
-#upschub-apk-popup-v31{position:relative;box-sizing:border-box;width:min(440px,100%);padding:30px 24px 24px;border:1px solid rgba(105,92,255,.2);border-radius:24px;background:linear-gradient(145deg,#fff,#f2f5ff 60%,#e7f8ff);color:#17183c;text-align:center;box-shadow:0 25px 90px #090f503d}
-#upschub-apk-popup-v31 *{box-sizing:border-box}
-#upschub-apk-popup-v31 .apk-close{position:absolute;right:13px;top:12px;width:34px;height:34px;border:0;border-radius:50%;background:#e9edfa;color:#30365e;font-size:23px;cursor:pointer}
-#upschub-apk-popup-v31 .apk-icon{display:grid;place-items:center;width:66px;height:66px;margin:0 auto 15px;border-radius:20px;background:linear-gradient(135deg,#4d39df,#119de9);color:#fff;font-size:29px;font-weight:800}
-#upschub-apk-popup-v31 h2{margin:0 0 10px;font-size:25px;line-height:1.2;font-weight:800}
-#upschub-apk-popup-v31 p{margin:0 auto 19px;max-width:340px;font-size:14px;line-height:1.65;color:#555c7b}
-#upschub-apk-popup-v31 .apk-download{display:flex;align-items:center;justify-content:center;gap:9px;width:100%;min-height:49px;padding:13px 18px;border:0;border-radius:13px;background:linear-gradient(100deg,#4c39df,#119fe9);color:#fff;text-decoration:none;font-weight:750;font-size:15px}
-#upschub-apk-popup-v31 .apk-note{display:block;margin-top:13px;font-size:11px;color:#737995}
-@media(prefers-reduced-motion:reduce){#upschub-apk-popup-v31{animation:none}}
-</style>
-<style id="gurukul-disable-old-popup">
-#upschub-apk-overlay-v31,
-#upschub-apk-popup-v31 {
-    display: none !important;
-    visibility: hidden !important;
-    pointer-events: none !important;
-}
-</style>
-
-<style id="gurukul-banner-styles">
-#gurukul-app-banner {
-  position: relative;
-  z-index: 1000;
-  width: 100%;
-  box-sizing: border-box;
-  color: #f8fafc;
-  background:
-    radial-gradient(ellipse at 12% 0%, rgba(212,175,91,.20), transparent 38%),
-    linear-gradient(105deg,#101a32 0%,#172b4d 58%,#102b35 100%);
-  border-bottom: 1px solid rgba(225,190,110,.5);
-  font-family: inherit;
-}
-#gurukul-app-banner * { box-sizing: border-box; }
-.gurukul-banner-inner {
-  max-width: 1240px;
-  min-height: 102px;
-  margin: 0 auto;
-  padding: 16px 48px 16px 24px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-}
-.gurukul-brand { display:flex; align-items:center; flex-shrink:0; }
-.gurukul-banner-logo {
-  display:block;
-  width:66px;
-  height:66px;
-  object-fit:contain;
-  border-radius:12px;
-}
-.gurukul-banner-copy {
-  display:flex;
-  flex:1;
-  flex-direction:column;
-  gap:5px;
-  min-width:0;
-}
-.gurukul-banner-eyebrow {
-  color:#e5c77e;
-  font-size:10px;
-  font-weight:800;
-  letter-spacing:2px;
-}
-.gurukul-banner-copy strong {
-  color:#fff;
-  font-size:clamp(16px,2vw,21px);
-  line-height:1.3;
-}
-.gurukul-banner-copy > span:last-child {
-  color:#cbd5e1;
-  font-size:13px;
-  line-height:1.5;
-}
-.gurukul-banner-button {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  flex-shrink:0;
-  min-height:46px;
-  padding:0 22px;
-  color:#101a32 !important;
-  background:linear-gradient(135deg,#f0d58c,#d6ad53);
-  border-radius:10px;
-  text-decoration:none !important;
-  font-weight:800;
-  font-size:14px;
-  box-shadow:0 5px 18px rgba(0,0,0,.15);
-  transition:transform .2s, box-shadow .2s;
-}
-.gurukul-banner-button:hover {
-  transform:translateY(-2px);
-  box-shadow:0 8px 24px rgba(0,0,0,.24);
-}
-.gurukul-banner-close {
-  position:absolute;
-  top:8px;
-  right:10px;
-  width:28px;
-  height:28px;
-  border:1px solid rgba(255,255,255,.18);
-  border-radius:50%;
-  background:rgba(255,255,255,.08);
-  color:#fff;
-  font-size:20px;
-  line-height:1;
-  cursor:pointer;
-}
-@media(max-width:650px) {
-  .gurukul-banner-inner {
-    min-height:0;
-    padding:16px 38px 16px 14px;
-    gap:12px;
-    flex-wrap:wrap;
-  }
-  .gurukul-banner-logo { width:48px; height:48px; }
-  .gurukul-banner-copy { flex:1; }
-  .gurukul-banner-eyebrow { font-size:9px; letter-spacing:1px; }
-  .gurukul-banner-copy strong { font-size:15px; }
-  .gurukul-banner-copy > span:last-child { font-size:12px; }
-  .gurukul-banner-button {
-    width:100%;
-    min-height:43px;
-    margin-left:60px;
-    flex:1 0 calc(100% - 60px);
-  }
-}
-@media(prefers-reduced-motion:reduce) {
-  .gurukul-banner-button { transition:none; }
-}
-</style>
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#101a32">
-
-<!-- HIDE_GURUKUL_BANNER_IN_INSTALLED_APP -->
-<style>
-  @media (display-mode: standalone) {
-    #gurukul-app-banner { display: none !important; }
-  }
-  @media (display-mode: fullscreen) {
-    #gurukul-app-banner { display: none !important; }
-  }
-</style>
-<script>
-(function () {
-  function hideInstalledAppBanner() {
-    var referrer = document.referrer || "";
-    var standalone = false;
-
-    try {
-      standalone =
-        window.matchMedia("(display-mode: standalone)").matches ||
-        window.matchMedia("(display-mode: fullscreen)").matches ||
-        window.navigator.standalone === true ||
-        referrer.indexOf("android-app://online.upscgurukul.twa") === 0;
-    } catch (e) {}
-
-    if (standalone) {
-      var banner = document.getElementById("gurukul-app-banner");
-      if (banner) banner.style.setProperty("display", "none", "important");
-    }
-  }
-
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", hideInstalledAppBanner);
-  } else {
-    hideInstalledAppBanner();
-  }
-})();
-</script>
 </head>
 
 <body class="font-body">
-<!-- UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²: Android app announcement banner -->
+
+<script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "Organization", "name": "UPSC गुरुकुल", "url": "https://upscgurukul.online",
+  "founder": { "@type": "Person", "name": "Pratyush Swain", "url": "https://pratyushswain.in" } }
+</script>
+<script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "WebSite", "name": "UPSC गुरुकुल", "url": "https://upscgurukul.online/" }
+</script>
+
+<header class="app-header">
+    <div class="header-content-wrapper">
+        <a href="index.html" class="logo" aria-label="UPSC गुरुकुल home">
+            <img src="assets/upsc-gurukul-logo.png" alt="">
+            <span>UPSC गुरुकुल</span>
+        </a>
+        <div class="header-right">
+            <div id="datetime-container"></div>
+            <button id="toggle-btn" class="icon-btn fas fa-sun" type="button" aria-label="Toggle dark mode"></button>
+        </div>
+    </div>
+</header>
+
+<!-- Android app banner -->
 <section id="gurukul-app-banner" aria-label="Android app download">
-  <div class="gurukul-banner-inner">
-    <a class="gurukul-brand" href="homeUPSChub.html"
-       aria-label="UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² home">
-      <img src="assets/upsc-gurukul-logo.png"
-           alt="UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² logo" class="gurukul-banner-logo">
-    </a>
-
-    <div class="gurukul-banner-copy">
-      <span class="gurukul-banner-eyebrow">YOUR PREPARATION, EVERYWHERE</span>
-      <strong>UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² is now on Android</strong>
-      <span>Learn, revise and prepare wherever you go.</span>
+    <div class="gurukul-banner-inner">
+        <a class="gurukul-brand" href="index.html" aria-label="UPSC गुरुकुल home">
+            <img src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo" class="gurukul-banner-logo">
+        </a>
+        <div class="gurukul-banner-copy">
+            <span class="gurukul-banner-eyebrow">YOUR PREPARATION, EVERYWHERE</span>
+            <strong>UPSC गुरुकुल is now on Android</strong>
+            <span>Learn, revise and prepare wherever you go.</span>
+        </div>
+        <a class="gurukul-banner-button" href="#download">Get the app <i class="fas fa-download" aria-hidden="true"></i></a>
+        <button class="gurukul-banner-close" type="button" aria-label="Dismiss app banner"
+            onclick="document.getElementById('gurukul-app-banner').remove();">&times;</button>
     </div>
-
-    <a class="gurukul-banner-button" href="download.html">
-      Get the app <span aria-hidden="true">Ã¢â€ â€”</span>
-    </a>
-
-    <button class="gurukul-banner-close" type="button"
-      aria-label="Dismiss app banner"
-      onclick="document.getElementById('gurukul-app-banner').remove();">
-      Ãƒâ€”
-    </button>
-  </div>
 </section>
-<!-- End UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² announcement banner -->
 
-
-    <script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "Organization",
- "name": "UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²",
- "url": "https://upscgurukul.online"
-}
-</script>
-
-    <script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "WebSite",
- "name": "UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²",
- "url": "https://upscgurukul.online/"
-}
-</script>
-
-    <header class="app-header">
-
-
-        <div class="header-content-wrapper">
-            <a href="index.html" class="logo">UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²</a>
-            <div class="header-right">
-                <div id="datetime-container"></div>
-                <div id="toggle-btn" class="icon-btn fas fa-sun"></div>
-            </div>
-        </div>
-    </header>
-
-    <!-- Top sub navbar -->
-    <div class="subnav">
-        <div style="max-width:1200px; margin:auto; display:flex; justify-content:center; gap:40px; padding:12px 10px;">
-            <a href="/Prelims/">Prelims</a>
-            <a href="/notes.html">Notes</a>
-            <a href="/test-series/">Test Series</a>
-            <a href="/mains/">Mains</a>
-        </div>
+<!-- Sub nav -->
+<nav class="subnav" aria-label="Primary">
+    <div class="subnav-inner">
+        <a href="/Prelims/">Prelims</a>
+        <a href="/mains/">Mains</a>
+        <a href="/notes.html">Notes</a>
+        <a href="/test-series/">Test Series</a>
+        <a href="#download">Download App</a>
     </div>
+</nav>
 
-    <div class="runner-bar">
-        <div class="runner-text">
-            <span>Powered by Google AI <i class="fas fa-brain"></i> New: AI Quiz Builder is now LIVE! <i
-                    class="fas fa-star"></i> Mains Answer Writing analysis with AI feedback <i class="fas fa-star"></i>
-                Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
-            <span>Powered by Google AI <i class="fas fa-brain"></i> New: AI Quiz Builder is now LIVE! <i
-                    class="fas fa-star"></i> Mains Answer Writing analysis with AI feedback <i class="fas fa-star"></i>
-                Remember to revise your notes daily for better retention! <i class="fas fa-star"></i> </span>
-        </div>
-    </div>
-
-    <div class="sidebar-overlay"></div>
-
-    <div class="side-bar">
-        <div class="sidebar-header">
-            <h3 class="title">Complete Menu</h3>
-            <div id="close-btn"><i class="fas fa-times"></i></div>
-        </div>
-        <div class="profile">
-    <div style="display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 12px;">
-        <img src="assets/upsc-gurukul-logo.png" alt="UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² Logo"
-             style="width: 68px; height: 68px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); object-fit: contain;">
-
-        <div>
-            <h3 style="margin: 0; font-family:'Sora',sans-serif; font-weight:700; font-size: 1.35rem; color: var(--text-primary-light);">UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²</h3>
-            <p style="margin: 4px 0 0 0; font-size:0.85rem; opacity:0.75; color: var(--text-secondary-light);">Your Success Partner</p>
-        </div>
+<div class="runner-bar" aria-hidden="true">
+    <div class="runner-track">
+        <span>Powered by Google AI <i class="fas fa-brain"></i> New: AI Quiz Builder is now LIVE! <i class="fas fa-star"></i> Mains Answer Writing analysis with AI feedback <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i></span>
+        <span>Powered by Google AI <i class="fas fa-brain"></i> New: AI Quiz Builder is now LIVE! <i class="fas fa-star"></i> Mains Answer Writing analysis with AI feedback <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i></span>
     </div>
 </div>
 
-        <nav class="navbar">
-            <div class="sidebar-category"><h4>Learn</h4></div>
-            <a href="homeUPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².html"><i class="fas fa-home"></i><span>Home</span></a>
-            <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
-            <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
-            <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
-            <div class="sidebar-category"><h4>Practice & Tools</h4></div>
-            <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
-            <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
-            <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test details</span></a>
-            <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
-            <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
-            <div class="sidebar-category"><h4>Resources</h4></div>
-            <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
-            <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
-            <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
-            <div class="sidebar-category"><h4>Support & Info</h4></div>
-            <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
-            <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
-            <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
-            <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
-        </nav>
+<div class="sidebar-overlay"></div>
+
+<aside class="side-bar" aria-label="Menu">
+    <div class="sidebar-header">
+        <h3 class="title">Complete Menu</h3>
+        <button id="close-btn" type="button" aria-label="Close menu"><i class="fas fa-times"></i></button>
     </div>
-
-    <main class="main-content">
-
-        <!-- HERO - Fixed alignment -->
-        <section class="hero-wrap reveal">
-            <div class="hero-glow"></div>
-            <div class="hero-section" style="position:relative; z-index:1;">
-                <span class="hero-badge"><span class="dot"></span> Trusted by serious UPSC aspirants</span>
-                <h1>Master the Civil Services <span class="grad">the smart way.</span></h1>
-                <p class="lead">Structured resources, sharp analysis, and AI-powered tools built to take you from Prelims to Interview Ã¢â‚¬â€ one focused day at a time.</p>
-                <a href="testinterface.html" class="hero-cta">Start a Mock Test <i class="fas fa-arrow-right"></i></a>
-                <div class="hero-stats">
-                    <div class="hero-stat"><b>28</b><span>Day Planner</span></div>
-                    <div class="hero-stat"><b>AI</b><span>Answer Feedback</span></div>
-                    <div class="hero-stat"><b>24/7</b><span>Study Access</span></div>
-                </div>
-            </div>
-        </section>
-
-        <!-- UPSC Exam Stages -->
-        <section class="upsc-prep-hub reveal" style="text-align:center; margin-top:56px;">
-            <div class="section-eyebrow">
-                <div class="eyebrow-icon"><i class="fas fa-layer-group"></i></div>
-                <h2 class="section-title">UPSC Exam Stages</h2>
-            </div>
-
-            <div class="journey-track">
-                <div class="journey-line"></div>
-                <div class="journey-line-anim"></div>
-
-                <div class="journey-node">
-                    <div class="journey-orb orb-prelims"><i class="fas fa-bullseye"></i></div>
-                    <div>
-                        <h4>Prelims</h4>
-                        <p>GS, CSAT & Trends</p>
-                        <a href="Prelims/prelims.html" class="stage-link link-prelims">Open <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-
-                <div class="journey-node">
-                    <div class="journey-orb orb-mains"><i class="fas fa-pen-fancy"></i></div>
-                    <div>
-                        <h4>Mains</h4>
-                        <p>Answer Writing & Essay</p>
-                        <a href="mains.html" class="stage-link link-mains">Open <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-
-                <div class="journey-node">
-                    <div class="journey-orb orb-interview"><i class="fas fa-user-tie"></i></div>
-                    <div>
-                        <h4>Interview</h4>
-                        <p>DAF & Personality</p>
-                        <a href="interview.html" class="stage-link link-interview">Open <i class="fas fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- 2028 Zone -->
-        <section class="reveal">
-            <div class="zone-card">
-                <span class="zone-badge"><span class="live-dot"></span> LIVE Ã‚Â· New Zone</span>
-                <div class="zone-marquee">
-                    <span>New UPSC Zone 2028 Activated Ã¢â‚¬Â¢ Planner 2028 Ã¢â‚¬Â¢ Daily Goals Ã¢â‚¬Â¢ Smart Tracker Ã¢â‚¬Â¢ Test Series Ã¢â‚¬Â¢ Revision System Ã¢â‚¬Â¢ Performance Analytics Ã¢â‚¬Â¢ Weekly Targets Ã¢â‚¬Â¢ Monthly Strategy Ã¢â‚¬Â¢ UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² Ã‚Â© All Rights Reserved Ã¢â‚¬Â¢ Dream. Plan. Crack UPSC 2028</span>
-                </div>
-                <h3 class="zone-title">UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² 2028 Circuit</h3>
-                <p class="zone-sub">A complete two-year roadmap UPSC daily goals, smart tracking, and a test series built for the long game.</p>
-                <a href="/UPSC2028/" class="zone-cta"><i class="fas fa-calendar-check"></i> Open the 2028 Zone</a>
-                <div class="zone-foot">Ã‚Â© Designed & Curated by <strong>UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²</strong></div>
-            </div>
-        </section>
-
-        <!-- Quick Actions -->
-        <section class="reveal" style="margin-top:48px;">
-            <div class="quick-actions-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:16px;">
-                <a href="notes.html" class="quick-action-item">
-                    <div class="quick-action-icon"><i class="fas fa-sticky-note"></i></div>
-                    <span class="label">Notes</span>
-                </a>
-                <a href="newsupdate.html" class="quick-action-item">
-                    <div class="quick-action-icon"><i class="fas fa-newspaper"></i></div>
-                    <span class="label">Daily News</span>
-                </a>
-                <a href="./TestSeries/TestSeries_UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².html" class="quick-action-item">
-                    <div class="quick-action-icon"><i class="fas fa-tasks"></i></div>
-                    <span class="label">Mock Tests</span>
-                </a>
-                <a href="AnswerWriting/answerwriting.html" class="quick-action-item">
-                    <div class="quick-action-icon"><i class="fas fa-tasks"></i></div>
-                    <span class="label">Answer Writing</span>
-                </a>
-                <a href="/assignments/" class="quick-action-item">
-                    <div class="quick-action-icon"><i class="fas fa-tasks"></i></div>
-                    <span class="label">Daily Tracker</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- AI Section -->
-        <section class="ai-section reveal">
-            <div class="ai-collab-header">
-                <img src="assets/upsc-gurukul-logo.png" alt="UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â² Logo" class="logo-img">
-                <i class="fas fa-plus" style="font-size:14px;"></i>
-                <img src="https://www.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_92x30dp.png" alt="Google Logo" class="logo-img">
-                <span>Powered by Google AI</span>
-            </div>
-            <h2 class="ai-section-title">Introducing <span style="background:var(--primary-gradient); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².ai</span></h2>
-            <p style="color:var(--text-secondary-light); margin-top:8px; max-width:520px;">Revolutionize your preparation with cutting-edge AI tools designed to give you an edge.</p>
-
-            <div class="ai-tools-grid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-top:26px;">
-                <a href="UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²AI/AI.UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².html" class="ai-tool-card">
-                    <h4 style="font-size:1.1rem; font-weight:700; margin-bottom:8px;">UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².ai</h4>
-                    <p style="font-size:.85rem; color:var(--text-secondary-light); line-height:1.5;">Your AI-powered UPSC companion Ã¢â‚¬â€ from quizzes and answer evaluation to personalized learning and smart revisions.</p>
-                    <span class="action-link">Explore UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².ai <i class="fas fa-arrow-right"></i></span>
-                </a>
-            </div>
-        </section>
-
-        <!-- Dashboard Grid -->
-        <section class="card-grid reveal" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:22px; margin-top:48px;">
-
-            <div class="card">
-                <img src="images/UPSC.syllabus.jpg" alt="UPSC Syllabus" class="card-img">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-book-open"></i></div>
-                    <h3>UPSC Syllabus</h3>
-                </div>
-                <p>Access the complete and detailed Prelims & Mains syllabi to structure your preparation.</p>
-                <a href="syllabusUPSC.html" class="action-btn">View Syllabus</a>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-scroll"></i></div>
-                    <h3>Indian Constitution Articles</h3>
-                </div>
-                <p>Explore all important Articles of the Indian Constitution with simplified explanations for UPSC preparation.</p>
-                <a href="article.html" class="action-btn">View Articles</a>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-chart-line"></i></div>
-                    <h3>Essay & Debate Section</h3>
-                </div>
-                <p>Get detailed, insightful essays and debate topics daily.</p>
-                <a href="/special/index.html" class="action-btn">View Report</a>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-pen-fancy"></i></div>
-                    <h3>Answer Writing</h3>
-                </div>
-                <p>Upload your Mains answers for peer and expert evaluation to hone your writing skills.</p>
-                <a href="drive.doc.html" class="action-btn">Upload Document</a>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-video"></i></div>
-                    <h3>Video Lectures</h3>
-                </div>
-                <p>Explore our comprehensive video learning section covering all subjects and topics.</p>
-                <a href="preplibrary.html" class="action-btn">Watch Videos</a>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-book-reader"></i></div>
-                    <h3>Revision Tools</h3>
-                </div>
-                <p>Use smart flashcards and spaced repetition to master key topics and improve retention.</p>
-                <a href="revision.html" class="action-btn">Start Revising</a>
-            </div>
-
-            <div class="card">
-                <div style="display:flex; align-items:center; gap:14px; margin-bottom:6px;">
-                    <div class="card-icon-circle"><i class="fas fa-folder-open"></i></div>
-                    <h3>Resource Files</h3>
-                </div>
-                <p>Find all your confidential study materials, notes, and downloaded resources in one place.</p>
-                <a href="TESTseries-daily.html" class="action-btn">Access Files</a>
-            </div>
-        </section>
-    </main>
-
-    <footer class="site-footer">
-        <div class="footer-content-wrapper">
-            <div class="footer-container" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:40px; margin-bottom:40px;">
-                <div class="footer-about">
-                    <h3 class="footer-title">UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²</h3>
-                    <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
-                </div>
-                <div class="footer-links">
-                    <h3 class="footer-title">Quick Links</h3>
-                    <ul>
-                        <li><a href="about.html">About Us</a></li>
-                        <li><a href="contact.html">Contact Support</a></li>
-                        <li><a href="courses.html">Courses</a></li>
-                        <li><a href="TESTseries-daily.html">Test Series</a></li>
-                    </ul>
-                </div>
-                <div class="footer-social">
-                    <h3 class="footer-title">Connect With Us</h3>
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
-                    <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>Ã‚Â© 2024 UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â². All Rights Reserved.</p>
-                <p><a href="privacy.html">Privacy Policy</a> Ã¢â‚¬Â¢ <a href="terms.html">Terms of Use</a></p>
-                Founder: <a href="https://pratyushswain.in">Pratyush Swain</a>
+    <div class="profile">
+        <div class="profile-row">
+            <img src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo">
+            <div>
+                <h3>UPSC गुरुकुल</h3>
+                <p>Your Success Partner</p>
             </div>
         </div>
-    </footer>
-
-    <nav class="bottom-nav">
-        <a href="homeUPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â².html" class="nav-item active"> <i class="fas fa-home"></i> <span>Home</span> </a>
-        <a href="/Planner/schedule.html" class="nav-item"> <i class="fas fa-calendar-alt"></i> <span>Planner</span> </a>
-        <a href="testinterface.html" class="nav-item"> <i class="fas fa-clipboard-check"></i> <span>Tests</span> </a>
-        <div id="menu-btn" class="nav-item"> <i class="fas fa-bars"></i> <span>Menu</span> </div>
+    </div>
+    <nav class="navbar">
+        <div class="sidebar-category"><h4>Learn</h4></div>
+        <a href="index.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
+        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+        <div class="sidebar-category"><h4>Practice &amp; Tools</h4></div>
+        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+        <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test Details</span></a>
+        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+        <div class="sidebar-category"><h4>Resources</h4></div>
+        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+        <a href="#download"><i class="fab fa-android"></i><span>Download App</span></a>
+        <div class="sidebar-category"><h4>Support &amp; Info</h4></div>
+        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
     </nav>
+</aside>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // Theme toggle logic
-            const toggleBtn = document.querySelector('#toggle-btn');
-            const body = document.body;
-            const applyTheme = (theme) => {
-                body.classList.toggle('dark-mode', theme === 'dark');
-                if (toggleBtn) {
-                    toggleBtn.classList.toggle('fa-moon', theme === 'dark');
-                    toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
-                }
-            };
-            const savedTheme = localStorage.getItem('theme') || 'light';
-            applyTheme(savedTheme);
+<main class="main-content">
 
-            if (toggleBtn) {
-                toggleBtn.addEventListener('click', () => {
-                    const newTheme = body.classList.contains('dark-mode') ? 'light' : 'dark';
-                    localStorage.setItem('theme', newTheme);
-                    applyTheme(newTheme);
-                });
-            }
+    <!-- Hero -->
+    <section class="hero-wrap reveal">
+        <div class="hero-glow"></div>
+        <div class="hero-section" style="position:relative; z-index:1;">
+            <span class="hero-badge"><span class="dot"></span> Trusted by serious UPSC aspirants</span>
+            <h1>Master the Civil Services <span class="grad">the smart way.</span></h1>
+            <p class="lead">Structured resources, sharp analysis, and AI-powered tools built to take you from Prelims to Interview — one focused day at a time.</p>
+            <div class="hero-actions">
+                <a href="testinterface.html" class="hero-cta">Start a Mock Test <i class="fas fa-arrow-right"></i></a>
+                <a href="#download" class="hero-cta-alt"><i class="fab fa-android"></i> Get the Android App</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat"><b>28</b><span>Day Planner</span></div>
+                <div class="hero-stat"><b>AI</b><span>Answer Feedback</span></div>
+                <div class="hero-stat"><b>24/7</b><span>Study Access</span></div>
+            </div>
+        </div>
+    </section>
 
-            // Sidebar toggle logic
-            const menuBtn = document.querySelector('#menu-btn');
-            const closeBtn = document.querySelector('#close-btn');
-            const sideBar = document.querySelector('.side-bar');
-            const sidebarOverlay = document.querySelector('.sidebar-overlay');
+    <!-- Exam stages -->
+    <section class="reveal" style="text-align:center; margin-top:56px;">
+        <div class="section-eyebrow">
+            <div class="eyebrow-icon"><i class="fas fa-layer-group"></i></div>
+            <h2 class="section-title">UPSC Exam Stages</h2>
+        </div>
+        <div class="journey-track">
+            <div class="journey-line"></div>
+            <div class="journey-node">
+                <div class="journey-orb orb-prelims"><i class="fas fa-bullseye"></i></div>
+                <div>
+                    <h4>Prelims</h4>
+                    <p>GS, CSAT &amp; Trends</p>
+                    <a href="Prelims/prelims.html" class="stage-link link-prelims">Open <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="journey-node">
+                <div class="journey-orb orb-mains"><i class="fas fa-pen-fancy"></i></div>
+                <div>
+                    <h4>Mains</h4>
+                    <p>Answer Writing &amp; Essay</p>
+                    <a href="mains.html" class="stage-link link-mains">Open <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="journey-node">
+                <div class="journey-orb orb-interview"><i class="fas fa-user-tie"></i></div>
+                <div>
+                    <h4>Interview</h4>
+                    <p>DAF &amp; Personality</p>
+                    <a href="interview.html" class="stage-link link-interview">Open <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-            const closeSidebar = () => {
-                if (sideBar) sideBar.classList.remove('active');
-                if (sidebarOverlay) sidebarOverlay.classList.remove('active');
-            };
+    <!-- 2028 Zone -->
+    <section class="reveal">
+        <div class="zone-card">
+            <span class="zone-badge"><span class="live-dot"></span> LIVE · New Zone</span>
+            <div class="zone-marquee" aria-hidden="true">
+                <div class="zone-track">
+                    <span>New UPSC Zone 2028 Activated • Planner 2028 • Daily Goals • Smart Tracker • Test Series • Revision System • Performance Analytics • Weekly Targets • Monthly Strategy • Dream. Plan. Crack UPSC 2028</span>
+                    <span>New UPSC Zone 2028 Activated • Planner 2028 • Daily Goals • Smart Tracker • Test Series • Revision System • Performance Analytics • Weekly Targets • Monthly Strategy • Dream. Plan. Crack UPSC 2028</span>
+                </div>
+            </div>
+            <h3 class="zone-title">UPSC गुरुकुल 2028 Circuit</h3>
+            <p class="zone-sub">A complete two-year roadmap with daily goals, smart tracking, and a test series built for the long game.</p>
+            <a href="/UPSC2028/" class="zone-cta"><i class="fas fa-calendar-check"></i> Open the 2028 Zone</a>
+            <div class="zone-foot">© Designed &amp; Curated by <strong>UPSC गुरुकुल</strong></div>
+        </div>
+    </section>
 
-            if (menuBtn) {
-                menuBtn.addEventListener('click', () => {
-                    if (sideBar) sideBar.classList.add('active');
-                    if (sidebarOverlay) sidebarOverlay.classList.add('active');
-                });
-            }
-            if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
-            if (sidebarOverlay) sidebarOverlay.addEventListener('click', closeSidebar);
+    <!-- Quick actions -->
+    <section class="reveal" style="margin-top:48px;">
+        <div class="quick-actions-grid">
+            <a href="notes.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-sticky-note"></i></div><span class="label">Notes</span></a>
+            <a href="newsupdate.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-newspaper"></i></div><span class="label">Daily News</span></a>
+            <a href="TestSeries/TestSeries_UPSChub.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-clipboard-list"></i></div><span class="label">Mock Tests</span></a>
+            <a href="AnswerWriting/answerwriting.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-pen-nib"></i></div><span class="label">Answer Writing</span></a>
+            <a href="/assignments/" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-list-check"></i></div><span class="label">Daily Tracker</span></a>
+        </div>
+    </section>
 
-            // Live date and time display
-            const datetimeContainer = document.getElementById('datetime-container');
-            const updateDateTime = () => {
-                const now = new Date();
-                const dateOptions = { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' };
-                const timeOptions = { hour: '2-digit', minute: '2-digit', hour12: true };
-                if (datetimeContainer) {
-                    datetimeContainer.textContent = `${now.toLocaleDateString('en-US', dateOptions)} | ${now.toLocaleTimeString('en-US', timeOptions)}`;
-                }
-            };
-            updateDateTime();
-            setInterval(updateDateTime, 1000);
+    <!-- Download -->
+    <section id="download" class="download-section reveal" aria-labelledby="download-title">
+        <img class="download-logo" src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल app icon">
+        <div class="download-copy">
+            <span class="eyebrow">ANDROID APP</span>
+            <h2 id="download-title">Download UPSC गुरुकुल</h2>
+            <p>Study anytime, anywhere. Get the app for notes, mock tests, daily news and your 28-day planner — right on your phone.</p>
+            <div class="download-meta" id="apk-meta">Checking latest version…</div>
+        </div>
+        <div class="download-actions">
+            <a id="apk-download" class="btn-gold" href="download.html"><i class="fab fa-android"></i> Download APK</a>
+            <button id="gurukul-install-button" class="btn-ghost" type="button" hidden><i class="fas fa-mobile-screen"></i> Install as web app</button>
+            <p id="gurukul-install-help" hidden>Or open your browser menu and choose <strong>Install app</strong> / <strong>Add to Home screen</strong>.</p>
+        </div>
+    </section>
 
-            // Auto-hide bottom navigation on scroll
-            const bottomNav = document.querySelector('.bottom-nav');
-            let lastScrollY = window.scrollY;
-            if (bottomNav) {
-                window.addEventListener('scroll', () => {
-                    const currentScrollY = window.scrollY;
-                    if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                        bottomNav.style.transform = 'translateY(100%)';
-                    } else {
-                        bottomNav.style.transform = 'translateY(0)';
-                    }
-                    lastScrollY = Math.max(0, currentScrollY);
-                });
-            }
+    <!-- AI -->
+    <section class="ai-section reveal">
+        <div class="ai-collab-header">
+            <img src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo" class="logo-img">
+            <i class="fas fa-plus" style="font-size:14px;"></i>
+            <img src="https://www.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_92x30dp.png" alt="Google logo" class="logo-img">
+            <span>Powered by Google AI</span>
+        </div>
+        <h2 class="ai-section-title">Introducing <span class="grad">UPSC गुरुकुल.ai</span></h2>
+        <p style="color:var(--text-secondary-light); margin-top:8px; max-width:520px; line-height:1.6;">Revolutionize your preparation with cutting-edge AI tools designed to give you an edge.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-top:26px;">
+            <a href="UPSChubAI/AI.UPSChub.html" class="ai-tool-card">
+                <h4 style="font-size:1.1rem; font-weight:700; margin:0 0 8px;">UPSC गुरुकुल.ai</h4>
+                <p style="font-size:.85rem; color:var(--text-secondary-light); line-height:1.5; margin:0;">Your AI-powered UPSC companion — from quizzes and answer evaluation to personalized learning and smart revisions.</p>
+                <span class="action-link">Explore UPSC गुरुकुल.ai <i class="fas fa-arrow-right"></i></span>
+            </a>
+        </div>
+    </section>
 
-            // Scroll reveal animation
-            const revealEls = document.querySelectorAll('.reveal');
-            const io = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('in-view');
-                        io.unobserve(entry.target);
-                    }
-                });
-            }, { threshold: 0.12 });
-            revealEls.forEach(el => io.observe(el));
-        });
-    </script>
+    <!-- Dashboard grid -->
+    <section class="card-grid reveal">
+        <div class="card">
+            <img src="images/UPSC.syllabus.jpg" alt="UPSC Syllabus" class="card-img" loading="lazy">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-book-open"></i></div><h3>UPSC Syllabus</h3></div>
+            <p>Access the complete and detailed Prelims &amp; Mains syllabi to structure your preparation.</p>
+            <a href="syllabusUPSC.html" class="action-btn">View Syllabus</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-scroll"></i></div><h3>Indian Constitution Articles</h3></div>
+            <p>Explore all important Articles of the Indian Constitution with simplified explanations for UPSC preparation.</p>
+            <a href="article.html" class="action-btn">View Articles</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-chart-line"></i></div><h3>Essay &amp; Debate Section</h3></div>
+            <p>Get detailed, insightful essays and debate topics daily.</p>
+            <a href="/special/index.html" class="action-btn">Read Essays</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-pen-fancy"></i></div><h3>Answer Writing</h3></div>
+            <p>Upload your Mains answers for peer and expert evaluation to hone your writing skills.</p>
+            <a href="drive.doc.html" class="action-btn">Upload Document</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-video"></i></div><h3>Video Lectures</h3></div>
+            <p>Explore our comprehensive video learning section covering all subjects and topics.</p>
+            <a href="preplibrary.html" class="action-btn">Watch Videos</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-book-reader"></i></div><h3>Revision Tools</h3></div>
+            <p>Use smart flashcards and spaced repetition to master key topics and improve retention.</p>
+            <a href="revision.html" class="action-btn">Start Revising</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-folder-open"></i></div><h3>Resource Files</h3></div>
+            <p>Find your study materials, notes, and downloaded resources in one place.</p>
+            <a href="TESTseries-daily.html" class="action-btn">Access Files</a>
+        </div>
+    </section>
+</main>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const banner = document.getElementById("holiBanner");
-            if (!localStorage.getItem("holiSeen")) {
-                localStorage.setItem("holiSeen", "true");
-                window.location.href = "";
-            } else {
-                if (banner) banner.style.display = "block";
-            }
-        });
-    </script>
+<footer class="site-footer">
+    <div class="footer-content-wrapper">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3 class="footer-title">UPSC गुरुकुल</h3>
+                <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
+            </div>
+            <div class="footer-links">
+                <h3 class="footer-title">Quick Links</h3>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Support</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="TESTseries-daily.html">Test Series</a></li>
+                    <li><a href="#download">Download App</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h3 class="footer-title">Connect With Us</h3>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 UPSC गुरुकुल. All Rights Reserved.</p>
+            <p><a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms of Use</a></p>
+            <p>Founder: <a href="https://pratyushswain.in">Pratyush Swain</a></p>
+        </div>
+    </div>
+</footer>
 
-    <script>
-        (function () {
-            const today = new Date();
-            const year = today.getFullYear();
-            const holiStart = new Date(year, 2, 1);
-            const holiEnd = new Date(year, 2, 31);
-            if (today >= holiStart && today <= holiEnd) {
-                if (!sessionStorage.getItem("holiVisited")) {
-                    sessionStorage.setItem("holiVisited", "true");
-                    window.location.href = "";
-                }
-            }
-        })();
-    </script>
+<nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="index.html" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/Planner/schedule.html" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Planner</span></a>
+    <a href="testinterface.html" class="nav-item"><i class="fas fa-clipboard-check"></i><span>Tests</span></a>
+    <a href="#download" class="nav-item"><i class="fas fa-download"></i><span>App</span></a>
+    <button id="menu-btn" class="nav-item" type="button"><i class="fas fa-bars"></i><span>Menu</span></button>
+</nav>
 
-    <script type="application/ld+json">
-{
- "@context": "https://schema.org",
- "@type": "Organization",
- "name": "UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²",
- "url": "https://upscgurukul.online",
- "founder": {
-   "@type": "Person",
-   "name": "Pratyush Swain",
-   "url": "https://pratyushswain.in"
- }
-}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Theme
+    const toggleBtn = document.querySelector('#toggle-btn');
+    const body = document.body;
+    const applyTheme = (theme) => {
+        body.classList.toggle('dark-mode', theme === 'dark');
+        if (toggleBtn) {
+            toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+            toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+        }
+    };
+    let savedTheme = 'light';
+    try { savedTheme = localStorage.getItem('theme') || 'light'; } catch (e) {}
+    applyTheme(savedTheme);
+    if (toggleBtn) toggleBtn.addEventListener('click', () => {
+        const t = body.classList.contains('dark-mode') ? 'light' : 'dark';
+        try { localStorage.setItem('theme', t); } catch (e) {}
+        applyTheme(t);
+    });
+
+    // Sidebar
+    const menuBtn = document.querySelector('#menu-btn');
+    const closeBtn = document.querySelector('#close-btn');
+    const sideBar = document.querySelector('.side-bar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const closeSidebar = () => { sideBar.classList.remove('active'); overlay.classList.remove('active'); };
+    menuBtn.addEventListener('click', () => { sideBar.classList.add('active'); overlay.classList.add('active'); });
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+    sideBar.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', closeSidebar));
+
+    // Clock
+    const dt = document.getElementById('datetime-container');
+    const tick = () => {
+        const now = new Date();
+        dt.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+            + ' | ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+    tick(); setInterval(tick, 1000);
+
+    // Auto-hide bottom nav
+    const bottomNav = document.querySelector('.bottom-nav');
+    let lastY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        bottomNav.style.transform = (y > lastY && y > 100) ? 'translateY(100%)' : 'translateY(0)';
+        lastY = Math.max(0, y);
+    }, { passive: true });
+
+    // Reveal
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in-view'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+});
 </script>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
-        import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
-        import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+<!-- Download: always point the button at the newest APK release -->
+<script>
+(function () {
+    const API = 'https://api.github.com/repos/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
+    const RELEASES = 'https://github.com/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
+    const btn = document.getElementById('apk-download');
+    const meta = document.getElementById('apk-meta');
+    fetch(API, { headers: { Accept: 'application/vnd.github+json' } })
+        .then(r => { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+        .then(rel => {
+            const apk = (rel.assets || []).find(a => /\.apk$/i.test(a.name) && a.browser_download_url);
+            const ver = String(rel.tag_name || '').replace(/^v/i, '');
+            if (!apk) { btn.href = RELEASES; meta.textContent = 'Open the releases page to download the APK.'; return; }
+            btn.href = apk.browser_download_url;
+            btn.setAttribute('download', '');
+            btn.innerHTML = '<i class="fab fa-android"></i> Download v' + ver;
+            const mb = (apk.size / 1048576).toFixed(1);
+            meta.textContent = 'Version ' + ver + ' • ' + mb + ' MB • Android 5.0+ • You may need to allow installs from this source.';
+        })
+        .catch(() => { btn.href = RELEASES; meta.textContent = 'Tap to open the latest release.'; });
+})();
+</script>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
-            authDomain: "upscstudyhub-github.firebaseapp.com",
-            projectId: "upscstudyhub-github",
-            messagingSenderId: "451692540885",
-            appId: "1:451692540885:web:b425e85128e5de97c7c35c"
-        };
+<!-- PWA install -->
+<script>
+(function () {
+    let deferredPrompt = null;
+    const button = document.getElementById('gurukul-install-button');
+    const help = document.getElementById('gurukul-install-help');
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; button.hidden = false; help.hidden = true; });
+    button.addEventListener('click', async () => {
+        if (!deferredPrompt) { help.hidden = false; return; }
+        deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; button.hidden = true;
+    });
+    window.addEventListener('appinstalled', () => { button.hidden = true; help.hidden = true; });
+    setTimeout(() => {
+        if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) help.hidden = false;
+    }, 2500);
+})();
+</script>
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const messaging = getMessaging(app);
+<!-- Update checker -->
+<script>
+(() => {
+    const API = 'https://api.github.com/repos/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
+    const KEY = 'upscgurukul_installed_version';
+    const compare = (a, b) => {
+        const x = String(a).replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+        const y = String(b).replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+        for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0);
+        return 0;
+    };
+    async function check() {
+        try {
+            const params = new URLSearchParams(location.search);
+            const launch = params.get('app_version');
+            // Only relevant inside the installed app
+            if (!launch && !localStorage.getItem(KEY)) return;
+            const r = await fetch(API, { headers: { Accept: 'application/vnd.github+json' }, cache: 'no-store' });
+            if (!r.ok) return;
+            const rel = await r.json();
+            const latest = String(rel.tag_name || '').replace(/^v/i, '');
+            const installed = launch || localStorage.getItem(KEY) || '3.3';
+            if (!latest || compare(latest, installed) <= 0) return;
+            const asset = (rel.assets || []).find(a => /\.apk$/i.test(a.name) && a.browser_download_url);
+            if (!asset || document.getElementById('upscg-update')) return;
 
-        async function setupNotifications() {
-            try {
-                const permission = await Notification.requestPermission();
-                if (permission === 'granted') {
-                    const registration = await navigator.serviceWorker.ready;
-                    const token = await getToken(messaging, {
-                        serviceWorkerRegistration: registration,
-                        vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo'
-                    });
+            const css = document.createElement('style');
+            css.textContent = '#upscg-update{position:fixed;z-index:2147483647;left:16px;right:16px;bottom:80px;max-width:520px;margin:auto;padding:18px;border:1px solid #d9e4f5;border-radius:18px;background:#fff;color:#152238;box-shadow:0 12px 40px #0003;font:15px/1.45 system-ui}#upscg-update h3{margin:0 0 6px}#upscg-update p{margin:0 0 14px}#upscg-update a,#upscg-update button{display:inline-block;border:0;border-radius:10px;padding:11px 14px;font-weight:700;text-decoration:none;cursor:pointer}#upscg-update a{background:#173ea5;color:#fff}#upscg-update button{background:#eef2f8;color:#23324b;margin-left:8px}';
+            document.head.appendChild(css);
 
-                    if (token) {
-                        console.log("Device Token Success:", token);
-                        let visitorId = localStorage.getItem('visitorId') || 'visitor_' + Date.now();
-                        localStorage.setItem('visitorId', visitorId);
-                        await setDoc(doc(db, "artifacts", "default-app-id", "users", visitorId), {
-                            fcmToken: token,
-                            type: "anonymous_visitor",
-                            subscribedAt: serverTimestamp()
-                        }, { merge: true });
-                        console.log("Success! Token saved for this visitor.");
-                    }
-                }
-            } catch (error) {
-                console.error("Firebase Notification Error:", error);
+            const box = document.createElement('section');
+            box.id = 'upscg-update'; box.setAttribute('role', 'dialog');
+            const h = document.createElement('h3'); h.textContent = 'UPSC गुरुकुल update available';
+            const p = document.createElement('p'); p.textContent = 'Version ' + latest + ' is available. Your version: ' + installed + '.';
+            const a = document.createElement('a'); a.href = asset.browser_download_url; a.textContent = 'Download v' + latest; a.rel = 'noopener';
+            const later = document.createElement('button'); later.type = 'button'; later.textContent = 'Later'; later.onclick = () => box.remove();
+            box.append(h, p, a, later);
+            document.body.appendChild(box);
+        } catch (e) { console.warn('UPSC Gurukul update check failed:', e); }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check, { once: true }); else check();
+})();
+</script>
+
+<!-- Push notifications (Firebase) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+        authDomain: "upscstudyhub-github.firebaseapp.com",
+        projectId: "upscstudyhub-github",
+        messagingSenderId: "451692540885",
+        appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const messaging = getMessaging(app);
+
+    async function setupNotifications() {
+        try {
+            if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') return;
+            const registration = await navigator.serviceWorker.ready;
+            const token = await getToken(messaging, {
+                serviceWorkerRegistration: registration,
+                vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo'
+            });
+            if (token) {
+                const visitorId = localStorage.getItem('visitorId') || 'visitor_' + Date.now();
+                localStorage.setItem('visitorId', visitorId);
+                await setDoc(doc(db, "artifacts", "default-app-id", "users", visitorId), {
+                    fcmToken: token, type: "anonymous_visitor", subscribedAt: serverTimestamp()
+                }, { merge: true });
             }
+        } catch (error) {
+            console.error("Firebase Notification Error:", error);
         }
-
-        setupNotifications();
-    </script>
+    }
+    setupNotifications();
+</script>
 
 <script defer src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"efa534aadbef4833acd06bd246b237e2","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 <script src="/festival/independence_day/independence-day.js"></script>
 <script src="/festival/independence_day/independence-reminder.js"></script>
-<div id="upschub-apk-overlay-v31" aria-hidden="true">
-  <section id="upschub-apk-popup-v31" role="dialog" aria-modal="true" aria-labelledby="upschub-apk-title-v31">
-    <button type="button" class="apk-close" id="upschub-apk-close-v31" aria-label="Close popup">&times;</button>
-    <div class="apk-icon" aria-hidden="true">U</div>
-    <h2 id="upschub-apk-title-v31">UPSC à¤—à¥à¤°à¥à¤•à¥à¤²</h2>
-    <p>Study anytime, anywhere. Get the UPSC à¤—à¥à¤°à¥à¤•à¥à¤² app and continue your preparation wherever you go.</p>
-    </section>
-</div>
-<script id="upschub-apk-popup-v31-script">
-(function(){
-  var overlay=document.getElementById('upschub-apk-overlay-v31');
-  var close=document.getElementById('upschub-apk-close-v31');
-  if(!overlay||!close)return;
-  function hide(){overlay.classList.remove('is-visible');overlay.setAttribute('aria-hidden','true');try{sessionStorage.setItem('upschub-apk-popup-dismissed-v31','1')}catch(e){}}
-  close.addEventListener('click',hide);
-  overlay.addEventListener('click',function(e){if(e.target===overlay)hide()});
-  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&overlay.classList.contains('is-visible'))hide()});
-  var dismissed=false;
-  try{dismissed=sessionStorage.getItem('upschub-apk-popup-dismissed-v31')==='1'}catch(e){}
-  if(!dismissed){setTimeout(function(){overlay.classList.add('is-visible');overlay.setAttribute('aria-hidden','false')},1800)}
-})();
-</script>
-<div id="gurukul-pwa-install" style="max-width:1100px;margin:16px auto;padding:0 16px;font-family:inherit">
-  <button id="gurukul-install-button" type="button" hidden
-    style="border:0;border-radius:10px;padding:13px 20px;background:#d9b45f;color:#101a32;font-weight:800;cursor:pointer">
-    Install UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â²
-  </button>
-  <p id="gurukul-install-help" hidden style="font-size:13px;line-height:1.6;color:inherit">
-    To install UPSC Ã Â¤â€”Ã Â¥ÂÃ Â¤Â°Ã Â¥ÂÃ Â¤â€¢Ã Â¥ÂÃ Â¤Â², open your browser menu and choose
-    <strong>Install app</strong> or <strong>Add to Home screen</strong>, if available.
-  </p>
-</div>
-<script id="gurukul-pwa-install-script">
-(function () {
-  let deferredPrompt = null;
-  const button = document.getElementById('gurukul-install-button');
-  const help = document.getElementById('gurukul-install-help');
-  if (!button || !help) return;
-
-  window.addEventListener('beforeinstallprompt', function (event) {
-    event.preventDefault();
-    deferredPrompt = event;
-    button.hidden = false;
-    help.hidden = true;
-  });
-
-  button.addEventListener('click', async function () {
-    if (!deferredPrompt) {
-      help.hidden = false;
-      return;
-    }
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    button.hidden = true;
-  });
-
-  window.addEventListener('appinstalled', function () {
-    button.hidden = true;
-    help.hidden = true;
-  });
-
-  // A native prompt may not be available on every browser or visit.
-  setTimeout(function () {
-    if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) {
-      help.hidden = false;
-    }
-  }, 2500);
-})();
-</script>
-<!-- UPSCGURUKUL_UPDATE_CHECKER_V1 -->
-<script>
-(() => {
-  const API = 'https://api.github.com/repos/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
-  const RELEASES = 'https://github.com/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
-  const KEY = 'upscgurukul_installed_version';
-
-  const compare = (a,b) => {
-    const x=String(a).replace(/^v/i,'').split('.').map(n=>parseInt(n,10)||0);
-    const y=String(b).replace(/^v/i,'').split('.').map(n=>parseInt(n,10)||0);
-    for(let i=0;i<Math.max(x.length,y.length);i++){
-      if((x[i]||0)!==(y[i]||0)) return (x[i]||0)-(y[i]||0);
-    }
-    return 0;
-  };
-
-  async function check() {
-    try {
-      const r = await fetch(API, {
-        headers:{Accept:'application/vnd.github+json'},
-        cache:'no-store'
-      });
-      if(!r.ok) return;
-
-      const release = await r.json();
-      const latest = String(release.tag_name||'').replace(/^v/i,'');
-      if(!latest) return;
-
-      const params = new URLSearchParams(location.search);
-      const launchVersion = params.get('app_version');
-      const savedVersion = localStorage.getItem(KEY);
-
-      // Legacy installations default to v3.3 until identified.
-      const installed = launchVersion || savedVersion || '3.3';
-
-      if(compare(latest,installed)<=0) return;
-
-      const asset = (release.assets||[]).find(a =>
-        /\.apk$/i.test(a.name) && a.browser_download_url
-      );
-      if(!asset) return;
-
-      if(document.getElementById('upscg-update')) return;
-
-      const css = document.createElement('style');
-      css.textContent = '#upscg-update{position:fixed;z-index:2147483647;left:16px;right:16px;bottom:16px;max-width:520px;margin:auto;padding:18px;border:1px solid #d9e4f5;border-radius:18px;background:#fff;color:#152238;box-shadow:0 12px 40px #0003;font:15px/1.45 system-ui}#upscg-update h3{margin:0 0 6px}#upscg-update p{margin:0 0 14px}#upscg-update a,#upscg-update button{display:inline-block;border:0;border-radius:10px;padding:11px 14px;font-weight:700;text-decoration:none;cursor:pointer}#upscg-update a{background:#173ea5;color:white}#upscg-update button{background:#eef2f8;color:#23324b;margin:8px 8px 0 0}';
-      document.head.appendChild(css);
-
-      const box = document.createElement('section');
-      box.id = 'upscg-update';
-      box.setAttribute('role','dialog');
-
-      const h = document.createElement('h3');
-      h.textContent = 'UPSC Gurukul update available';
-
-      const p = document.createElement('p');
-      p.textContent = 'Version '+latest+' is available. Your version: '+installed+'.';
-
-      const a = document.createElement('a');
-      a.href = asset.browser_download_url;
-      a.textContent = 'Download v'+latest;
-      a.target = '_blank';
-      a.rel = 'noopener';
-
-      const later = document.createElement('button');
-      later.textContent = 'Later';
-      later.onclick = () => box.remove();
-      box.append(h,p,a,later);
-      document.body.appendChild(box);
-    } catch(e) {
-      console.warn('UPSC Gurukul update check failed:',e);
-    }
-  }
-
-  if(document.readyState==='loading')
-    document.addEventListener('DOMContentLoaded',check,{once:true});
-  else check();
-})();
-</script>
-<!-- UPSCGURUKUL_AUTO_LATEST_RELEASE_V1 -->
-<script src="/latest-release.js?v=1" defer></script>  <script type="module" src="/upscgurukul-push-registration.js"></script>
+<script src="/latest-release.js?v=1" defer></script>
+<script type="module" src="/upscgurukul-push-registration.js"></script>
 <script src="/upscgurukul-debug.js?v=1"></script>
 <script src="/upscgurukul-dev-lockdown.js?v=9"></script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
