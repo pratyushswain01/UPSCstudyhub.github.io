@@ -21,20 +21,22 @@
     document.addEventListener("DOMContentLoaded",mount,{once:true});
   }
 
-  fetch("/debug-mode.json?t="+Date.now(),{cache:"no-store"})
-    .then(function(r){if(!r.ok)throw Error("status");return r.json();})
+ var settled=false;
+  function drop(){ if(!settled){ settled=true; cover.remove(); } }
+  var ctl=window.AbortController?new AbortController():null;
+  var timer=setTimeout(function(){ if(ctl) ctl.abort(); drop(); },2500);
+
+  fetch("/debug-mode.json?t="+Date.now(),{cache:"no-store",signal:ctl?ctl.signal:undefined})
+    .then(function(r){ if(!r.ok) throw Error("status"); return r.json(); })
     .then(function(data){
-      if(data.enabled===true){
-        cover.querySelector("div div:nth-child(2)").textContent="Development environment";
-        cover.querySelector("div div:nth-child(3)").textContent="Loading official development portal…";
-      }else{
-        cover.remove();
-      }
+      clearTimeout(timer);
+      if(data && data.enabled===true){
+        var parts=cover.querySelectorAll("div div");
+        if(parts[1]) parts[1].textContent="Development environment";
+        if(parts[2]) parts[2].textContent="Loading official development portal…";
+      }else{ drop(); }
     })
-    .catch(function(){
-      cover.remove();
-      console.warn("UPSC Gurukul: debug-mode check failed; continuing in public mode.");
-    });
+    .catch(function(){ clearTimeout(timer); drop(); console.warn("UPSC Gurukul: debug-mode check failed; continuing in public mode."); });
 })();
 </script>
 
