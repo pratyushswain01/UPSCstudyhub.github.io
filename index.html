@@ -157,6 +157,19 @@
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     }
 
+    .video-card video { background: var(--navy-800); }
+    .fallback-art { display: none; position: absolute; inset: 0; z-index: 1; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+      background: radial-gradient(circle at 50% 40%, rgba(214,173,83,.22), transparent 60%), linear-gradient(160deg, var(--navy-700), var(--navy-900)); }
+    .fallback-art img { width: 96px; height: 96px; border-radius: 26px; object-fit: contain; background: var(--navy-800);
+      box-shadow: 0 0 0 6px rgba(229,199,126,.15), 0 0 60px rgba(214,173,83,.4); animation: pulse 2s ease-in-out infinite; }
+    .fallback-art span { font: 700 1.3rem 'Poppins','Noto Sans Devanagari',sans-serif; color: var(--gold-300); letter-spacing: .02em; }
+    .video-card.no-video video { display: none; }
+    .video-card.no-video .fallback-art { display: flex; }
+    .play-btn { position: absolute; z-index: 4; left: 50%; top: 50%; transform: translate(-50%,-50%); width: 68px; height: 68px; border-radius: 50%;
+      border: 0; cursor: pointer; font-size: 26px; color: var(--navy-800); padding-left: 5px;
+      background: linear-gradient(135deg, var(--gold-300), var(--gold-500)); box-shadow: 0 10px 34px rgba(0,0,0,.45); }
+    @keyframes pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.06); } }
+
     /* Copy */
     .headline { margin-top: 26px; font-size: clamp(1.35rem, 5.4vw, 1.85rem); font-weight: 600; letter-spacing: -.02em; line-height: 1.25;
       opacity: 0; animation: rise .8s ease forwards .8s; }
@@ -259,9 +272,12 @@
     </header>
 
     <section class="video-card" aria-label="Intro video">
-      <video id="introVideo" autoplay muted playsinline preload="auto" poster="assets/upsc-gurukul-logo.png">
-        <source src="images/intro.mp4" type="video/mp4">
-      </video>
+      <video id="introVideo" src="images/intro.mp4" autoplay muted playsinline preload="auto"></video>
+      <div class="fallback-art" aria-hidden="true">
+        <img src="assets/upsc-gurukul-logo.png" alt="">
+        <span>UPSC गुरुकुल</span>
+      </div>
+      <button id="playBtn" class="play-btn" type="button" aria-label="Play intro" hidden>▶</button>
       <button id="soundBtn" class="sound-btn" type="button" aria-label="Turn sound on" hidden>🔇</button>
       <div class="progress" aria-hidden="true"><i id="progressBar"></i></div>
     </section>
@@ -300,17 +316,9 @@
 
       function leave() {
         if (go) return; go = true;
-        try { sessionStorage.setItem('upscg_intro_seen', '1'); } catch (e) {}
         body.classList.add('page-exit');
         setTimeout(function () { window.location.replace(dest()); }, 450);
       }
-
-      // Already watched this session (e.g. app reopened / back button) → go straight in
-      try {
-        if (sessionStorage.getItem('upscg_intro_seen') === '1' && !/[?&]intro=1/.test(location.search)) {
-          window.location.replace(dest()); return;
-        }
-      } catch (e) {}
 
       // Keep query (app_version etc.) on every link into the dashboard
       document.getElementById('enterBtn').href = dest('');
@@ -330,15 +338,40 @@
       });
 
       // Safety nets: never get stuck on this page
-      video.addEventListener('error', function () { setTimeout(leave, 2500); });
-      var source = video.querySelector('source');
-      if (source) source.addEventListener('error', function () { setTimeout(leave, 2500); });
-      setTimeout(function () {                    // autoplay blocked / video never started
-        if (video.paused && video.currentTime === 0 && !go) {
-          var p = video.play(); if (p && p.catch) p.catch(function () { setTimeout(leave, 1500); });
-        }
-      }, 1500);
-      setTimeout(leave, 30000);                   // hard cap
+      var card = document.querySelector('.video-card');
+      var playBtn = document.getElementById('playBtn');
+      var sources = ['images/intro.mp4', '/images/intro.mp4'];
+      var tried = 0, started = false, iv = null;
+
+      function tryPlay() {
+        var p = video.play();
+        if (p && p.catch) p.catch(function (err) {
+          if (err && err.name === 'NotAllowedError') playBtn.hidden = false;   // autoplay blocked → tap to play
+        });
+      }
+      function fallback() {                       // video unavailable → animated logo splash, then continue
+        if (started || go || iv) return;
+        card.classList.add('no-video');
+        var t0 = Date.now(), total = 3600;
+        iv = setInterval(function () {
+          var pct = Math.min(100, ((Date.now() - t0) / total) * 100);
+          bar.style.width = pct + '%';
+          if (pct >= 100) { clearInterval(iv); leave(); }
+        }, 80);
+      }
+      video.addEventListener('error', function () {
+        tried++;
+        if (tried < sources.length) { video.src = sources[tried]; video.load(); tryPlay(); }
+        else fallback();
+      });
+      video.addEventListener('playing', function () {
+        started = true; playBtn.hidden = true;
+        if (iv) { clearInterval(iv); iv = null; card.classList.remove('no-video'); }
+      });
+      playBtn.addEventListener('click', function () { video.muted = true; tryPlay(); });
+      setTimeout(function () { if (!started && !go && playBtn.hidden) tryPlay(); }, 1200);
+      setTimeout(function () { if (!started && !go && playBtn.hidden) fallback(); }, 6000);
+      setTimeout(leave, 45000);                   // hard cap
 
       // Optional sound toggle
       video.addEventListener('playing', function () { soundBtn.hidden = false; }, { once: true });
