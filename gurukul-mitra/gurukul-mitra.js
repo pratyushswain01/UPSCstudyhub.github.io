@@ -52,10 +52,23 @@
   const currentYear = new Date().getFullYear();
 
   root.innerHTML = `
-    <button class="gm-launcher" type="button" aria-label="Open Gurukul Mitra assistant" aria-expanded="false">
-      <span class="gm-mark" aria-hidden="true">ॐ</span>
-      <span class="gm-launcher-label">Gurukul Mitra</span>
-    </button>
+    <!-- Floating Launcher + Greeting Bubble -->
+    <div class="gm-launcher-wrap">
+      <div class="gm-bubble" id="gmBubble" role="status" aria-live="polite">
+        <div class="gm-bubble-text">
+          <strong>Namaste, Aspirant!</strong>
+          How may I help you today?<br>
+          <span class="gm-bubble-cta">Click me →</span>
+        </div>
+        <button class="gm-bubble-close" type="button" aria-label="Dismiss greeting">×</button>
+      </div>
+
+      <button class="gm-launcher" type="button" aria-label="Open Gurukul Mitra assistant" aria-expanded="false">
+        <span class="gm-mark" aria-hidden="true">ॐ</span>
+        <span class="gm-launcher-label">Gurukul Mitra</span>
+      </button>
+    </div>
+
     <section class="gm-panel" role="dialog" aria-label="Gurukul Mitra AI assistant" aria-modal="false">
       <header class="gm-head">
         <div class="gm-avatar" aria-hidden="true">ॐ</div>
@@ -92,16 +105,38 @@
   const input = root.querySelector(".gm-input");
   const sendBtn = root.querySelector(".gm-send");
   const messages = root.querySelector(".gm-messages");
+  const bubble = root.querySelector("#gmBubble");
+  const bubbleClose = root.querySelector(".gm-bubble-close");
 
   let busy = false;
-  let hasConversation = false; // tracks if any real user/assistant messages exist
+  let hasConversation = false;
 
-  // ---------- Welcome screen (first open only) ----------
+  // ---------- Greeting Bubble Logic ----------
+  const BUBBLE_KEY = "gm_bubble_shown";
+
+  function showBubble() {
+    // Show only once per session (or until dismissed)
+    if (sessionStorage.getItem(BUBBLE_KEY)) return;
+    bubble.classList.add("gm-bubble-visible");
+  }
+
+  function hideBubble() {
+    bubble.classList.remove("gm-bubble-visible");
+    sessionStorage.setItem(BUBBLE_KEY, "1");
+  }
+
+  // Show bubble after a short delay so it feels natural
+  setTimeout(showBubble, 1200);
+
+  bubbleClose.addEventListener("click", (e) => {
+    e.stopPropagation();
+    hideBubble();
+  });
+
+  // ---------- Welcome inside panel ----------
   function showWelcome() {
-    // Only show if no conversation has started
     if (hasConversation || messages.querySelector(".gm-msg")) return;
 
-    // Clear any previous welcome (safety)
     const existingWelcome = messages.querySelector(".gm-welcome");
     if (existingWelcome) existingWelcome.remove();
     const existingSuggestions = messages.querySelector(".gm-suggestions");
@@ -112,7 +147,7 @@
     welcome.innerHTML = `
       <strong>Namaste, Aspirant!</strong>
       <p>“Your journey to civil services starts with one good question. I'm Gurukul Mitra, your UPSC companion—here to help you learn, plan, practise, and move forward with confidence.”</p>
-      <p style="margin-top:10px;font-weight:600;color:var(--gm-accent-strong,#176b58);">What shall we work on today?</p>
+      <p class="gm-question">What shall we work on today?</p>
     `;
 
     const suggestions = document.createElement("div");
@@ -131,7 +166,6 @@
       btn.type = "button";
       btn.textContent = chip.label;
       btn.addEventListener("click", () => {
-        // Remove welcome + chips once conversation starts
         welcome.remove();
         suggestions.remove();
         ask(chip.prompt);
@@ -146,11 +180,10 @@
   function setOpen(open) {
     panel.classList.toggle("gm-open", open);
     launcher.setAttribute("aria-expanded", String(open));
+
     if (open) {
-      // Show welcome only when panel opens and no conversation yet
-      if (!hasConversation) {
-        showWelcome();
-      }
+      hideBubble();                 // hide the popup when user opens the chat
+      if (!hasConversation) showWelcome();
       setTimeout(() => input.focus(), 80);
     }
   }
@@ -208,10 +241,8 @@
     const message = text.trim();
     if (!message || busy) return;
 
-    // Mark that a real conversation has started
     hasConversation = true;
 
-    // Remove welcome screen if still present
     const welcomeEl = messages.querySelector(".gm-welcome");
     if (welcomeEl) welcomeEl.remove();
     const suggestionsEl = messages.querySelector(".gm-suggestions");
@@ -253,7 +284,6 @@
       const data = await response.json();
       const reply = data.reply || localFallback(message);
 
-      // Replace loading indicator safely
       pending.className = "gm-msg assistant";
       pending.textContent = reply;
 
@@ -282,13 +312,11 @@
     }
   }
 
-  // Form submit
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     ask(input.value);
   });
 
-  // Enter to send, Shift+Enter for newline
   input.addEventListener("keydown", (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -296,7 +324,6 @@
     }
   });
 
-  // Auto-resize textarea
   input.addEventListener("input", () => {
     input.style.height = "auto";
     input.style.height = `${Math.min(input.scrollHeight, 110)}px`;
