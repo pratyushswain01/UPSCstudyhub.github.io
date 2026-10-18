@@ -380,10 +380,9 @@ var settled=false;
       function finish() {
         body.classList.add('ready');
         tBar.style.transition = 'width 1.8s linear';
-                tBar.style.width = '100%';
-        body.classList.add('ready');
-        later(leave, 1500);
-      } else {
+        tBar.style.width = '100%';
+        if (!reduce) later(leave, 1900);          // auto-continue to the home page
+      }
 
       if (reduce) {
         script.forEach(function (it) {
@@ -391,9 +390,9 @@ var settled=false;
           it.segs.forEach(function (sg) { var sp = document.createElement('span'); sp.className = sg[1]; sp.textContent = sg[0]; row.appendChild(sp); });
           tBody.appendChild(row);
         });
-                tBar.style.width = '100%';
+        tBar.style.width = '100%';
         body.classList.add('ready');
-        later(leave, 1500);
+        later(leave, 1500);                       // auto-continue in reduced-motion mode too
       } else {
         later(function () { run(0); }, 1150);    // starts as the logo settles
       }
