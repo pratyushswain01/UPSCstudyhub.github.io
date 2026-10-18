@@ -40,7 +40,25 @@
 
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script>
+    /* Detect installed app (PWA / Android TWA) vs normal website, before first paint */
+    (function () {
+        var app = false;
+        try {
+            var q = new URLSearchParams(location.search);
+            app = window.matchMedia('(display-mode: standalone)').matches ||
+                  window.matchMedia('(display-mode: fullscreen)').matches ||
+                  window.matchMedia('(display-mode: minimal-ui)').matches ||
+                  window.navigator.standalone === true ||
+                  (document.referrer || '').indexOf('android-app://') === 0 ||
+                  q.has('app_version') || q.get('source') === 'twa';
+            if (app) sessionStorage.setItem('upscg_app', '1');
+            else if (sessionStorage.getItem('upscg_app') === '1') app = true;
+        } catch (e) {}
+        if (app) document.documentElement.classList.add('app-mode');
+    })();
+    </script>
     <meta name="google-adsense-account" content="ca-pub-1102687898568560">
     <meta name="description" content="UPSC गुरुकुल – structured notes, mock tests, answer writing and AI tools for UPSC Civil Services preparation.">
     <meta name="keywords" content="UPSC गुरुकुल, UPSC Gurukul, UPSC preparation, civil services, exam preparation">
@@ -82,7 +100,7 @@
             --upsc-prelims: #3b82f6;
             --upsc-mains: #f43f5e;
             --upsc-interview: #14b8a6;
-            --header-h: 64px;
+            --header-h: calc(64px + env(safe-area-inset-top, 0px));
         }
 
         * { box-sizing: border-box; }
@@ -462,6 +480,89 @@
             .zone-card, .download-section { padding: 30px 22px; }
             .download-actions { width: 100%; }
         }
+
+        /* ===== v3: header fix, website vs app modes ===== */
+        html { -webkit-tap-highlight-color: transparent; }
+        .app-header { padding-top: env(safe-area-inset-top, 0px); }
+        .header-content-wrapper { height: 64px; }
+
+        /* Sub-nav: chips, scrollable, never cut off (first/last item centred via auto margins) */
+        .subnav-inner {
+            justify-content: flex-start; gap: 8px; padding: 10px 16px;
+            overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        }
+        .subnav-inner::-webkit-scrollbar { display: none; }
+        .subnav-inner a:first-child { margin-left: auto; }
+        .subnav-inner a:last-child  { margin-right: auto; }
+        .subnav a {
+            flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; font-size: .84rem;
+            background: rgba(79,70,229,0.07); color: var(--text-primary-light);
+        }
+        body.dark-mode .subnav a { background: rgba(255,255,255,0.07); color: var(--text-primary-dark); }
+        .subnav a::after { display: none; }
+        .subnav a:hover { background: var(--primary-mid); color: #fff; }
+        .subnav a[href="#download"] { background: linear-gradient(135deg,#f0d58c,#d6ad53); color: #101a32; font-weight: 800; }
+
+        /* Desktop header nav (website only) */
+        .desktop-nav { display: none; align-items: center; gap: 4px; margin: 0 auto 0 28px; }
+        .desktop-nav a {
+            padding: 8px 14px; border-radius: 10px; font-size: .9rem; font-weight: 600;
+            color: var(--text-secondary-light); text-decoration: none; transition: all .2s;
+        }
+        body.dark-mode .desktop-nav a { color: var(--text-secondary-dark); }
+        .desktop-nav a:hover { background: rgba(79,70,229,0.09); color: var(--primary-mid); }
+        .desktop-nav a.nav-cta { margin-left: 8px; background: linear-gradient(135deg,#f0d58c,#d6ad53); color: #101a32; font-weight: 800; }
+        .desktop-nav a.nav-cta:hover { filter: brightness(1.05); color: #101a32; }
+        .header-menu { display: none; }
+
+        /* Bottom nav: safe area + active indicator */
+        .bottom-nav { height: calc(64px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+        body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+        .nav-item { position: relative; }
+        .nav-item.active::before {
+            content: ''; position: absolute; top: 0; width: 28px; height: 3px; border-radius: 0 0 4px 4px; background: var(--primary-gradient);
+        }
+
+        /* ---------- WEBSITE on desktop ---------- */
+        @media (min-width: 900px) {
+            html:not(.app-mode) .desktop-nav { display: flex; }
+            html:not(.app-mode) .header-menu { display: grid; }
+            html:not(.app-mode) .subnav,
+            html:not(.app-mode) .bottom-nav { display: none; }
+            html:not(.app-mode) body { padding-bottom: 0; }
+            html:not(.app-mode) .main-content { padding: 0 28px; }
+            html:not(.app-mode) .hero-wrap { padding: 80px 60px 64px; }
+        }
+        @media (max-width: 899px) {
+            .desktop-nav { display: none !important; }
+        }
+
+        /* ---------- INSTALLED APP (PWA / Android) ---------- */
+        html.app-mode #gurukul-app-banner,
+        html.app-mode #download,
+        html.app-mode a[href="#download"],
+        html.app-mode .desktop-nav,
+        html.app-mode .header-menu,
+        html.app-mode #datetime-container,
+        html.app-mode .runner-bar,
+        html.app-mode .hero-badge,
+        html.app-mode .footer-social { display: none !important; }
+
+        html.app-mode, html.app-mode body { overscroll-behavior-y: none; }
+        html.app-mode body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        html.app-mode input, html.app-mode textarea { -webkit-user-select: text; user-select: text; }
+        html.app-mode .main-content { padding: 0 14px; }
+        html.app-mode .hero-wrap { margin-top: 12px; padding: 34px 18px 28px; border-radius: 22px; }
+        html.app-mode .hero-section h1 { font-size: 2rem; margin-top: 0; }
+        html.app-mode .hero-stats { gap: 24px; margin-top: 24px; }
+        html.app-mode .card, html.app-mode .zone-card, html.app-mode .ai-section { border-radius: 20px; }
+        html.app-mode .card:hover, html.app-mode .quick-action-item:hover { transform: none; }
+        html.app-mode .card:active, html.app-mode .quick-action-item:active, html.app-mode .action-btn:active { transform: scale(.97); }
+        html.app-mode .site-footer { padding: 28px 0 18px; margin-top: 36px; }
+        html.app-mode .footer-container { margin-bottom: 18px; gap: 22px; }
+        html.app-mode .app-header { background: var(--card-bg-light); }
+        body.dark-mode.dark-mode .app-header { background: var(--card-bg-dark); }
+        html.app-mode .bottom-nav { display: flex !important; box-shadow: 0 -8px 30px -12px rgba(20,20,60,.25); }
     </style>
 </head>
 
@@ -481,9 +582,18 @@
             <img src="assets/upsc-gurukul-logo.png" alt="">
             <span>UPSC गुरुकुल</span>
         </a>
+        <nav class="desktop-nav" aria-label="Main">
+            <a href="/Prelims/">Prelims</a>
+            <a href="/mains/">Mains</a>
+            <a href="/notes.html">Notes</a>
+            <a href="/test-series/">Test Series</a>
+            <a href="/UPSC2028/">2028 Zone</a>
+            <a href="#download" class="nav-cta"><i class="fab fa-android"></i> Get the App</a>
+        </nav>
         <div class="header-right">
             <div id="datetime-container"></div>
             <button id="toggle-btn" class="icon-btn fas fa-sun" type="button" aria-label="Toggle dark mode"></button>
+            <button class="icon-btn header-menu fas fa-bars js-open-menu" type="button" aria-label="Open menu"></button>
         </div>
     </div>
 </header>
@@ -762,7 +872,7 @@
     <a href="/Planner/schedule.html" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Planner</span></a>
     <a href="testinterface.html" class="nav-item"><i class="fas fa-clipboard-check"></i><span>Tests</span></a>
     <a href="#download" class="nav-item"><i class="fas fa-download"></i><span>App</span></a>
-    <button id="menu-btn" class="nav-item" type="button"><i class="fas fa-bars"></i><span>Menu</span></button>
+    <button id="menu-btn" class="nav-item js-open-menu" type="button"><i class="fas fa-bars"></i><span>Menu</span></button>
 </nav>
 
 <script>
@@ -792,7 +902,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const sideBar = document.querySelector('.side-bar');
     const overlay = document.querySelector('.sidebar-overlay');
     const closeSidebar = () => { sideBar.classList.remove('active'); overlay.classList.remove('active'); };
-    menuBtn.addEventListener('click', () => { sideBar.classList.add('active'); overlay.classList.add('active'); });
+    document.querySelectorAll('.js-open-menu').forEach(b => b.addEventListener('click', () => {
+        sideBar.classList.add('active'); overlay.classList.add('active');
+    }));
     closeBtn.addEventListener('click', closeSidebar);
     overlay.addEventListener('click', closeSidebar);
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
