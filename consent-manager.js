@@ -150,7 +150,7 @@
     var analyticsLabel = element("label", {});
     var analytics = element("input", {
       type: "checkbox",
-      id: "ug-consent-analytics"
+      id: "ug-consent-analytics", "aria-label": "Optional analytics"
     });
     analyticsLabel.appendChild(analytics);
     analyticsLabel.appendChild(document.createTextNode("Optional analytics"));
@@ -159,7 +159,7 @@
     var adsLabel = element("label", {});
     var advertising = element("input", {
       type: "checkbox",
-      id: "ug-consent-advertising"
+      id: "ug-consent-advertising", "aria-label": "Personalized advertising"
     });
     adsLabel.appendChild(advertising);
     adsLabel.appendChild(document.createTextNode("Personalized advertising"));
