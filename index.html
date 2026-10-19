@@ -417,5 +417,19 @@ var settled=false;
   </script>
   <script src="/upscgurukul-debug.js?v=1"></script>
   <script src="/upscgurukul-dev-lockdown.js?v=9"></script>
+<script id="UPSCGURUKUL_EXIT_CONFIRM_V1">
+(function () {
+  try {
+    if (sessionStorage.getItem('upscg_app') !== '1') return;
+    history.pushState({ upscgExitGuard: true }, '', location.href);
+    window.addEventListener('popstate', function () {
+      var stay = window.confirm('Are you sure you want to exit UPSC Gurukul?');
+      if (!stay) {
+        history.pushState({ upscgExitGuard: true }, '', location.href);
+      }
+    });
+  } catch (e) {}
+})();
+</script>
 </body>
 </html>
