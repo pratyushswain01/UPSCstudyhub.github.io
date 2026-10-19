@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, follow">
+  <title>Data Rights Requests | UPSC गुरुकुल</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 24px;
+      font-family: system-ui, sans-serif;
+      background: #f4f7fb; color: #172235; line-height: 1.6;
+    }
+    main {
+      max-width: 680px; margin: 24px auto; padding: 28px;
+      background: #fff; border: 1px solid #dce4ee;
+      border-radius: 16px;
+    }
+    h1 { line-height: 1.25; }
+    label { display: block; margin-top: 16px; font-weight: 600; }
+    input, select, textarea {
+      display: block; width: 100%; margin-top: 6px;
+      padding: 11px; border: 1px solid #b8c5d6;
+      border-radius: 8px; font: inherit; background: #fff;
+    }
+    button {
+      margin-top: 20px; padding: 12px 18px; border: 0;
+      border-radius: 8px; background: #0f766e; color: white;
+      font: inherit; font-weight: 600; cursor: pointer;
+    }
+    .notice {
+      padding: 12px; border-radius: 8px;
+      background: #fff7df; border: 1px solid #ead28a;
+    }
+    a { color: #0f766e; }
+  </style>
+</head>
+<body>
+<main>
+  <p><strong>UPSC गुरुकुल</strong></p>
+  <h1>Personal Data Request</h1>
+  <p class="notice"><strong>Draft — legal review required.</strong>
+  This page prepares an email on your device. It does not send or store
+  a request automatically.</p>
+
+  <p>You may request access to, correction of, or deletion of personal
+  information, or ask a question about privacy and consent. We may need
+  to verify your identity before acting.</p>
+
+  <form id="rightsForm">
+    <label for="name">Your name</label>
+    <input id="name" name="name" autocomplete="name" maxlength="120" required>
+
+    <label for="email">Account or contact email</label>
+    <input id="email" name="email" type="email" autocomplete="email"
+           maxlength="254" required>
+
+    <label for="requestType">Request type</label>
+    <select id="requestType" name="requestType" required>
+      <option value="">Choose a request</option>
+      <option>Access my personal data</option>
+      <option>Correct my personal data</option>
+      <option>Request deletion of my personal data</option>
+      <option>Withdraw an optional consent</option>
+      <option>Ask a privacy question</option>
+      <option>Other privacy request</option>
+    </select>
+
+    <label for="details">Details (do not include passwords or OTPs)</label>
+    <textarea id="details" name="details" rows="5" maxlength="3000"
+              placeholder="Describe your request"></textarea>
+
+    <button type="submit">Prepare email request</button>
+  </form>
+
+  <p id="status" role="status" aria-live="polite"></p>
+  <p><a href="/privacy.html">Privacy Notice</a> ·
+     <a href="/terms.html">Terms</a> ·
+     <a href="/">Home</a></p>
+</main>
+<script>
+(function () {
+  "use strict";
+  const form = document.getElementById("rightsForm");
+  const status = document.getElementById("status");
+
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    if (!form.reportValidity()) return;
+
+    const values = new FormData(form);
+    const subject = "UPSC Gurukul - Personal Data Request";
+    const body = [
+      "Personal Data Request",
+      "",
+      "Name: " + values.get("name"),
+      "Contact email: " + values.get("email"),
+      "Request type: " + values.get("requestType"),
+      "",
+      "Details:",
+      values.get("details") || "(No additional details)",
+      "",
+      "Please verify my identity before processing this request."
+    ].join("\n");
+
+    status.textContent =
+      "Your email application should open. Review the message before sending.";
+    window.location.href =
+      "mailto:email@pratyushswain.in?subject=" +
+      encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+  });
+})();
+</script>
+</body>
+</html>
