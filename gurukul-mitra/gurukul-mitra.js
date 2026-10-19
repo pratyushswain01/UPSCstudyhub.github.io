@@ -173,8 +173,7 @@
   }, { passive: true });
 
   sideTab.addEventListener("click", () => {
-    revealLauncherTemporarily();
-    launcher.focus();
+    setOpen(true);
   });
 // ---------- Welcome inside panel ----------
   function showWelcome() {

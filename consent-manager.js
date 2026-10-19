@@ -96,6 +96,13 @@
     if (old) old.remove();
   }
 
+  // Keep the consent manager active but hide its floating preferences shortcut.
+  if (!document.getElementById("ug-hide-floating-preferences")) {
+    var hidePreferencesStyle = document.createElement("style");
+    hidePreferencesStyle.id = "ug-hide-floating-preferences";
+    hidePreferencesStyle.textContent = "#ug-consent-preferences{display:none!important}";
+    (document.head || document.documentElement).appendChild(hidePreferencesStyle);
+  }
   function ensurePreferencesButton() {
     if (document.getElementById("ug-consent-preferences")) return;
 
