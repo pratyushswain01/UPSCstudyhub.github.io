@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Log in | UPSC गुरुकुल</title>
+  <style>
+    body{font-family:system-ui,sans-serif;background:#0b1424;color:#e8ecf8;min-height:100vh;display:grid;place-items:center;margin:0;padding:20px}
+    .card{width:100%;max-width:400px;background:#101a32;border:1px solid #243056;border-radius:16px;padding:28px}
+    h1{font-size:24px;margin:0 0 8px} p{color:#9fb0c8;font-size:14px;margin:0 0 20px}
+    label{display:block;font-size:13px;color:#9fb0c8;margin:12px 0 6px}
+    input{width:100%;padding:12px;border-radius:10px;border:1px solid #243056;background:#0b1424;color:#fff;font:inherit;box-sizing:border-box}
+    button{width:100%;margin-top:12px;padding:12px;border:0;border-radius:10px;background:#0f766e;color:#fff;font-weight:600;cursor:pointer}
+    button.secondary{background:#1e293b;border:1px solid #334155}
+    .err{color:#f87171;font-size:13px;min-height:18px;margin-top:10px}
+    .seg{display:flex;gap:8px;margin-bottom:8px}
+    .seg button{flex:1}
+    a{color:#5eead4}
+    .ok{color:#34d399;font-size:14px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="title">Welcome back</h1>
+    <p id="sub">One account for Hub, notes, AI and the app.</p>
+    <div class="seg">
+      <button type="button" id="tabLogin">Log in</button>
+      <button type="button" id="tabSignup" class="secondary">Sign up</button>
+    </div>
+    <form id="form">
+      <div id="nameWrap" hidden>
+        <label>Full name</label>
+        <input name="name" autocomplete="name" />
+      </div>
+      <label>Email</label>
+      <input name="email" type="email" required autocomplete="email" />
+      <label>Password</label>
+      <input name="password" type="password" required minlength="6" autocomplete="current-password" />
+      <label style="display:flex;gap:8px;align-items:flex-start;margin-top:14px;font-size:12px;color:#9fb0c8">
+        <input type="checkbox" name="consent" style="width:auto;margin-top:3px" />
+        <span>I agree to the <a href="/privacy.html" target="_blank">Privacy Notice</a> and <a href="/terms.html" target="_blank">Terms</a> (required to create an account).</span>
+      </label>
+      <p class="err" id="err"></p>
+      <button type="submit" id="go">Log in</button>
+    </form>
+    <button type="button" class="secondary" id="google">Continue with Google</button>
+    <p style="margin-top:16px;font-size:13px"><a href="/homeUPSChub.html">← Back to Hub</a></p>
+    <p class="ok" id="status" hidden></p>
+  </div>
+  <script type="module">
+    import {
+      auth, watchUser,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      updateProfile,
+      GoogleAuthProvider,
+      signInWithPopup
+    } from "/auth/firebase-auth.js";
+
+    let mode = "login";
+    const err = (m) => { document.getElementById("err").textContent = m || ""; };
+    const params = new URLSearchParams(location.search);
+    const next = params.get("next") || "/homeUPSChub.html";
+
+    watchUser((user) => {
+      if (user) {
+        document.getElementById("status").hidden = false;
+        document.getElementById("status").textContent = "Signed in as " + (user.email || "") + " — redirecting…";
+        setTimeout(() => { location.href = next; }, 600);
+      }
+    });
+
+    function setMode(m) {
+      mode = m;
+      const signup = m === "signup";
+      document.getElementById("title").textContent = signup ? "Create account" : "Welcome back";
+      document.getElementById("sub").textContent = signup
+        ? "Register once — use the same login on website and app."
+        : "One account for Hub, notes, AI and the app.";
+      document.getElementById("nameWrap").hidden = !signup;
+      document.getElementById("go").textContent = signup ? "Create account" : "Log in";
+      document.getElementById("tabLogin").className = signup ? "secondary" : "";
+      document.getElementById("tabSignup").className = signup ? "" : "secondary";
+      err("");
+    }
+
+    document.getElementById("tabLogin").onclick = () => setMode("login");
+    document.getElementById("tabSignup").onclick = () => setMode("signup");
+
+    document.getElementById("form").onsubmit = async (e) => {
+      e.preventDefault();
+      err("");
+      const fd = new FormData(e.target);
+      const email = String(fd.get("email") || "").trim();
+      const password = String(fd.get("password") || "");
+      const name = String(fd.get("name") || "").trim();
+      const consent = e.target.consent.checked;
+
+      if (mode === "signup" && !consent) {
+        return err("Please accept Privacy Notice and Terms to register.");
+      }
+
+      const btn = document.getElementById("go");
+      btn.disabled = true;
+      try {
+        if (mode === "signup") {
+          const cred = await createUserWithEmailAndPassword(auth, email, password);
+          if (name) await updateProfile(cred.user, { displayName: name });
+          try {
+            localStorage.setItem("ug_consent_record", JSON.stringify({
+              email, purposes: ["account"], ts: Date.now(), v: 1
+            }));
+          } catch (_) {}
+        } else {
+          await signInWithEmailAndPassword(auth, email, password);
+        }
+      } catch (ex) {
+        err(ex.code || ex.message || "Auth failed");
+      } finally {
+        btn.disabled = false;
+      }
+    };
+
+    document.getElementById("google").onclick = async () => {
+      err("");
+      try {
+        const provider = new GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: "select_account" });
+        await signInWithPopup(auth, provider);
+      } catch (ex) {
+        err(ex.code || ex.message || "Google sign-in failed");
+      }
+    };
+  </script>
+</body>
+</html>

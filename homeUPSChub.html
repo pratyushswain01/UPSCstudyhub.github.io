@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -1075,7 +1075,24 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="/upscgurukul-debug.js?v=1"></script>
 <script src="/upscgurukul-dev-lockdown.js?v=9"></script>
 
+
+<!-- unified auth -->
+<script type="module">
+  import { watchUser } from "/auth/firebase-auth.js";
+  watchUser((user) => {
+    document.querySelectorAll('a[href*="login"], #acct, [data-auth="login"]').forEach((el) => {
+      if (user) {
+        el.textContent = user.displayName || (user.email ? user.email.split("@")[0] : "Account");
+        el.href = "/auth/login.html";
+      } else {
+        el.textContent = "Log in";
+        el.href = "/auth/login.html?next=" + encodeURIComponent("/homeUPSChub.html");
+      }
+    });
+  });
+</script>
 </body>
 </html>
 
 <script src="/gurukul-mitra/gurukul-mitra.js" defer></script>
+
