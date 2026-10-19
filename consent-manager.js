@@ -71,7 +71,7 @@
       "#ug-consent-panel .ug-consent-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}",
       "#ug-consent-panel button,#ug-consent-preferences{font:inherit;cursor:pointer;border-radius:8px;padding:9px 13px;border:1px solid #0f766e;background:#fff;color:#115e59}",
       "#ug-consent-panel button.ug-primary{background:#0f766e;color:#fff}",
-      "#ug-consent-preferences{position:fixed;z-index:2147482999;bottom:12px;right:12px;background:#fff;color:#115e59;box-shadow:0 2px 10px #0002}",
+      "#ug-consent-preferences{position:fixed;z-index:2147482999;right:12px;bottom:calc(82px + env(safe-area-inset-bottom));max-width:calc(100vw - 24px);padding:8px 12px;font-size:13px;background:#fff;color:#115e59;box-shadow:0 2px 10px #0002}",
       "@media(prefers-color-scheme:dark){#ug-consent-panel,#ug-consent-preferences{background:#172235;color:#f8fafc;border-color:#475569}}"
     ].join("\n");
 
@@ -231,3 +231,4 @@
     init();
   }
 })();
+/* UG_FOOTER_SAFE_POSITION */

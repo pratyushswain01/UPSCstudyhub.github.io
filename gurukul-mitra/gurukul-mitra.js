@@ -113,27 +113,70 @@
 
   // ---------- Greeting Bubble Logic ----------
   const BUBBLE_KEY = "gm_bubble_shown";
+  const launcherWrap = root.querySelector(".gm-launcher-wrap");
+  let launcherHideTimer = null;
+
+  // Small persistent side tab lets visitors bring the launcher back.
+  const sideTab = document.createElement("button");
+  sideTab.type = "button";
+  sideTab.className = "gm-side-tab";
+  sideTab.textContent = "Mitra";
+  sideTab.setAttribute("aria-label", "Show Gurukul Mitra launcher");
+  sideTab.title = "Open Gurukul Mitra";
+  root.appendChild(sideTab);
 
   function showBubble() {
-    // Show only once per session (or until dismissed)
-    if (sessionStorage.getItem(BUBBLE_KEY)) return;
-    bubble.classList.add("gm-bubble-visible");
+    try {
+      if (sessionStorage.getItem(BUBBLE_KEY)) return;
+    } catch (_) {}
+    if (!panel.classList.contains("gm-open")) {
+      bubble.classList.add("gm-bubble-visible");
+    }
   }
 
   function hideBubble() {
     bubble.classList.remove("gm-bubble-visible");
-    sessionStorage.setItem(BUBBLE_KEY, "1");
+    try { sessionStorage.setItem(BUBBLE_KEY, "1"); } catch (_) {}
   }
 
-  // Show bubble after a short delay so it feels natural
+  function hideLauncher() {
+    if (!panel.classList.contains("gm-open")) {
+      launcherWrap.classList.add("gm-launcher-hidden");
+    }
+  }
+
+  function revealLauncherTemporarily() {
+    launcherWrap.classList.remove("gm-launcher-hidden");
+    if (launcherHideTimer) clearTimeout(launcherHideTimer);
+    if (!panel.classList.contains("gm-open")) {
+      launcherHideTimer = setTimeout(hideLauncher, 6500);
+    }
+  }
+
+  // Keep the greeting brief; hide the large launcher after initial attention.
   setTimeout(showBubble, 1200);
+  setTimeout(hideBubble, 6500);
+  setTimeout(hideLauncher, 8500);
 
   bubbleClose.addEventListener("click", (e) => {
     e.stopPropagation();
     hideBubble();
   });
 
-  // ---------- Welcome inside panel ----------
+  // Scrolling briefly reveals the launcher. The side tab stays available.
+  let scrollRevealTimer = null;
+  window.addEventListener("scroll", () => {
+    if (panel.classList.contains("gm-open")) return;
+    revealLauncherTemporarily();
+    if (scrollRevealTimer) clearTimeout(scrollRevealTimer);
+    scrollRevealTimer = setTimeout(hideLauncher, 6500);
+  }, { passive: true });
+
+  sideTab.addEventListener("click", () => {
+    revealLauncherTemporarily();
+    launcher.focus();
+  });
+// ---------- Welcome inside panel ----------
   function showWelcome() {
     if (hasConversation || messages.querySelector(".gm-msg")) return;
 
@@ -182,9 +225,13 @@
     launcher.setAttribute("aria-expanded", String(open));
 
     if (open) {
-      hideBubble();                 // hide the popup when user opens the chat
+      if (launcherHideTimer) clearTimeout(launcherHideTimer);
+      launcherWrap.classList.remove("gm-launcher-hidden");
+      hideBubble();
       if (!hasConversation) showWelcome();
       setTimeout(() => input.focus(), 80);
+    } else {
+      launcherHideTimer = setTimeout(hideLauncher, 6500);
     }
   }
 
