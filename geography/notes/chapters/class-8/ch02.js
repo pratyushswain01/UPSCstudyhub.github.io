@@ -1,0 +1,1325 @@
+﻿window.__UG_CHAPTERS = window.__UG_CHAPTERS || {};
+window.__UG_CHAPTERS["class-8/ch02.json"] = {
+    "pdf":  {
+                "href":  "pdfs/hess402.pdf",
+                "title":  "NCERT Class 8, Chapter 2"
+            },
+    "schemaVersion":  1,
+    "id":  "geo-8-resources-land-soil-water-ch02",
+    "demo":  false,
+    "meta":  {
+                 "class":  "Class 8",
+                 "subject":  "Geography",
+                 "chapterNo":  2,
+                 "title":  "Land, Soil, Water, Natural Vegetation and Wildlife Resources",
+                 "intro":  "Detailed notes on the major components of Earth\u0027s natural environment, their distribution, importance, threats, conservation and links to sustainable development.",
+                 "subjectHref":  "../index.html",
+                 "prev":  "chapters/class-8/ch01.json",
+                 "next":  null
+             },
+    "objectives":  [
+                       "Explain why land, soil and water are essential natural resources.",
+                       "Identify physical and human factors influencing land use.",
+                       "Explain soil formation, soil erosion and soil conservation.",
+                       "Understand the importance, distribution and conservation of water resources.",
+                       "Distinguish natural vegetation types and explain the factors controlling their distribution.",
+                       "Explain the importance of wildlife and biodiversity conservation.",
+                       "Connect resource management with sustainable development and Indian environmental examples."
+                   ],
+    "sections":  [
+                     {
+                         "id":  "land",
+                         "title":  "1. Land Resources: Foundation of Human Life",
+                         "blocks":  [
+                                        {
+                                            "t":  "p",
+                                            "text":  "**Land** is one of the most important natural resources. It supports natural vegetation, wildlife, agriculture, settlements, transport networks, industries and other human activities. Although the Earth\u0027s surface is extensive, land suitable for a particular use is limited and unevenly distributed."
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Land use",
+                                            "text":  "The way people utilise land for activities such as agriculture, forestry, housing, industry, transport, mining and recreation."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Factors affecting land use"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Physical and human factors influencing land use",
+                                            "head":  [
+                                                         "Factor",
+                                                         "How it influences land use",
+                                                         "Example"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Topography / relief",
+                                                             "Slope, altitude and terrain influence farming, transport and settlement.",
+                                                             "Flat plains generally support easier cultivation and construction than steep slopes."
+                                                         ],
+                                                         [
+                                                             "Soil",
+                                                             "Soil depth, fertility, texture and drainage influence crops and vegetation.",
+                                                             "Fertile alluvial soils support intensive agriculture in many plains."
+                                                         ],
+                                                         [
+                                                             "Climate",
+                                                             "Rainfall, temperature and seasonal conditions influence vegetation and agriculture.",
+                                                             "Arid regions require careful water management."
+                                                         ],
+                                                         [
+                                                             "Mineral resources",
+                                                             "Mineral deposits can encourage mining and related industries.",
+                                                             "Mining settlements may develop near mineral-bearing areas."
+                                                         ],
+                                                         [
+                                                             "Population",
+                                                             "Population growth increases demand for housing, food, roads and services.",
+                                                             "Expanding towns often convert surrounding land to built-up areas."
+                                                         ],
+                                                         [
+                                                             "Technology and economy",
+                                                             "Irrigation, machinery, capital and infrastructure change what land can support.",
+                                                             "Irrigation can make some previously dry areas cultivable, subject to water availability."
+                                                         ],
+                                                         [
+                                                             "Culture and institutions",
+                                                             "Traditions, land ownership, planning rules and public policy influence land use.",
+                                                             "Protected areas restrict some forms of commercial land use."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "concept",
+                                            "title":  "Core geographical idea",
+                                            "text":  "Land-use patterns reflect an interaction between the physical environment and human decisions. A physical condition may create an opportunity or constraint, while technology, institutions and planning influence the final outcome."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Major land-use categories"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "**Agricultural land:** used for growing crops and related farming activities.",
+                                                          "**Forest land:** supports tree cover, habitats, biodiversity and ecosystem services.",
+                                                          "**Pasture and grazing land:** supports livestock and pastoral livelihoods.",
+                                                          "**Settlement and industrial land:** accommodates houses, institutions, factories and other built-up uses.",
+                                                          "**Transport and infrastructure land:** includes roads, railways, airports, canals and utility networks.",
+                                                          "**Barren or sparsely vegetated land:** may have natural constraints, but some areas can still provide ecological or economic value."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: How land-use change happens",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Drivers",
+                                                              "text":  "Population growth, demand for food, jobs, housing and infrastructure."
+                                                          },
+                                                          {
+                                                              "label":  "Decision",
+                                                              "text":  "Land is selected and allocated according to suitability, access, technology and policy."
+                                                          },
+                                                          {
+                                                              "label":  "Land-use change",
+                                                              "text":  "Agricultural expansion, urban growth, industry, roads or other uses."
+                                                          },
+                                                          {
+                                                              "label":  "Consequences",
+                                                              "text":  "Possible gains in production and access, but also habitat loss, soil sealing and pressure on water."
+                                                          },
+                                                          {
+                                                              "label":  "Better planning",
+                                                              "text":  "Land-use mapping, environmental assessment, compact development and protection of sensitive areas."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Land degradation and conservation"
+                                        },
+                                        {
+                                            "t":  "p",
+                                            "text":  "**Land degradation** is the decline in the quality or productive capacity of land. It can result from deforestation, overgrazing, mining, excessive chemical use, soil erosion, salinisation, pollution and poorly planned construction."
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "Afforestation and restoration of degraded land.",
+                                                          "Controlled grazing and sustainable farming practices.",
+                                                          "Scientific mine closure and rehabilitation.",
+                                                          "Proper drainage and efficient irrigation to reduce waterlogging and salinity.",
+                                                          "Urban planning that protects wetlands, fertile farmland and ecologically sensitive areas.",
+                                                          "Community participation in managing common lands and local natural resources."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "upsc",
+                                            "title":  "UPSC foundation connection",
+                                            "text":  "Land degradation links physical geography with agriculture, urbanisation, biodiversity, disaster risk, livelihoods and environmental governance. In an analytical answer, explain the cause, impact, affected groups and practical conservation measures."
+                                        }
+                                    ]
+                     },
+                     {
+                         "id":  "soil",
+                         "title":  "2. Soil Resources: The Living Skin of Earth",
+                         "blocks":  [
+                                        {
+                                            "t":  "def",
+                                            "term":  "Soil",
+                                            "text":  "The upper layer of Earth\u0027s land surface, composed of mineral particles, organic matter, water, air and living organisms. Soil supports plant growth and performs many essential ecological functions."
+                                        },
+                                        {
+                                            "t":  "p",
+                                            "text":  "Soil develops gradually through the interaction of parent rock or material, climate, organisms, relief and time. Soil is not simply powdered rock: it is a dynamic system in which minerals, organic matter, water, air and organisms interact."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Soil formation: key factors"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Factors of soil formation",
+                                            "head":  [
+                                                         "Factor",
+                                                         "Role"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Parent material",
+                                                             "Provides the original mineral material and influences texture and mineral composition."
+                                                         ],
+                                                         [
+                                                             "Climate",
+                                                             "Temperature and rainfall influence weathering, leaching and decomposition."
+                                                         ],
+                                                         [
+                                                             "Organisms",
+                                                             "Plants, animals, fungi and microbes add organic matter and recycle nutrients."
+                                                         ],
+                                                         [
+                                                             "Relief / topography",
+                                                             "Slope affects runoff, erosion, drainage and the accumulation of soil material."
+                                                         ],
+                                                         [
+                                                             "Time",
+                                                             "Soil characteristics develop and change over long periods."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: Basic process of soil formation",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Weathering",
+                                                              "text":  "Physical, chemical and biological processes break down rocks and parent material."
+                                                          },
+                                                          {
+                                                              "label":  "Organic inputs",
+                                                              "text":  "Leaves, roots and organisms contribute organic matter."
+                                                          },
+                                                          {
+                                                              "label":  "Mixing and transformation",
+                                                              "text":  "Organisms, water and chemical reactions mix and alter mineral and organic materials."
+                                                          },
+                                                          {
+                                                              "label":  "Soil development",
+                                                              "text":  "Over time, soil layers and distinct characteristics may develop."
+                                                          },
+                                                          {
+                                                              "label":  "Living soil system",
+                                                              "text":  "Roots, organisms, air and water support nutrient cycling and plant growth."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Soil profile: a simplified diagram"
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Soil profile from surface to deeper layers",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "O horizon",
+                                                              "text":  "Organic litter and decomposing plant material, where this layer is present."
+                                                          },
+                                                          {
+                                                              "label":  "A horizon",
+                                                              "text":  "Topsoil, usually containing mineral material and organic matter; many roots and soil organisms are active here."
+                                                          },
+                                                          {
+                                                              "label":  "B horizon",
+                                                              "text":  "Subsoil where materials such as clay or certain minerals may accumulate."
+                                                          },
+                                                          {
+                                                              "label":  "C horizon",
+                                                              "text":  "Partly weathered parent material."
+                                                          },
+                                                          {
+                                                              "label":  "Bedrock",
+                                                              "text":  "Underlying rock; the boundaries and depth of layers vary among soils."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "caution",
+                                            "title":  "Remember",
+                                            "text":  "Not every soil has all horizons clearly developed. Soil profiles vary with climate, parent material, organisms, relief and the time available for soil formation."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Why soil is important"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "Provides anchorage and nutrients for plants.",
+                                                          "Stores and filters water and influences groundwater recharge.",
+                                                          "Supports soil organisms and nutrient cycling.",
+                                                          "Stores carbon in organic matter and influences the carbon cycle.",
+                                                          "Provides a foundation for buildings and infrastructure, depending on its properties.",
+                                                          "Supports agriculture, forestry, grazing and many rural livelihoods."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Soil erosion: causes and effects"
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Soil erosion",
+                                            "text":  "The removal and transport of topsoil by agents such as running water, wind, ice or human activities."
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Major causes of soil erosion",
+                                            "head":  [
+                                                         "Cause",
+                                                         "Mechanism",
+                                                         "Possible impact"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Deforestation",
+                                                             "Loss of canopy and roots reduces soil protection.",
+                                                             "Greater runoff and soil loss."
+                                                         ],
+                                                         [
+                                                             "Overgrazing",
+                                                             "Excessive grazing reduces protective vegetation cover.",
+                                                             "Bare ground becomes more vulnerable to erosion."
+                                                         ],
+                                                         [
+                                                             "Improper farming",
+                                                             "Cultivation along steep slopes or leaving soil bare increases runoff.",
+                                                             "Loss of fertile topsoil and lower productivity."
+                                                         ],
+                                                         [
+                                                             "Wind",
+                                                             "Strong winds transport loose, dry and exposed soil.",
+                                                             "Dust, loss of fine particles and damage to crops."
+                                                         ],
+                                                         [
+                                                             "Heavy rainfall and runoff",
+                                                             "Water detaches and carries soil particles downslope.",
+                                                             "Rills, gullies, sedimentation and land degradation."
+                                                         ],
+                                                         [
+                                                             "Construction and mining",
+                                                             "Ground disturbance exposes soil and changes drainage.",
+                                                             "Erosion, sediment pollution and habitat disturbance."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Soil conservation methods"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Match the method to the process",
+                                            "head":  [
+                                                         "Method",
+                                                         "How it helps"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Contour ploughing",
+                                                             "Ploughing along contour lines slows runoff on sloping land."
+                                                         ],
+                                                         [
+                                                             "Terracing",
+                                                             "Creates level or gently sloping steps on hillsides and reduces slope length."
+                                                         ],
+                                                         [
+                                                             "Strip cropping",
+                                                             "Alternating strips of crops can reduce wind and water erosion."
+                                                         ],
+                                                         [
+                                                             "Shelter belts",
+                                                             "Rows of trees or shrubs reduce wind speed and protect exposed fields."
+                                                         ],
+                                                         [
+                                                             "Cover crops and mulching",
+                                                             "Protect the soil surface, improve infiltration and reduce direct impact from raindrops."
+                                                         ],
+                                                         [
+                                                             "Afforestation and vegetation restoration",
+                                                             "Roots bind soil and plant cover reduces erosion."
+                                                         ],
+                                                         [
+                                                             "Check dams and gully control",
+                                                             "Small barriers can slow runoff and trap sediment when properly designed."
+                                                         ],
+                                                         [
+                                                             "Controlled grazing",
+                                                             "Allows vegetation to recover and reduces pressure on fragile land."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: Soil conservation logic",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Identify risk",
+                                                              "text":  "Assess slope, rainfall, wind, soil type and vegetation cover."
+                                                          },
+                                                          {
+                                                              "label":  "Protect the surface",
+                                                              "text":  "Maintain cover crops, mulch, grass, trees or crop residues."
+                                                          },
+                                                          {
+                                                              "label":  "Slow movement",
+                                                              "text":  "Use contour practices, terraces, shelter belts or suitable drainage controls."
+                                                          },
+                                                          {
+                                                              "label":  "Restore soil health",
+                                                              "text":  "Add organic matter, maintain nutrient balance and reduce damaging land use."
+                                                          },
+                                                          {
+                                                              "label":  "Monitor",
+                                                              "text":  "Check erosion, productivity, water quality and vegetation recovery."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "upsc",
+                                            "title":  "UPSC connection: soil and food security",
+                                            "text":  "Soil degradation can reduce agricultural productivity, increase sediment in rivers and reservoirs, affect rural incomes and worsen vulnerability to droughts and intense rainfall. Soil conservation is therefore linked to sustainable agriculture, water management and livelihood security."
+                                        }
+                                    ]
+                     },
+                     {
+                         "id":  "water",
+                         "title":  "3. Water Resources: Availability, Scarcity and Conservation",
+                         "blocks":  [
+                                        {
+                                            "t":  "p",
+                                            "text":  "Water is essential for drinking, sanitation, agriculture, industry, energy generation and ecosystem functioning. Most of Earth\u0027s water is saline; only a small proportion is freshwater, and much freshwater is stored in glaciers, ice caps or underground."
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Freshwater",
+                                            "text":  "Water with a relatively low concentration of dissolved salts, found in rivers, lakes, glaciers, soil moisture and groundwater. Freshwater availability depends on location, season, quality and accessibility."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "The hydrological cycle"
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: Water cycle",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Evaporation and transpiration",
+                                                              "text":  "Water moves from oceans, lakes, soil and plants into the atmosphere."
+                                                          },
+                                                          {
+                                                              "label":  "Condensation",
+                                                              "text":  "Water vapour cools and forms clouds or droplets."
+                                                          },
+                                                          {
+                                                              "label":  "Precipitation",
+                                                              "text":  "Water returns to Earth\u0027s surface as rain, snow or other forms of precipitation."
+                                                          },
+                                                          {
+                                                              "label":  "Infiltration and percolation",
+                                                              "text":  "Some water enters the soil and may recharge groundwater."
+                                                          },
+                                                          {
+                                                              "label":  "Runoff and storage",
+                                                              "text":  "Some water flows into streams, rivers, lakes and oceans; some is stored in ice, soil or aquifers."
+                                                          },
+                                                          {
+                                                              "label":  "Cycle continues",
+                                                              "text":  "Solar energy and gravity drive the continuing movement of water."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Surface water and groundwater"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Two important freshwater sources",
+                                            "head":  [
+                                                         "Source",
+                                                         "Meaning",
+                                                         "Management concerns"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Surface water",
+                                                             "Water in rivers, lakes, reservoirs, ponds and wetlands.",
+                                                             "Seasonal variability, pollution, evaporation, ecological flows and competing demands."
+                                                         ],
+                                                         [
+                                                             "Groundwater",
+                                                             "Water stored in pores and fractures beneath the ground, including aquifers.",
+                                                             "Over-extraction, slow recharge in some areas, contamination and falling water tables."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Aquifer",
+                                            "text":  "A geological formation that can store and transmit usable quantities of groundwater."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Why water availability varies"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "**Rainfall distribution:** precipitation differs by region and season.",
+                                                          "**Climate:** temperature influences evaporation and water demand.",
+                                                          "**Relief and geology:** landforms and rock properties affect runoff, storage and groundwater recharge.",
+                                                          "**Population and economic activity:** domestic, agricultural and industrial demand can create pressure.",
+                                                          "**Infrastructure:** reservoirs, pipelines, irrigation systems and treatment plants influence access.",
+                                                          "**Water quality:** polluted water may be physically present but unsafe or costly to use.",
+                                                          "**Governance and equity:** management, allocation, affordability and local institutions affect who receives water."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Water scarcity",
+                                            "text":  "A condition in which available water of suitable quality is insufficient to meet needs. Scarcity may be caused by low natural availability, seasonal shortages, excessive demand, pollution, unequal access or inadequate infrastructure."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Causes and consequences of water scarcity"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Water scarcity: cause and effect",
+                                            "head":  [
+                                                         "Cause",
+                                                         "Possible consequence"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Low or irregular rainfall",
+                                                             "Seasonal shortages and drought stress."
+                                                         ],
+                                                         [
+                                                             "Over-extraction of groundwater",
+                                                             "Falling water tables, higher pumping costs and reduced well reliability."
+                                                         ],
+                                                         [
+                                                             "Water pollution",
+                                                             "Reduced safe supply and greater treatment costs."
+                                                         ],
+                                                         [
+                                                             "Inefficient irrigation",
+                                                             "High withdrawals and avoidable losses."
+                                                         ],
+                                                         [
+                                                             "Loss of wetlands and catchment vegetation",
+                                                             "Reduced ecosystem health and changes to water storage and runoff."
+                                                         ],
+                                                         [
+                                                             "Poor infrastructure or unequal access",
+                                                             "Some communities may lack reliable safe water even where water exists nearby."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Water conservation and management"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "Repair leaks and use water-efficient fixtures.",
+                                                          "Harvest rainwater where local conditions and design make it suitable.",
+                                                          "Protect ponds, lakes, wetlands and river catchments.",
+                                                          "Use irrigation methods and schedules appropriate to crops, soil and climate.",
+                                                          "Treat wastewater and reuse it safely where suitable.",
+                                                          "Prevent sewage, industrial waste and agricultural pollutants from entering water bodies.",
+                                                          "Recharge groundwater where geology, water quality and local hydrogeology permit.",
+                                                          "Monitor withdrawals and balance human use with ecological requirements."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: Rainwater harvesting",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Collect",
+                                                              "text":  "Capture rainfall from rooftops or suitable surface catchments."
+                                                          },
+                                                          {
+                                                              "label":  "Filter",
+                                                              "text":  "Remove debris and use suitable filtration or first-flush arrangements."
+                                                          },
+                                                          {
+                                                              "label":  "Store or recharge",
+                                                              "text":  "Direct water to a safe storage tank or a technically suitable recharge structure."
+                                                          },
+                                                          {
+                                                              "label":  "Use responsibly",
+                                                              "text":  "Use stored water appropriately and maintain the system."
+                                                          },
+                                                          {
+                                                              "label":  "Monitor safety",
+                                                              "text":  "Prevent contamination and ensure that recharge methods do not pollute groundwater."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "concept",
+                                            "title":  "Water is renewable, but usable water is limited",
+                                            "text":  "The water cycle continually circulates water, but clean freshwater is unevenly distributed and can be depleted locally or contaminated. Water management must consider quantity, quality, timing and access."
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "upsc",
+                                            "title":  "UPSC foundation connection",
+                                            "text":  "Water security connects the hydrological cycle with agriculture, urbanisation, public health, groundwater governance, climate variability, interstate river management and ecosystem protection. Avoid treating water scarcity as only a rainfall problem."
+                                        }
+                                    ]
+                     },
+                     {
+                         "id":  "vegetation",
+                         "title":  "4. Natural Vegetation: Climate, Soil and Ecosystems",
+                         "blocks":  [
+                                        {
+                                            "t":  "def",
+                                            "term":  "Natural vegetation",
+                                            "text":  "Plant life that grows naturally in an area without being deliberately planted and managed as a crop or garden. Human influence can still alter natural vegetation through grazing, fire, logging and land-use change."
+                                        },
+                                        {
+                                            "t":  "p",
+                                            "text":  "Natural vegetation provides habitat, protects soil, influences the water cycle, stores carbon, moderates local climate and supports livelihoods. Its distribution is strongly influenced by temperature and precipitation, along with soil, relief, altitude and human activity."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Factors controlling vegetation distribution"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Environmental controls on vegetation",
+                                            "head":  [
+                                                         "Factor",
+                                                         "Influence"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Temperature",
+                                                             "Affects plant growth, growing seasons and the ability of species to survive cold or heat."
+                                                         ],
+                                                         [
+                                                             "Precipitation",
+                                                             "Influences water availability and helps distinguish humid forests from grasslands and deserts."
+                                                         ],
+                                                         [
+                                                             "Soil",
+                                                             "Provides nutrients, water storage, rooting conditions and drainage."
+                                                         ],
+                                                         [
+                                                             "Relief and altitude",
+                                                             "Influence temperature, moisture, slope and exposure."
+                                                         ],
+                                                         [
+                                                             "Sunlight",
+                                                             "Provides energy for photosynthesis; light conditions vary with latitude, season and canopy cover."
+                                                         ],
+                                                         [
+                                                             "Human activity",
+                                                             "Agriculture, settlement, logging, grazing, fire and restoration alter vegetation cover."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Major broad vegetation types"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Vegetation patterns and environmental conditions",
+                                            "head":  [
+                                                         "Type",
+                                                         "Typical conditions",
+                                                         "General characteristics"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Tropical evergreen forests",
+                                                             "Warm conditions and high rainfall through much of the year.",
+                                                             "Dense, multi-layered vegetation; many species may coexist."
+                                                         ],
+                                                         [
+                                                             "Tropical deciduous forests",
+                                                             "Seasonal rainfall with a distinct dry period.",
+                                                             "Many trees shed leaves during a dry or unfavourable season."
+                                                         ],
+                                                         [
+                                                             "Temperate forests",
+                                                             "Moderate climates with seasonal changes.",
+                                                             "Tree types and leaf patterns vary with temperature and moisture."
+                                                         ],
+                                                         [
+                                                             "Coniferous forests / taiga",
+                                                             "Cold climates, especially in high latitudes or some mountain regions.",
+                                                             "Conifers such as pine, spruce and fir are common."
+                                                         ],
+                                                         [
+                                                             "Grasslands",
+                                                             "Conditions where grasses are favoured, often due to seasonal rainfall, grazing, fire or other ecological factors.",
+                                                             "Grasses dominate; trees may be sparse or locally abundant."
+                                                         ],
+                                                         [
+                                                             "Desert and xerophytic vegetation",
+                                                             "Very low or irregular rainfall and high water stress.",
+                                                             "Plants often have adaptations that reduce water loss or store water."
+                                                         ],
+                                                         [
+                                                             "Mountain vegetation",
+                                                             "Conditions change with altitude, slope and exposure.",
+                                                             "Vegetation zones may change vertically from lower slopes to higher elevations."
+                                                         ],
+                                                         [
+                                                             "Mangroves",
+                                                             "Sheltered tropical and subtropical coasts, estuaries and tidal wetlands.",
+                                                             "Salt-tolerant vegetation adapted to waterlogged and often oxygen-poor sediments."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: Climate and vegetation",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Temperature + rainfall",
+                                                              "text":  "Determine the broad availability of heat and moisture."
+                                                          },
+                                                          {
+                                                              "label":  "Soil + relief",
+                                                              "text":  "Modify drainage, nutrients, rooting conditions and local microclimate."
+                                                          },
+                                                          {
+                                                              "label":  "Plant adaptations",
+                                                              "text":  "Species with suitable adaptations survive and reproduce more successfully."
+                                                          },
+                                                          {
+                                                              "label":  "Vegetation community",
+                                                              "text":  "Forests, grasslands, shrublands, deserts or other communities develop."
+                                                          },
+                                                          {
+                                                              "label":  "Human influence",
+                                                              "text":  "Land use, conservation, fire and resource extraction can alter the pattern."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Importance of natural vegetation"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "Reduces soil erosion and helps maintain soil structure.",
+                                                          "Provides habitat, food and shelter for wildlife.",
+                                                          "Supports carbon storage and influences climate regulation.",
+                                                          "Interception, infiltration and evapotranspiration influence local water movement.",
+                                                          "Provides timber, fibres, food, medicines and other products when harvested sustainably.",
+                                                          "Supports cultural values, tourism and the livelihoods of many communities."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Threats and conservation"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "Conversion of forests and grasslands to agriculture or built-up land.",
+                                                          "Unsustainable logging and extraction.",
+                                                          "Overgrazing and poorly managed fires.",
+                                                          "Invasive species and pollution.",
+                                                          "Habitat fragmentation caused by roads, dams and other infrastructure.",
+                                                          "Climate change that alters temperature, rainfall and the frequency of extreme events."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "concept",
+                                            "title":  "Conservation should match the ecosystem",
+                                            "text":  "Planting trees is not a universal replacement for every natural habitat. Grasslands, wetlands, mangroves and naturally open ecosystems have their own ecological value and should be restored according to their natural conditions."
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "upsc",
+                                            "title":  "UPSC foundation connection",
+                                            "text":  "Vegetation is linked to climate, soil conservation, carbon storage, biodiversity, water security, livelihoods and disaster-risk reduction. A sound answer distinguishes the ecological role of a habitat from the commercial value of its products."
+                                        }
+                                    ]
+                     },
+                     {
+                         "id":  "wildlife",
+                         "title":  "5. Wildlife and Biodiversity: Why Life Must Be Protected",
+                         "blocks":  [
+                                        {
+                                            "t":  "def",
+                                            "term":  "Wildlife",
+                                            "text":  "Wild animals and other non-domesticated organisms living in their natural environments. In conservation discussions, wildlife is closely connected with the habitats, food webs and ecological processes on which organisms depend."
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Biodiversity",
+                                            "text":  "The variety of life, including diversity within species, between species and among ecosystems."
+                                        },
+                                        {
+                                            "t":  "p",
+                                            "text":  "Wildlife contributes to ecosystem balance through pollination, seed dispersal, decomposition, predation and other ecological interactions. Biodiversity also supports food systems, genetic resources, scientific knowledge, cultural values and ecosystem resilience."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Why wildlife matters"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "**Ecological balance:** species interact through food webs and ecosystem processes.",
+                                                          "**Pollination and seed dispersal:** many organisms support plant reproduction and regeneration.",
+                                                          "**Food webs:** changes in one population can affect other species.",
+                                                          "**Genetic resources:** biodiversity provides variation that can support adaptation and research.",
+                                                          "**Livelihoods and culture:** communities may depend on healthy ecosystems for food, materials, tourism and cultural practices.",
+                                                          "**Ecosystem resilience:** diverse ecosystems may have a wider range of responses to environmental change, although resilience depends on many factors."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Major threats to wildlife"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Threats, mechanisms and responses",
+                                            "head":  [
+                                                         "Threat",
+                                                         "How it harms wildlife",
+                                                         "Possible response"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Habitat loss",
+                                                             "Removes feeding, breeding and shelter areas.",
+                                                             "Protect and restore habitats; plan land use carefully."
+                                                         ],
+                                                         [
+                                                             "Habitat fragmentation",
+                                                             "Breaks continuous habitat into smaller isolated patches.",
+                                                             "Maintain suitable corridors and reduce barriers where feasible."
+                                                         ],
+                                                         [
+                                                             "Poaching and illegal trade",
+                                                             "Directly removes individuals from populations.",
+                                                             "Enforce laws, reduce illegal demand and support community-based protection."
+                                                         ],
+                                                         [
+                                                             "Pollution",
+                                                             "Can poison organisms or damage habitats and food webs.",
+                                                             "Prevent pollution and monitor ecosystem health."
+                                                         ],
+                                                         [
+                                                             "Invasive species",
+                                                             "May compete with, prey on or alter the habitat of native species.",
+                                                             "Use science-based prevention, monitoring and control."
+                                                         ],
+                                                         [
+                                                             "Climate change",
+                                                             "Shifts suitable habitat and changes temperature, water availability and seasonal patterns.",
+                                                             "Reduce emissions and improve ecosystem resilience and connectivity."
+                                                         ],
+                                                         [
+                                                             "Human-wildlife conflict",
+                                                             "Can cause injury, crop loss, livestock loss and retaliatory killing.",
+                                                             "Use locally appropriate prevention, rapid response and fair compensation systems."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "In-situ and ex-situ conservation"
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Two complementary conservation approaches",
+                                            "head":  [
+                                                         "Approach",
+                                                         "Meaning",
+                                                         "Examples"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "In-situ conservation",
+                                                             "Protecting species in their natural habitats and maintaining ecological processes.",
+                                                             "National parks, wildlife sanctuaries, biosphere reserves and habitat corridors."
+                                                         ],
+                                                         [
+                                                             "Ex-situ conservation",
+                                                             "Protecting organisms outside their natural habitats under managed conditions.",
+                                                             "Zoos, botanical gardens, seed banks, gene banks and captive-breeding programmes."
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "concept",
+                                            "title":  "In-situ versus ex-situ",
+                                            "text":  "In-situ conservation protects habitats and ecological relationships. Ex-situ conservation can help selected species or genetic material, but it usually cannot replace a functioning natural ecosystem."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Conservation in India: broad examples"
+                                        },
+                                        {
+                                            "t":  "list",
+                                            "items":  [
+                                                          "**Protected areas:** national parks and wildlife sanctuaries conserve habitats and species under different legal arrangements.",
+                                                          "**Biosphere reserves:** large areas intended to combine conservation with research and, where appropriate, sustainable human activity.",
+                                                          "**Wetland protection:** wetlands provide habitat, store water, support fisheries and help regulate floods.",
+                                                          "**Mangrove conservation:** mangroves support coastal biodiversity and can reduce some wave and erosion impacts under suitable conditions.",
+                                                          "**Community participation:** local stewardship, traditional knowledge and fair sharing of benefits can support long-term conservation.",
+                                                          "**Wildlife corridors:** connected habitats can help some species move between areas, depending on the landscape and species."
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Flowchart: A practical conservation framework",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Identify",
+                                                              "text":  "Record important species, habitats and threats."
+                                                          },
+                                                          {
+                                                              "label":  "Protect",
+                                                              "text":  "Prevent avoidable habitat destruction, poaching and pollution."
+                                                          },
+                                                          {
+                                                              "label":  "Restore",
+                                                              "text":  "Repair degraded habitat using ecologically suitable methods."
+                                                          },
+                                                          {
+                                                              "label":  "Involve communities",
+                                                              "text":  "Include local people, respect livelihoods and reduce conflict."
+                                                          },
+                                                          {
+                                                              "label":  "Monitor and adapt",
+                                                              "text":  "Track species and habitat outcomes, then improve the approach."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "upsc",
+                                            "title":  "UPSC foundation connection",
+                                            "text":  "Wildlife conservation involves ecology, law, livelihoods, development planning, indigenous and local community rights, tourism, enforcement and human-wildlife conflict. Conservation is more durable when ecological objectives and social realities are considered together."
+                                        }
+                                    ]
+                     },
+                     {
+                         "id":  "integration",
+                         "title":  "6. Interrelationship, Sustainable Development and Case Analysis",
+                         "blocks":  [
+                                        {
+                                            "t":  "p",
+                                            "text":  "Land, soil, water, vegetation and wildlife are interconnected. Changes in one component can affect the others. For example, removing vegetation may increase runoff and soil erosion; eroded soil can enter rivers and reservoirs; sediment can reduce water quality and damage aquatic habitats."
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Integrated environmental flowchart",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Vegetation loss",
+                                                              "text":  "Less canopy cover, fewer roots and reduced protection of the soil surface."
+                                                          },
+                                                          {
+                                                              "label":  "Runoff increases",
+                                                              "text":  "More rainfall may flow rapidly over the ground instead of infiltrating."
+                                                          },
+                                                          {
+                                                              "label":  "Soil erosion",
+                                                              "text":  "Topsoil and nutrients are carried away."
+                                                          },
+                                                          {
+                                                              "label":  "Water impacts",
+                                                              "text":  "Sediment enters streams and reservoirs; water quality and storage may be affected."
+                                                          },
+                                                          {
+                                                              "label":  "Ecosystem and livelihood impacts",
+                                                              "text":  "Aquatic habitats, farming, water supply and local livelihoods may suffer."
+                                                          },
+                                                          {
+                                                              "label":  "Integrated management",
+                                                              "text":  "Restore suitable vegetation, conserve soil, protect catchments and manage water demand."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Sustainable development"
+                                        },
+                                        {
+                                            "t":  "def",
+                                            "term":  "Sustainable development",
+                                            "text":  "Development that meets present needs while protecting the ability of future generations to meet their own needs."
+                                        },
+                                        {
+                                            "t":  "p",
+                                            "text":  "Sustainable management seeks to balance environmental protection, economic activity and social well-being. It does not mean stopping all development. It means planning development so that resource use, pollution and ecological damage remain within acceptable limits and benefits are distributed fairly."
+                                        },
+                                        {
+                                            "t":  "table",
+                                            "caption":  "Three connected dimensions of sustainability",
+                                            "head":  [
+                                                         "Dimension",
+                                                         "Key concern",
+                                                         "Illustrative question"
+                                                     ],
+                                            "rows":  [
+                                                         [
+                                                             "Environmental",
+                                                             "Ecosystem health, biodiversity, soil, water and pollution.",
+                                                             "Will the activity damage an ecosystem or exhaust a resource?"
+                                                         ],
+                                                         [
+                                                             "Economic",
+                                                             "Jobs, production, affordability, efficiency and long-term viability.",
+                                                             "Can the activity meet needs without creating avoidable long-term costs?"
+                                                         ],
+                                                         [
+                                                             "Social",
+                                                             "Health, equity, access, participation and livelihoods.",
+                                                             "Who benefits, who bears the costs and whose views are included?"
+                                                         ]
+                                                     ]
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "Case study framework: a village facing water and soil stress"
+                                        },
+                                        {
+                                            "t":  "example",
+                                            "title":  "Illustrative scenario for practice",
+                                            "steps":  [
+                                                          "A village depends on seasonal rainfall, agriculture and a small groundwater supply.",
+                                                          "Vegetation cover declines on nearby slopes and soil erosion increases during heavy rain.",
+                                                          "Reservoirs and streams receive more sediment while groundwater levels decline during dry months.",
+                                                          "Farmers experience variable yields and households face unreliable water availability.",
+                                                          "The village maps its catchment, restores suitable vegetation, adopts soil-conservation practices, repairs water infrastructure and monitors groundwater withdrawals."
+                                                      ],
+                                            "answer":  "The scenario shows why land, soil and water should be managed together. The success of interventions depends on local geology, rainfall, community participation, maintenance and monitoring."
+                                        },
+                                        {
+                                            "t":  "h3",
+                                            "text":  "A topper-style method for environmental answers"
+                                        },
+                                        {
+                                            "t":  "sequence",
+                                            "title":  "Answer-writing framework",
+                                            "steps":  [
+                                                          {
+                                                              "label":  "Define",
+                                                              "text":  "Give a precise definition of the resource or environmental problem."
+                                                          },
+                                                          {
+                                                              "label":  "Explain causes",
+                                                              "text":  "Separate physical factors from human causes."
+                                                          },
+                                                          {
+                                                              "label":  "Show impacts",
+                                                              "text":  "Cover ecological, economic and social consequences."
+                                                          },
+                                                          {
+                                                              "label":  "Use an example",
+                                                              "text":  "Add a relevant Indian or local example only when accurate and useful."
+                                                          },
+                                                          {
+                                                              "label":  "Suggest measures",
+                                                              "text":  "Offer practical, location-sensitive and implementable solutions."
+                                                          },
+                                                          {
+                                                              "label":  "Conclude",
+                                                              "text":  "Link the answer to conservation, resilience and sustainable development."
+                                                          }
+                                                      ]
+                                        },
+                                        {
+                                            "t":  "callout",
+                                            "variant":  "upsc",
+                                            "title":  "Remember for UPSC foundation",
+                                            "text":  "Avoid one-dimensional explanations. Environmental problems often arise from the interaction of physical processes, resource demand, technology, institutions and social inequality. Good analysis connects causes, consequences and solutions."
+                                        }
+                                    ]
+                     }
+                 ],
+    "revision":  {
+                     "takeaways":  [
+                                       "Land supports ecosystems and human activities, but suitability varies with relief, soil, climate, resources and human factors.",
+                                       "Land degradation can result from deforestation, overgrazing, erosion, mining, pollution and poorly planned land use.",
+                                       "Soil forms gradually through weathering and interactions among parent material, climate, organisms, relief and time.",
+                                       "Soil erosion removes soil and can reduce fertility, increase sedimentation and affect water systems.",
+                                       "Contour ploughing, terracing, cover crops, shelter belts, vegetation restoration and controlled grazing can reduce erosion when suited to local conditions.",
+                                       "The hydrological cycle connects evaporation, condensation, precipitation, infiltration, runoff and storage.",
+                                       "Freshwater availability depends on quantity, timing, quality, infrastructure and access, not rainfall alone.",
+                                       "Rainwater harvesting, pollution prevention, efficient irrigation, wastewater treatment and groundwater management can support water security.",
+                                       "Natural vegetation distribution is influenced by temperature, rainfall, soil, relief, altitude and human activity.",
+                                       "Natural vegetation protects soil, influences water movement, stores carbon and supports biodiversity and livelihoods.",
+                                       "Wildlife and biodiversity maintain ecological relationships and provide important ecosystem, cultural and livelihood benefits.",
+                                       "In-situ conservation protects organisms in natural habitats; ex-situ conservation protects them outside their natural habitats.",
+                                       "Land, soil, water, vegetation and wildlife are interconnected, so integrated management is often more effective than isolated action.",
+                                       "Sustainable development balances environmental protection, economic viability and social well-being."
+                                   ],
+                     "summary":  [
+                                     "Land is a finite and unevenly suitable resource. Its use reflects physical conditions, technology, population, economic needs and planning.",
+                                     "Soil is a living natural system that forms slowly and supports food production, water regulation, nutrient cycling and ecosystems. Erosion and degradation require preventive management.",
+                                     "Water continually circulates through the hydrological cycle, but accessible clean freshwater is limited and unevenly distributed. Conservation must address demand, pollution, infrastructure and governance.",
+                                     "Natural vegetation reflects climate, soil, relief and ecological conditions. It supports biodiversity, protects soil and contributes to water and carbon cycles.",
+                                     "Wildlife conservation requires habitat protection, law enforcement, restoration, community participation and attention to human-wildlife conflict.",
+                                     "Integrated resource management connects land, soil, water, vegetation and wildlife with sustainable livelihoods and long-term environmental resilience."
+                                 ],
+                     "flashcards":  [
+                                        {
+                                            "q":  "What is land use?",
+                                            "a":  "The way people utilise land for agriculture, forestry, settlements, industry, transport and other activities."
+                                        },
+                                        {
+                                            "q":  "Name four factors affecting land use.",
+                                            "a":  "Relief, soil, climate and population; technology, economy, culture and institutions also matter."
+                                        },
+                                        {
+                                            "q":  "What is soil erosion?",
+                                            "a":  "The removal and transport of soil by water, wind, ice or human activities."
+                                        },
+                                        {
+                                            "q":  "Name three soil-conservation methods.",
+                                            "a":  "Contour ploughing, terracing and cover crops; shelter belts and vegetation restoration are other examples."
+                                        },
+                                        {
+                                            "q":  "What is an aquifer?",
+                                            "a":  "A geological formation that stores and transmits usable quantities of groundwater."
+                                        },
+                                        {
+                                            "q":  "What is water scarcity?",
+                                            "a":  "A condition in which available water of suitable quality is insufficient to meet needs."
+                                        },
+                                        {
+                                            "q":  "What is the hydrological cycle?",
+                                            "a":  "The continuous movement of water through processes such as evaporation, condensation, precipitation, infiltration and runoff."
+                                        },
+                                        {
+                                            "q":  "Name three factors that influence natural vegetation.",
+                                            "a":  "Temperature, precipitation and soil; relief, altitude and human activity also influence vegetation."
+                                        },
+                                        {
+                                            "q":  "What is biodiversity?",
+                                            "a":  "The variety of life within species, between species and among ecosystems."
+                                        },
+                                        {
+                                            "q":  "Distinguish in-situ and ex-situ conservation.",
+                                            "a":  "In-situ conservation protects organisms in their natural habitats; ex-situ conservation protects them outside their natural habitats."
+                                        },
+                                        {
+                                            "q":  "Why is vegetation important for soil and water?",
+                                            "a":  "Vegetation protects soil from erosion, can improve infiltration, influences runoff and supports catchment health."
+                                        },
+                                        {
+                                            "q":  "What are the three dimensions of sustainability?",
+                                            "a":  "Environmental protection, economic viability and social well-being."
+                                        }
+                                    ]
+                 },
+    "questions":  [
+                      {
+                          "id":  "q1",
+                          "q":  "Which of the following is a physical factor affecting land use?",
+                          "options":  [
+                                          "Population growth",
+                                          "Topography",
+                                          "Land ownership policy",
+                                          "Industrial investment"
+                                      ],
+                          "answer":  1,
+                          "why":  "Topography is a physical factor. Population, ownership and investment are human factors.",
+                          "ref":  "sec-land"
+                      },
+                      {
+                          "id":  "q2",
+                          "q":  "Which combination is most directly involved in soil formation?",
+                          "options":  [
+                                          "Parent material, climate, organisms, relief and time",
+                                          "Only rainfall and wind",
+                                          "Only human activity",
+                                          "Only temperature and population"
+                                      ],
+                          "answer":  0,
+                          "why":  "Soil formation is influenced by parent material, climate, organisms, relief and time.",
+                          "ref":  "sec-soil"
+                      },
+                      {
+                          "id":  "q3",
+                          "q":  "Which practice is especially useful for reducing runoff erosion on suitable sloping farmland?",
+                          "options":  [
+                                          "Removing all vegetation",
+                                          "Contour ploughing",
+                                          "Overgrazing",
+                                          "Leaving soil bare"
+                                      ],
+                          "answer":  1,
+                          "why":  "Contour ploughing follows contour lines and can slow the movement of runoff.",
+                          "ref":  "sec-soil"
+                      },
+                      {
+                          "id":  "q4",
+                          "q":  "What is an important consequence of excessive groundwater extraction?",
+                          "options":  [
+                                          "The water table must rise",
+                                          "Groundwater becomes unlimited",
+                                          "The water table may decline",
+                                          "All pollution disappears"
+                                      ],
+                          "answer":  2,
+                          "why":  "Extraction faster than recharge can lower groundwater levels and make wells less reliable.",
+                          "ref":  "sec-water"
+                      },
+                      {
+                          "id":  "q5",
+                          "q":  "Which statement about freshwater is correct?",
+                          "options":  [
+                                          "All Earth\u0027s water is freshwater",
+                                          "Freshwater is evenly distributed throughout the year",
+                                          "Usable freshwater availability depends on quantity, quality and access",
+                                          "Groundwater cannot be polluted"
+                                      ],
+                          "answer":  2,
+                          "why":  "Water may be unavailable for use because of pollution, seasonal variation, infrastructure or unequal access.",
+                          "ref":  "sec-water"
+                      },
+                      {
+                          "id":  "q6",
+                          "q":  "Which set of factors strongly influences natural vegetation?",
+                          "options":  [
+                                          "Temperature and rainfall",
+                                          "Only national borders",
+                                          "Only market prices",
+                                          "Only road density"
+                                      ],
+                          "answer":  0,
+                          "why":  "Temperature and precipitation are major controls on vegetation, alongside soil, relief and other factors.",
+                          "ref":  "sec-vegetation"
+                      },
+                      {
+                          "id":  "q7",
+                          "q":  "Which is an example of in-situ conservation?",
+                          "options":  [
+                                          "A seed bank",
+                                          "A botanical garden",
+                                          "A protected natural habitat",
+                                          "A laboratory culture"
+                                      ],
+                          "answer":  2,
+                          "why":  "In-situ conservation protects organisms in their natural habitats.",
+                          "ref":  "sec-wildlife"
+                      },
+                      {
+                          "id":  "q8",
+                          "q":  "Which statement best describes ex-situ conservation?",
+                          "options":  [
+                                          "Protecting a species only in its natural habitat",
+                                          "Protecting organisms outside their natural habitats",
+                                          "Removing all protected areas",
+                                          "Converting forests into farmland"
+                                      ],
+                          "answer":  1,
+                          "why":  "Examples include zoos, botanical gardens, seed banks and some captive-breeding programmes.",
+                          "ref":  "sec-wildlife"
+                      },
+                      {
+                          "id":  "q9",
+                          "q":  "Why should grasslands not automatically be replaced with tree plantations?",
+                          "options":  [
+                                          "Grasslands have no ecological value",
+                                          "All grasslands are deserts",
+                                          "Natural grasslands support their own specialised ecosystems",
+                                          "Trees cannot grow anywhere"
+                                      ],
+                          "answer":  2,
+                          "why":  "Naturally open ecosystems support specialised species and ecological processes; restoration should match the ecosystem.",
+                          "ref":  "sec-vegetation"
+                      },
+                      {
+                          "id":  "q10",
+                          "q":  "Which approach best represents integrated resource management?",
+                          "options":  [
+                                          "Managing groundwater without considering land use",
+                                          "Planting trees without considering the local ecosystem",
+                                          "Managing land, soil, water and vegetation together",
+                                          "Maximising extraction regardless of consequences"
+                                      ],
+                          "answer":  2,
+                          "why":  "Land, soil, water and vegetation interact, so coordinated management can address connected causes and effects.",
+                          "ref":  "sec-integration"
+                      },
+                      {
+                          "id":  "q11",
+                          "q":  "A reservoir is filling with sediment after vegetation loss on nearby slopes. Which process best explains this?",
+                          "options":  [
+                                          "Reduced erosion",
+                                          "Soil erosion followed by sediment transport",
+                                          "Reduced runoff in every case",
+                                          "Groundwater recharge alone"
+                                      ],
+                          "answer":  1,
+                          "why":  "Loss of protective vegetation can increase erosion, and runoff can transport soil into rivers and reservoirs.",
+                          "ref":  "sec-integration"
+                      },
+                      {
+                          "id":  "q12",
+                          "q":  "Which set best represents the three dimensions of sustainability?",
+                          "options":  [
+                                          "Environmental, economic and social",
+                                          "Political, military and sporting",
+                                          "Rainfall, altitude and longitude",
+                                          "Mining, logging and construction"
+                                      ],
+                          "answer":  0,
+                          "why":  "Sustainable development considers environmental protection, economic viability and social well-being.",
+                          "ref":  "sec-integration"
+                      }
+                  ],
+    "sourceNote":  "type: original-study-guide\ndescription: Original explanatory study notes aligned with the broad themes of NCERT Class 8 Geography Chapter 2 on land, soil, water, natural vegetation and wildlife resources, with additional UPSC-foundation connections. This is not a verbatim reproduction of the textbook. Check terminology and chapter arrangement against the edition prescribed by your school.\nofficialTextbook: https://ncert.nic.in/textbook.php"
+};
+

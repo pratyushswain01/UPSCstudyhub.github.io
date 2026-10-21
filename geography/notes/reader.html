@@ -1060,7 +1060,32 @@ function normBlock(b) {
   }
 }
 function navLink(x) {
-  var href = x && safeHref(x.href), title = x && str(x.title).trim();
+  if (!x) return null;
+
+  var href = '', title = '';
+
+  if (typeof x === 'string') {
+    var p = x.trim().replace(/\\/g, '/');
+    if (!p || p.indexOf('..') !== -1 || !/^[A-Za-z0-9_./-]+\.json$/.test(p)) return null;
+
+    var key = p.replace(/^chapters\//, '');
+    var registry = window.__UG_CHAPTERS || {};
+    var chapter = registry[key] || null;
+
+    href = safeHref('reader.html?chapter=' + encodeURIComponent(p));
+    title = chapter && chapter.meta && chapter.meta.title
+      ? str(chapter.meta.title).trim()
+      : '';
+
+    if (!title) {
+      var match = key.match(/ch(\d+)\.json$/i);
+      title = match ? 'Chapter ' + Number(match[1]) : 'Open chapter';
+    }
+  } else if (typeof x === 'object') {
+    href = safeHref(x.href);
+    title = str(x.title).trim();
+  }
+
   return (href && title) ? { href: href, title: title } : null;
 }
 
@@ -1147,11 +1172,63 @@ function normalizeChapter(raw) {
     return { id: qid, q: str(q.q).trim(), options: options, answer: ans, why: str(q.why), ref: refTo(q.ref) };
   }).filter(Boolean);
 
+  function sourceText(value) {
+    if (typeof value === 'string') return value.trim();
+    if (value == null) return '';
+    if (typeof value !== 'object') return str(value).trim();
+
+    var parts = [];
+    Object.keys(value).forEach(function (key) {
+      var item = value[key];
+      if (item != null && typeof item !== 'object' && str(item).trim()) {
+        parts.push(str(item).trim());
+      }
+    });
+    return parts.join(' ');
+  }
+
   var src = arr(raw.sources).map(function (s) {
-    return typeof s === 'string' ? { label: s, note: '', href: '' }
-      : { label: str(s && s.label), note: str(s && s.note), href: safeHref(s && s.href) };
+    if (typeof s === 'string') return { label: s.trim(), note: '', href: '' };
+
+    s = (s && typeof s === 'object') ? s : {};
+    var label = str(s.label || s.title || s.name).trim();
+    var note = sourceText(s.note || s.description || s.text);
+    if (!label && note) {
+      label = 'Source information';
+    }
+    return {
+      label: label,
+      note: note,
+      href: safeHref(s.href || s.url)
+    };
   }).filter(function (s) { return s.label; });
-  if (!src.length && str(raw.sourceNote).trim()) src = [{ label: 'About this material', note: str(raw.sourceNote).trim(), href: '' }];
+
+  if (!src.length && raw.sourceNote != null) {
+    if (typeof raw.sourceNote === 'object') {
+      var source = raw.sourceNote;
+      var sourceLabel = str(source.label || source.title || source.name).trim()
+        || 'About this material';
+      var sourceHref = safeHref(source.href || source.url);
+      var sourceNoteText = sourceText(source.note || source.description || source.text);
+
+      if (!sourceNoteText) {
+        sourceNoteText = sourceText(source);
+      }
+
+      src = [{
+        label: sourceLabel,
+        note: sourceNoteText,
+        href: sourceHref
+      }];
+    } else if (str(raw.sourceNote).trim()) {
+      src = [{
+        label: 'About this material',
+        note: str(raw.sourceNote).trim(),
+        href: ''
+      }];
+    }
+  }
+
   d.sources = src;
   return d;
 }
