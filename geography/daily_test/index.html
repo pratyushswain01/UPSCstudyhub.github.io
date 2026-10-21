@@ -140,7 +140,12 @@ html.is-scrolled .brand__mark{width:34px;height:34px}
 .hero{position:relative;isolation:isolate;padding:clamp(2rem,5vw,3.4rem) 0 clamp(2rem,4vw,2.8rem);border-bottom:1px solid var(--line)}
 .hero__contours{position:absolute;z-index:-1;right:-4%;top:-10%;width:min(580px,72%);height:auto;color:var(--sage);opacity:.45;
   -webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent 100%);mask-image:radial-gradient(closest-side,#000 30%,transparent 100%)}
-.hero__no{position:absolute;z-index:-1;right:0;top:-.05em;font:300 clamp(6rem,18vw,11rem)/1 var(--font-serif);color:transparent;-webkit-text-stroke:1px var(--gold);opacity:.4;user-select:none}
+.hero__no-wrap{position:absolute;z-index:-1;right:0;top:-.05em;text-align:right;user-select:none;pointer-events:none}
+.hero__no{display:block;font:300 clamp(5.5rem,16vw,10.5rem)/.88 var(--font-serif);color:transparent;-webkit-text-stroke:1px var(--gold);opacity:.42;font-variant-numeric:lining-nums}
+.hero__no-row{display:flex;align-items:baseline;justify-content:flex-end;gap:.35em}
+.hero__no-month{font:700 clamp(.9rem,1.6vw,1.25rem)/1 var(--font-sans);color:#fff;opacity:.9;letter-spacing:.04em;text-transform:uppercase}
+.hero__no-sub{display:block;margin-top:.18em;font:500 clamp(.85rem,1.4vw,1.1rem)/1.2 var(--font-sans);color:var(--gold-ink);opacity:.75;letter-spacing:.06em;text-transform:uppercase}
+.hero__no-count{display:block;margin-top:.28em;font:500 .78rem/1.2 var(--font-sans);color:var(--muted);opacity:.85}
 .hero>*:not(.hero__contours):not(.hero__no){animation:fadeUp .8s cubic-bezier(.2,.7,.2,1) both}
 .hero__kicker{animation-delay:.1s!important;font:500 .9rem/1.3 var(--font-sans);color:var(--gold-ink);display:flex;align-items:center;gap:.75rem}
 .hero__kicker::before{content:"";width:2.2rem;height:1px;background:var(--gold)}
@@ -345,7 +350,14 @@ html.is-scrolled .brand__mark{width:34px;height:34px}
       <ellipse cx="200" cy="160" rx="90" ry="55" stroke="currentColor" stroke-width="1" opacity=".3" transform="rotate(-15 200 160)"/>
       <path d="M140 160h120M200 120v80" stroke="currentColor" stroke-width=".8" opacity=".25"/>
     </svg>
-    <span class="hero__no" aria-hidden="true">01</span>
+    <div class="hero__no-wrap" aria-hidden="true">
+      <div class="hero__no-row">
+        <span class="hero__no" id="heroDay">22</span>
+        <span class="hero__no-month" id="heroMonth">OCT</span>
+      </div>
+      <span class="hero__no-sub" id="heroDayName">THURSDAY</span>
+      <span class="hero__no-count" id="heroTestCount">14 tests</span>
+    </div>
 
     <p class="hero__kicker">UPSC CSE PREPARATION · DAILY PRACTICE</p>
     <h1 id="heroTitle">Geography Daily Test Series</h1>
@@ -457,5 +469,33 @@ html.is-scrolled .brand__mark{width:34px;height:34px}
 </footer>
 
 <script src="./geo-daily.js" defer></script>
+
+<script>
+(function(){
+  const TZ = "Asia/Kolkata";
+  const now = new Date();
+  const dayNum  = new Intl.DateTimeFormat("en-GB", {day:"2-digit", timeZone:TZ}).format(now);
+  const dayName = new Intl.DateTimeFormat("en-GB", {weekday:"long", timeZone:TZ}).format(now).toUpperCase();
+
+  const d = document.getElementById("heroDay");
+  const n = document.getElementById("heroDayName");
+  const c = document.getElementById("heroTestCount");
+
+  if (d) d.textContent = dayNum;
+  if (n) n.textContent = dayName;
+  const m = document.getElementById("heroMonth");
+  if (m) {
+    m.textContent = new Intl.DateTimeFormat("en-GB", {month:"short", timeZone:TZ}).format(now).toUpperCase();
+  }
+
+  function setCount(){
+    let total = 14;
+    if (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.tests)) total = CONFIG.tests.length;
+    if (c) c.textContent = total + " tests";
+  }
+  setCount();
+  setTimeout(setCount, 800);
+})();
+</script>
 </body>
 </html>
