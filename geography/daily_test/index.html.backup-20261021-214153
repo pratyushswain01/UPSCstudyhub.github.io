@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geography Daily Test Series · UPSC Gurukul</title>
+<meta name="description" content="UPSC Gurukul Geography Daily Test Series — one day, one topic. Practice physical, Indian and world geography MCQs for CSE Prelims with a clean editorial interface.">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#F7F5EF">
+<link rel="canonical" href="https://upscgurukul.online/geography.html">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Geography Daily Test Series · UPSC Gurukul">
+<meta property="og:description" content="One day. One topic. A stronger command of Geography. Daily MCQ practice for UPSC CSE Prelims.">
+<meta property="og:url" content="https://upscgurukul.online/geography.html">
+<meta property="og:site_name" content="UPSC Gurukul">
+
+<script>
+/* Apply saved theme before first paint to avoid flash */
+try{if(localStorage.getItem('ug-theme')==='dark'){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+
+<!-- Firebase SDK (compat builds for simple script-tag usage) -->
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+
+<style>
+/* =========================================================
+   1. Design tokens — matched to UPSC Gurukul Reader
+   ========================================================= */
+:root{
+  --font-serif:"Source Serif 4","Source Serif Pro",Charter,"Iowan Old Style",Georgia,"Times New Roman",serif;
+  --font-sans:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+
+  --bg:#F7F5EF; --paper:#FFFEFB; --paper-2:#FBF9F3;
+  --ink:#20251F; --ink-2:#333B32; --muted:#5C655A;
+  --line:#E2DDCF; --line-2:#CFC8B6;
+  --accent:#214C3B; --accent-2:#2D6650; --on-accent:#F7F5EF;
+  --sage:#8DA595; --sage-soft:#E5EBE3; --sage-ink:#2F5443;
+  --gold:#B08F3E; --gold-ink:#7A5F1F; --gold-soft:#F3ECD6;
+  --ok:#2C6A48; --ok-soft:#E1EEE5; --bad:#99392D; --bad-soft:#F7E4E0;
+  --shadow:0 1px 0 rgba(32,37,31,.04),0 10px 28px -16px rgba(32,37,31,.25);
+
+  --hdr-h:68px; --radius:10px;
+}
+:root[data-theme="dark"]{
+  --bg:#151C19; --paper:#1C2621; --paper-2:#19221E;
+  --ink:#F1EDE2; --ink-2:#DAD6CA; --muted:#A6B1A7;
+  --line:#2B3831; --line-2:#3B4B42;
+  --accent:#9CCDB3; --accent-2:#B7DCC7; --on-accent:#10201A;
+  --sage:#7FA08C; --sage-soft:#22302A; --sage-ink:#BBD6C6;
+  --gold:#C9A85C; --gold-ink:#DABF7E; --gold-soft:#2C291D;
+  --ok:#7CC49B; --ok-soft:#1F3328; --bad:#E69A8C; --bad-soft:#3A2521;
+  --shadow:0 1px 0 rgba(0,0,0,.2),0 10px 28px -16px rgba(0,0,0,.6);
+}
+html.is-scrolled{--hdr-h:54px}
+
+/* =========================================================
+   2. Base
+   ========================================================= */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth;scroll-padding-top:calc(var(--hdr-h) + 24px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 1rem/1.6 var(--font-sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;transition:background-color .3s,color .3s}
+body.no-scroll{overflow:hidden}
+img,svg{max-width:100%}
+a{color:var(--accent);text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+h1,h2,h3,p,ol,ul,dl,dd,figure{margin:0}
+ol,ul{padding:0;list-style:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
+[hidden]{display:none!important}
+.skip{position:absolute;left:12px;top:-60px;z-index:100;background:var(--accent);color:var(--on-accent);padding:.6rem 1rem;border-radius:8px;text-decoration:none;transition:top .2s}
+.skip:focus{top:12px}
+
+/* =========================================================
+   3. Header
+   ========================================================= */
+@keyframes hdrIn{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.hdr{position:sticky;top:0;z-index:50;height:var(--hdr-h);background:color-mix(in srgb,var(--bg) 90%,transparent);
+  -webkit-backdrop-filter:blur(10px) saturate(1.1);backdrop-filter:blur(10px) saturate(1.1);
+  border-bottom:1px solid transparent;transition:height .3s ease,border-color .3s,box-shadow .3s;
+  animation:hdrIn .7s cubic-bezier(.2,.7,.2,1) both}
+html.is-scrolled .hdr{border-bottom-color:var(--line);box-shadow:0 10px 24px -20px rgba(0,0,0,.45)}
+.hdr__in{height:100%;max-width:1240px;margin:0 auto;padding:0 clamp(12px,3vw,32px);display:flex;align-items:center;gap:clamp(8px,1.6vw,20px)}
+.hdr__in>*{animation:fadeUp .6s cubic-bezier(.2,.7,.2,1) both;animation-delay:calc(var(--i,0) * 70ms + 160ms)}
+
+.brand{display:flex;align-items:center;gap:.7rem;text-decoration:none;color:var(--ink);min-width:0}
+.brand__mark{position:relative;flex:none;width:42px;height:42px;border-radius:50%;background:var(--paper);display:grid;place-items:center;border:1px solid var(--line);transition:width .3s,height .3s}
+html.is-scrolled .brand__mark{width:34px;height:34px}
+.brand__fb{font:600 .95rem/1 var(--font-serif);color:var(--accent);letter-spacing:.02em}
+.brand__text{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand__name{font:600 1.02rem/1.1 var(--font-serif);letter-spacing:.005em;white-space:nowrap}
+.brand__series{font:500 .75rem/1.2 var(--font-sans);color:var(--muted);white-space:nowrap}
+
+.nav{display:none;align-items:center;gap:.25rem;margin-left:1rem}
+.nav a{padding:.45rem .75rem;border-radius:8px;font:500 .875rem var(--font-sans);color:var(--ink-2);transition:background-color .2s,color .2s}
+.nav a:hover,.nav a[aria-current="page"]{background:var(--sage-soft);color:var(--ink)}
+.nav a[aria-current="page"]{font-weight:600}
+
+.hdr__tools{margin-left:auto;display:flex;align-items:center;gap:4px}
+.icon-btn{position:relative;display:inline-grid;place-items:center;width:40px;height:40px;border:1px solid transparent;border-radius:10px;background:none;color:var(--ink);transition:background-color .2s,border-color .2s,color .2s,transform .2s}
+.icon-btn:hover{background:var(--sage-soft);border-color:var(--line)}
+.icon-btn:active{transform:scale(.94)}
+.icon-btn svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.theme-btn .i-moon{display:none}
+:root[data-theme="dark"] .theme-btn .i-moon{display:block}
+:root[data-theme="dark"] .theme-btn .i-sun{display:none}
+.menu-btn{margin-left:-6px}
+
+@media (min-width:900px){.nav{display:flex}.menu-btn{display:none}}
+@media (max-width:420px){.brand__series{display:none}.brand__name{font-size:.98rem}}
+
+/* Mobile drawer */
+.side{position:fixed;z-index:70;left:0;top:0;bottom:0;width:min(88vw,320px);overflow:auto;padding:1.2rem 1.1rem 2rem;background:var(--paper);border-right:1px solid var(--line-2);box-shadow:var(--shadow);transform:translateX(-104%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.7,.2,1),visibility 0s .32s}
+.side.is-open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.7,.2,1),visibility 0s}
+.scrim{position:fixed;inset:0;z-index:65;background:rgba(21,28,25,.45);animation:fadeUp .2s both}
+.side__top{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem}
+.side__h{font:600 .8125rem/1.3 var(--font-sans);color:var(--muted);letter-spacing:.01em}
+.side nav a{display:block;padding:.7rem .8rem;border-radius:8px;font:500 .95rem var(--font-sans);color:var(--ink-2);transition:background-color .2s}
+.side nav a:hover,.side nav a[aria-current="page"]{background:var(--sage-soft);color:var(--ink)}
+@media (min-width:900px){.side,.scrim{display:none!important}}
+
+/* =========================================================
+   4. Layout
+   ========================================================= */
+.shell{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3vw,32px) 4rem}
+.main{min-width:0;outline:none}
+
+/* =========================================================
+   5. Hero
+   ========================================================= */
+.hero{position:relative;isolation:isolate;padding:clamp(2rem,5vw,3.4rem) 0 clamp(2rem,4vw,2.8rem);border-bottom:1px solid var(--line)}
+.hero__contours{position:absolute;z-index:-1;right:-4%;top:-10%;width:min(580px,72%);height:auto;color:var(--sage);opacity:.45;
+  -webkit-mask-image:radial-gradient(closest-side,#000 30%,transparent 100%);mask-image:radial-gradient(closest-side,#000 30%,transparent 100%)}
+.hero__no{position:absolute;z-index:-1;right:0;top:-.05em;font:300 clamp(6rem,18vw,11rem)/1 var(--font-serif);color:transparent;-webkit-text-stroke:1px var(--gold);opacity:.4;user-select:none}
+.hero>*:not(.hero__contours):not(.hero__no){animation:fadeUp .8s cubic-bezier(.2,.7,.2,1) both}
+.hero__kicker{animation-delay:.1s!important;font:500 .9rem/1.3 var(--font-sans);color:var(--gold-ink);display:flex;align-items:center;gap:.75rem}
+.hero__kicker::before{content:"";width:2.2rem;height:1px;background:var(--gold)}
+.hero h1{animation-delay:.2s!important;margin:.5em 0 .4em;max-width:16em;font:600 clamp(2.1rem,1.2rem + 3.5vw,3.4rem)/1.08 var(--font-serif);letter-spacing:-.012em;text-wrap:balance}
+.hero__lede{animation-delay:.3s!important;max-width:40rem;font:400 clamp(1.05rem,1rem + .3vw,1.22rem)/1.6 var(--font-serif);color:var(--ink-2)}
+.hero__sub{animation-delay:.35s!important;margin-top:.6rem;font:500 1.05rem/1.45 var(--font-serif);color:var(--accent)}
+.hero__actions{animation-delay:.45s!important;display:flex;flex-wrap:wrap;gap:.7rem;margin-top:1.8rem}
+
+/* =========================================================
+   6. Buttons & chips
+   ========================================================= */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:44px;padding:.55rem 1.15rem;border:1px solid var(--line-2);border-radius:10px;background:var(--paper);color:var(--ink);font:500 .9rem var(--font-sans);text-decoration:none;transition:background-color .2s,border-color .2s,color .2s,transform .2s}
+.btn:hover{border-color:var(--sage);background:var(--sage-soft)}
+.btn:active{transform:translateY(1px)}
+.btn--primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn--primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:var(--on-accent)}
+.btn--ghost{background:transparent}
+.btn:disabled,.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed;pointer-events:none}
+
+.chip{display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .65rem;border:1px solid var(--line-2);border-radius:999px;background:var(--paper);font:500 .78rem var(--font-sans);color:var(--ink-2)}
+.chip--gold{background:var(--gold-soft);border-color:transparent;color:var(--gold-ink)}
+.chip--sage{background:var(--sage-soft);border-color:transparent;color:var(--sage-ink)}
+.chip--ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.chip--muted{background:var(--paper-2);color:var(--muted)}
+.chip--sample{background:var(--gold-soft);border:1px dashed var(--gold);color:var(--gold-ink)}
+
+/* =========================================================
+   7. Today's Test card
+   ========================================================= */
+.today{margin-top:clamp(2rem,4vw,2.8rem)}
+.today__label{font:600 .85rem/1.3 var(--font-sans);color:var(--gold-ink);letter-spacing:.02em;margin-bottom:.8rem;display:flex;align-items:center;gap:.6rem}
+.today__label::before{content:"";width:1.6rem;height:1px;background:var(--gold)}
+.today-card{position:relative;padding:clamp(1.4rem,3vw,2rem);border:1px solid var(--line);border-radius:14px;background:var(--paper);box-shadow:var(--shadow);overflow:hidden}
+.today-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(180deg,var(--gold),var(--accent))}
+.today-card__top{display:flex;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:1rem;margin-bottom:1.1rem}
+.today-card__date{font:500 .9rem var(--font-sans);color:var(--muted)}
+.today-card h2{font:600 clamp(1.35rem,1.1rem + 1vw,1.7rem)/1.25 var(--font-serif);margin-bottom:.35rem}
+.today-card__topic{font:500 .95rem var(--font-sans);color:var(--accent);margin-bottom:.8rem}
+.today-card__desc{font:400 1rem/1.6 var(--font-serif);color:var(--ink-2);max-width:42rem;margin-bottom:1.2rem}
+.today-meta{display:flex;flex-wrap:wrap;gap:.5rem .9rem;margin-bottom:1.4rem;font-size:.875rem;color:var(--muted)}
+.today-meta li{display:flex;align-items:center;gap:.35rem}
+.today-meta strong{color:var(--ink);font-weight:600}
+.today-card__actions{display:flex;flex-wrap:wrap;gap:.7rem;align-items:center}
+.today-empty{padding:2rem;text-align:center;color:var(--muted);font:400 1.05rem/1.55 var(--font-serif)}
+
+/* =========================================================
+   8. Filters & search
+   ========================================================= */
+.controls{margin-top:clamp(2.4rem,5vw,3.2rem);padding:1.2rem 0;border-top:1px solid var(--line)}
+.controls__row{display:flex;flex-wrap:wrap;gap:.8rem 1rem;align-items:center;margin-bottom:1rem}
+.controls__row:last-child{margin-bottom:0}
+.search-wrap{position:relative;flex:1;min-width:min(100%,240px);max-width:360px}
+.search-wrap svg{position:absolute;left:.85rem;top:50%;transform:translateY(-50%);width:18px;height:18px;stroke:var(--muted);fill:none;stroke-width:1.7;pointer-events:none}
+.search-wrap input{width:100%;height:42px;padding:0 1rem 0 2.6rem;border:1px solid var(--line-2);border-radius:10px;background:var(--paper);color:var(--ink);font:400 .9rem var(--font-sans);transition:border-color .2s}
+.search-wrap input:focus{outline:none;border-color:var(--accent)}
+.search-wrap input::placeholder{color:var(--muted)}
+
+.select{height:42px;padding:0 2rem 0 .9rem;border:1px solid var(--line-2);border-radius:10px;background:var(--paper) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%235C655A' stroke-width='1.5' stroke-linecap='round' d='M3 4.5L6 7.5 9 4.5'/%3E%3C/svg%3E") no-repeat right .7rem center;color:var(--ink);font:400 .875rem var(--font-sans);appearance:none;cursor:pointer;min-width:140px}
+.select:focus{outline:none;border-color:var(--accent)}
+:root[data-theme="dark"] .select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23A6B1A7' stroke-width='1.5' stroke-linecap='round' d='M3 4.5L6 7.5 9 4.5'/%3E%3C/svg%3E")}
+
+.btn--clear{min-height:42px;padding:.4rem .9rem;font-size:.85rem}
+
+/* =========================================================
+   9. Test grid & cards
+   ========================================================= */
+.section-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.8rem;margin:clamp(1.8rem,3.5vw,2.4rem) 0 1.2rem}
+.section-head h2{font:600 clamp(1.35rem,1.15rem + .8vw,1.7rem)/1.25 var(--font-serif)}
+.section-head .count{font:500 .875rem var(--font-sans);color:var(--muted)}
+
+.grid{display:grid;gap:1.1rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
+.card{display:flex;flex-direction:column;padding:1.25rem 1.3rem;border:1px solid var(--line);border-radius:12px;background:var(--paper);transition:border-color .2s,box-shadow .2s,transform .2s}
+.card:hover{border-color:var(--sage);box-shadow:var(--shadow)}
+.card__date{font:500 .8rem var(--font-sans);color:var(--muted);margin-bottom:.45rem}
+.card h3{font:600 1.1rem/1.3 var(--font-serif);margin-bottom:.3rem;color:var(--ink)}
+.card__topic{font:500 .875rem var(--font-sans);color:var(--accent);margin-bottom:.7rem}
+.card__meta{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem;margin-top:auto}
+.card__actions{display:flex;flex-wrap:wrap;gap:.5rem;align-items:center;padding-top:.3rem}
+.card--sample{border-style:dashed}
+.card--upcoming{opacity:.88}
+.card--done{border-color:var(--ok)}
+
+.empty{padding:2.5rem 1.5rem;text-align:center;border:1px dashed var(--line-2);border-radius:12px;color:var(--muted);font:400 1rem/1.55 var(--font-serif)}
+.empty strong{display:block;font:600 1.05rem var(--font-serif);color:var(--ink-2);margin-bottom:.4rem}
+
+/* =========================================================
+   10. Categories
+   ========================================================= */
+.cats{margin-top:clamp(2.5rem,5vw,3.4rem)}
+.cats__grid{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(min(100%,220px),1fr))}
+.cat{padding:1.1rem 1.2rem;border:1px solid var(--line);border-radius:12px;background:var(--paper-2);transition:border-color .2s,background-color .2s}
+.cat:hover{border-color:var(--sage);background:var(--paper)}
+.cat h3{font:600 .95rem/1.3 var(--font-serif);margin-bottom:.55rem;color:var(--ink)}
+.cat ul{display:grid;gap:.3rem}
+.cat li{font:400 .85rem/1.4 var(--font-sans);color:var(--ink-2);padding-left:.9rem;position:relative}
+.cat li::before{content:"";position:absolute;left:0;top:.55em;width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7}
+
+/* =========================================================
+   11. Performance panel
+   ========================================================= */
+.perf{margin-top:clamp(2.5rem,5vw,3.4rem);padding:1.4rem 1.5rem;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+.perf__head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.8rem;margin-bottom:1.1rem}
+.perf__head h2{font:600 1.2rem/1.3 var(--font-serif)}
+.perf__note{font:400 .8rem var(--font-sans);color:var(--muted);margin-bottom:1rem}
+.perf__stats{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));margin-bottom:1.2rem}
+.stat{padding:.9rem 1rem;border-radius:10px;background:var(--sage-soft)}
+.stat dt{font:500 .78rem var(--font-sans);color:var(--muted);margin-bottom:.25rem}
+.stat dd{font:600 1.35rem/1.2 var(--font-serif);color:var(--ink)}
+.perf__list{font:400 .9rem/1.5 var(--font-sans);color:var(--ink-2)}
+.perf__list li{padding:.4rem 0;border-bottom:1px solid var(--line)}
+.perf__list li:last-child{border-bottom:0}
+.perf__empty{color:var(--muted);font-size:.9rem}
+.sync-status{font:500 .8rem var(--font-sans);color:var(--muted);display:flex;align-items:center;gap:.4rem}
+.sync-status[data-state="synced"]{color:var(--ok)}
+.sync-status[data-state="error"]{color:var(--bad)}
+.sync-status[data-state="syncing"]{color:var(--gold-ink)}
+
+/* =========================================================
+   12. Footer
+   ========================================================= */
+.footer{margin-top:clamp(3rem,6vw,4rem);padding:2rem 0 1.5rem;border-top:1px solid var(--line)}
+.footer__in{max-width:1240px;margin:0 auto;padding:0 clamp(16px,3vw,32px);display:grid;gap:1.2rem}
+.footer__brand{font:600 1.05rem var(--font-serif);color:var(--ink)}
+.footer__series{font:500 .85rem var(--font-sans);color:var(--muted)}
+.footer__links{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem}
+.footer__links a{font:500 .875rem var(--font-sans);color:var(--ink-2)}
+.footer__links a:hover{color:var(--accent)}
+.footer__copy{font:400 .8rem/1.5 var(--font-sans);color:var(--muted)}
+.footer__disclaimer{font:400 .78rem/1.5 var(--font-sans);color:var(--muted);max-width:42rem}
+
+/* =========================================================
+   13. Utilities & motion
+   ========================================================= */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- ========== HEADER ========== -->
+<header class="hdr" role="banner">
+  <div class="hdr__in">
+    <a class="brand" href="/" style="--i:0" aria-label="UPSC Gurukul home">
+      <span class="brand__mark">
+        <span class="brand__fb" aria-hidden="true">UG</span>
+      </span>
+      <span class="brand__text">
+        <span class="brand__name">UPSC Gurukul</span>
+        <span class="brand__series">Geography · Daily Test Series</span>
+      </span>
+    </a>
+
+    <nav class="nav" aria-label="Primary" style="--i:1">
+      <a href="/">Home</a>
+      <a href="geography.html" aria-current="page">Daily Tests</a>
+      <a href="#archive">Test Archive</a>
+      <a href="#performance">Performance</a>
+    </nav>
+
+    <div class="hdr__tools" style="--i:2">
+      <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Switch to dark theme">
+        <svg class="i-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="icon-btn menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="sideNav">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile side nav -->
+<div class="scrim" id="scrim" hidden></div>
+<aside class="side" id="sideNav" aria-label="Mobile navigation">
+  <div class="side__top">
+    <span class="side__h">Menu</span>
+    <button class="icon-btn" id="sideClose" type="button" aria-label="Close menu">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+    </button>
+  </div>
+  <nav>
+    <a href="/">Home</a>
+    <a href="geography.html" aria-current="page">Daily Tests</a>
+    <a href="#archive">Test Archive</a>
+    <a href="#performance">Performance</a>
+  </nav>
+</aside>
+
+<main class="shell main" id="main">
+  <!-- ========== HERO ========== -->
+  <section class="hero" aria-labelledby="heroTitle">
+    <svg class="hero__contours" viewBox="0 0 600 400" fill="none" aria-hidden="true">
+      <path d="M50 280c80-40 140-100 220-90s140 60 220 40 120-80 160-60" stroke="currentColor" stroke-width="1.2" opacity=".6"/>
+      <path d="M30 320c90-50 160-110 250-95s150 70 240 45 130-90 180-70" stroke="currentColor" stroke-width="1" opacity=".45"/>
+      <path d="M80 200c70-30 120-70 190-65s130 45 200 30 100-55 140-40" stroke="currentColor" stroke-width=".9" opacity=".35"/>
+      <circle cx="480" cy="120" r="48" stroke="currentColor" stroke-width="1.2" opacity=".5"/>
+      <circle cx="480" cy="120" r="32" stroke="currentColor" stroke-width=".9" opacity=".4"/>
+      <path d="M480 72v16M480 152v16M432 120h16M512 120h16" stroke="currentColor" stroke-width="1.1" opacity=".55"/>
+      <path d="M448 88l12 12M500 140l12 12M448 152l12-12M500 88l12-12" stroke="currentColor" stroke-width=".9" opacity=".4"/>
+      <ellipse cx="200" cy="160" rx="90" ry="55" stroke="currentColor" stroke-width="1" opacity=".3" transform="rotate(-15 200 160)"/>
+      <path d="M140 160h120M200 120v80" stroke="currentColor" stroke-width=".8" opacity=".25"/>
+    </svg>
+    <span class="hero__no" aria-hidden="true">01</span>
+
+    <p class="hero__kicker">UPSC CSE PREPARATION · DAILY PRACTICE</p>
+    <h1 id="heroTitle">Geography Daily Test Series</h1>
+    <p class="hero__sub">One day. One topic. A stronger command of Geography.</p>
+    <p class="hero__lede">Build geographical understanding through regular MCQ practice covering physical geography, Indian geography, world geography, and mapping, with a focus on UPSC Prelims preparation.</p>
+    <div class="hero__actions">
+      <a class="btn btn--primary" href="#today" id="heroTodayBtn">Attempt Today's Test</a>
+      <a class="btn" href="#archive">Explore Test Archive</a>
+    </div>
+  </section>
+
+  <!-- ========== TODAY'S TEST ========== -->
+  <section class="today" id="today" aria-labelledby="todayHeading">
+    <p class="today__label" id="todayHeading">Today's Geography Test</p>
+    <div id="todayHost">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- ========== CONTROLS ========== -->
+  <section class="controls" id="archive" aria-label="Search and filter tests">
+    <div class="controls__row">
+      <div class="search-wrap">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input type="search" id="searchInput" placeholder="Search by title or topic…" aria-label="Search tests by title or topic" autocomplete="off">
+      </div>
+      <select class="select" id="filterTopic" aria-label="Filter by topic">
+        <option value="">All topics</option>
+      </select>
+      <select class="select" id="filterDiff" aria-label="Filter by difficulty">
+        <option value="">All difficulties</option>
+        <option value="Easy">Easy</option>
+        <option value="Moderate">Moderate</option>
+        <option value="Hard">Hard</option>
+      </select>
+      <select class="select" id="filterStatus" aria-label="Filter by availability">
+        <option value="">All statuses</option>
+        <option value="available">Available</option>
+        <option value="upcoming">Upcoming</option>
+        <option value="completed">Completed on this device</option>
+        <option value="unavailable">Unavailable</option>
+      </select>
+      <select class="select" id="sortBy" aria-label="Sort tests">
+        <option value="newest">Newest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
+      <button class="btn btn--clear" type="button" id="clearFilters">Clear filters</button>
+    </div>
+  </section>
+
+  <!-- ========== ARCHIVE GRID ========== -->
+  <section aria-labelledby="archiveHeading">
+    <div class="section-head">
+      <h2 id="archiveHeading">Daily Test Archive</h2>
+      <span class="count" id="resultCount"></span>
+    </div>
+    <div class="grid" id="testGrid" role="list">
+      <!-- Populated by JS -->
+    </div>
+    <div class="empty" id="emptyState" hidden>
+      <strong>No tests match your filters</strong>
+      Try a different search term or clear the filters.
+    </div>
+  </section>
+
+  <!-- ========== CATEGORIES ========== -->
+  <section class="cats" aria-labelledby="catsHeading">
+    <div class="section-head">
+      <h2 id="catsHeading">Test Categories</h2>
+    </div>
+    <div class="cats__grid" id="catsGrid">
+      <!-- Static structure filled below for clarity -->
+    </div>
+  </section>
+
+  <!-- ========== PERFORMANCE ========== -->
+  <section class="perf" id="performance" aria-labelledby="perfHeading">
+    <div class="perf__head">
+      <h2 id="perfHeading">Your progress</h2>
+      <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+        <span class="sync-status" id="syncStatus" data-state="idle">Connecting…</span>
+        <button class="btn btn--ghost" type="button" id="resetHistory" style="min-height:36px;font-size:.85rem">Reset history</button>
+      </div>
+    </div>
+    <p class="perf__note">Progress is saved to the cloud (Firebase) and also kept on this device as a backup. Scores appear only when the test page reports them.</p>
+    <dl class="perf__stats" id="perfStats">
+      <!-- Populated by JS -->
+    </dl>
+    <div id="perfHistory"></div>
+  </section>
+</main>
+
+<!-- ========== FOOTER ========== -->
+<footer class="footer" role="contentinfo">
+  <div class="footer__in">
+    <div>
+      <p class="footer__brand">UPSC Gurukul</p>
+      <p class="footer__series">Geography · Daily Test Series</p>
+    </div>
+    <nav class="footer__links" aria-label="Footer">
+      <a href="/">Home</a>
+      <a href="geography.html">Geography Tests</a>
+      <a href="#archive">Test Archive</a>
+      <a href="#performance">Performance</a>
+    </nav>
+    <p class="footer__copy">© <span id="year"></span> UPSC Gurukul. All rights reserved.</p>
+    <p class="footer__disclaimer">Progress is stored in Firebase under an anonymous account tied to this browser, with a localStorage backup. Sample tests are clearly marked and exist only for demonstration until real scheduled tests are configured.</p>
+  </div>
+</footer>
+
+<script>
+/* =========================================================
+   CENTRAL CONFIGURATION
+   ========================================================= */
+const CONFIG = {
+  homeUrl: "/",
+  testPageUrl: "/geography-test.html",   // ← set to your actual test page filename
+  timezone: "Asia/Kolkata",
+  canonical: "https://upscgurukul.online/geography.html",
+
+  /* -------------------------------------------------------
+     FIREBASE CONFIG — REPLACE WITH YOUR PROJECT VALUES
+     1. Go to Firebase Console → Project Settings → General
+     2. Under "Your apps" copy the firebaseConfig object
+     3. Enable Authentication → Sign-in method → Anonymous
+     4. Enable Realtime Database (start in test mode, then
+        tighten rules – example rules are in the comment below)
+     ------------------------------------------------------- */
+  firebase: {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    databaseURL: "https://YOUR_PROJECT-default-rtdb.firebaseio.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+  },
+
+  /*
+   * Recommended Realtime Database rules (paste in Firebase Console):
+   * {
+   *   "rules": {
+   *     "users": {
+   *       "$uid": {
+   *         ".read": "$uid === auth.uid",
+   *         ".write": "$uid === auth.uid"
+   *       }
+   *     }
+   *   }
+   * }
+   *
+   * Path used:  users/{uid}/geoAttempts/{testId}
+   * Shape:      { started?: bool, completed?: bool, score?: number, total?: number, at: number }
+   *
+   * The existing test engine should write to the same path when a student finishes.
+   * Example (to be added inside the test page):
+   *
+   *   firebase.database().ref(`users/${uid}/geoAttempts/${testId}`).update({
+   *     completed: true,
+   *     score: correctCount,
+   *     total: questionCount,
+   *     at: Date.now()
+   *   });
+   */
+
+  tests: [
+    {
+      id: "geo-daily-001",
+      date: "2026-10-21",
+      title: "Geography Daily Test — Physical Geography Fundamentals",
+      topic: "Physical Geography",
+      category: "PHYSICAL GEOGRAPHY",
+      description: "Core concepts of the Earth’s structure, landforms and basic geomorphic processes. Sample configuration for demonstration.",
+      difficulty: "Moderate",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-002",
+      date: "2026-10-20",
+      title: "Geography Daily Test — Geomorphology",
+      topic: "Geomorphology",
+      category: "PHYSICAL GEOGRAPHY",
+      description: "Landform evolution, weathering, erosion and depositional systems.",
+      difficulty: "Moderate",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-003",
+      date: "2026-10-19",
+      title: "Geography Daily Test — Climatology Basics",
+      topic: "Climatology",
+      category: "PHYSICAL GEOGRAPHY",
+      description: "Atmosphere, temperature, pressure belts and wind systems.",
+      difficulty: "Easy",
+      questionCount: 15,
+      durationMinutes: 20,
+      maxMarks: 30,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-004",
+      date: "2026-10-18",
+      title: "Geography Daily Test — Oceanography",
+      topic: "Oceanography",
+      category: "PHYSICAL GEOGRAPHY",
+      description: "Ocean currents, waves, tides and marine resources.",
+      difficulty: "Moderate",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-005",
+      date: "2026-10-17",
+      title: "Geography Daily Test — Indian Physiography",
+      topic: "Physiography",
+      category: "INDIAN GEOGRAPHY",
+      description: "Himalayas, Northern Plains, Peninsular Plateau and coastal regions.",
+      difficulty: "Moderate",
+      questionCount: 25,
+      durationMinutes: 30,
+      maxMarks: 50,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-006",
+      date: "2026-10-16",
+      title: "Geography Daily Test — Indian Drainage Systems",
+      topic: "Rivers and Drainage",
+      category: "INDIAN GEOGRAPHY",
+      description: "Himalayan and Peninsular river systems, basins and interlinking.",
+      difficulty: "Hard",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-007",
+      date: "2026-10-15",
+      title: "Geography Daily Test — Indian Monsoon",
+      topic: "Indian Climate and Monsoon",
+      category: "INDIAN GEOGRAPHY",
+      description: "Mechanism, onset, withdrawal and variability of the Indian monsoon.",
+      difficulty: "Hard",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-008",
+      date: "2026-10-14",
+      title: "Geography Daily Test — Soils of India",
+      topic: "Soils",
+      category: "INDIAN GEOGRAPHY",
+      description: "Major soil types, distribution, characteristics and conservation.",
+      difficulty: "Easy",
+      questionCount: 15,
+      durationMinutes: 20,
+      maxMarks: 30,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-009",
+      date: "2026-10-13",
+      title: "Geography Daily Test — Agriculture & Resources",
+      topic: "Agriculture",
+      category: "INDIAN GEOGRAPHY",
+      description: "Cropping patterns, irrigation, mineral and energy resources overview.",
+      difficulty: "Moderate",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-010",
+      date: "2026-10-22",
+      title: "Geography Daily Test — World Continents & Oceans",
+      topic: "Continents and Oceans",
+      category: "WORLD GEOGRAPHY",
+      description: "Major landmasses, ocean basins and their strategic significance.",
+      difficulty: "Easy",
+      questionCount: 15,
+      durationMinutes: 20,
+      maxMarks: 30,
+      testUrl: "/geography-test.html",
+      status: "upcoming",
+      sample: true
+    },
+    {
+      id: "geo-daily-011",
+      date: "2026-10-23",
+      title: "Geography Daily Test — Mountains, Rivers & Lakes",
+      topic: "Mountains and Plateaus",
+      category: "WORLD GEOGRAPHY",
+      description: "Major mountain ranges, river systems and lakes of the world.",
+      difficulty: "Moderate",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "upcoming",
+      sample: true
+    },
+    {
+      id: "geo-daily-012",
+      date: "2026-10-12",
+      title: "Geography Daily Test — India Mapping",
+      topic: "India Mapping",
+      category: "MAPPING PRACTICE",
+      description: "States, capitals, rivers, national parks and important locations.",
+      difficulty: "Moderate",
+      questionCount: 25,
+      durationMinutes: 30,
+      maxMarks: 50,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-013",
+      date: "2026-10-11",
+      title: "Geography Daily Test — World Mapping",
+      topic: "World Mapping",
+      category: "MAPPING PRACTICE",
+      description: "Countries, capitals, straits, seas and strategic locations.",
+      difficulty: "Hard",
+      questionCount: 20,
+      durationMinutes: 25,
+      maxMarks: 40,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    },
+    {
+      id: "geo-daily-014",
+      date: "2026-10-10",
+      title: "Geography Daily Test — Mixed Revision",
+      topic: "Prelims-Oriented Mixed MCQs",
+      category: "MIXED REVISION",
+      description: "Integrated practice across physical, Indian and world geography.",
+      difficulty: "Hard",
+      questionCount: 30,
+      durationMinutes: 35,
+      maxMarks: 60,
+      testUrl: "/geography-test.html",
+      status: "available",
+      sample: true
+    }
+  ]
+};
+
+/* =========================================================
+   Categories (static display)
+   ========================================================= */
+const CATEGORIES = [
+  {
+    title: "Physical Geography",
+    items: ["Geomorphology", "Climatology", "Oceanography", "Earth's Interior", "Earthquakes and Volcanoes"]
+  },
+  {
+    title: "Indian Geography",
+    items: ["Physiography", "Rivers and Drainage", "Indian Climate and Monsoon", "Soils", "Agriculture", "Mineral and Energy Resources"]
+  },
+  {
+    title: "World Geography",
+    items: ["Continents and Oceans", "Mountains and Plateaus", "Rivers and Lakes", "Deserts and Grasslands", "Climate Regions"]
+  },
+  {
+    title: "Mapping Practice",
+    items: ["India Mapping", "World Mapping", "Africa Mapping", "South America Mapping", "Important Locations"]
+  },
+  {
+    title: "Mixed Revision",
+    items: ["Previous Topics", "Multiple-Chapter Practice", "Prelims-Oriented Mixed MCQs"]
+  }
+];
+
+/* =========================================================
+   Utilities
+   ========================================================= */
+const TZ = CONFIG.timezone;
+const LOCAL_KEY = "ug.geo.attempts";
+
+function todayISO() {
+  const fmt = new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit" });
+  return fmt.format(new Date());
+}
+
+function formatDateDisplay(iso) {
+  const d = new Date(iso + "T12:00:00+05:30");
+  return d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long", year: "numeric", timeZone: TZ });
+}
+
+function formatShortDate(iso) {
+  const d = new Date(iso + "T12:00:00+05:30");
+  return d.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric", timeZone: TZ });
+}
+
+function storeGet(key, fallback) {
+  try {
+    const v = localStorage.getItem(key);
+    return v ? JSON.parse(v) : fallback;
+  } catch (e) { return fallback; }
+}
+function storeSet(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch (e) {}
+}
+
+/* =========================================================
+   Firebase layer
+   ========================================================= */
+let db = null;
+let auth = null;
+let currentUid = null;
+let attemptsCache = storeGet(LOCAL_KEY, {});   // always keep a local mirror
+
+function setSyncStatus(state, text) {
+  const el = document.getElementById("syncStatus");
+  if (!el) return;
+  el.dataset.state = state;
+  el.textContent = text;
+}
+
+function isFirebaseConfigured() {
+  const f = CONFIG.firebase;
+  return f && f.apiKey && f.apiKey !== "YOUR_API_KEY" && f.databaseURL && f.databaseURL.includes("firebaseio.com");
+}
+
+async function initFirebase() {
+  if (!isFirebaseConfigured()) {
+    setSyncStatus("error", "Firebase not configured — using local storage only");
+    return false;
+  }
+
+  try {
+    firebase.initializeApp(CONFIG.firebase);
+    auth = firebase.auth();
+    db = firebase.database();
+
+    setSyncStatus("syncing", "Signing in…");
+
+    // Anonymous auth – creates a persistent UID for this browser
+    const cred = await auth.signInAnonymously();
+    currentUid = cred.user.uid;
+
+    // Pull existing data from cloud and merge with local
+    await pullFromCloud();
+
+    // Listen for remote changes (e.g. when the test page writes a completion)
+    db.ref(`users/${currentUid}/geoAttempts`).on("value", snap => {
+      const remote = snap.val() || {};
+      attemptsCache = { ...attemptsCache, ...remote };
+      storeSet(LOCAL_KEY, attemptsCache);
+      renderToday();
+      renderGrid();
+      renderPerformance();
+      setSyncStatus("synced", "Synced with cloud");
+    });
+
+    setSyncStatus("synced", "Synced with cloud");
+    return true;
+  } catch (err) {
+    console.error("Firebase init error:", err);
+    setSyncStatus("error", "Cloud unavailable — local only");
+    return false;
+  }
+}
+
+async function pullFromCloud() {
+  if (!db || !currentUid) return;
+  try {
+    const snap = await db.ref(`users/${currentUid}/geoAttempts`).once("value");
+    const remote = snap.val() || {};
+    // Merge: cloud wins on conflicts, but keep any purely-local entries
+    attemptsCache = { ...attemptsCache, ...remote };
+    storeSet(LOCAL_KEY, attemptsCache);
+  } catch (e) {
+    console.warn("Pull failed:", e);
+  }
+}
+
+async function pushAttempt(testId, data) {
+  // Always update local cache first
+  attemptsCache[testId] = { ...(attemptsCache[testId] || {}), ...data, at: data.at || Date.now() };
+  storeSet(LOCAL_KEY, attemptsCache);
+
+  // Then push to Firebase if available
+  if (db && currentUid) {
+    try {
+      await db.ref(`users/${currentUid}/geoAttempts/${testId}`).update(attemptsCache[testId]);
+      setSyncStatus("synced", "Synced with cloud");
+    } catch (e) {
+      console.warn("Push failed:", e);
+      setSyncStatus("error", "Cloud write failed — saved locally");
+    }
+  }
+}
+
+function getAttempts() {
+  return attemptsCache;
+}
+
+function markStarted(id) {
+  pushAttempt(id, { started: true });
+}
+
+/* Resolve effective status for a test */
+function resolveStatus(test) {
+  const attempts = getAttempts();
+  const rec = attempts[test.id];
+  if (rec && rec.completed) return "completed";
+
+  const today = todayISO();
+  if (test.status === "unavailable") return "unavailable";
+  if (test.date > today) return "upcoming";
+  if (test.status === "upcoming" && test.date === today) return "available";
+  if (test.date < today || test.date === today) {
+    return test.status === "available" ? "available" : (test.status || "available");
+  }
+  return test.status || "unavailable";
+}
+
+function canLaunch(test) {
+  const s = resolveStatus(test);
+  return (s === "available" || s === "completed") && test.testUrl;
+}
+
+/* =========================================================
+   Theme
+   ========================================================= */
+const root = document.documentElement;
+function setTheme(t) {
+  root.setAttribute("data-theme", t);
+  try { localStorage.setItem("ug-theme", t); } catch (e) {}
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute("content", t === "dark" ? "#151C19" : "#F7F5EF");
+  const btn = document.getElementById("themeBtn");
+  if (btn) btn.setAttribute("aria-label", t === "dark" ? "Switch to light theme" : "Switch to dark theme");
+}
+
+/* =========================================================
+   Render helpers
+   ========================================================= */
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  if (attrs) {
+    Object.entries(attrs).forEach(([k, v]) => {
+      if (k === "class") node.className = v;
+      else if (k === "html") node.innerHTML = v;
+      else if (k.startsWith("on") && typeof v === "function") node.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (v != null && v !== false) node.setAttribute(k, v === true ? "" : v);
+    });
+  }
+  children.flat().forEach(c => {
+    if (c == null || c === false) return;
+    node.append(typeof c === "string" || typeof c === "number" ? document.createTextNode(c) : c);
+  });
+  return node;
+}
+
+function statusChip(status) {
+  const map = {
+    available: { label: "Available", cls: "chip--sage" },
+    upcoming: { label: "Upcoming", cls: "chip--muted" },
+    completed: { label: "Completed", cls: "chip--ok" },
+    unavailable: { label: "Unavailable", cls: "chip--muted" }
+  };
+  const m = map[status] || map.unavailable;
+  return el("span", { class: "chip " + m.cls }, m.label);
+}
+
+function renderToday() {
+  const host = document.getElementById("todayHost");
+  const today = todayISO();
+  const test = CONFIG.tests.find(t => t.date === today);
+
+  if (!test) {
+    host.replaceChildren(
+      el("div", { class: "today-card" },
+        el("div", { class: "today-empty" },
+          el("p", null, "Today's Geography test is being prepared."),
+          el("p", { style: "margin-top:.6rem;font-size:.95rem" }, "Explore the available tests in the archive below.")
+        )
+      )
+    );
+    return;
+  }
+
+  const status = resolveStatus(test);
+  const launchable = canLaunch(test);
+
+  const meta = [];
+  if (test.questionCount) meta.push(el("li", null, el("strong", null, String(test.questionCount)), " questions"));
+  if (test.durationMinutes) meta.push(el("li", null, el("strong", null, String(test.durationMinutes)), " min"));
+  if (test.maxMarks) meta.push(el("li", null, el("strong", null, String(test.maxMarks)), " marks"));
+  meta.push(el("li", null, "Difficulty: ", el("strong", null, test.difficulty)));
+
+  const actions = [];
+  if (launchable) {
+    actions.push(
+      el("a", {
+        class: "btn btn--primary",
+        href: test.testUrl || CONFIG.testPageUrl,
+        onClick: function () { markStarted(test.id); }
+      }, status === "completed" ? "Retake Today's Test" : "Start Today's Test")
+    );
+  } else if (status === "upcoming") {
+    actions.push(el("button", { class: "btn", disabled: true, "aria-disabled": "true" }, "Available on " + formatShortDate(test.date)));
+  } else {
+    actions.push(el("button", { class: "btn", disabled: true, "aria-disabled": "true" }, "Coming soon"));
+  }
+
+  host.replaceChildren(
+    el("article", { class: "today-card" },
+      el("div", { class: "today-card__top" },
+        el("div", null,
+          el("p", { class: "today-card__date" }, formatDateDisplay(test.date)),
+          el("h2", null, test.title),
+          el("p", { class: "today-card__topic" }, test.topic)
+        ),
+        el("div", { style: "display:flex;flex-wrap:wrap;gap:.4rem;justify-content:flex-end" },
+          statusChip(status),
+          test.sample ? el("span", { class: "chip chip--sample" }, "Sample data") : null
+        )
+      ),
+      el("p", { class: "today-card__desc" }, test.description),
+      el("ul", { class: "today-meta" }, ...meta),
+      el("div", { class: "today-card__actions" }, ...actions)
+    )
+  );
+}
+
+function getFilteredTests() {
+  const q = (document.getElementById("searchInput").value || "").trim().toLowerCase();
+  const topic = document.getElementById("filterTopic").value;
+  const diff = document.getElementById("filterDiff").value;
+  const status = document.getElementById("filterStatus").value;
+  const sort = document.getElementById("sortBy").value;
+
+  let list = CONFIG.tests.slice();
+
+  if (q) {
+    list = list.filter(t =>
+      (t.title || "").toLowerCase().includes(q) ||
+      (t.topic || "").toLowerCase().includes(q) ||
+      (t.category || "").toLowerCase().includes(q)
+    );
+  }
+  if (topic) list = list.filter(t => t.topic === topic || t.category === topic);
+  if (diff) list = list.filter(t => t.difficulty === diff);
+  if (status) list = list.filter(t => resolveStatus(t) === status);
+
+  list.sort((a, b) => {
+    if (sort === "oldest") return a.date.localeCompare(b.date) || a.id.localeCompare(b.id);
+    return b.date.localeCompare(a.date) || a.id.localeCompare(b.id);
+  });
+
+  return list;
+}
+
+function renderCard(test) {
+  const status = resolveStatus(test);
+  const launchable = canLaunch(test);
+
+  const meta = [];
+  meta.push(statusChip(status));
+  if (test.sample) meta.push(el("span", { class: "chip chip--sample" }, "Sample"));
+  meta.push(el("span", { class: "chip" }, test.difficulty));
+  if (test.questionCount) meta.push(el("span", { class: "chip chip--muted" }, test.questionCount + " Qs"));
+  if (test.durationMinutes) meta.push(el("span", { class: "chip chip--muted" }, test.durationMinutes + " min"));
+
+  let action;
+  if (launchable) {
+    action = el("a", {
+      class: "btn btn--primary",
+      href: test.testUrl || CONFIG.testPageUrl,
+      style: "min-height:38px;padding:.4rem .9rem;font-size:.85rem",
+      onClick: function () { markStarted(test.id); }
+    }, status === "completed" ? "Retake" : "Start Test");
+  } else if (status === "upcoming") {
+    action = el("button", { class: "btn", disabled: true, "aria-disabled": "true", style: "min-height:38px;padding:.4rem .9rem;font-size:.85rem" }, "Upcoming");
+  } else {
+    action = el("button", { class: "btn", disabled: true, "aria-disabled": "true", style: "min-height:38px;padding:.4rem .9rem;font-size:.85rem" }, "Coming soon");
+  }
+
+  const cls = ["card"];
+  if (test.sample) cls.push("card--sample");
+  if (status === "upcoming") cls.push("card--upcoming");
+  if (status === "completed") cls.push("card--done");
+
+  return el("article", { class: cls.join(" "), role: "listitem" },
+    el("p", { class: "card__date" }, formatShortDate(test.date)),
+    el("h3", null, test.title),
+    el("p", { class: "card__topic" }, test.topic),
+    el("div", { class: "card__meta" }, ...meta),
+    el("div", { class: "card__actions" }, action)
+  );
+}
+
+function renderGrid() {
+  const list = getFilteredTests();
+  const grid = document.getElementById("testGrid");
+  const empty = document.getElementById("emptyState");
+  const count = document.getElementById("resultCount");
+
+  count.textContent = list.length + " test" + (list.length === 1 ? "" : "s");
+
+  if (!list.length) {
+    grid.replaceChildren();
+    empty.hidden = false;
+    return;
+  }
+  empty.hidden = true;
+  grid.replaceChildren(...list.map(renderCard));
+}
+
+function populateTopicFilter() {
+  const sel = document.getElementById("filterTopic");
+  const topics = [...new Set(CONFIG.tests.map(t => t.topic).filter(Boolean))].sort();
+  topics.forEach(t => {
+    sel.append(el("option", { value: t }, t));
+  });
+}
+
+function renderCategories() {
+  const host = document.getElementById("catsGrid");
+  host.replaceChildren(...CATEGORIES.map(c =>
+    el("div", { class: "cat" },
+      el("h3", null, c.title),
+      el("ul", null, ...c.items.map(i => el("li", null, i)))
+    )
+  ));
+}
+
+function renderPerformance() {
+  const attempts = getAttempts();
+  const ids = Object.keys(attempts);
+  const completed = ids.filter(id => attempts[id].completed);
+  const started = ids.filter(id => attempts[id].started && !attempts[id].completed);
+
+  const stats = document.getElementById("perfStats");
+  stats.replaceChildren(
+    el("div", { class: "stat" }, el("dt", null, "Tests completed"), el("dd", null, String(completed.length))),
+    el("div", { class: "stat" }, el("dt", null, "Tests started"), el("dd", null, String(started.length))),
+    el("div", { class: "stat" }, el("dt", null, "Total tracked"), el("dd", null, String(ids.length)))
+  );
+
+  const hist = document.getElementById("perfHistory");
+  if (!ids.length) {
+    hist.replaceChildren(el("p", { class: "perf__empty" }, "No attempt history yet. Start a test to begin tracking."));
+    return;
+  }
+
+  const items = ids
+    .map(id => {
+      const t = CONFIG.tests.find(x => x.id === id);
+      const rec = attempts[id];
+      return { id, title: t ? t.title : id, topic: t ? t.topic : "—", rec };
+    })
+    .sort((a, b) => (b.rec.at || 0) - (a.rec.at || 0));
+
+  hist.replaceChildren(
+    el("ul", { class: "perf__list" },
+      ...items.map(item => {
+        let detail = item.rec.completed ? "Completed" : "Started";
+        if (item.rec.completed && typeof item.rec.score === "number" && typeof item.rec.total === "number") {
+          detail += ` · ${item.rec.score}/${item.rec.total}`;
+        }
+        if (item.rec.at) {
+          detail += " · " + new Date(item.rec.at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+        }
+        return el("li", null, el("strong", null, item.title), " · ", item.topic, " · ", detail);
+      })
+    )
+  );
+}
+
+/* =========================================================
+   Wiring
+   ========================================================= */
+function wire() {
+  document.getElementById("themeBtn").addEventListener("click", () => {
+    setTheme(root.getAttribute("data-theme") === "dark" ? "light" : "dark");
+  });
+
+  // Mobile menu
+  const side = document.getElementById("sideNav");
+  const scrim = document.getElementById("scrim");
+  const menuBtn = document.getElementById("menuBtn");
+  function setDrawer(open) {
+    side.classList.toggle("is-open", open);
+    scrim.hidden = !open;
+    menuBtn.setAttribute("aria-expanded", String(open));
+    document.body.classList.toggle("no-scroll", open);
+  }
+  menuBtn.addEventListener("click", () => setDrawer(true));
+  document.getElementById("sideClose").addEventListener("click", () => setDrawer(false));
+  scrim.addEventListener("click", () => setDrawer(false));
+  side.querySelectorAll("a").forEach(a => a.addEventListener("click", () => setDrawer(false)));
+
+  // Filters
+  ["searchInput", "filterTopic", "filterDiff", "filterStatus", "sortBy"].forEach(id => {
+    const node = document.getElementById(id);
+    node.addEventListener(id === "searchInput" ? "input" : "change", renderGrid);
+  });
+  document.getElementById("clearFilters").addEventListener("click", () => {
+    document.getElementById("searchInput").value = "";
+    document.getElementById("filterTopic").value = "";
+    document.getElementById("filterDiff").value = "";
+    document.getElementById("filterStatus").value = "";
+    document.getElementById("sortBy").value = "newest";
+    renderGrid();
+  });
+
+  // Reset history (clears both local + cloud)
+  document.getElementById("resetHistory").addEventListener("click", async () => {
+    if (!confirm("Clear all Geography test history? This will delete cloud data for this browser as well.")) return;
+
+    attemptsCache = {};
+    storeSet(LOCAL_KEY, {});
+
+    if (db && currentUid) {
+      try {
+        await db.ref(`users/${currentUid}/geoAttempts`).remove();
+        setSyncStatus("synced", "History cleared");
+      } catch (e) {
+        setSyncStatus("error", "Cloud clear failed — local cleared");
+      }
+    }
+
+    renderToday();
+    renderGrid();
+    renderPerformance();
+  });
+
+  // Scroll header state
+  let ticking = false;
+  window.addEventListener("scroll", () => {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(() => {
+        root.classList.toggle("is-scrolled", window.scrollY > 24);
+        ticking = false;
+      });
+    }
+  }, { passive: true });
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+}
+
+/* =========================================================
+   Init
+   ========================================================= */
+async function init() {
+  setTheme(root.getAttribute("data-theme") === "dark" ? "dark" : "light");
+  populateTopicFilter();
+  renderToday();
+  renderGrid();
+  renderCategories();
+  renderPerformance();
+  wire();
+
+  // Firebase runs after first paint so the UI is never blocked
+  await initFirebase();
+  // Re-render once cloud data is ready
+  renderToday();
+  renderGrid();
+  renderPerformance();
+}
+init();
+</script>
+</body>
+</html>

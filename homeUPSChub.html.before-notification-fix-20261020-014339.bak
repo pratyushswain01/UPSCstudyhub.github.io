@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<script id="ug-early-lockdown">
+(function(){
+  var id="ug-early-lockdown-cover";
+  var style="position:fixed;inset:0;z-index:2147483646;background:#0b1424;color:#f5f7fb;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font:14px system-ui,sans-serif";
+  var cover=document.createElement("div");
+  cover.id=id;
+  cover.setAttribute("style",style);
+  cover.innerHTML='<div><div style="font-size:12px;letter-spacing:3px;color:#d8b477">UPSC GURUKUL</div><div style="font-size:25px;font-weight:700;margin:18px 0 10px">Preparing your experience</div><div style="color:#9aabc1">Checking platform status…</div><div style="font-size:11px;color:#718198;margin-top:28px">2026 @ Pratyush.dev inc</div></div>';
+
+  function mount(){
+    if(settled) return;
+    if(!document.getElementById(id)){
+      (document.body||document.documentElement).appendChild(cover);
+    }
+  }
+  mount();
+  if(document.readyState==="loading"){
+    document.addEventListener("DOMContentLoaded",mount,{once:true});
+  }
+
+ var settled=false;
+  function drop(){ if(!settled){ settled=true; cover.remove(); } }
+  var ctl=window.AbortController?new AbortController():null;
+  var timer=setTimeout(function(){ if(ctl) ctl.abort(); drop(); },2500);
+
+  fetch("/debug-mode.json?t="+Date.now(),{cache:"no-store",signal:ctl?ctl.signal:undefined})
+    .then(function(r){ if(!r.ok) throw Error("status"); return r.json(); })
+    .then(function(data){
+      clearTimeout(timer);
+      if(data && data.enabled===true){
+        var parts=cover.querySelectorAll("div div");
+        if(parts[1]) parts[1].textContent="Development environment";
+        if(parts[2]) parts[2].textContent="Loading official development portal…";
+      }else{ drop(); }
+    })
+    .catch(function(){ clearTimeout(timer); drop(); console.warn("UPSC Gurukul: debug-mode check failed; continuing in public mode."); });
+})();
+</script>
+
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <script>
+    /* Detect installed app (PWA / Android TWA) vs normal website, before first paint */
+    (function () {
+        var app = false;
+        try {
+            var q = new URLSearchParams(location.search);
+            app = window.matchMedia('(display-mode: standalone)').matches ||
+                  window.matchMedia('(display-mode: fullscreen)').matches ||
+                  window.matchMedia('(display-mode: minimal-ui)').matches ||
+                  window.navigator.standalone === true ||
+                  (document.referrer || '').indexOf('android-app://') === 0 ||
+                  q.has('app_version') || q.get('source') === 'twa';
+            if (app) sessionStorage.setItem('upscg_app', '1');
+            else if (sessionStorage.getItem('upscg_app') === '1') app = true;
+        } catch (e) {}
+        if (app) document.documentElement.classList.add('app-mode');
+    })();
+    </script>
+    <meta name="google-adsense-account" content="ca-pub-1102687898568560">
+    <meta name="description" content="UPSC गुरुकुल – structured notes, mock tests, answer writing and AI tools for UPSC Civil Services preparation.">
+    <meta name="keywords" content="UPSC गुरुकुल, UPSC Gurukul, UPSC preparation, civil services, exam preparation">
+    <title>UPSC गुरुकुल – Your Preparation Dashboard</title>
+    <link rel="icon" type="image/png" href="assets/upsc-gurukul-logo.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#101a32">
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+
+    <style>
+        :root {
+            --primary-start: #4338ca;
+            --primary-mid: #4f46e5;
+            --primary-end: #0ea5e9;
+            --primary-gradient: linear-gradient(115deg, var(--primary-start), var(--primary-mid) 45%, var(--primary-end));
+            --gold: #d6ad53;
+            --teal: #14b8a6;
+            --amber: #f59e0b;
+
+            --bg-light: #f4f5fb;
+            --card-bg-light: #ffffff;
+            --text-primary-light: #12123a;
+            --text-secondary-light: #5c5e82;
+            --border-light: #e4e5f4;
+
+            --bg-dark: #0a0a1a;
+            --card-bg-dark: #14133a;
+            --text-primary-dark: #f4f5fb;
+            --text-secondary-dark: #a2a3c9;
+            --border-dark: #26254f;
+
+            --upsc-prelims: #3b82f6;
+            --upsc-mains: #f43f5e;
+            --upsc-interview: #14b8a6;
+            --header-h: calc(64px + env(safe-area-inset-top, 0px));
+        }
+
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', 'Noto Sans Devanagari', sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-primary-light);
+            transition: background-color .4s ease, color .4s ease;
+            padding-top: var(--header-h);
+            padding-bottom: 76px;
+            margin: 0;
+            background-image:
+                radial-gradient(circle at 8% 0%, rgba(79,70,229,0.06), transparent 45%),
+                radial-gradient(circle at 92% 15%, rgba(14,165,233,0.07), transparent 45%);
+        }
+        body.dark-mode {
+            background-color: var(--bg-dark);
+            color: var(--text-primary-dark);
+            background-image:
+                radial-gradient(circle at 8% 0%, rgba(79,70,229,0.18), transparent 45%),
+                radial-gradient(circle at 92% 15%, rgba(14,165,233,0.14), transparent 45%);
+        }
+        h1, h2, h3, h4 { font-family: 'Sora', 'Noto Sans Devanagari', sans-serif; }
+
+        a:focus-visible, button:focus-visible, .icon-btn:focus-visible, .nav-item:focus-visible {
+            outline: 3px solid var(--primary-end); outline-offset: 2px;
+        }
+
+        /* Header */
+        .app-header {
+            position: fixed; top: 0; left: 0; right: 0; height: var(--header-h);
+            display: flex; align-items: center;
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000; transition: all .4s ease;
+        }
+        body.dark-mode .app-header { background: rgba(10,10,26,0.75); border-bottom-color: var(--border-dark); }
+        .header-content-wrapper {
+            width: 100%; max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: center; padding: 0 18px;
+        }
+        .app-header .logo {
+            display: flex; align-items: center; gap: 10px; text-decoration: none;
+            font-family: 'Sora', 'Noto Sans Devanagari', sans-serif;
+            font-size: 21px; font-weight: 800; letter-spacing: -0.01em;
+        }
+        .app-header .logo img { width: 34px; height: 34px; border-radius: 9px; object-fit: contain; }
+        .app-header .logo span {
+            background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .header-right { display: flex; align-items: center; gap: 14px; }
+        #datetime-container {
+            font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+            color: var(--text-secondary-light); font-weight: 500; white-space: nowrap;
+        }
+        body.dark-mode #datetime-container { color: var(--text-secondary-dark); }
+        .icon-btn {
+            font-size: 17px; color: var(--text-secondary-light); cursor: pointer; background: none;
+            width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
+            transition: all .2s; border: 1px solid var(--border-light);
+        }
+        body.dark-mode .icon-btn { color: var(--text-secondary-dark); border-color: var(--border-dark); }
+        .icon-btn:hover { background-color: rgba(79,70,229,0.08); color: var(--primary-mid); }
+        @media (max-width: 560px) { #datetime-container { display: none; } }
+
+        /* App banner */
+        #gurukul-app-banner {
+            position: relative; width: 100%; color: #f8fafc;
+            background: radial-gradient(ellipse at 12% 0%, rgba(212,175,91,.20), transparent 38%),
+                        linear-gradient(105deg,#101a32 0%,#172b4d 58%,#102b35 100%);
+            border-bottom: 1px solid rgba(225,190,110,.5);
+        }
+        .gurukul-banner-inner {
+            max-width: 1240px; margin: 0 auto; padding: 14px 52px 14px 24px;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .gurukul-banner-logo { display: block; width: 60px; height: 60px; object-fit: contain; border-radius: 12px; }
+        .gurukul-banner-copy { display: flex; flex: 1; flex-direction: column; gap: 4px; min-width: 0; }
+        .gurukul-banner-eyebrow { color: #e5c77e; font-size: 10px; font-weight: 800; letter-spacing: 2px; }
+        .gurukul-banner-copy strong { color: #fff; font-size: clamp(16px,2vw,20px); line-height: 1.3; font-family: 'Sora','Noto Sans Devanagari',sans-serif; }
+        .gurukul-banner-copy > span:last-child { color: #cbd5e1; font-size: 13px; }
+        .gurukul-banner-button {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; flex-shrink: 0;
+            min-height: 44px; padding: 0 22px; color: #101a32 !important;
+            background: linear-gradient(135deg,#f0d58c,#d6ad53); border-radius: 10px;
+            text-decoration: none !important; font-weight: 800; font-size: 14px;
+            box-shadow: 0 5px 18px rgba(0,0,0,.15); transition: transform .2s, box-shadow .2s;
+        }
+        .gurukul-banner-button:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,.24); }
+        .gurukul-banner-close {
+            position: absolute; top: 8px; right: 10px; width: 28px; height: 28px;
+            border: 1px solid rgba(255,255,255,.18); border-radius: 50%;
+            background: rgba(255,255,255,.08); color: #fff; font-size: 18px; line-height: 1; cursor: pointer;
+        }
+        @media (max-width: 650px) {
+            .gurukul-banner-inner { padding: 14px 40px 14px 14px; gap: 12px; flex-wrap: wrap; }
+            .gurukul-banner-logo { width: 46px; height: 46px; }
+            .gurukul-banner-button { width: 100%; }
+        }
+        @media (display-mode: standalone), (display-mode: fullscreen) {
+            #gurukul-app-banner { display: none !important; }
+        }
+
+        /* Sub nav */
+        .subnav {
+            position: sticky; top: var(--header-h); z-index: 999;
+            background: rgba(255,255,255,0.88); backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border-light);
+        }
+        body.dark-mode .subnav { background: rgba(20,19,58,0.8); border-bottom-color: var(--border-dark); }
+        .subnav-inner {
+            max-width: 1200px; margin: auto; display: flex; justify-content: center;
+            gap: 36px; padding: 12px 16px; overflow-x: auto;
+        }
+        .subnav a {
+            text-decoration: none; color: var(--text-secondary-light); font-weight: 600; font-size: .88rem;
+            padding: 4px 2px; position: relative; transition: color .2s; white-space: nowrap;
+        }
+        body.dark-mode .subnav a { color: var(--text-secondary-dark); }
+        .subnav a::after {
+            content: ''; position: absolute; left: 0; right: 0; bottom: -4px; height: 2px;
+            background: var(--primary-gradient); transform: scaleX(0); transition: transform .25s ease;
+        }
+        .subnav a:hover { color: var(--primary-mid); }
+        .subnav a:hover::after { transform: scaleX(1); }
+
+        /* Runner bar */
+        .runner-bar {
+            background: var(--primary-gradient); color: white; padding: 7px 0;
+            overflow: hidden; white-space: nowrap;
+        }
+        .runner-bar .runner-track { display: inline-flex; animation: scroll-left 40s linear infinite; }
+        .runner-bar .runner-track span { padding-right: 60px; font-size: .84rem; font-weight: 500; }
+        .runner-bar i { margin: 0 8px; opacity: .85; }
+        @keyframes scroll-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+        .main-content { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+
+        /* Hero */
+        .hero-wrap { position: relative; padding: 56px 40px 44px; overflow: hidden; border-radius: 28px; margin-top: 24px; text-align: center; }
+        .hero-glow {
+            position: absolute; inset: 0; z-index: 0;
+            background: radial-gradient(circle at 15% 20%, rgba(79,70,229,0.16), transparent 55%),
+                        radial-gradient(circle at 85% 30%, rgba(14,165,233,0.14), transparent 50%),
+                        radial-gradient(circle at 50% 90%, rgba(20,184,166,0.10), transparent 50%);
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px; font-size: .78rem; font-weight: 700;
+            padding: 7px 16px; border-radius: 999px; background: rgba(79,70,229,0.08);
+            border: 1px solid rgba(79,70,229,0.18); color: var(--primary-mid);
+        }
+        body.dark-mode .hero-badge { background: rgba(99,102,241,0.14); border-color: rgba(99,102,241,0.28); color: #a5b4fc; }
+        .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 0 3px rgba(20,184,166,0.25); animation: pulse-dot 1.8s infinite; }
+        @keyframes pulse-dot { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+        .hero-section h1 {
+            font-size: clamp(2.1rem, 5.2vw, 3.5rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em;
+            margin: 18px auto 14px; max-width: 760px;
+        }
+        .grad { background: var(--primary-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .hero-section p.lead { font-size: clamp(.95rem, 2vw, 1.1rem); color: var(--text-secondary-light); max-width: 580px; line-height: 1.65; margin: 0 auto; }
+        body.dark-mode .hero-section p.lead { color: var(--text-secondary-dark); }
+        .hero-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 26px; }
+        .hero-cta, .hero-cta-alt {
+            display: inline-flex; align-items: center; gap: 10px; padding: 13px 26px; border-radius: 14px;
+            font-weight: 700; font-size: .92rem; text-decoration: none; transition: transform .2s ease, box-shadow .2s ease;
+        }
+        .hero-cta { background: var(--primary-gradient); color: white; box-shadow: 0 10px 30px -8px rgba(67,56,202,0.55); }
+        .hero-cta:hover { transform: translateY(-2px); box-shadow: 0 14px 36px -6px rgba(67,56,202,0.6); }
+        .hero-cta-alt { background: var(--card-bg-light); color: var(--text-primary-light); border: 1px solid var(--border-light); }
+        body.dark-mode .hero-cta-alt { background: var(--card-bg-dark); color: var(--text-primary-dark); border-color: var(--border-dark); }
+        .hero-cta-alt:hover { transform: translateY(-2px); border-color: var(--primary-mid); }
+        .hero-stats { display: flex; gap: 36px; margin-top: 34px; justify-content: center; flex-wrap: wrap; }
+        .hero-stat b { font-family: 'Sora', sans-serif; font-size: 1.5rem; font-weight: 800; display: block; }
+        .hero-stat span { font-size: .74rem; color: var(--text-secondary-light); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+        body.dark-mode .hero-stat span { color: var(--text-secondary-dark); }
+
+        /* Section heading */
+        .section-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px; background: var(--card-bg-light);
+            padding: 7px 18px; border-radius: 999px; box-shadow: 0 4px 15px rgba(20,20,60,0.06), 0 0 0 1px var(--border-light);
+        }
+        body.dark-mode .section-eyebrow { background: var(--card-bg-dark); box-shadow: 0 4px 15px rgba(0,0,0,0.2), 0 0 0 1px var(--border-dark); }
+        .eyebrow-icon { width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: .68rem; color: white; background: var(--primary-gradient); }
+        .section-title { font-size: 1rem; font-weight: 700; margin: 0; }
+
+        /* Journey */
+        .journey-track { position: relative; display: flex; justify-content: space-between; align-items: flex-start; max-width: 760px; margin: 34px auto 0; padding: 0 8px; }
+        .journey-line { position: absolute; top: 27px; left: 16%; right: 16%; height: 3px; background: linear-gradient(90deg, var(--upsc-prelims), var(--upsc-mains), var(--upsc-interview)); border-radius: 3px; opacity: .4; }
+        .journey-node { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; width: 33%; text-align: center; }
+        .journey-orb {
+            width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font-size: 1.15rem; color: white;
+            box-shadow: 0 0 0 5px var(--bg-light), 0 0 24px -4px currentColor; transition: transform .3s ease;
+        }
+        body.dark-mode .journey-orb { box-shadow: 0 0 0 5px var(--bg-dark), 0 0 24px -4px currentColor; }
+        .journey-node:hover .journey-orb { transform: scale(1.1); }
+        .orb-prelims { background: var(--upsc-prelims); color: var(--upsc-prelims); }
+        .orb-mains { background: var(--upsc-mains); color: var(--upsc-mains); }
+        .orb-interview { background: var(--upsc-interview); color: var(--upsc-interview); }
+        .journey-orb i { color: white; }
+        .journey-node h4 { font-size: .95rem; font-weight: 700; margin: 12px 0 0; }
+        .journey-node p { font-size: .76rem; color: var(--text-secondary-light); margin: 2px 0 0; max-width: 150px; }
+        body.dark-mode .journey-node p { color: var(--text-secondary-dark); }
+        .stage-link { margin-top: 10px; display: inline-block; font-size: .74rem; font-weight: 700; text-decoration: none; padding: 5px 14px; border-radius: 999px; transition: all .2s; }
+        .link-prelims { color: var(--upsc-prelims); background: rgba(59,130,246,0.1); }
+        .link-prelims:hover { background: var(--upsc-prelims); color: white; }
+        .link-mains { color: var(--upsc-mains); background: rgba(244,63,94,0.1); }
+        .link-mains:hover { background: var(--upsc-mains); color: white; }
+        .link-interview { color: var(--upsc-interview); background: rgba(20,184,166,0.1); }
+        .link-interview:hover { background: var(--upsc-interview); color: white; }
+        @media (max-width: 640px) {
+            .journey-track { flex-direction: column; gap: 24px; align-items: stretch; }
+            .journey-line { display: none; }
+            .journey-node { width: 100%; flex-direction: row; text-align: left; gap: 14px; align-items: center; }
+            .journey-node > div:last-child { flex: 1; }
+            .journey-node p { max-width: none; }
+        }
+
+        /* 2028 zone */
+        .zone-card {
+            position: relative; border-radius: 26px; overflow: hidden; margin-top: 40px;
+            background: linear-gradient(135deg, #1a1948 0%, #312a70 45%, #0e3a52 100%);
+            box-shadow: 0 25px 60px -20px rgba(30,27,90,0.55); padding: 40px 32px;
+        }
+        .zone-card::before {
+            content: ''; position: absolute; inset: 0;
+            background: radial-gradient(circle at 85% 0%, rgba(245,158,11,0.18), transparent 45%),
+                        radial-gradient(circle at 10% 100%, rgba(14,165,233,0.2), transparent 45%);
+        }
+        .zone-card > * { position: relative; z-index: 1; }
+        .zone-badge { display: inline-flex; align-items: center; gap: 7px; font-size: .72rem; font-weight: 800; color: #fda4af; background: rgba(244,63,94,0.14); border: 1px solid rgba(244,63,94,0.35); padding: 5px 13px; border-radius: 999px; letter-spacing: .03em; text-transform: uppercase; }
+        .zone-badge .live-dot { width: 7px; height: 7px; border-radius: 50%; background: #f43f5e; animation: pulse-dot 1.2s infinite; }
+        .zone-marquee { overflow: hidden; white-space: nowrap; margin-top: 18px; opacity: .8; }
+        .zone-marquee .zone-track { display: inline-flex; animation: scroll-left 30s linear infinite; }
+        .zone-marquee span { padding-right: 50px; font-size: .78rem; font-weight: 600; color: #cbd5f5; }
+        .zone-title { font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 800; color: white; margin: 16px 0 0; }
+        .zone-sub { color: #b7b9e8; font-size: .95rem; margin-top: 8px; max-width: 520px; line-height: 1.6; }
+        .zone-cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px; padding: 12px 26px; border-radius: 12px; background: linear-gradient(120deg, var(--amber), #fb923c); color: #1a1408; font-weight: 800; font-size: .88rem; text-decoration: none; box-shadow: 0 12px 28px -6px rgba(245,158,11,0.5); transition: transform .2s ease; }
+        .zone-cta:hover { transform: translateY(-2px); }
+        .zone-foot { margin-top: 18px; font-size: .72rem; color: #9294c4; font-weight: 600; }
+
+        /* Quick actions */
+        .quick-actions-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 16px; }
+        .quick-action-item {
+            display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: var(--text-primary-light);
+            padding: 20px 12px; background: var(--card-bg-light); border-radius: 16px; border: 1px solid var(--border-light); transition: all .25s ease;
+        }
+        body.dark-mode .quick-action-item { color: var(--text-primary-dark); background: var(--card-bg-dark); border-color: var(--border-dark); }
+        .quick-action-item:hover { transform: translateY(-6px); border-color: transparent; box-shadow: 0 16px 32px -12px rgba(67,56,202,0.35); }
+        .quick-action-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; color: white; background: var(--primary-gradient); }
+        .quick-action-item .label { font-size: .82rem; font-weight: 600; text-align: center; }
+        @media (max-width: 768px) { .quick-actions-grid { grid-template-columns: repeat(2,1fr); } }
+
+        /* Download section */
+        .download-section {
+            position: relative; border-radius: 26px; overflow: hidden; margin-top: 48px; padding: 36px 32px;
+            display: flex; align-items: center; gap: 28px; flex-wrap: wrap;
+            background: radial-gradient(ellipse at 100% 0%, rgba(214,173,83,.22), transparent 45%),
+                        linear-gradient(110deg,#101a32 0%,#172b4d 60%,#102b35 100%);
+            border: 1px solid rgba(225,190,110,.4); color: #f8fafc;
+        }
+        .download-logo { width: 84px; height: 84px; border-radius: 20px; object-fit: contain; background: rgba(255,255,255,.06); padding: 6px; }
+        .download-copy { flex: 1; min-width: 240px; }
+        .download-copy .eyebrow { color: #e5c77e; font-size: 11px; font-weight: 800; letter-spacing: 2px; }
+        .download-copy h2 { font-size: clamp(1.4rem,3.2vw,1.9rem); font-weight: 800; margin: 6px 0 8px; color: #fff; }
+        .download-copy p { color: #cbd5e1; font-size: .92rem; line-height: 1.6; margin: 0; max-width: 460px; }
+        .download-meta { margin-top: 12px; font-size: .76rem; color: #9fb0c8; font-weight: 600; }
+        .download-actions { display: flex; flex-direction: column; gap: 10px; min-width: 220px; }
+        .btn-gold {
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 50px; padding: 0 24px; border: 0; border-radius: 12px; cursor: pointer;
+            background: linear-gradient(135deg,#f0d58c,#d6ad53); color: #101a32; font-weight: 800; font-size: .95rem; text-decoration: none;
+            box-shadow: 0 10px 26px -8px rgba(214,173,83,.55); transition: transform .2s ease;
+        }
+        .btn-gold:hover { transform: translateY(-2px); }
+        .btn-ghost {
+            display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 44px; padding: 0 20px; border-radius: 12px; cursor: pointer;
+            background: rgba(255,255,255,.08); color: #fff; border: 1px solid rgba(255,255,255,.22); font-weight: 700; font-size: .86rem; text-decoration: none;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,.15); }
+        #gurukul-install-help { font-size: 12px; line-height: 1.6; color: #b7c3d6; margin: 0; }
+
+        /* AI section */
+        .ai-section { position: relative; border-radius: 26px; padding: 36px 30px; margin-top: 48px; overflow: hidden; background: linear-gradient(135deg, var(--card-bg-light), #eef0ff); border: 1px solid var(--border-light); }
+        body.dark-mode .ai-section { background: linear-gradient(135deg, var(--card-bg-dark), #1c1a4d); border-color: var(--border-dark); }
+        .ai-collab-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; font-size: .84rem; font-weight: 600; color: var(--text-secondary-light); }
+        body.dark-mode .ai-collab-header { color: var(--text-secondary-dark); }
+        .ai-collab-header .logo-img { height: 22px; }
+        .ai-section-title { font-size: clamp(1.5rem, 3.6vw, 2.1rem); font-weight: 800; margin: 0; }
+        .ai-tool-card { background: var(--card-bg-light); border: 1px solid var(--border-light); padding: 22px; border-radius: 16px; text-decoration: none; color: var(--text-primary-light); transition: all .3s ease; display: block; }
+        body.dark-mode .ai-tool-card { background: var(--card-bg-dark); border-color: var(--border-dark); color: var(--text-primary-dark); }
+        .ai-tool-card:hover { transform: translateY(-5px); box-shadow: 0 16px 34px -12px rgba(67,56,202,0.4); border-color: var(--primary-mid); }
+        .ai-tool-card .action-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px; font-weight: 700; color: var(--primary-mid); font-size: .86rem; }
+
+        /* Cards */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(280px,1fr)); gap: 22px; margin-top: 48px; }
+        .card { background: var(--card-bg-light); border: 1px solid var(--border-light); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; transition: all .3s ease; box-shadow: 0 6px 20px -12px rgba(20,20,60,0.12); overflow: hidden; }
+        body.dark-mode .card { background: var(--card-bg-dark); border-color: var(--border-dark); }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px -16px rgba(67,56,202,0.3); border-color: rgba(79,70,229,0.3); }
+        .card-img { width: calc(100% + 48px); height: 150px; object-fit: cover; margin: -24px -24px 20px -24px; }
+        .card-head { display: flex; align-items: center; gap: 14px; }
+        .card-icon-circle { width: 46px; height: 46px; display: grid; place-items: center; border-radius: 13px; background: var(--primary-gradient); color: white; font-size: 20px; flex-shrink: 0; }
+        .card h3 { font-size: 1.05rem; font-weight: 700; margin: 0; }
+        .card p { font-size: .88rem; color: var(--text-secondary-light); margin: 12px 0 20px; flex-grow: 1; line-height: 1.55; }
+        body.dark-mode .card p { color: var(--text-secondary-dark); }
+        .action-btn { display: block; background: var(--primary-gradient); color: white; padding: 11px 18px; border-radius: 11px; text-decoration: none; font-size: .86rem; font-weight: 700; text-align: center; margin-top: auto; transition: all .2s ease; }
+        .action-btn:hover { transform: scale(1.02); box-shadow: 0 8px 20px -6px rgba(67,56,202,0.5); }
+
+        /* Sidebar */
+        .sidebar-overlay { position: fixed; inset: 0; background: rgba(6,6,20,0.55); backdrop-filter: blur(2px); z-index: 1001; display: none; }
+        .sidebar-overlay.active { display: block; }
+        .side-bar { position: fixed; top: 0; left: -320px; width: 300px; max-width: 86vw; height: 100vh; background: var(--card-bg-light); z-index: 1002; transition: left .4s cubic-bezier(.25,.46,.45,.94); display: flex; flex-direction: column; box-shadow: 10px 0 40px rgba(0,0,0,.15); }
+        body.dark-mode .side-bar { background: var(--card-bg-dark); border-right: 1px solid var(--border-dark); box-shadow: none; }
+        .side-bar.active { left: 0; }
+        .sidebar-header { padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-light); }
+        body.dark-mode .sidebar-header { border-bottom-color: var(--border-dark); }
+        .sidebar-header .title { font-family: 'Sora', sans-serif; font-size: 17px; font-weight: 700; margin: 0; }
+        #close-btn { font-size: 20px; cursor: pointer; color: var(--text-secondary-light); background: none; border: 0; }
+        .side-bar .profile { padding: 22px 20px; border-bottom: 1px solid var(--border-light); background: linear-gradient(135deg, rgba(79,70,229,0.06), rgba(14,165,233,0.06)); }
+        body.dark-mode .side-bar .profile { border-bottom-color: var(--border-dark); }
+        .profile-row { display: flex; align-items: center; gap: 14px; }
+        .profile-row img { width: 62px; height: 62px; border-radius: 50%; border: 3px solid white; box-shadow: 0 4px 20px rgba(0,0,0,0.15); object-fit: contain; background: #fff; }
+        .profile-row h3 { margin: 0; font-weight: 700; font-size: 1.2rem; }
+        .profile-row p { margin: 3px 0 0; font-size: .82rem; opacity: .75; }
+        .side-bar .navbar { flex-grow: 1; overflow-y: auto; padding-bottom: 20px; }
+        .sidebar-category { padding: 16px 25px 6px; }
+        .sidebar-category h4 { font-size: .72rem; text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-secondary-light); font-weight: 800; margin: 0; }
+        body.dark-mode .sidebar-category h4 { color: var(--text-secondary-dark); }
+        .side-bar .navbar a { display: flex; align-items: center; padding: 11px 25px; color: var(--text-primary-light); text-decoration: none; transition: all .2s ease; border-left: 3px solid transparent; font-size: .92rem; font-weight: 500; }
+        body.dark-mode .side-bar .navbar a { color: var(--text-primary-dark); }
+        .side-bar .navbar a:hover { background: rgba(79,70,229,0.06); border-left-color: var(--primary-mid); color: var(--primary-mid); }
+        .side-bar .navbar a i { margin-right: 14px; font-size: 16px; width: 22px; text-align: center; color: var(--text-secondary-light); }
+        body.dark-mode .side-bar .navbar a i { color: var(--text-secondary-dark); }
+        .side-bar .navbar a:hover i { color: var(--primary-mid); }
+
+        /* Footer */
+        .site-footer { width: 100%; background: var(--card-bg-light); color: var(--text-secondary-light); padding: 50px 0 30px; margin-top: 56px; border-top: 1px solid var(--border-light); }
+        body.dark-mode .site-footer { background: var(--card-bg-dark); color: var(--text-secondary-dark); border-top-color: var(--border-dark); }
+        .footer-content-wrapper { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+        .footer-container { display: grid; grid-template-columns: repeat(auto-fit,minmax(240px,1fr)); gap: 40px; margin-bottom: 40px; }
+        .footer-title { font-size: 1rem; font-weight: 700; margin: 0 0 15px; color: var(--text-primary-light); }
+        body.dark-mode .footer-title { color: var(--text-primary-dark); }
+        .footer-about p { line-height: 1.65; font-size: .9rem; margin: 0; }
+        .footer-links ul { list-style: none; padding: 0; margin: 0; }
+        .footer-links li { margin-bottom: 10px; }
+        .footer-links a { text-decoration: none; color: inherit; transition: color .2s ease; }
+        .footer-links a:hover { color: var(--primary-mid); }
+        .footer-social a { display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: var(--primary-gradient); color: white; font-size: 1rem; margin-right: 10px; text-decoration: none; transition: transform .2s ease; }
+        .footer-social a:hover { transform: translateY(-3px); }
+        .footer-bottom { text-align: center; padding-top: 20px; border-top: 1px solid var(--border-light); font-size: .85rem; }
+        body.dark-mode .footer-bottom { border-top-color: var(--border-dark); }
+        .footer-bottom p { margin: 4px 0; }
+        .footer-bottom a { color: inherit; font-weight: 600; text-decoration: none; }
+        .footer-bottom a:hover { text-decoration: underline; color: var(--primary-mid); }
+
+        /* Bottom nav */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 64px; background: rgba(255,255,255,0.88); backdrop-filter: blur(14px); border-top: 1px solid var(--border-light); display: flex; justify-content: space-around; z-index: 1000; transition: transform .4s cubic-bezier(.25,.46,.45,.94); }
+        body.dark-mode .bottom-nav { background: rgba(10,10,26,0.88); border-top-color: var(--border-dark); }
+        .nav-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--text-secondary-light); text-decoration: none; flex-grow: 1; transition: color .2s, transform .2s; cursor: pointer; background: none; border: 0; font-family: inherit; }
+        body.dark-mode .nav-item { color: var(--text-secondary-dark); }
+        .nav-item i { font-size: 19px; margin-bottom: 4px; }
+        .nav-item span { font-size: 10.5px; font-weight: 600; }
+        .nav-item.active { color: var(--primary-mid); }
+        .nav-item:hover { transform: translateY(-3px); color: var(--primary-end); }
+
+        /* Reveal */
+        .reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; }
+        .reveal.in-view { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) {
+                .hero-badge .dot, .live-dot { animation: none !important; }
+    .runner-track { animation-duration: 80s !important; }
+    .zone-track { animation-duration: 60s !important; }
+            .runner-track, .zone-track, .hero-badge .dot, .live-dot { animation: none !important; }
+            html { scroll-behavior: auto; }
+        }
+        @media (max-width: 768px) {
+            .hero-wrap { padding: 44px 20px 36px; }
+            .zone-card, .download-section { padding: 30px 22px; }
+            .download-actions { width: 100%; }
+        }
+
+        /* ===== v3: header fix, website vs app modes ===== */
+        html { -webkit-tap-highlight-color: transparent; }
+        .app-header { padding-top: env(safe-area-inset-top, 0px); }
+        .header-content-wrapper { height: 64px; }
+
+        /* Sub-nav: chips, scrollable, never cut off (first/last item centred via auto margins) */
+        .subnav-inner {
+            justify-content: flex-start; gap: 8px; padding: 10px 16px;
+            overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+        }
+        .subnav-inner::-webkit-scrollbar { display: none; }
+        .subnav-inner a:first-child { margin-left: auto; }
+        .subnav-inner a:last-child  { margin-right: auto; }
+        .subnav a {
+            flex: 0 0 auto; padding: 8px 16px; border-radius: 999px; font-size: .84rem;
+            background: rgba(79,70,229,0.07); color: var(--text-primary-light);
+        }
+        body.dark-mode .subnav a { background: rgba(255,255,255,0.07); color: var(--text-primary-dark); }
+        .subnav a::after { display: none; }
+        .subnav a:hover { background: var(--primary-mid); color: #fff; }
+        .subnav a[href="#download"] { background: linear-gradient(135deg,#f0d58c,#d6ad53); color: #101a32; font-weight: 800; }
+
+        /* Desktop header nav (website only) */
+        .desktop-nav { display: none; align-items: center; gap: 4px; margin: 0 auto 0 28px; }
+        .desktop-nav a {
+            padding: 8px 14px; border-radius: 10px; font-size: .9rem; font-weight: 600;
+            color: var(--text-secondary-light); text-decoration: none; transition: all .2s;
+        }
+        body.dark-mode .desktop-nav a { color: var(--text-secondary-dark); }
+        .desktop-nav a:hover { background: rgba(79,70,229,0.09); color: var(--primary-mid); }
+        .desktop-nav a.nav-cta { margin-left: 8px; background: linear-gradient(135deg,#f0d58c,#d6ad53); color: #101a32; font-weight: 800; }
+        .desktop-nav a.nav-cta:hover { filter: brightness(1.05); color: #101a32; }
+        .header-menu { display: none; }
+
+        /* Bottom nav: safe area + active indicator */
+        .bottom-nav { height: calc(64px + env(safe-area-inset-bottom, 0px)); padding-bottom: env(safe-area-inset-bottom, 0px); }
+        body { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+        .nav-item { position: relative; }
+        .nav-item.active::before {
+            content: ''; position: absolute; top: 0; width: 28px; height: 3px; border-radius: 0 0 4px 4px; background: var(--primary-gradient);
+        }
+
+        /* ---------- WEBSITE on desktop ---------- */
+        @media (min-width: 900px) {
+            html:not(.app-mode) .desktop-nav { display: flex; }
+            html:not(.app-mode) .header-menu { display: grid; }
+            html:not(.app-mode) .subnav,
+            html:not(.app-mode) .bottom-nav { display: none; }
+            html:not(.app-mode) body { padding-bottom: 0; }
+            html:not(.app-mode) .main-content { padding: 0 28px; }
+            html:not(.app-mode) .hero-wrap { padding: 80px 60px 64px; }
+        }
+        @media (max-width: 899px) {
+            .desktop-nav { display: none !important; }
+        }
+
+        /* ---------- INSTALLED APP (PWA / Android) ---------- */
+        html.app-mode #gurukul-app-banner,
+        html.app-mode #download,
+        html.app-mode a[href="#download"],
+        html.app-mode .desktop-nav,
+        html.app-mode .header-menu,
+        html.app-mode #datetime-container,
+        html.app-mode .runner-bar,
+        html.app-mode .hero-badge,
+        html.app-mode .footer-social { display: none !important; }
+
+        html.app-mode, html.app-mode body { overscroll-behavior-y: none; }
+        html.app-mode body { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+        html.app-mode input, html.app-mode textarea { -webkit-user-select: text; user-select: text; }
+        html.app-mode .main-content { padding: 0 14px; }
+        html.app-mode .hero-wrap { margin-top: 12px; padding: 34px 18px 28px; border-radius: 22px; }
+        html.app-mode .hero-section h1 { font-size: 2rem; margin-top: 0; }
+        html.app-mode .hero-stats { gap: 24px; margin-top: 24px; }
+        html.app-mode .card, html.app-mode .zone-card, html.app-mode .ai-section { border-radius: 20px; }
+        html.app-mode .card:hover, html.app-mode .quick-action-item:hover { transform: none; }
+        html.app-mode .card:active, html.app-mode .quick-action-item:active, html.app-mode .action-btn:active { transform: scale(.97); }
+        html.app-mode .site-footer { padding: 28px 0 18px; margin-top: 36px; }
+        html.app-mode .footer-container { margin-bottom: 18px; gap: 22px; }
+        html.app-mode .app-header { background: var(--card-bg-light); }
+        body.dark-mode.dark-mode .app-header { background: var(--card-bg-dark); }
+        html.app-mode .bottom-nav { display: flex !important; box-shadow: 0 -8px 30px -12px rgba(20,20,60,.25); }
+    </style>
+</head>
+
+<body class="font-body">
+
+<script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "Organization", "name": "UPSC गुरुकुल", "url": "https://upscgurukul.online",
+  "founder": { "@type": "Person", "name": "Pratyush Swain", "url": "https://pratyushswain.in" } }
+</script>
+<script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "WebSite", "name": "UPSC गुरुकुल", "url": "https://upscgurukul.online/" }
+</script>
+
+<header class="app-header">
+    <div class="header-content-wrapper">
+        <a href="homeUPSChub.html" class="logo" aria-label="UPSC गुरुकुल home">
+            <img src="assets/upsc-gurukul-logo.png" alt="">
+            <span>UPSC गुरुकुल</span>
+        </a>
+        <nav class="desktop-nav" aria-label="Main">
+            <a href="/Prelims/">Prelims</a>
+            <a href="/mains/">Mains</a>
+            <a href="/notes.html">Notes</a>
+            <a href="/test-series/">Test Series</a>
+            <a href="/UPSC2028/">2028 Zone</a>
+            <a href="#download" class="nav-cta"><i class="fab fa-android"></i> Get the App</a>
+        </nav>
+        <div class="header-right">
+            <div id="datetime-container"></div>
+            <button id="toggle-btn" class="icon-btn fas fa-sun" type="button" aria-label="Toggle dark mode"></button>
+            <button class="icon-btn header-menu fas fa-bars js-open-menu" type="button" aria-label="Open menu"></button>
+        </div>
+    </div>
+</header>
+
+<!-- Android app banner -->
+<section id="gurukul-app-banner" aria-label="Android app download">
+    <div class="gurukul-banner-inner">
+        <a class="gurukul-brand" href="homeUPSChub.html" aria-label="UPSC गुरुकुल home">
+            <img src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo" class="gurukul-banner-logo">
+        </a>
+        <div class="gurukul-banner-copy">
+            <span class="gurukul-banner-eyebrow">YOUR PREPARATION, EVERYWHERE</span>
+            <strong>UPSC गुरुकुल is now on Android</strong>
+            <span>Learn, revise and prepare wherever you go.</span>
+        </div>
+        <a class="gurukul-banner-button" href="#download">Get the app <i class="fas fa-download" aria-hidden="true"></i></a>
+        <button class="gurukul-banner-close" type="button" aria-label="Dismiss app banner"
+            onclick="document.getElementById('gurukul-app-banner').remove();">&times;</button>
+    </div>
+</section>
+
+<!-- Sub nav -->
+<nav class="subnav" aria-label="Primary">
+    <div class="subnav-inner">
+        <a href="/Prelims/">Prelims</a>
+        <a href="/mains/">Mains</a>
+        <a href="/notes.html">Notes</a>
+        <a href="/test-series/">Test Series</a>
+        <a href="#download">Download App</a>
+    </div>
+</nav>
+
+<div class="runner-bar" aria-hidden="true">
+    <div class="runner-track">
+        <span>Powered by Google AI <i class="fas fa-brain"></i> New: AI Quiz Builder is now LIVE! <i class="fas fa-star"></i> Mains Answer Writing analysis with AI feedback <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i></span>
+        <span>Powered by Google AI <i class="fas fa-brain"></i> New: AI Quiz Builder is now LIVE! <i class="fas fa-star"></i> Mains Answer Writing analysis with AI feedback <i class="fas fa-star"></i> Remember to revise your notes daily for better retention! <i class="fas fa-star"></i></span>
+    </div>
+</div>
+
+<div class="sidebar-overlay"></div>
+
+<aside class="side-bar" aria-label="Menu">
+    <div class="sidebar-header">
+        <h3 class="title">Complete Menu</h3>
+        <button id="close-btn" type="button" aria-label="Close menu"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="profile">
+        <div class="profile-row">
+            <img src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo">
+            <div>
+                <h3>UPSC गुरुकुल</h3>
+                <p>Your Success Partner</p>
+            </div>
+        </div>
+    </div>
+    <nav class="navbar">
+        <div class="sidebar-category"><h4>Learn</h4></div>
+        <a href="homeUPSChub.html"><i class="fas fa-home"></i><span>Home</span></a>
+        <a href="courses.html"><i class="fas fa-graduation-cap"></i><span>Courses</span></a>
+        <a href="preplibrary.html"><i class="fas fa-book-reader"></i><span>Videos</span></a>
+        <a href="UPSCsection.html"><i class="fas fa-bullseye"></i><span>UPSC Section</span></a>
+        <div class="sidebar-category"><h4>Practice &amp; Tools</h4></div>
+        <a href="planner.html"><i class="fas fa-calendar-alt"></i><span>UPSC-28 Planner</span></a>
+        <a href="testinterface.html"><i class="fas fa-clipboard-check"></i><span>Online Mock</span></a>
+        <a href="testdetails.html"><i class="fas fa-lightbulb"></i><span>Test Details</span></a>
+        <a href="revision.html"><i class="fas fa-sync-alt"></i><span>Revision Tools</span></a>
+        <a href="focustimer.html"><i class="fas fa-clock"></i><span>Focus Timer</span></a>
+        <div class="sidebar-category"><h4>Resources</h4></div>
+        <a href="pdfviewer.html"><i class="fas fa-file-pdf"></i><span>PDF Viewer</span></a>
+        <a href="magazine.html"><i class="fas fa-book-open"></i><span>Magazine</span></a>
+        <a href="poll.html"><i class="fas fa-poll"></i><span>Live Poll</span></a>
+        <a href="#download"><i class="fab fa-android"></i><span>Download App</span></a>
+        <div class="sidebar-category"><h4>Support &amp; Info</h4></div>
+        <a href="about.html"><i class="fas fa-question-circle"></i><span>About</span></a>
+        <a href="contact.html"><i class="fas fa-headset"></i><span>Contact Us</span></a>
+        <a href="privacy.html"><i class="fas fa-user-shield"></i><span>Privacy Policy</span></a>
+        <a href="terms.html"><i class="fas fa-file-contract"></i><span>Terms of Use</span></a>
+    </nav>
+</aside>
+
+<main class="main-content">
+
+    <!-- Hero -->
+    <section class="hero-wrap reveal">
+        <div class="hero-glow"></div>
+        <div class="hero-section" style="position:relative; z-index:1;">
+            <span class="hero-badge"><span class="dot"></span> Trusted by serious UPSC aspirants</span>
+            <h1>Master the Civil Services <span class="grad">the smart way.</span></h1>
+            <p class="lead">Structured resources, sharp analysis, and AI-powered tools built to take you from Prelims to Interview — one focused day at a time.</p>
+            <div class="hero-actions">
+                <a href="testinterface.html" class="hero-cta">Start a Mock Test <i class="fas fa-arrow-right"></i></a>
+                <a href="#download" class="hero-cta-alt"><i class="fab fa-android"></i> Get the Android App</a>
+            </div>
+            <div class="hero-stats">
+                <div class="hero-stat"><b>28</b><span>Day Planner</span></div>
+                <div class="hero-stat"><b>AI</b><span>Answer Feedback</span></div>
+                <div class="hero-stat"><b>24/7</b><span>Study Access</span></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Exam stages -->
+    <section class="reveal" style="text-align:center; margin-top:56px;">
+        <div class="section-eyebrow">
+            <div class="eyebrow-icon"><i class="fas fa-layer-group"></i></div>
+            <h2 class="section-title">UPSC Exam Stages</h2>
+        </div>
+        <div class="journey-track">
+            <div class="journey-line"></div>
+            <div class="journey-node">
+                <div class="journey-orb orb-prelims"><i class="fas fa-bullseye"></i></div>
+                <div>
+                    <h4>Prelims</h4>
+                    <p>GS, CSAT &amp; Trends</p>
+                    <a href="Prelims/prelims.html" class="stage-link link-prelims">Open <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="journey-node">
+                <div class="journey-orb orb-mains"><i class="fas fa-pen-fancy"></i></div>
+                <div>
+                    <h4>Mains</h4>
+                    <p>Answer Writing &amp; Essay</p>
+                    <a href="mains.html" class="stage-link link-mains">Open <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+            <div class="journey-node">
+                <div class="journey-orb orb-interview"><i class="fas fa-user-tie"></i></div>
+                <div>
+                    <h4>Interview</h4>
+                    <p>DAF &amp; Personality</p>
+                    <a href="interview.html" class="stage-link link-interview">Open <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2028 Zone -->
+    <section class="reveal">
+        <div class="zone-card">
+            <span class="zone-badge"><span class="live-dot"></span> LIVE · New Zone</span>
+            <div class="zone-marquee" aria-hidden="true">
+                <div class="zone-track">
+                    <span>New UPSC Zone 2028 Activated • Planner 2028 • Daily Goals • Smart Tracker • Test Series • Revision System • Performance Analytics • Weekly Targets • Monthly Strategy • Dream. Plan. Crack UPSC 2028</span>
+                    <span>New UPSC Zone 2028 Activated • Planner 2028 • Daily Goals • Smart Tracker • Test Series • Revision System • Performance Analytics • Weekly Targets • Monthly Strategy • Dream. Plan. Crack UPSC 2028</span>
+                </div>
+            </div>
+            <h3 class="zone-title">UPSC गुरुकुल 2028 Circuit</h3>
+            <p class="zone-sub">A complete two-year roadmap with daily goals, smart tracking, and a test series built for the long game.</p>
+            <a href="/UPSC2028/" class="zone-cta"><i class="fas fa-calendar-check"></i> Open the 2028 Zone</a>
+            <div class="zone-foot">© Designed &amp; Curated by <strong>UPSC गुरुकुल</strong></div>
+        </div>
+    </section>
+
+    <!-- Quick actions -->
+    <section class="reveal" style="margin-top:48px;">
+        <div class="quick-actions-grid">
+            <a href="notes.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-sticky-note"></i></div><span class="label">Notes</span></a>
+            <a href="newsupdate.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-newspaper"></i></div><span class="label">Daily News</span></a>
+            <a href="TestSeries/TestSeries_UPSChub.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-clipboard-list"></i></div><span class="label">Mock Tests</span></a>
+            <a href="AnswerWriting/answerwriting.html" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-pen-nib"></i></div><span class="label">Answer Writing</span></a>
+            <a href="/assignments/" class="quick-action-item"><div class="quick-action-icon"><i class="fas fa-list-check"></i></div><span class="label">Daily Tracker</span></a>
+        </div>
+    </section>
+
+    <!-- Download -->
+    <section id="download" class="download-section reveal" aria-labelledby="download-title">
+        <img class="download-logo" src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल app icon">
+        <div class="download-copy">
+            <span class="eyebrow">ANDROID APP</span>
+            <h2 id="download-title">Download UPSC गुरुकुल</h2>
+            <p>Study anytime, anywhere. Get the app for notes, mock tests, daily news and your 28-day planner — right on your phone.</p>
+            <div class="download-meta" id="apk-meta">Checking latest version…</div>
+        </div>
+        <div class="download-actions">
+            <a id="apk-download" class="btn-gold" href="download.html"><i class="fab fa-android"></i> Download APK</a>
+            <button id="gurukul-install-button" class="btn-ghost" type="button" hidden><i class="fas fa-mobile-screen"></i> Install as web app</button>
+            <p id="gurukul-install-help" hidden>Or open your browser menu and choose <strong>Install app</strong> / <strong>Add to Home screen</strong>.</p>
+        </div>
+    </section>
+
+    <!-- AI -->
+    <section class="ai-section reveal">
+        <div class="ai-collab-header">
+            <img src="assets/upsc-gurukul-logo.png" alt="UPSC गुरुकुल logo" class="logo-img">
+            <i class="fas fa-plus" style="font-size:14px;"></i>
+            <img src="https://www.gstatic.com/images/branding/googlelogo/1x/googlelogo_color_92x30dp.png" alt="Google logo" class="logo-img">
+            <span>Powered by Google AI</span>
+        </div>
+        <h2 class="ai-section-title">Introducing <span class="grad">UPSC गुरुकुल.ai</span></h2>
+        <p style="color:var(--text-secondary-light); margin-top:8px; max-width:520px; line-height:1.6;">Revolutionize your preparation with cutting-edge AI tools designed to give you an edge.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; margin-top:26px;">
+            <a href="UPSChubAI/AI.UPSChub.html" class="ai-tool-card">
+                <h4 style="font-size:1.1rem; font-weight:700; margin:0 0 8px;">UPSC गुरुकुल.ai</h4>
+                <p style="font-size:.85rem; color:var(--text-secondary-light); line-height:1.5; margin:0;">Your AI-powered UPSC companion — from quizzes and answer evaluation to personalized learning and smart revisions.</p>
+                <span class="action-link">Explore UPSC गुरुकुल.ai <i class="fas fa-arrow-right"></i></span>
+            </a>
+        </div>
+    </section>
+
+    <!-- Dashboard grid -->
+    <section class="card-grid reveal">
+        <div class="card">
+            <img src="images/UPSC.syllabus.jpg" alt="UPSC Syllabus" class="card-img" loading="lazy">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-book-open"></i></div><h3>UPSC Syllabus</h3></div>
+            <p>Access the complete and detailed Prelims &amp; Mains syllabi to structure your preparation.</p>
+            <a href="syllabusUPSC.html" class="action-btn">View Syllabus</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-scroll"></i></div><h3>Indian Constitution Articles</h3></div>
+            <p>Explore all important Articles of the Indian Constitution with simplified explanations for UPSC preparation.</p>
+            <a href="article.html" class="action-btn">View Articles</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-chart-line"></i></div><h3>Essay &amp; Debate Section</h3></div>
+            <p>Get detailed, insightful essays and debate topics daily.</p>
+            <a href="/special/index.html" class="action-btn">Read Essays</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-pen-fancy"></i></div><h3>Answer Writing</h3></div>
+            <p>Upload your Mains answers for peer and expert evaluation to hone your writing skills.</p>
+            <a href="drive.doc.html" class="action-btn">Upload Document</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-video"></i></div><h3>Video Lectures</h3></div>
+            <p>Explore our comprehensive video learning section covering all subjects and topics.</p>
+            <a href="preplibrary.html" class="action-btn">Watch Videos</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-book-reader"></i></div><h3>Revision Tools</h3></div>
+            <p>Use smart flashcards and spaced repetition to master key topics and improve retention.</p>
+            <a href="revision.html" class="action-btn">Start Revising</a>
+        </div>
+        <div class="card">
+            <div class="card-head"><div class="card-icon-circle"><i class="fas fa-folder-open"></i></div><h3>Resource Files</h3></div>
+            <p>Find your study materials, notes, and downloaded resources in one place.</p>
+            <a href="TESTseries-daily.html" class="action-btn">Access Files</a>
+        </div>
+    </section>
+</main>
+
+<footer class="site-footer">
+    <div class="footer-content-wrapper">
+        <div class="footer-container">
+            <div class="footer-about">
+                <h3 class="footer-title">UPSC गुरुकुल</h3>
+                <p>Your dedicated partner in the journey to crack the Civil Services Examination. We provide structured resources, expert analysis, and a supportive community to help you achieve your goal.</p>
+            </div>
+            <div class="footer-links">
+                <h3 class="footer-title">Quick Links</h3>
+                <ul>
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="contact.html">Contact Support</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="TESTseries-daily.html">Test Series</a></li>
+                    <li><a href="#download">Download App</a></li>
+                </ul>
+            </div>
+            <div class="footer-social">
+                <h3 class="footer-title">Connect With Us</h3>
+                <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="Telegram"><i class="fab fa-telegram-plane"></i></a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>© 2026 UPSC गुरुकुल. All Rights Reserved.</p>
+            <p><a href="privacy.html">Privacy Policy</a> • <a href="terms.html">Terms of Use</a></p>
+            <p>Founder: <a href="https://pratyushswain.in">Pratyush Swain</a></p>
+        </div>
+    </div>
+</footer>
+
+<nav class="bottom-nav" aria-label="Quick navigation">
+    <a href="homeUPSChub.html" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/Planner/schedule.html" class="nav-item"><i class="fas fa-calendar-alt"></i><span>Planner</span></a>
+    <a href="testinterface.html" class="nav-item"><i class="fas fa-clipboard-check"></i><span>Tests</span></a>
+    <a href="#download" class="nav-item"><i class="fas fa-download"></i><span>App</span></a>
+    <button id="menu-btn" class="nav-item js-open-menu" type="button"><i class="fas fa-bars"></i><span>Menu</span></button>
+</nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Theme
+    const toggleBtn = document.querySelector('#toggle-btn');
+    const body = document.body;
+    const applyTheme = (theme) => {
+        body.classList.toggle('dark-mode', theme === 'dark');
+        if (toggleBtn) {
+            toggleBtn.classList.toggle('fa-moon', theme === 'dark');
+            toggleBtn.classList.toggle('fa-sun', theme !== 'dark');
+        }
+    };
+    let savedTheme = 'light';
+    try { savedTheme = localStorage.getItem('theme') || 'light'; } catch (e) {}
+    applyTheme(savedTheme);
+    if (toggleBtn) toggleBtn.addEventListener('click', () => {
+        const t = body.classList.contains('dark-mode') ? 'light' : 'dark';
+        try { localStorage.setItem('theme', t); } catch (e) {}
+        applyTheme(t);
+    });
+
+    // Sidebar
+    const menuBtn = document.querySelector('#menu-btn');
+    const closeBtn = document.querySelector('#close-btn');
+    const sideBar = document.querySelector('.side-bar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    const closeSidebar = () => { sideBar.classList.remove('active'); overlay.classList.remove('active'); };
+    document.querySelectorAll('.js-open-menu').forEach(b => b.addEventListener('click', () => {
+        sideBar.classList.add('active'); overlay.classList.add('active');
+    }));
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeSidebar(); });
+    sideBar.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', closeSidebar));
+
+    // Clock
+    const dt = document.getElementById('datetime-container');
+    const tick = () => {
+        const now = new Date();
+        dt.textContent = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })
+            + ' | ' + now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+    };
+    tick(); setInterval(tick, 1000);
+
+    // Auto-hide bottom nav
+    const bottomNav = document.querySelector('.bottom-nav');
+    let lastY = window.scrollY;
+    window.addEventListener('scroll', () => {
+        const y = window.scrollY;
+        bottomNav.style.transform = (y > lastY && y > 100) ? 'translateY(100%)' : 'translateY(0)';
+        lastY = Math.max(0, y);
+    }, { passive: true });
+
+    // Reveal
+    const io = new IntersectionObserver(entries => {
+        entries.forEach(en => { if (en.isIntersecting) { en.target.classList.add('in-view'); io.unobserve(en.target); } });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+});
+</script>
+
+<!-- Download: always point the button at the newest APK release -->
+<script>
+(function () {
+    const API = 'https://api.github.com/repos/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
+    const RELEASES = 'https://github.com/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
+    const btn = document.getElementById('apk-download');
+    const meta = document.getElementById('apk-meta');
+    fetch(API, { headers: { Accept: 'application/vnd.github+json' } })
+        .then(r => { if (!r.ok) throw new Error('status ' + r.status); return r.json(); })
+        .then(rel => {
+            const apk = (rel.assets || []).find(a => /\.apk$/i.test(a.name) && a.browser_download_url);
+            const ver = String(rel.tag_name || '').replace(/^v/i, '');
+            if (!apk) { btn.href = RELEASES; meta.textContent = 'Open the releases page to download the APK.'; return; }
+            btn.href = apk.browser_download_url;
+            btn.setAttribute('download', '');
+            btn.innerHTML = '<i class="fab fa-android"></i> Download v' + ver;
+            const mb = (apk.size / 1048576).toFixed(1);
+            meta.textContent = 'Version ' + ver + ' • ' + mb + ' MB • Android 5.0+ • You may need to allow installs from this source.';
+        })
+        .catch(() => { btn.href = RELEASES; meta.textContent = 'Tap to open the latest release.'; });
+})();
+</script>
+
+<!-- PWA install -->
+<script>
+(function () {
+    let deferredPrompt = null;
+    const button = document.getElementById('gurukul-install-button');
+    const help = document.getElementById('gurukul-install-help');
+    window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); deferredPrompt = e; button.hidden = false; help.hidden = true; });
+    button.addEventListener('click', async () => {
+        if (!deferredPrompt) { help.hidden = false; return; }
+        deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; button.hidden = true;
+    });
+    window.addEventListener('appinstalled', () => { button.hidden = true; help.hidden = true; });
+    setTimeout(() => {
+        if (!deferredPrompt && !window.matchMedia('(display-mode: standalone)').matches) help.hidden = false;
+    }, 2500);
+})();
+</script>
+
+<!-- Update checker -->
+<script>
+(() => {
+    const API = 'https://api.github.com/repos/pratyushswain01/UPSCstudyhub.github.io/releases/latest';
+    const KEY = 'upscgurukul_installed_version';
+    const compare = (a, b) => {
+        const x = String(a).replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+        const y = String(b).replace(/^v/i, '').split('.').map(n => parseInt(n, 10) || 0);
+        for (let i = 0; i < Math.max(x.length, y.length); i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) - (y[i] || 0);
+        return 0;
+    };
+    async function check() {
+        try {
+            const params = new URLSearchParams(location.search);
+            const launch = params.get('app_version');
+            // Only relevant inside the installed app
+            if (!launch && !localStorage.getItem(KEY)) return;
+            const r = await fetch(API, { headers: { Accept: 'application/vnd.github+json' }, cache: 'no-store' });
+            if (!r.ok) return;
+            const rel = await r.json();
+            const latest = String(rel.tag_name || '').replace(/^v/i, '');
+            const installed = launch || localStorage.getItem(KEY) || '3.3';
+            if (!latest || compare(latest, installed) <= 0) return;
+            const asset = (rel.assets || []).find(a => /\.apk$/i.test(a.name) && a.browser_download_url);
+            if (!asset || document.getElementById('upscg-update')) return;
+
+            const css = document.createElement('style');
+            css.textContent = '#upscg-update{position:fixed;z-index:2147483647;left:16px;right:16px;bottom:80px;max-width:520px;margin:auto;padding:18px;border:1px solid #d9e4f5;border-radius:18px;background:#fff;color:#152238;box-shadow:0 12px 40px #0003;font:15px/1.45 system-ui}#upscg-update h3{margin:0 0 6px}#upscg-update p{margin:0 0 14px}#upscg-update a,#upscg-update button{display:inline-block;border:0;border-radius:10px;padding:11px 14px;font-weight:700;text-decoration:none;cursor:pointer}#upscg-update a{background:#173ea5;color:#fff}#upscg-update button{background:#eef2f8;color:#23324b;margin-left:8px}';
+            document.head.appendChild(css);
+
+            const box = document.createElement('section');
+            box.id = 'upscg-update'; box.setAttribute('role', 'dialog');
+            const h = document.createElement('h3'); h.textContent = 'UPSC गुरुकुल update available';
+            const p = document.createElement('p'); p.textContent = 'Version ' + latest + ' is available. Your version: ' + installed + '.';
+            const a = document.createElement('a'); a.href = asset.browser_download_url; a.textContent = 'Download v' + latest; a.rel = 'noopener';
+            const later = document.createElement('button'); later.type = 'button'; later.textContent = 'Later'; later.onclick = () => box.remove();
+            box.append(h, p, a, later);
+            document.body.appendChild(box);
+        } catch (e) { console.warn('UPSC Gurukul update check failed:', e); }
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', check, { once: true }); else check();
+})();
+</script>
+
+<!-- Push notifications (Firebase) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js";
+    import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-messaging.js";
+    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
+        authDomain: "upscstudyhub-github.firebaseapp.com",
+        projectId: "upscstudyhub-github",
+        messagingSenderId: "451692540885",
+        appId: "1:451692540885:web:b425e85128e5de97c7c35c"
+    };
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const messaging = getMessaging(app);
+
+    async function setupNotifications() {
+        try {
+            if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+            const permission = await Notification.requestPermission();
+            if (permission !== 'granted') return;
+            const registration = await navigator.serviceWorker.ready;
+            const token = await getToken(messaging, {
+                serviceWorkerRegistration: registration,
+                vapidKey: 'BGKEpaujSsPlAOnayTs--9Ko5ge5Rr1ckfeYxunCD54fNNH11RKk8x9eXIlDWLRp8djIIRfctvuX9LcTyQ0V6Fo'
+            });
+            if (token) {
+                const visitorId = localStorage.getItem('visitorId') || 'visitor_' + Date.now();
+                localStorage.setItem('visitorId', visitorId);
+                await setDoc(doc(db, "artifacts", "default-app-id", "users", visitorId), {
+                    fcmToken: token, type: "anonymous_visitor", subscribedAt: serverTimestamp()
+                }, { merge: true });
+            }
+        } catch (error) {
+            console.error("Firebase Notification Error:", error);
+        }
+    }
+    setupNotifications();
+</script>
+
+<script src="/festival/independence_day/independence-day.js"></script>
+<script src="/festival/independence_day/independence-reminder.js"></script>
+<script src="/latest-release.js?v=1" defer></script>
+<script type="module" src="/upscgurukul-push-registration.js"></script>
+<script src="/upscgurukul-debug.js?v=1"></script>
+<script src="/upscgurukul-dev-lockdown.js?v=9"></script>
+
+
+<!-- unified auth -->
+<script type="module">
+  import { watchUser } from "/auth/firebase-auth.js";
+  watchUser((user) => {
+    document.querySelectorAll('a[href*="login"], #acct, [data-auth="login"]').forEach((el) => {
+      if (user) {
+        el.textContent = user.displayName || (user.email ? user.email.split("@")[0] : "Account");
+        el.href = "/auth/login.html";
+      } else {
+        el.textContent = "Log in";
+        el.href = "/auth/login.html?next=" + encodeURIComponent("/homeUPSChub.html");
+      }
+    });
+  });
+</script>
+<script src="/consent-manager.js" defer></script>
+</body>
+</html>
+
+<script src="/gurukul-mitra/gurukul-mitra.js" defer></script>
+

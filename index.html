@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <script id="ug-early-lockdown">
@@ -429,6 +429,57 @@ var settled=false;
       }
     });
   } catch (e) {}
+})();
+</script>
+<script>
+(function(){
+  const TZ = "Asia/Kolkata";
+  const now = new Date();
+  const dayNum = new Intl.DateTimeFormat("en-GB", { day: "2-digit", timeZone: TZ }).format(now);
+  const dayName = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: TZ }).format(now);
+
+  const dayEl   = document.getElementById("heroDay");
+  const nameEl  = document.getElementById("heroDayName");
+  const countEl = document.getElementById("heroTestCount");
+
+  if (dayEl)  dayEl.textContent  = dayNum;
+  if (nameEl) nameEl.textContent = dayName;
+
+  // Try to read total tests from CONFIG if the main script already loaded it
+  function updateCount() {
+    let total = 14; // fallback
+    if (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.tests)) {
+      total = CONFIG.tests.length;
+    }
+    if (countEl) countEl.textContent = total + " tests";
+  }
+  updateCount();
+  // In case geo-daily.js loads later
+  setTimeout(updateCount, 400);
+})();
+</script>
+
+<script>
+(function(){
+  const TZ = "Asia/Kolkata";
+  const now = new Date();
+  const dayNum  = new Intl.DateTimeFormat("en-GB", {day:"2-digit", timeZone:TZ}).format(now);
+  const dayName = new Intl.DateTimeFormat("en-GB", {weekday:"long", timeZone:TZ}).format(now).toUpperCase();
+
+  const d = document.getElementById("heroDay");
+  const n = document.getElementById("heroDayName");
+  const c = document.getElementById("heroTestCount");
+
+  if (d) d.textContent = dayNum;
+  if (n) n.textContent = dayName;
+
+  function setCount(){
+    let total = 14;
+    if (typeof CONFIG !== "undefined" && Array.isArray(CONFIG.tests)) total = CONFIG.tests.length;
+    if (c) c.textContent = total + " tests";
+  }
+  setCount();
+  setTimeout(setCount, 600);
 })();
 </script>
 </body>

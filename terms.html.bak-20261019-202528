@@ -1,0 +1,99 @@
+
+cd "C:\Users\Mr.PRATYUSH\Documents\UPSCstudyhub.github.io"
+
+$ErrorActionPreference = "Stop"
+$file = ".\terms.html"
+
+# Keep a backup before making any changes
+$backup = ".\terms.html.bak-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+Copy-Item $file $backup
+
+# Read the existing HTML
+$html = [System.IO.File]::ReadAllText(
+    (Resolve-Path $file),
+    [System.Text.Encoding]::UTF8
+)
+
+# Update visible branding throughout the Terms page
+$html = $html.Replace("UPSChub", "UPSC गुरुकुल")
+
+# Update the page title and description
+$html = $html.Replace(
+    '<title>Terms of Service | UPSC गुरुकुल</title>',
+    '<title>Terms of Use | UPSC गुरुकुल</title>'
+)
+$html = $html.Replace(
+    'By using UPSC गुरुकुल, you agree to these terms and conditions. Please read them carefully.',
+    'These Terms explain the conditions for using the UPSC गुरुकुल website, educational resources and related services.'
+)
+
+# Update outdated application-only wording
+$html = $html.Replace(
+    'By accessing or using the UPSC गुरुकुल mobile application ("App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to all of these Terms, do not use the App.',
+    'By accessing or using the UPSC गुरुकुल website or related services, you agree to these Terms. If you do not agree, please discontinue use of the services.'
+)
+$html = $html.Replace(
+    'When creating an account with UPSC गुरुकुल:',
+    'When creating or using an account with UPSC गुरुकुल:'
+)
+$html = $html.Replace(
+    'All content and materials available on UPSC गुरुकुल, including but not limited to:',
+    'Educational content and other materials available through UPSC गुरुकुल, including:'
+)
+
+# Update the date
+$html = $html.Replace(
+    'Last Updated: January 12, 2025',
+    'Last Updated: 19 October 2026'
+)
+
+# Fix the duplicated footer wrapper
+$html = $html.Replace(
+    '<div class="title-wrapper">' + "`r`n" +
+    '<div class="title-wrapper">' + "`r`n" +
+    '  <div class="owner-title">Owner</div>',
+    '<div class="title-wrapper">' + "`r`n" +
+    '  <div class="owner-title">Owner</div>'
+)
+$html = $html.Replace(
+    '<p>© 2023 UPSC गुरुकुल. All rights reserved.</p>',
+    '<p>© 2026 UPSC गुरुकुल. All rights reserved.</p>'
+)
+
+# Add links to the existing privacy and data-rights pages
+$marker = '            <div class="section">' + "`r`n" +
+          '                <h2>8. Changes to These Terms</h2>'
+
+$privacySection = @'
+            <div class="section">
+                <h2>8. Privacy and Data Rights</h2>
+                <p>Your use of the website is also subject to our
+                <a href="/privacy.html">Privacy Policy</a>.
+                For information about privacy requests and available data-rights options,
+                visit our <a href="/data-rights.html">Data Rights page</a>.</p>
+            </div>
+
+'@
+
+if (-not $html.Contains($marker)) {
+    throw "Could not locate the expected section. No changes have been written. Backup: $backup"
+}
+
+$html = $html.Replace($marker, $privacySection + $marker)
+$html = $html.Replace(
+    '<h2>8. Changes to These Terms</h2>',
+    '<h2>9. Changes to These Terms</h2>'
+)
+
+# Save as UTF-8
+[System.IO.File]::WriteAllText(
+    (Join-Path (Get-Location) "terms.html"),
+    $html,
+    [System.Text.UTF8Encoding]::new($false)
+)
+
+# Verify changes before any Git operation
+Write-Host "`nUpdated terms.html. Backup: $backup" -ForegroundColor Green
+Select-String -Path $file -Pattern '<title>', 'UPSC गुरुकुल', 'Privacy and Data Rights', 'Last Updated'
+git diff --check -- terms.html
+git diff --stat -- terms.html
