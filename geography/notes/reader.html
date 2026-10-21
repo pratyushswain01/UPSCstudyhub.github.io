@@ -473,7 +473,10 @@ a.pn:hover{border-color:var(--accent);transform:translateY(-2px)}
 /* =========================================================
    10. Motion preferences and print
    ========================================================= */
-@media (prefers-reduced-motion:reduce){
+.promo{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:.5rem 1rem;margin-top:2.2rem;padding:.7rem 1rem;border:1px dashed var(--gold);border-radius:var(--radius);background:var(--gold-soft);font-size:.85rem;color:var(--ink-2)}
+.promo__a{font-weight:600;color:var(--accent);white-space:nowrap}
+.legal{margin-top:1rem;padding-top:1rem;border-top:1px solid var(--line);font-size:.76rem;line-height:1.55;color:var(--muted)}
+.legal p+p{margin-top:.4rem}@media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
 /* NCERT PDF panel */
@@ -522,6 +525,35 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
   .print-notes:empty{display:none}
   .opt{border:1px solid #999}
   body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk--h3{display:block}
+}
+</style>
+<style>
+/* UPSC Gurukul screenshot watermark */
+#upscg-watermark {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 0.16;
+}
+#upscg-watermark span {
+  display: block;
+  transform: rotate(-28deg);
+  color: #52647a;
+  font-size: clamp(20px, 3.2vw, 42px);
+  font-weight: 800;
+  letter-spacing: 2px;
+  white-space: nowrap;
+  text-align: center;
+  text-shadow: 0 1px 1px rgba(255,255,255,.25);
+}
+@media print {
+  #upscg-watermark { position: fixed; }
 }
 </style>
 </head>
@@ -1805,6 +1837,44 @@ function setupPdf() {
   setPdf(G.pdfOpen, true);
 }
 
+/* ---------- UPSC Gurukul promo, copyright notice and copy protection ---------- */
+var PROMO_URL = '';   /* put your live site address here, e.g. 'https://yourdomain.in/' */
+var COPY_MAX = 350;   /* most characters a reader can copy at once */
+var ZW0 = '\u200B', ZW1 = '\u200C', ZWS = '\u200D';
+function siteUrl() {
+  if (PROMO_URL) return PROMO_URL;
+  try { var u = new URL(SITE.homeHref, location.href); return u.protocol === 'file:' ? '' : u.href; } catch (e) { return ''; }
+}
+function zwTag(s) { return s.split('').map(function (c) { return c.charCodeAt(0).toString(2).padStart(8, '0').replace(/0/g, ZW0).replace(/1/g, ZW1); }).join(ZWS); }
+function copyGuard(e) {
+  var sel = window.getSelection(); if (!sel || sel.isCollapsed || !e.clipboardData) return;
+  var n = sel.anchorNode, host = n && (n.nodeType === 1 ? n : n.parentElement);
+  if (!host || !host.closest('#chapter') || host.closest('input,textarea')) return;
+  var txt = sel.toString().replace(/\s+/g, ' ').trim();
+  if (txt.length > COPY_MAX) { txt = txt.slice(0, COPY_MAX); var k = txt.lastIndexOf(' '); txt = txt.slice(0, k > 200 ? k : COPY_MAX) + ' ...'; }
+  var tag = zwTag('UPSCGURUKUL'), i = 0;
+  txt = txt.split(' ').map(function (w) {
+    i++; if (w.length > 3) w = w.replace(/(.{3})(?=.)/g, '$1' + ZW0);
+    return i % 6 === 0 ? w + tag : w;
+  }).join(' ');
+  var out = txt + tag + '\n\n(c) ' + SITE.brandName + '. All rights reserved. Copying or republishing without written permission is prohibited and may lead to legal action.' + (siteUrl() ? ' Source: ' + siteUrl() : '');
+  e.clipboardData.setData('text/plain', out);
+  e.clipboardData.setData('text/html', '<p>' + out.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/\n/g, '<br>') + '</p>');
+  e.preventDefault();
+}
+function addPromo() {
+  var secs = $$('#reading .sec').filter(function (s) { return !s.classList.contains('sec--revise') && !s.classList.contains('sec--practice'); });
+  if (secs.length >= 2) {
+    secs[Math.ceil(secs.length / 2) - 1].append(el('aside', { class: 'promo', 'aria-label': 'About ' + SITE.brandName },
+      el('span', null, el('b', null, SITE.brandName), ' \u00B7 Free notes, tests and guidance for UPSC aspirants.'),
+      el('a', { class: 'promo__a', href: siteUrl() || SITE.homeHref, target: '_blank', rel: 'noopener' }, 'Click here to visit')));
+  }
+  $('#after').append(el('section', { class: 'legal', 'aria-label': 'Copyright notice' },
+    el('p', null, '\u00A9 ' + new Date().getFullYear() + ' ' + SITE.brandName + '. All rights reserved.'),
+    el('p', null, 'The explanations, questions, notes, design and code on this page are original works of ' + SITE.brandName + ' and are protected by copyright (Copyright Act, 1957, India). Copying, scraping, republishing, selling or sharing this content without written permission is prohibited. Copied text carries an invisible identifier, and violations may lead to legal action. NCERT textbook material remains the property of NCERT.')));
+  document.addEventListener('copy', copyGuard);
+  $('#chapter').addEventListener('dragstart', function (e) { e.preventDefault(); });
+}
 /* ---------- key-term popover ---------- */
 var pop = $('#termPop'), popBtn = null;
 function closeTerm() { if (popBtn) { popBtn.setAttribute('aria-expanded', 'false'); popBtn.removeAttribute('aria-describedby'); } popBtn = null; pop.hidden = true; }
@@ -2049,6 +2119,7 @@ function init() {
   buildRevise();
   buildPractice();
   buildAfter();
+  addPromo();
   buildHero();
   buildOutline();
   buildQuiz();
@@ -2081,5 +2152,8 @@ init();
 boot();
 })();
 </script>
+<div id="upscg-watermark" aria-hidden="true">
+  <span>UPSC GURUKUL • upscgurukul.online</span>
+</div>
 </body>
 </html>
