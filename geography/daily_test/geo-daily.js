@@ -9,12 +9,12 @@ const CONFIG = {
   canonical: "https://upscgurukul.online/geography.html",
 
   /* -------------------------------------------------------
-     FIREBASE CONFIG â€” REPLACE WITH YOUR PROJECT VALUES
+     FIREBASE CONFIG — REPLACE WITH YOUR PROJECT VALUES
      1. Go to Firebase Console â†’ Project Settings â†’ General
      2. Under "Your apps" copy the firebaseConfig object
      3. Enable Authentication â†’ Sign-in method â†’ Anonymous
      4. Enable Realtime Database (start in test mode, then
-        tighten rules â€“ example rules are in the comment below)
+        tighten rules “ example rules are in the comment below)
      ------------------------------------------------------- */
   firebase: {
     apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
@@ -57,10 +57,10 @@ const CONFIG = {
     {
       id: "geo-daily-001",
       date: "2026-10-21",
-      title: "Geography Daily Test â€” Physical Geography Fundamentals",
+      title: "Geography Daily Test — Physical Geography Fundamentals",
       topic: "Physical Geography",
       category: "PHYSICAL GEOGRAPHY",
-      description: "Core concepts of the Earthâ€™s structure, landforms and basic geomorphic processes. Sample configuration for demonstration.",
+      description: "Core concepts of the Earth’s structure, landforms and basic geomorphic processes. Sample configuration for demonstration.",
       difficulty: "Moderate",
       questionCount: 20,
       durationMinutes: 25,
@@ -72,7 +72,7 @@ const CONFIG = {
     {
       id: "geo-daily-002",
       date: "2026-10-20",
-      title: "Geography Daily Test â€” Geomorphology",
+      title: "Geography Daily Test — Geomorphology",
       topic: "Geomorphology",
       category: "PHYSICAL GEOGRAPHY",
       description: "Landform evolution, weathering, erosion and depositional systems.",
@@ -87,7 +87,7 @@ const CONFIG = {
     {
       id: "geo-daily-003",
       date: "2026-10-19",
-      title: "Geography Daily Test â€” Climatology Basics",
+      title: "Geography Daily Test — Climatology Basics",
       topic: "Climatology",
       category: "PHYSICAL GEOGRAPHY",
       description: "Atmosphere, temperature, pressure belts and wind systems.",
@@ -102,7 +102,7 @@ const CONFIG = {
     {
       id: "geo-daily-004",
       date: "2026-10-18",
-      title: "Geography Daily Test â€” Oceanography",
+      title: "Geography Daily Test — Oceanography",
       topic: "Oceanography",
       category: "PHYSICAL GEOGRAPHY",
       description: "Ocean currents, waves, tides and marine resources.",
@@ -117,7 +117,7 @@ const CONFIG = {
     {
       id: "geo-daily-005",
       date: "2026-10-17",
-      title: "Geography Daily Test â€” Indian Physiography",
+      title: "Geography Daily Test — Indian Physiography",
       topic: "Physiography",
       category: "INDIAN GEOGRAPHY",
       description: "Himalayas, Northern Plains, Peninsular Plateau and coastal regions.",
@@ -132,7 +132,7 @@ const CONFIG = {
     {
       id: "geo-daily-006",
       date: "2026-10-16",
-      title: "Geography Daily Test â€” Indian Drainage Systems",
+      title: "Geography Daily Test — Indian Drainage Systems",
       topic: "Rivers and Drainage",
       category: "INDIAN GEOGRAPHY",
       description: "Himalayan and Peninsular river systems, basins and interlinking.",
@@ -147,7 +147,7 @@ const CONFIG = {
     {
       id: "geo-daily-007",
       date: "2026-10-15",
-      title: "Geography Daily Test â€” Indian Monsoon",
+      title: "Geography Daily Test — Indian Monsoon",
       topic: "Indian Climate and Monsoon",
       category: "INDIAN GEOGRAPHY",
       description: "Mechanism, onset, withdrawal and variability of the Indian monsoon.",
@@ -162,7 +162,7 @@ const CONFIG = {
     {
       id: "geo-daily-008",
       date: "2026-10-14",
-      title: "Geography Daily Test â€” Soils of India",
+      title: "Geography Daily Test — Soils of India",
       topic: "Soils",
       category: "INDIAN GEOGRAPHY",
       description: "Major soil types, distribution, characteristics and conservation.",
@@ -177,7 +177,7 @@ const CONFIG = {
     {
       id: "geo-daily-009",
       date: "2026-10-13",
-      title: "Geography Daily Test â€” Agriculture & Resources",
+      title: "Geography Daily Test — Agriculture & Resources",
       topic: "Agriculture",
       category: "INDIAN GEOGRAPHY",
       description: "Cropping patterns, irrigation, mineral and energy resources overview.",
@@ -192,7 +192,7 @@ const CONFIG = {
     {
       id: "geo-daily-010",
       date: "2026-10-22",
-      title: "Geography Daily Test â€” World Continents & Oceans",
+      title: "Geography Daily Test — World Continents & Oceans",
       topic: "Continents and Oceans",
       category: "WORLD GEOGRAPHY",
       description: "Major landmasses, ocean basins and their strategic significance.",
@@ -207,7 +207,7 @@ const CONFIG = {
     {
       id: "geo-daily-011",
       date: "2026-10-23",
-      title: "Geography Daily Test â€” Mountains, Rivers & Lakes",
+      title: "Geography Daily Test — Mountains, Rivers & Lakes",
       topic: "Mountains and Plateaus",
       category: "WORLD GEOGRAPHY",
       description: "Major mountain ranges, river systems and lakes of the world.",
@@ -222,7 +222,7 @@ const CONFIG = {
     {
       id: "geo-daily-012",
       date: "2026-10-12",
-      title: "Geography Daily Test â€” India Mapping",
+      title: "Geography Daily Test — India Mapping",
       topic: "India Mapping",
       category: "MAPPING PRACTICE",
       description: "States, capitals, rivers, national parks and important locations.",
@@ -237,7 +237,7 @@ const CONFIG = {
     {
       id: "geo-daily-013",
       date: "2026-10-11",
-      title: "Geography Daily Test â€” World Mapping",
+      title: "Geography Daily Test — World Mapping",
       topic: "World Mapping",
       category: "MAPPING PRACTICE",
       description: "Countries, capitals, straits, seas and strategic locations.",
@@ -252,7 +252,7 @@ const CONFIG = {
     {
       id: "geo-daily-014",
       date: "2026-10-10",
-      title: "Geography Daily Test â€” Mixed Revision",
+      title: "Geography Daily Test — Mixed Revision",
       topic: "Prelims-Oriented Mixed MCQs",
       category: "MIXED REVISION",
       description: "Integrated practice across physical, Indian and world geography.",
@@ -346,7 +346,7 @@ function isFirebaseConfigured() {
 
 async function initFirebase() {
   if (!isFirebaseConfigured()) {
-    setSyncStatus("error", "Firebase not configured â€” using local storage only");
+    setSyncStatus("error", "Firebase not configured — using local storage only");
     return false;
   }
 
@@ -357,7 +357,7 @@ async function initFirebase() {
 
     setSyncStatus("syncing", "Signing inâ€¦");
 
-    // Anonymous auth â€“ creates a persistent UID for this browser
+    // Anonymous auth “ creates a persistent UID for this browser
     const cred = await auth.signInAnonymously();
     currentUid = cred.user.uid;
 
@@ -379,7 +379,7 @@ async function initFirebase() {
     return true;
   } catch (err) {
     console.error("Firebase init error:", err);
-    setSyncStatus("error", "Cloud unavailable â€” local only");
+    setSyncStatus("error", "Cloud unavailable — local only");
     return false;
   }
 }
@@ -409,7 +409,7 @@ async function pushAttempt(testId, data) {
       setSyncStatus("synced", "Synced with cloud");
     } catch (e) {
       console.warn("Push failed:", e);
-      setSyncStatus("error", "Cloud write failed â€” saved locally");
+      setSyncStatus("error", "Cloud write failed — saved locally");
     }
   }
 }
@@ -677,7 +677,7 @@ function renderPerformance() {
     .map(id => {
       const t = CONFIG.tests.find(x => x.id === id);
       const rec = attempts[id];
-      return { id, title: t ? t.title : id, topic: t ? t.topic : "â€”", rec };
+      return { id, title: t ? t.title : id, topic: t ? t.topic : "—", rec };
     })
     .sort((a, b) => (b.rec.at || 0) - (a.rec.at || 0));
 
@@ -686,12 +686,12 @@ function renderPerformance() {
       ...items.map(item => {
         let detail = item.rec.completed ? "Completed" : "Started";
         if (item.rec.completed && typeof item.rec.score === "number" && typeof item.rec.total === "number") {
-          detail += ` Â· ${item.rec.score}/${item.rec.total}`;
+          detail += ` · ${item.rec.score}/${item.rec.total}`;
         }
         if (item.rec.at) {
-          detail += " Â· " + new Date(item.rec.at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+          detail += " · " + new Date(item.rec.at).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
         }
-        return el("li", null, el("strong", null, item.title), " Â· ", item.topic, " Â· ", detail);
+        return el("li", null, el("strong", null, item.title), " · ", item.topic, " · ", detail);
       })
     )
   );
@@ -746,7 +746,7 @@ function wire() {
         await db.ref(`users/${currentUid}/geoAttempts`).remove();
         setSyncStatus("synced", "History cleared");
       } catch (e) {
-        setSyncStatus("error", "Cloud clear failed â€” local cleared");
+        setSyncStatus("error", "Cloud clear failed — local cleared");
       }
     }
 
