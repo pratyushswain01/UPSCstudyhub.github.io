@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
@@ -287,6 +287,7 @@ mark.hl{background:color-mix(in srgb,var(--gold) 35%,transparent);color:inherit;
 .ex__steps{counter-reset:s;display:grid;gap:.6rem}
 .ex__steps li{counter-increment:s;display:grid;grid-template-columns:1.8rem 1fr;font:400 calc(1.02rem * var(--scale))/1.55 var(--font-serif);color:var(--ink-2)}
 .ex__steps li::before{content:counter(s);display:grid;place-items:center;width:1.35rem;height:1.35rem;margin-top:.2rem;border-radius:50%;border:1px solid var(--sage);font:600 .72rem var(--font-sans);color:var(--sage-ink)}
+.ex__text{font:400 calc(1.02rem * var(--scale))/1.6 var(--font-serif);color:var(--ink-2)}
 .ex__answer{margin-top:1rem;padding-top:.85rem;border-top:1px dashed var(--line-2);font:600 calc(1.05rem * var(--scale))/1.5 var(--font-serif);color:var(--accent)}
 
 /* Diagram */
@@ -475,12 +476,40 @@ a.pn:hover{border-color:var(--accent);transform:translateY(-2px)}
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.001ms!important;animation-delay:0s!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}
 }
+/* NCERT PDF panel */
+.pdfp{display:none}
+.js-pdf.icon-btn[aria-expanded="true"]{color:var(--gold-ink);background:var(--sage-soft);border-color:var(--line)}
+.pdfp__bar{display:flex;align-items:center;gap:.6rem;padding:.45rem .5rem .45rem .9rem;border-bottom:1px solid var(--line);background:var(--bg)}
+.pdfp__t{flex:1;min-width:0}
+.pdfp__t strong{display:block;font:600 .9rem/1.3 var(--font-serif);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pdfp__t small{display:block;font:400 .74rem/1.35 var(--font-sans);color:var(--muted)}
+.pdfp__bar a{font:500 .82rem var(--font-sans);white-space:nowrap}
+.pdfp__body{position:relative;flex:1;min-height:0;background:var(--paper-2)}
+.pdfp__body iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
+.pdfp__grip{position:absolute;left:-7px;top:0;bottom:0;width:14px;cursor:col-resize;touch-action:none;z-index:3}
+.pdfp__grip::after{content:"";position:absolute;left:5px;top:50%;width:4px;height:48px;margin-top:-24px;border-radius:3px;background:var(--line-2);transition:background-color .2s,height .2s,margin .2s}
+.pdfp__grip:hover::after,.pdfp__grip:focus-visible::after,body.pdf-drag .pdfp__grip::after{background:var(--accent);height:72px;margin-top:-36px}
+body.pdf-drag{user-select:none;cursor:col-resize}
+body.pdf-drag .pdfp__body iframe{pointer-events:none}
+@media (min-width:720px){
+  .pdfp{display:flex;flex-direction:column;position:fixed;z-index:40;right:0;top:var(--hdr-h);height:calc(100vh - var(--hdr-h));height:calc(100dvh - var(--hdr-h));width:var(--pdf-w,45%);background:var(--paper);border-left:1px solid var(--line-2);box-shadow:-12px 0 30px -24px rgba(0,0,0,.5);transition:top .3s ease,height .3s ease}
+  body.pdf-open .shell{max-width:none;margin:0 var(--pdf-w,45%) 0 0;gap:28px;padding-right:clamp(16px,2.5vw,32px)}
+}
+@media (min-width:1024px) and (max-width:1699.98px){
+  body.pdf-open .shell{grid-template-columns:minmax(0,1fr)}
+  body.pdf-open .side{position:fixed;z-index:70;left:0;top:0;bottom:0;max-height:none;width:min(88vw,340px);overflow:auto;padding:1rem 1.1rem 2rem;background:var(--paper);border-right:1px solid var(--line-2);box-shadow:var(--shadow);transform:translateX(-104%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.7,.2,1),visibility 0s .32s}
+  body.pdf-open .side.is-open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.7,.2,1),visibility 0s}
+  body.pdf-open .side__close,body.pdf-open .menu-btn{display:inline-grid}
+  body.pdf-open .scrim:not([hidden]){display:block!important;position:fixed;inset:0;z-index:65;background:rgba(21,28,25,.45)}
+}
 body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk--h3{display:none}
 
 @media print{
   :root{--bg:#fff;--paper:#fff;--paper-2:#fff;--ink:#000;--ink-2:#111;--muted:#333;--line:#bbb;--line-2:#999;--sage-soft:#f1f1f1;--gold-soft:#f5f5f5;--bad-soft:#f5f5f5;--ok-soft:#f5f5f5}
   .hdr,.side,.scrim,.hero__contours,.hero__no,.hero__actions,.hlbtn,.toast,.resume,.term-pop,dialog,.quiz-actions,.finish,.rev-bar,.quick-note{display:none!important}
   body{font-size:11pt;background:#fff}
+  .pdfp{display:none!important}
+  body.pdf-open .shell{margin:0!important}
   .shell{display:block;padding:0;max-width:none}
   a{color:#000;text-decoration:none}
   .hero>*{animation:none!important}
@@ -524,7 +553,10 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
       <button class="icon-btn search-icon" id="searchIcon" type="button" aria-label="Search this chapter">
         <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
       </button>
-      <button class="icon-btn" id="bmBtn" type="button" aria-pressed="false" aria-label="Bookmark this chapter">
+      <button class="icon-btn js-pdf" id="pdfBtn" type="button" aria-controls="pdfPane" aria-label="Open NCERT PDF" title="NCERT PDF" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H7a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1V7z"/><path d="M14 3v4h4M9 13h6M9 17h4"/></svg>
+      </button>
+<button class="icon-btn" id="bmBtn" type="button" aria-pressed="false" aria-label="Bookmark this chapter">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3.5h10a1 1 0 0 1 1 1V21l-6-4.2L6 21V4.5a1 1 0 0 1 1-1z"/></svg>
       </button>
       <button class="icon-btn theme-btn" id="themeBtn" type="button" aria-label="Switch to dark theme">
@@ -577,6 +609,7 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
 
     <section class="panel" aria-labelledby="stH">
       <h2 class="side__h" id="stH">Study tools</h2>
+      <button class="tool js-pdf" id="pdfTool" type="button" hidden><span class="js-pdf-label">Read with NCERT PDF</span></button>
       <button class="tool" id="openNotes" type="button"><span>Notes and highlights</span><span class="pill" id="notesCount"></span></button>
       <button class="tool" id="openLib" type="button"><span>Saved chapters</span><span class="pill" id="libCount"></span></button>
       <button class="tool" id="printBtn" type="button"><span>Print this chapter</span></button>
@@ -604,7 +637,7 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
               <li><b>Core concept</b> The main ideas of the chapter.</li>
               <li><b>Enrichment</b> Extra context beyond the core text.</li>
               <li><b>UPSC relevance</b> Why a fact is useful for the examination.</li>
-              <li><b>Sample practice</b> Questions written for this demonstration, not official.</li>
+              <li id="legendSample"><b>Sample practice</b> Questions written for this demonstration, not official.</li>
               <li><b>NCERT-derived</b> and <b>official PYQ</b> labels appear only when verified source details are supplied.</li>
             </ul>
           </aside>
@@ -612,6 +645,7 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
         <div class="hero__actions">
           <a class="btn btn--primary" id="startBtn" href="#">Start reading</a>
           <button class="btn js-complete" type="button">Mark chapter complete</button>
+          <button class="btn js-pdf" type="button" hidden><span class="js-pdf-label">Read with NCERT PDF</span></button>
         </div>
         <p class="demo-note" id="demoNote" hidden><strong>Demonstration content.</strong> This chapter was written as original explanatory text to show the reader. It is not quoted from NCERT and has not been checked against a specific NCERT edition. Its practice questions are samples, not official NCERT or UPSC questions.</p>
       </header>
@@ -623,6 +657,17 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
     <noscript><p class="note">This reader needs JavaScript to display the chapter.</p></noscript>
   </main>
 </div>
+
+<!-- NCERT PDF panel (laptop and tablet). On phones the PDF opens in its own page. -->
+<aside class="pdfp" id="pdfPane" aria-label="NCERT chapter PDF" hidden>
+  <div class="pdfp__grip" id="pdfGrip" role="separator" aria-orientation="vertical" aria-label="Resize PDF panel (arrow keys, double-click to reset)" aria-valuemin="25" aria-valuemax="70" aria-valuenow="45" tabindex="0"></div>
+  <div class="pdfp__bar">
+    <div class="pdfp__t"><strong id="pdfTitle">NCERT chapter PDF</strong><small id="pdfHint">If the PDF does not appear, open it in a new tab.</small></div>
+    <a id="pdfNew" href="#" target="_blank" rel="noopener noreferrer">Open in new tab</a>
+    <button class="icon-btn" id="pdfClose" type="button" aria-label="Close PDF panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+  </div>
+  <div class="pdfp__body"><iframe id="pdfFrame" title="NCERT chapter PDF"></iframe></div>
+</aside>
 
 <!-- Search -->
 <dialog class="dlg dlg--search" id="searchDlg" aria-label="Search this chapter">
@@ -849,14 +894,14 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
 </script>
 
 <script>
-(async function () {
+(function () {
 'use strict';
 
 /* =====================================================================
    SITE SETTINGS. Change the logo here, in one line.
    ===================================================================== */
 var SITE = {
-  logoSrc: '../../assets/logo.png',   // <-- put the path to YOUR logo here (relative to this file)
+  logoSrc: '../../assets/upsc-gurukul-logo.png',   // <-- path to YOUR logo, relative to this file
   logoAlt: 'UPSC Gurukul',
   homeHref: '../../index.html',
   brandName: 'UPSC Gurukul',
@@ -917,111 +962,256 @@ var store = {
 };
 
 /* ---------- data and saved state ---------- */
-var DATA;
-function normalizeChapter(data) {
-  if (!data || !data.meta || !Array.isArray(data.sections)) {
-    throw new Error('Invalid chapter JSON structure.');
+/* =====================================================================
+   CHAPTER LOADING
+   One path for every chapter: get the raw JSON (embedded demo or fetched
+   file), normalise it to the shape the renderer expects, then build the
+   page. Nothing below is specific to any one chapter.
+   ===================================================================== */
+var CALLOUT_KEYS = ['concept', 'upsc', 'enrich', 'caution', 'ncert'];
+function str(v) { return v == null ? '' : String(v); }
+function arr(v) { return Array.isArray(v) ? v : []; }
+function slug(s) { return str(s).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, ''); }
+function safeHref(h) {
+  h = str(h).trim();
+  if (!h) return '';
+  return (/^[a-z][a-z0-9+.\-]*:/i.test(h) && !/^https?:/i.test(h)) ? '' : h;
+}
+function userError(message, cause) { var e = new Error(message); e.userMessage = message; e.cause = cause; return e; }
+
+function normBlocks(list) { return arr(list).map(normBlock).filter(Boolean); }
+function normBlock(b) {
+  if (!b || typeof b !== 'object') return null;
+  var t = str(b.t || b.type);
+  var o = {};
+  Object.keys(b).forEach(function (k) { if (k !== 'type') o[k] = b[k]; });
+  o.t = t;
+  switch (t) {
+    case 'p': case 'h3': case 'quote':
+      o.text = str(b.text);
+      return o.text ? o : null;
+    case 'list':
+      o.items = arr(b.items).map(str).filter(Boolean);
+      o.ordered = !!b.ordered;
+      return o.items.length ? o : null;
+    case 'def':
+      o.term = str(b.term); o.text = str(b.text);
+      return (o.term && o.text) ? o : null;
+    case 'callout':
+      o.variant = CALLOUT_KEYS.indexOf(b.variant) > -1 ? b.variant : 'concept';
+      o.title = str(b.title); o.text = str(b.text);
+      return o.text ? o : null;
+    case 'table':
+      o.head = arr(b.head || b.headers).map(str);
+      o.rows = arr(b.rows).map(function (r) { return arr(r).map(str); }).filter(function (r) { return r.length; });
+      o.caption = str(b.caption);
+      delete o.headers;
+      return o.rows.length ? o : null;
+    case 'example':
+      o.title = str(b.title); o.text = str(b.text); o.answer = str(b.answer);
+      o.steps = arr(b.steps).map(str).filter(Boolean);
+      return (o.steps.length || o.text || o.answer) ? o : null;
+    case 'diagram':
+      o.kind = str(b.kind); o.caption = str(b.caption); o.alt = str(b.alt || b.caption);
+      return o.kind ? o : null;
+    case 'sequence':
+      o.title = str(b.title);
+      o.steps = arr(b.steps).map(function (s) { return { label: str(s && s.label), text: str(s && s.text) }; })
+        .filter(function (s) { return s.label || s.text; });
+      return o.steps.length ? o : null;
+    case 'expand':
+      o.summary = str(b.summary); o.blocks = normBlocks(b.blocks);
+      return (o.summary && o.blocks.length) ? o : null;
+    default:
+      console.warn('Chapter loader: skipping unsupported block type "' + t + '".');
+      return null;
   }
+}
+function navLink(x) {
+  var href = x && safeHref(x.href), title = x && str(x.title).trim();
+  return (href && title) ? { href: href, title: title } : null;
+}
 
-  data.meta = data.meta || {};
-  if (/^\d+$/.test(String(data.meta.class))) {
-    data.meta.class = 'Class ' + data.meta.class;
-  }
+/* Optional "pdf" in chapter JSON: "pdfs/ch01.pdf"  or  { "href": "...", "title": "...", "page": 3 } */
+function normPdf(p) {
+  if (p == null || p === '') return null;
+  if (typeof p === 'string') p = { href: p };
+  if (typeof p !== 'object') return null;
+  var href = safeHref(p.href || p.url || p.src);
+  if (!href) return null;
+  var pg = Number(p.page);
+  return { href: href, title: str(p.title).trim() || 'NCERT chapter PDF', page: pg > 0 ? Math.floor(pg) : 0 };
+}
 
-  data.meta.subjectHref = data.meta.subjectHref || '../index.html';
-  data.objectives = Array.isArray(data.objectives) ? data.objectives : [];
-  data.questions = Array.isArray(data.questions) ? data.questions : [];
+function normalizeChapter(raw) {
+  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('The file is not a JSON object.');
+  var m = raw.meta;
+  if (!m || typeof m !== 'object') throw new Error('It has no "meta" section.');
+  if (!str(m.title).trim()) throw new Error('It has no title (meta.title).');
+  if (!Array.isArray(raw.sections) || !raw.sections.length) throw new Error('It has no sections.');
 
-  function normalizeBlock(b) {
-    if (!b || typeof b !== 'object') return b;
+  var d = { schemaVersion: raw.schemaVersion || 1, demo: raw.demo === true };
+  var cls = str(m.class).trim();
+  d.meta = {
+    class: /^\d+$/.test(cls) ? 'Class ' + cls : cls,
+    subject: str(m.subject).trim() || 'Geography',
+    chapterNo: Number(m.chapterNo) > 0 ? Number(m.chapterNo) : 1,
+    title: str(m.title).trim(),
+    intro: str(m.intro),
+    subjectHref: safeHref(m.subjectHref) || '../index.html',
+    prev: navLink(m.prev),
+    next: navLink(m.next)
+  };
+  d.id = str(raw.id).trim() || slug(cls + ' ' + d.meta.subject + ' ' + d.meta.chapterNo + ' ' + d.meta.title);
+  d.objectives = arr(raw.objectives).map(str).filter(Boolean);
+  d.pdf = normPdf(raw.pdf != null ? raw.pdf : m.pdf);
 
-    b.t = b.t || b.type;
-
-    if (b.t === 'example' && !Array.isArray(b.steps)) {
-      b.t = 'p';
-      b.text = (b.title ? b.title + ': ' : '') + (b.text || '');
-    }
-
-    if (b.t === 'table') {
-      b.caption = b.caption || b.title || 'Comparison';
-      b.head = b.head || b.headers || b.columns || [];
-      b.rows = b.rows || [];
-    }
-
-    if (b.t === 'list') b.items = b.items || [];
-    if (b.t === 'callout') b.variant = b.variant || 'note';
-
-    if (b.t === 'expand' && Array.isArray(b.blocks)) {
-      b.blocks.forEach(normalizeBlock);
-    }
-
-    return b;
-  }
-
-  data.sections.forEach(function (s) {
-    s.blocks = Array.isArray(s.blocks) ? s.blocks : [];
-    s.blocks.forEach(normalizeBlock);
+  var used = { revise: true, practice: true };
+  d.sections = raw.sections.map(function (s, i) {
+    s = (s && typeof s === 'object') ? s : {};
+    var title = str(s.title).trim() || 'Section ' + (i + 1);
+    var base = slug(s.id) || slug(title) || 'section-' + (i + 1), id = base, n = 2;
+    while (used[id]) { id = base + '-' + n; n += 1; }
+    used[id] = true;
+    return { id: id, title: title, blocks: normBlocks(s.blocks) };
   });
 
-  data.revision = Object.assign({
-    takeaways: [],
-    summary: [],
-    flashcards: [],
-    recall: [],
-    misconceptions: [],
-    tableRef: null
-  }, data.revision || {});
+  var r = (raw.revision && typeof raw.revision === 'object') ? raw.revision : {};
+  var summary = Array.isArray(r.summary) ? r.summary.map(str)
+    : str(r.summary).replace(/([.!?])\s+/g, '$1\u0001').split('\u0001');
+  d.revision = {
+    takeaways: arr(r.takeaways).map(str).filter(Boolean),
+    summary: summary.map(function (x) { return x.trim(); }).filter(Boolean),
+    flashcards: arr(r.flashcards).map(function (f) { return { q: str(f && f.q), a: str(f && f.a) }; })
+      .filter(function (f) { return f.q && f.a; }),
+    recall: arr(r.recall).map(function (x) { return { prompt: str(x && x.prompt), model: str(x && x.model) }; })
+      .filter(function (x) { return x.prompt && x.model; }),
+    misconceptions: arr(r.misconceptions).map(function (x) { return { myth: str(x && x.myth), fact: str(x && x.fact) }; })
+      .filter(function (x) { return x.myth && x.fact; }),
+    tableRef: str(r.tableRef)
+  };
 
-  data.revision.takeaways = data.revision.takeaways || [];
-  data.revision.summary = data.revision.summary || [];
-  data.revision.flashcards = data.revision.flashcards || [];
-  data.revision.recall = data.revision.recall || [];
-  data.revision.misconceptions = data.revision.misconceptions || [];
+  /* A question may point at a section by id ("types"), by full id ("sec-types") or by title. */
+  function refTo(ref) {
+    var s = str(ref).trim(), low = s.toLowerCase();
+    if (!s) return '';
+    for (var i = 0; i < d.sections.length; i++) {
+      var sec = d.sections[i];
+      if (s === sec.id || s === 'sec-' + sec.id || low === sec.title.toLowerCase() || low === slug(sec.title)) return 'sec-' + sec.id;
+    }
+    return '';
+  }
+  var qUsed = {};
+  d.questions = arr(raw.questions).map(function (q, i) {
+    q = (q && typeof q === 'object') ? q : {};
+    var options = arr(q.options).map(str), ans = Number(q.answer);
+    if (!str(q.q).trim() || options.length < 2 || q.answer == null || q.answer === '' || ans % 1 !== 0 || ans < 0 || ans >= options.length) {
+      console.warn('Chapter loader: skipping question ' + (i + 1) + ' because it is incomplete or its answer is out of range.');
+      return null;
+    }
+    var qid = slug(q.id) || 'q' + (i + 1);
+    if (qUsed[qid]) qid = qid + '-' + (i + 1);
+    qUsed[qid] = true;
+    return { id: qid, q: str(q.q).trim(), options: options, answer: ans, why: str(q.why), ref: refTo(q.ref) };
+  }).filter(Boolean);
 
-  data.questions.forEach(function (q) {
-    q.options = q.options || [];
-    q.why = q.why || '';
+  var src = arr(raw.sources).map(function (s) {
+    return typeof s === 'string' ? { label: s, note: '', href: '' }
+      : { label: str(s && s.label), note: str(s && s.note), href: safeHref(s && s.href) };
+  }).filter(function (s) { return s.label; });
+  if (!src.length && str(raw.sourceNote).trim()) src = [{ label: 'About this material', note: str(raw.sourceNote).trim(), href: '' }];
+  d.sources = src;
+  return d;
+}
 
-    var section = data.sections.find(function (s) {
-      return s.title === q.ref || s.id === q.ref;
+/* Chapter files must live in the chapters folder next to this page. */
+function chapterRef(param) {
+  var p = str(param).trim();
+  if (!p) throw userError('No chapter file was named in the address.');
+  if (!/^[A-Za-z0-9_\-\/.]+\.json$/.test(p) || p.indexOf('..') > -1) throw userError('That chapter path is not valid.');
+  var base = new URL('chapters/', location.href), u = new URL(p, location.href);
+  if (u.origin !== base.origin || u.pathname.indexOf(base.pathname) !== 0) throw userError('Chapter files must be inside the chapters folder.');
+  return { url: u.href, key: u.pathname.slice(base.pathname.length) };
+}
+
+/* Opened straight from disk (file://), browsers forbid fetch(). A plain <script> is allowed, so the
+   reader then reads a companion "ch01.js" that sits next to "ch01.json" and stores the same data in
+   window.__UG_CHAPTERS. Websites (http/https) never use this route; they fetch the JSON itself. */
+function loadLocalChapter(ref) {
+  return new Promise(function (resolve, reject) {
+    var s = document.createElement('script');
+    s.src = ref.url.replace(/\.json$/i, '.js');
+    s.onload = function () {
+      var data = window.__UG_CHAPTERS && window.__UG_CHAPTERS[ref.key];
+      if (data) resolve(data);
+      else reject(userError('The local chapter file was found but does not contain "' + ref.key + '". Re-create it from the JSON file.'));
+    };
+    s.onerror = function () {
+      reject(userError('Opened from a local file, this page reads "' + ref.key.replace(/\.json$/i, '.js') + '" next to the JSON file, and it was not found. Create it with the make-local-chapters.ps1 script, or open the page from the website.'));
+    };
+    document.head.appendChild(s);
+  });
+}
+
+function fetchChapter(param) {
+  return new Promise(function (resolve) { resolve(chapterRef(param)); }).then(function (ref) {
+    if (location.protocol === 'file:') return loadLocalChapter(ref);
+    return fetch(ref.url, { cache: 'no-cache', credentials: 'same-origin' }).then(function (res) {
+      if (!res.ok) {
+        throw userError(res.status === 404
+          ? 'The chapter file was not found. Check the link or the file path.'
+          : 'The server returned an error (' + res.status + ') for the chapter file.');
+      }
+      return res.text();
+    }, function (err) {
+      throw userError('The chapter file could not be downloaded. Check your internet connection and try again.', err);
+    }).then(function (text) {
+      try { return JSON.parse(text); } catch (e) { throw userError('The chapter file is not valid JSON.', e); }
     });
-
-    if (section) q.ref = 'sec-' + section.id;
   });
-
-  return data;
 }
 
-try {
-  var chapterPath = new URLSearchParams(window.location.search).get('chapter');
-
-  if (chapterPath) {
-    var chapterURL = new URL(chapterPath, window.location.href);
-
-    if (chapterURL.origin !== window.location.origin) {
-      throw new Error('Chapter URL must use the same website.');
-    }
-
-    var chapterResponse = await fetch(chapterURL.href, { cache: 'no-cache' });
-
-    if (!chapterResponse.ok) {
-      throw new Error('Chapter file returned HTTP ' + chapterResponse.status);
-    }
-
-    DATA = normalizeChapter(await chapterResponse.json());
-  } else {
-    DATA = JSON.parse($('#chapter-data').textContent);
-  }
-} catch (e) {
-  $('#chTitle').textContent = 'The chapter could not be loaded.';
-  $('#lede').textContent = e.message;
-  console.error('Chapter loading error:', e);
-  return;
+function showLoadError(title, message) {
+  document.title = title + ' · ' + SITE.brandName;
+  $('#chTitle').textContent = title;
+  $('#kicker').textContent = 'Chapter unavailable';
+  $('#lede').textContent = message;
+  var cols = $('.hero__cols'); if (cols) cols.hidden = true;
+  $('#demoNote').hidden = true;
+  $('#quickNote').hidden = true;
+  $('#reading').replaceChildren();
+  $('#after').replaceChildren();
+  $('.hero__actions').replaceChildren(el('a', { class: 'btn btn--primary', href: '../index.html' }, 'Back to Geography'));
 }
+
+function boot() {
+  var params = new URLSearchParams(location.search);
+  var source = params.has('chapter')
+    ? fetchChapter(params.get('chapter'))
+    : Promise.resolve().then(function () {
+        try { return JSON.parse($('#chapter-data').textContent); }
+        catch (e) { throw userError('The built-in chapter data could not be read.', e); }
+      });
+  source.then(function (raw) {
+    var d;
+    try { d = normalizeChapter(raw); }
+    catch (e) { throw userError('This chapter file could not be used. ' + e.message, e); }
+    try { run(d); }
+    catch (e) {
+      console.error('Chapter render error:', e);
+      showLoadError('This chapter could not be displayed.', 'Something went wrong while building the page. The details are in the browser console.');
+    }
+  }).catch(function (e) {
+    console.error('Chapter load error:', e);
+    showLoadError('This chapter could not be loaded.', (e && e.userMessage) || 'An unexpected error occurred.');
+  });
+}
+
+function run(DATA) {
 
 var CK = 'ug.reader.' + DATA.id;
 var C = Object.assign({ visited: [], completed: false, completedAt: null, pos: null, notes: '', highlights: [], answers: {}, bookmarked: false }, store.get(CK, {}));
-var G = Object.assign({ fs: 1, quick: false }, store.get('ug.reader.settings', {}));
+var G = Object.assign({ fs: 1, quick: false, pdfOpen: false, pdfW: 45 }, store.get('ug.reader.settings', {}));
 function saveC() { store.set(CK, C); }
 function saveG() { store.set('ug.reader.settings', G); }
 
@@ -1162,22 +1352,24 @@ function block(b, ctx) {
         b.title ? el('p', { class: 'callout__title' }, b.title) : null,
         el('p', { class: 'callout__text', dataset: { hl: id } }, inline(b.text)));
     case 'table':
-      reg(id, ctx, [b.caption, b.head.join(' '), b.rows.map(function (r) { return r.join(' '); }).join(' ')].join('. '));
+      reg(id, ctx, [b.caption, b.head.join(' '), b.rows.map(function (r) { return r.join(' '); }).join(' ')].filter(Boolean).join('. '));
       return el('figure', { class: 'blk blk--table', id: id },
-        el('figcaption', null, b.caption),
-        el('div', { class: 'table-wrap', tabindex: '0', role: 'region', 'aria-label': b.caption + ' (scrollable table)' },
+        b.caption ? el('figcaption', null, b.caption) : null,
+        el('div', { class: 'table-wrap', tabindex: '0', role: 'region', 'aria-label': (b.caption || 'Table') + ' (scrollable table)' },
           el('table', null,
-            el('thead', null, el('tr', null, b.head.map(function (h) { return el('th', { scope: 'col' }, h); }))),
+            b.head.length ? el('thead', null, el('tr', null, b.head.map(function (h) { return el('th', { scope: 'col' }, h); }))) : null,
             el('tbody', null, b.rows.map(function (r) {
               return el('tr', null, r.map(function (c, i) { return i === 0 ? el('th', { scope: 'row' }, c) : el('td', null, c); }));
             })))));
     case 'example':
-      reg(id, ctx, b.title + '. ' + b.steps.join(' ') + ' ' + b.answer);
-      return el('section', { class: 'blk blk--example', id: id, 'aria-label': 'Worked example' },
-        el('span', { class: 'ex__label' }, 'Worked example'),
-        el('p', { class: 'ex__title' }, b.title),
-        el('ol', { class: 'ex__steps' }, b.steps.map(function (t) { return el('li', null, el('span', null, t)); })),
-        el('p', { class: 'ex__answer' }, b.answer));
+      var exLabel = b.steps.length ? 'Worked example' : 'Example';
+      reg(id, ctx, (b.title ? b.title + '. ' : '') + b.steps.join(' ') + (b.text ? ' ' + b.text : '') + (b.answer ? ' ' + b.answer : ''));
+      return el('section', { class: 'blk blk--example', id: id, 'aria-label': exLabel },
+        el('span', { class: 'ex__label' }, exLabel),
+        b.title ? el('p', { class: 'ex__title' }, b.title) : null,
+        b.steps.length ? el('ol', { class: 'ex__steps' }, b.steps.map(function (t) { return el('li', null, el('span', null, t)); })) : null,
+        b.text ? el('p', { class: 'ex__text', dataset: { hl: id } }, inline(b.text)) : null,
+        b.answer ? el('p', { class: 'ex__answer' }, b.answer) : null);
     case 'diagram':
       var build = DIAGRAMS[b.kind];
       if (!build) { console.warn('Unknown diagram kind:', b.kind); return null; }
@@ -1238,6 +1430,8 @@ function buildHero() {
   $('#lede').textContent = META.intro;
   $('#startBtn').setAttribute('href', '#' + OUT[0].id);
   $('#demoNote').hidden = !DATA.demo;
+  $('#legendSample').hidden = !DATA.demo;
+  $('.objectives').hidden = !DATA.objectives.length;
   var words = INDEX.reduce(function (n, i) { return n + i.text.split(/\s+/).length; }, 0);
   $('#heroMeta').append(
     el('li', null, 'Reading time ', el('strong', null, 'about ' + Math.max(1, Math.round(words / 200)) + ' min')),
@@ -1277,14 +1471,20 @@ function buildRevise() {
     el('span', null, 'Everything here comes from the chapter above. Use quick revision mode to hide the long-form text everywhere.'),
     el('button', { class: 'btn', type: 'button', dataset: { quickToggle2: '1' }, on: { click: function () { setQuick(!G.quick); } } }, 'Toggle quick revision')));
 
-  var tk = el('ol', { class: 'takeaways' }, R.takeaways.map(function (t, i) { reg('rv-t' + i, ctx, t); return el('li', { id: 'rv-t' + i }, t); }));
-  parts.push(el('div', { class: 'rev' }, el('h3', null, 'Key takeaways'), tk));
+  if (R.takeaways.length) {
+    var tk = el('ol', { class: 'takeaways' }, R.takeaways.map(function (t, i) { reg('rv-t' + i, ctx, t); return el('li', { id: 'rv-t' + i }, t); }));
+    parts.push(el('div', { class: 'rev' }, el('h3', null, 'Key takeaways'), tk));
+  }
 
-  parts.push(el('div', { class: 'rev' }, el('h3', null, 'Important definitions'),
-    el('dl', { class: 'defs' }, defs.map(function (d, i) { reg('rv-d' + i, ctx, d.term + '. ' + d.text); return el('div', { id: 'rv-d' + i }, el('dt', null, d.term), el('dd', null, d.text)); }))));
+  if (defs.length) {
+    parts.push(el('div', { class: 'rev' }, el('h3', null, 'Important definitions'),
+      el('dl', { class: 'defs' }, defs.map(function (d, i) { reg('rv-d' + i, ctx, d.term + '. ' + d.text); return el('div', { id: 'rv-d' + i }, el('dt', null, d.term), el('dd', null, d.text)); }))));
+  }
 
-  parts.push(el('div', { class: 'rev' }, el('h3', null, 'One-page summary'),
-    el('div', { class: 'sheet', id: 'rv-sheet' }, el('h4', null, META.title), el('ul', null, R.summary.map(function (t) { reg('rv-sheet', ctx, t); return el('li', null, t); })))));
+  if (R.summary.length) {
+    parts.push(el('div', { class: 'rev' }, el('h3', null, 'One-page summary'),
+      el('div', { class: 'sheet', id: 'rv-sheet' }, el('h4', null, META.title), el('ul', null, R.summary.map(function (t) { reg('rv-sheet', ctx, t); return el('li', null, t); })))));
+  }
 
   var grid = el('div', { class: 'flash-grid' });
   R.flashcards.forEach(function (f, i) {
@@ -1304,16 +1504,16 @@ function buildRevise() {
     $$('.flash', grid).forEach(function (c) { var q = $('.flash__q', c), a = $('.flash__a', c); a.hidden = !show; q.setAttribute('aria-expanded', String(show)); c.classList.toggle('is-open', show); q.lastChild.textContent = show ? 'Select to hide the answer' : 'Select to show the answer'; });
     flashBtn.textContent = show ? 'Hide all answers' : 'Show all answers';
   });
-  parts.push(el('div', { class: 'rev rev--wide' }, el('h3', null, 'Flashcards', flashBtn), grid));
+  if (R.flashcards.length) parts.push(el('div', { class: 'rev rev--wide' }, el('h3', null, 'Flashcards', flashBtn), grid));
 
-  parts.push(el('div', { class: 'rev' }, el('h3', null, 'Active recall'),
+  if (R.recall.length) parts.push(el('div', { class: 'rev' }, el('h3', null, 'Active recall'),
     el('p', { style: 'font-size:.92rem;color:var(--muted);margin-bottom:.4rem' }, 'Answer aloud or on paper first, then open the model answer.'),
     R.recall.map(function (r, i) {
       reg('rv-r' + i, ctx, r.prompt);
       return el('details', { class: 'recall', id: 'rv-r' + i }, el('summary', null, r.prompt), el('div', { class: 'expand__body' }, el('strong', null, 'Model answer'), r.model));
     })));
 
-  parts.push(el('div', { class: 'rev rev--wide' }, el('h3', null, 'Common misconceptions'),
+  if (R.misconceptions.length) parts.push(el('div', { class: 'rev rev--wide' }, el('h3', null, 'Common misconceptions'),
     el('div', { class: 'myths' }, R.misconceptions.map(function (m, i) {
       reg('rv-m' + i, ctx, m.myth + ' ' + m.fact);
       return el('div', { class: 'myth', id: 'rv-m' + i }, el('div', { class: 'm' }, el('b', null, 'Myth'), el('p', null, m.myth)), el('div', { class: 'f' }, el('b', null, 'Fact'), el('p', null, m.fact)));
@@ -1324,6 +1524,8 @@ function buildRevise() {
     DATA.sections.some(function (s) { tb = findBlock(s.blocks, R.tableRef); return !!tb; });
     if (tb) { var node = block(tb, ctx); node.id = 'rv-table'; parts.push(el('div', { class: 'rev rev--wide' }, el('h3', null, 'Compare at a glance'), node)); }
   }
+
+  if (parts.length === 1) parts.push(el('p', { class: 'empty' }, 'Revision notes for this chapter have not been added yet.'));
 
   $('#reading').append(el('section', { class: 'sec sec--revise', id: 'sec-revise', 'aria-labelledby': 'h-revise' },
     el('header', { class: 'sec__head' },
@@ -1339,7 +1541,7 @@ function buildPractice() {
       el('span', { class: 'sec__no', 'aria-hidden': 'true' }, pad(DATA.sections.length + 2)),
       el('h2', { id: 'h-practice' }, 'Check your understanding')),
     el('p', { class: 'blk', style: 'font:400 1.02rem/1.6 var(--font-serif);color:var(--ink-2)' }, 'Choose an answer to see immediate feedback. Your answers are kept on this device, and you can retry at any time.'),
-    el('span', { class: 'sample-flag' }, 'Sample practice questions written for this demonstration. These are not official NCERT or UPSC questions.'),
+    DATA.demo ? el('span', { class: 'sample-flag' }, 'Sample practice questions written for this demonstration. These are not official NCERT or UPSC questions.') : null,
     el('div', { class: 'quiz', id: 'quiz' }),
     el('div', { id: 'quizSum', 'aria-live': 'polite' }));
   $('#reading').append(sec);
@@ -1351,7 +1553,7 @@ function buildAfter() {
     el('h2', { id: 'fnH' }, 'Finished this chapter?'),
     el('p', null, 'Marking a chapter complete records that you have read it. It does not measure mastery. Your practice results and the Revise section are a better guide to what to revisit.'),
     el('button', { class: 'btn btn--primary js-complete', type: 'button' }, 'Mark chapter complete')));
-  host.append(el('section', { class: 'sources', 'aria-labelledby': 'srcH' },
+  if (DATA.sources.length) host.append(el('section', { class: 'sources', 'aria-labelledby': 'srcH' },
     el('h2', { id: 'srcH' }, 'Sources and provenance'),
     el('ol', null, DATA.sources.map(function (s) {
       return el('li', null, el('span', null,
@@ -1369,7 +1571,7 @@ function buildAfter() {
 function buildOutline() {
   var ol = $('#outline');
   OUT.forEach(function (o, i) {
-    ol.append(el('li', { dataset: { sec: o.id } }, el('a', { href: '#' + o.id, on: { click: function () { if (!mqDesk.matches) setDrawer(false, true); } } },
+    ol.append(el('li', { dataset: { sec: o.id } }, el('a', { href: '#' + o.id, on: { click: function () { if (isDrawer()) setDrawer(false, true); } } },
       el('span', { class: 'n' }, pad(i + 1)), el('span', null, o.title), el('span', { class: 'seen', 'aria-hidden': 'true' }))));
   });
   var segs = $('#segs');
@@ -1417,6 +1619,7 @@ var LETTERS = ['A', 'B', 'C', 'D', 'E'];
 function buildQuiz() {
   var quiz = $('#quiz');
   quiz.replaceChildren();
+  if (!DATA.questions.length) quiz.append(el('p', { class: 'quiz-empty' }, 'Practice questions for this chapter have not been added yet.'));
   DATA.questions.forEach(function (q, qi) {
     var card = el('div', { class: 'q', id: 'qc-' + q.id });
     var fb = el('div', { class: 'fb', 'aria-live': 'polite' });
@@ -1454,7 +1657,7 @@ function choose(q, oi) {
 function paintSummary() {
   var host = $('#quizSum'); host.replaceChildren();
   var st = stats(), quiz = $('#quiz');
-  if (st.attempted < st.total) { quiz.classList.remove('review'); return; }
+  if (!st.total || st.attempted < st.total) { quiz.classList.remove('review'); return; }
   var wrong = st.total - st.correct;
   var box = el('div', { class: 'quiz-sum' },
     el('div', { class: 'score' }, String(st.correct), el('small', null, ' / ' + st.total)),
@@ -1501,10 +1704,10 @@ function toast(msg) {
 var mqDesk = window.matchMedia('(min-width:1024px)');
 var side = $('#side'), scrim = $('#scrim'), menuBtn = $('#menuBtn');
 function syncInert() {
-  var closed = !mqDesk.matches && !side.classList.contains('is-open');
+  var closed = isDrawer() && !side.classList.contains('is-open');
   try { side.inert = closed; } catch (e) {}
   if (closed) side.setAttribute('aria-hidden', 'true'); else side.removeAttribute('aria-hidden');
-  try { $('#main').inert = !mqDesk.matches && side.classList.contains('is-open'); } catch (e) {}
+  try { $('#main').inert = isDrawer() && side.classList.contains('is-open'); } catch (e) {}
 }
 function setDrawer(open, silent) {
   side.classList.toggle('is-open', open); scrim.hidden = !open;
@@ -1512,6 +1715,94 @@ function setDrawer(open, silent) {
   document.body.classList.toggle('no-scroll', open);
   syncInert();
   if (open) { var a = $('a', side); if (a) a.focus(); } else if (!silent) { menuBtn.focus(); }
+}
+
+/* ---------- NCERT PDF panel ---------- */
+var PDF = DATA.pdf;
+var mqSplit = window.matchMedia('(min-width:720px)');
+var mqWide = window.matchMedia('(min-width:1700px)');
+var pane = $('#pdfPane'), frame = $('#pdfFrame'), grip = $('#pdfGrip');
+var IOS = /iP(ad|hone|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function listen(mq, fn) { if (mq.addEventListener) mq.addEventListener('change', fn); else if (mq.addListener) mq.addListener(fn); }
+function isDrawer() { return !mqDesk.matches || (document.body.classList.contains('pdf-open') && !mqWide.matches); }
+function layoutChanged() {
+  if (!isDrawer()) { side.classList.remove('is-open'); scrim.hidden = true; document.body.classList.remove('no-scroll'); menuBtn.setAttribute('aria-expanded', 'false'); }
+  syncInert();
+}
+function pdfUrl() {
+  if (!PDF) return '';
+  if (PDF.href.indexOf('#') > -1) return PDF.href;
+  return PDF.href + '#' + (PDF.page ? 'page=' + PDF.page + '&' : '') + 'view=FitH';
+}
+function vw() { return root.clientWidth || window.innerWidth; }
+function clampPct(p) {
+  var cw = vw(), lo = Math.max(25, 300 / cw * 100), hi = Math.min(70, (cw - 340) / cw * 100);
+  if (hi < lo) hi = lo; p = Number(p); if (!(p > 0)) p = 45;
+  return Math.min(hi, Math.max(lo, p));
+}
+function applyPdfW() {
+  var p = clampPct(G.pdfW);
+  root.style.setProperty('--pdf-w', Math.round(vw() * p / 100) + 'px');
+  grip.setAttribute('aria-valuenow', String(Math.round(p)));
+}
+function setPdfPct(p, keep) { G.pdfW = clampPct(p); applyPdfW(); if (!keep) saveG(); }
+function syncPdfUi() {
+  var split = mqSplit.matches, open = document.body.classList.contains('pdf-open');
+  var label = !split ? 'Open NCERT PDF in a new page' : (open ? 'Close NCERT PDF' : 'Read with NCERT PDF side by side');
+  $$('.js-pdf').forEach(function (b) {
+    b.hidden = !PDF;
+    var sp = $('.js-pdf-label', b);
+    if (sp) sp.textContent = !split ? 'Open NCERT PDF (new page)' : (open ? 'Close NCERT PDF' : 'Read with NCERT PDF');
+    else b.setAttribute('aria-label', label);
+    b.setAttribute('title', label);
+    if (split) b.setAttribute('aria-expanded', String(open)); else b.removeAttribute('aria-expanded');
+  });
+}
+function setPdf(open, silent) {
+  var b = document.body, on = !!(open && PDF && mqSplit.matches);
+  if (on === b.classList.contains('pdf-open')) { if (!silent) { G.pdfOpen = on; saveG(); } syncPdfUi(); return; }
+  var a = activeId && document.getElementById(activeId), off = a ? a.getBoundingClientRect().top : 0;
+  b.classList.toggle('pdf-open', on); pane.hidden = !on;
+  if (on) { if (!frame.getAttribute('src')) frame.setAttribute('src', pdfUrl()); applyPdfW(); }
+  else root.style.removeProperty('--pdf-w');
+  if (!silent) { G.pdfOpen = on; saveG(); }
+  layoutChanged(); syncPdfUi();
+  if (a) window.scrollTo({ top: window.scrollY + a.getBoundingClientRect().top - off, left: 0, behavior: 'instant' });
+  onScroll();
+}
+function togglePdf() {
+  if (!PDF) return;
+  if (side.classList.contains('is-open')) setDrawer(false, true);
+  if (!mqSplit.matches) { window.open(pdfUrl(), '_blank', 'noopener'); return; }
+  setPdf(!document.body.classList.contains('pdf-open'));
+}
+function setupPdf() {
+  if (PDF) {
+    $('#pdfTitle').textContent = PDF.title; frame.setAttribute('title', PDF.title);
+    $('#pdfNew').setAttribute('href', pdfUrl());
+    if (IOS) $('#pdfHint').textContent = 'On iPad, a panel may show only page 1. Use Open in new tab to read every page.';
+  }
+  $$('.js-pdf').forEach(function (b) { b.addEventListener('click', togglePdf); });
+  $('#pdfClose').addEventListener('click', function () { setPdf(false); var b = $('#pdfBtn'); if (b && !b.hidden) b.focus(); });
+  listen(mqDesk, layoutChanged); listen(mqWide, layoutChanged);
+  listen(mqSplit, function () { setPdf(G.pdfOpen, true); });
+  window.addEventListener('resize', debounce(function () { if (document.body.classList.contains('pdf-open')) applyPdfW(); }, 60));
+  var dragging = false;
+  grip.addEventListener('pointerdown', function (e) {
+    if (e.button > 0) return; e.preventDefault(); dragging = true;
+    try { grip.setPointerCapture(e.pointerId); } catch (x) {}
+    document.body.classList.add('pdf-drag');
+  });
+  grip.addEventListener('pointermove', function (e) { if (dragging) setPdfPct((vw() - e.clientX) / vw() * 100, true); });
+  function endDrag() { if (!dragging) return; dragging = false; document.body.classList.remove('pdf-drag'); saveG(); }
+  grip.addEventListener('pointerup', endDrag); grip.addEventListener('pointercancel', endDrag);
+  grip.addEventListener('dblclick', function () { setPdfPct(45); });
+  grip.addEventListener('keydown', function (e) {
+    var d = e.key === 'ArrowLeft' ? 3 : e.key === 'ArrowRight' ? -3 : 0;
+    if (d) { e.preventDefault(); setPdfPct(clampPct(G.pdfW) + d); }
+  });
+  syncPdfUi();
+  setPdf(G.pdfOpen, true);
 }
 
 /* ---------- key-term popover ---------- */
@@ -1699,10 +1990,10 @@ function wire() {
   na.value = C.notes;
   var saveNotes = debounce(function () { C.notes = na.value; saveC(); renderProgress(); $('#notesState').textContent = S.ok ? 'Saved on this device.' : 'Browser storage is off, so this note will be lost when you close the tab.'; }, 400);
   na.addEventListener('input', function () { $('#notesState').textContent = 'Saving…'; saveNotes(); });
-  $('#openNotes').addEventListener('click', function () { if (!mqDesk.matches) setDrawer(false, true); renderHlList(); $('#notesState').textContent = S.ok ? '' : 'Browser storage is off, so notes last only until you close the tab.'; openDlg(nd); });
+  $('#openNotes').addEventListener('click', function () { if (isDrawer()) setDrawer(false, true); renderHlList(); $('#notesState').textContent = S.ok ? '' : 'Browser storage is off, so notes last only until you close the tab.'; openDlg(nd); });
   $('#notesClose').addEventListener('click', function () { closeDlg(nd); });
   var ld = $('#libDlg');
-  $('#openLib').addEventListener('click', function () { if (!mqDesk.matches) setDrawer(false, true); renderLib(); openDlg(ld); });
+  $('#openLib').addEventListener('click', function () { if (isDrawer()) setDrawer(false, true); renderLib(); openDlg(ld); });
   $('#libClose').addEventListener('click', function () { closeDlg(ld); });
 
   document.addEventListener('click', function (e) {
@@ -1770,6 +2061,7 @@ function init() {
   renderBookmark();
   renderProgress();
   if (!S.ok) $('#storageNote').hidden = false;
+  setupPdf();
   wire();
   update();
 
@@ -1784,6 +2076,9 @@ function init() {
   }
 }
 init();
+}
+
+boot();
 })();
 </script>
 </body>
