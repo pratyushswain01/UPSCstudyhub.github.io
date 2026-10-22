@@ -1,40 +1,135 @@
-<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>UPSC Gurukul Games - learn chapter by chapter, by playing</title>
-<meta name="description" content="Subject-wise, chapter-wise UPSC games: practice, boss challenges, sorting, ordering, memory cards and a daily challenge.">
-<script>try{if(localStorage.getItem('ug-theme')==='dark')document.documentElement.setAttribute('data-theme','dark')}catch(e){}</script>
-<link rel="stylesheet" href="css/games.css"></head><body class="in-home">
-<header><a href="#/" class="logo"><span class="dot"></span>UPSC Gurukul Games</a><div class="row"><a href="../index.html" class="muted">Back to site</a><button class="btn" id="th" type="button">Theme</button></div></header>
-<div class="landing">
-<section class="hero"><div class="orb o1"></div><div class="orb o2"></div>
-<div class="hero-in"><div class="hero-txt">
-<p class="eyebrow rv">Free chapter-wise practice for UPSC aspirants</p>
-<h1 class="rv">Learn <span class="wordbox"><span id="word">Polity</span></span><br>one chapter at a time, by playing.</h1>
-<p class="lede rv">Pick a subject and chapter, play a quick game, read the explanation for every answer, then replay only what you missed.</p>
-<div class="row rv"><a class="btn pri big" href="#browse">Start playing</a><a class="btn big" href="#how">How it works</a></div>
-<p class="muted rv" style="margin-top:14px">No sign-up. Progress stays in your browser.</p></div>
-<div class="demo rv" aria-hidden="true"><span class="chip c1">Article 32</span><span class="chip c2">Godavari</span><span class="chip c3">1942</span><span class="chip c4">Repo rate</span>
-<div class="demo-card"><div class="row" style="justify-content:space-between"><span class="tag">Indian Polity</span><span class="tag s" id="demoStreak">Streak 0</span></div><h3 id="demoQ"></h3><div id="demoOpts"></div></div></div></div></section>
-<section class="stats rv"><div><b data-n="subjects" data-to="0">0</b><span>Subjects</span></div><div><b data-n="chapters" data-to="0">0</b><span>Playable chapters</span></div><div><b data-n="questions" data-to="0">0</b><span>Questions</span></div><div><b data-n="modes" data-to="0">0</b><span>Ways to play</span></div></section>
-<section class="sec"><h2 class="rv">Ten ways to play, one chapter at a time</h2><p class="muted rv">Every game is tied to a chapter, so practice always maps to the syllabus.</p>
-<div class="modes">
-<div class="mode rv"><i>1</i><b>Practice</b><span>Untimed, with an explanation after every answer.</span></div>
-<div class="mode rv"><i>2</i><b>Timed round</b><span>30 seconds a question for exam pressure.</span></div>
-<div class="mode rv"><i>3</i><b>Boss challenge</b><span>Three lives, questions get harder.</span></div>
-<div class="mode rv"><i>4</i><b>Fill in the blanks</b><span>Complete the Article, year or term.</span></div>
-<div class="mode rv"><i>5</i><b>Sort into groups</b><span>Fundamental Rights or DPSP? Bay of Bengal or Arabian Sea?</span></div>
-<div class="mode rv"><i>6</i><b>Rapid true/false</b><span>60 seconds, build a streak.</span></div>
-<div class="mode rv"><i>7</i><b>Chronology ordering</b><span>Put events in the right sequence.</span></div>
-<div class="mode rv"><i>8</i><b>Match the pairs</b><span>Articles to rights, rivers to cities.</span></div>
-<div class="mode rv"><i>9</i><b>Memory cards</b><span>Flip and find the matching pairs.</span></div>
-<div class="mode rv"><i>10</i><b>Review mistakes</b><span>Replay only the questions you missed.</span></div></div></section>
-<section class="sec" id="how"><h2 class="rv">How it works</h2><div class="steps">
-<div class="step rv"><i>1</i><b>Choose a subject</b><span>Polity, Geography, History, Economy, Environment or CSAT.</span></div>
-<div class="step rv"><i>2</i><b>Open a chapter</b><span>See your mastery, best score and mistakes to review.</span></div>
-<div class="step rv"><i>3</i><b>Play a game</b><span>Pick the format that suits your mood and time.</span></div>
-<div class="step rv"><i>4</i><b>Review and repeat</b><span>Read explanations, replay mistakes, and earn mastery honestly.</span></div></div></section>
-<section class="sec"><h2 class="rv">Browse by subject</h2><div class="tiles" id="subjTiles"></div></section>
-<section class="sec trust rv"><div><b>Honest by design</b><span>Starter questions are labelled unreviewed until checked against their source.</span></div><div><b>Mastery has to be earned</b><span>A chapter is mastered only after 80%+ accuracy with every question answered twice.</span></div><div><b>No fake leaderboards</b><span>Your scores and streaks stay private in your browser.</span></div></section>
-<div id="browse"></div></div>
-<main id="app"></main>
-<footer class="foot"><span>&copy; UPSC Gurukul. All rights reserved.</span><a href="../index.html">Back to UPSC Gurukul</a></footer>
-<script src="data/catalogue.js"></script><script src="data/questions.js"></script><script src="data/activities.js"></script><script src="js/app.js"></script><script src="js/landing.js"></script>
-</body></html>
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UPSC Gurukul Games – Learn by Playing</title>
+  <meta name="description" content="Subject-wise, chapter-wise UPSC games: practice, boss challenges, sorting, ordering, memory cards and a daily challenge.">
+  <script>
+    try {
+      if (localStorage.getItem('ug-theme') === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+      }
+    } catch (e) {}
+  </script>
+  <link rel="stylesheet" href="games.css">
+</head>
+<body class="in-home">
+
+  <!-- Floating particles background -->
+  <div class="particles" id="particles"></div>
+
+  <header>
+    <a href="#/" class="logo">
+      <span class="dot"></span>
+      UPSC Gurukul Games
+    </a>
+    <div class="row">
+      <a href="../index.html" class="muted">Back to site</a>
+      <button class="btn" id="th" type="button">Theme</button>
+    </div>
+  </header>
+
+  <div class="landing">
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="orb o1"></div>
+      <div class="orb o2"></div>
+      <div class="orb o3"></div>
+
+      <div class="hero-in">
+        <div class="hero-txt">
+          <p class="eyebrow rv">Free chapter-wise practice for UPSC aspirants</p>
+          <h1 class="rv">
+            Learn <span class="wordbox"><span id="word">Polity</span></span><br>
+            one chapter at a time, by playing.
+          </h1>
+          <p class="lede rv">
+            Pick a subject and chapter, play a quick game, read the explanation for every answer, then replay only what you missed.
+          </p>
+          <div class="row rv">
+            <a class="btn pri big" href="#browse">Start playing</a>
+            <a class="btn big" href="#how">How it works</a>
+          </div>
+          <p class="muted rv" style="margin-top:14px">No sign-up. Progress stays in your browser.</p>
+        </div>
+
+        <!-- Floating demo card -->
+        <div class="demo rv" aria-hidden="true">
+          <span class="chip c1">Article 32</span>
+          <span class="chip c2">Godavari</span>
+          <span class="chip c3">1942</span>
+          <span class="chip c4">Repo rate</span>
+
+          <div class="demo-card">
+            <div class="row" style="justify-content:space-between">
+              <span class="tag">Indian Polity</span>
+              <span class="tag s" id="demoStreak">Streak 0</span>
+            </div>
+            <h3 id="demoQ">Which Article gives the right to constitutional remedies?</h3>
+            <div class="dopts" id="demoOpts"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <div class="stats">
+      <div class="rv"><b data-n="subjects">0</b><span>Subjects</span></div>
+      <div class="rv"><b data-n="chapters">0</b><span>Chapters</span></div>
+      <div class="rv"><b data-n="questions">0</b><span>Questions</span></div>
+      <div class="rv"><b data-n="modes">0</b><span>Game Modes</span></div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <section class="sec" id="how">
+      <h2 class="rv">How it works</h2>
+      <p class="muted rv">Three simple steps to start mastering any chapter.</p>
+      <div class="steps">
+        <div class="step rv"><i>1</i><b>Pick a subject</b><span>Polity, History, Economy, Geography…</span></div>
+        <div class="step rv"><i>2</i><b>Choose a chapter</b><span>Play only what you need right now</span></div>
+        <div class="step rv"><i>3</i><b>Play & review</b><span>Get instant explanations after every answer</span></div>
+      </div>
+    </section>
+
+    <!-- GAME MODES -->
+    <section class="sec">
+      <h2 class="rv">Game Modes</h2>
+      <p class="muted rv">Different ways to test yourself.</p>
+      <div class="modes">
+        <a class="mode rv" href="#browse"><i>🎯</i><b>Quick Practice</b><span>Fast multiple-choice drills</span></a>
+        <a class="mode rv" href="#browse"><i>🔥</i><b>Boss Challenge</b><span>Harder timed questions</span></a>
+        <a class="mode rv" href="#browse"><i>🃏</i><b>Memory Cards</b><span>Match terms with definitions</span></a>
+        <a class="mode rv" href="#browse"><i>📊</i><b>Sorting & Ordering</b><span>Arrange events & concepts</span></a>
+      </div>
+    </section>
+
+    <!-- SUBJECTS -->
+    <div id="browse"></div>
+    <section class="sec">
+      <h2 class="rv">Browse Subjects</h2>
+      <p class="muted rv">Start with any subject you want to strengthen.</p>
+      <div class="tiles" id="tiles"></div>
+    </section>
+
+    <!-- TRUST -->
+    <section class="sec">
+      <h2 class="rv">Why students like it</h2>
+      <div class="trust">
+        <div class="rv"><b>Instant explanations</b><span>Every answer comes with a short, clear reason.</span></div>
+        <div class="rv"><b>Replay only mistakes</b><span>Focus on what you actually got wrong.</span></div>
+        <div class="rv"><b>No login required</b><span>Your progress is saved locally in the browser.</span></div>
+      </div>
+    </section>
+
+  </div>
+
+  <footer class="foot">
+    <span>© UPSC Gurukul Games</span>
+    <span>Made for serious aspirants</span>
+  </footer>
+
+  <script src="landing.js"></script>
+</body>
+</html>
