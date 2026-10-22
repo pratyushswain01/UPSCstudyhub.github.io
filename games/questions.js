@@ -1,0 +1,65 @@
+/* Question bank. Q(chapter,difficulty 1-3,question,options,answerIndex,explanation[,kind]).
+   Every starter question is unreviewed: check it against its source before relying on it. */
+(function(){
+var B=[],S=['1 only','2 only','Both 1 and 2','Neither 1 nor 2'];
+function Q(c,d,q,o,a,e,k){B.push({id:c+'-'+B.filter(function(x){return x.c===c}).length,c:c,d:d,q:q,o:o,a:a,e:e,f:o[0]!==S[0],k:k})}
+var c='fundamental-rights';
+Q(c,1,'Which Article lets a person move the Supreme Court directly to enforce Fundamental Rights?',['Article 32','Article 226','Article 136','Article 14'],0,'Article 32 is the right to constitutional remedies in the Supreme Court. Article 226 gives High Courts similar writ powers.');
+Q(c,1,'Article 21 protects:',['Equality before law','Life and personal liberty','Freedom of speech','Right against exploitation'],1,'No person may be deprived of life or personal liberty except by procedure established by law.');
+Q(c,1,'The writ of habeas corpus is issued to:',['Order an official to do a public duty','Produce a detained person before the court','Quash an order of a lower court','Question the authority of an office holder'],1,'Habeas corpus ("you may have the body") tests the legality of a detention.');
+Q(c,2,'Which of these is NOT a writ the courts can issue?',['Mandamus','Certiorari','Referendum','Quo warranto'],2,'The five writs are habeas corpus, mandamus, prohibition, certiorari and quo warranto.');
+Q(c,2,'The Right to Property is now:',['A Fundamental Right under Article 19','A legal right under Article 300A','A Directive Principle only','Not recognised at all'],1,'The 44th Amendment (1978) removed it from Fundamental Rights; Article 300A makes it a constitutional legal right.');
+Q(c,2,'Consider: 1. Article 17 abolishes untouchability. 2. Article 24 bars employing children below 14 in factories, mines or other hazardous work.',S,2,'Both statements match the constitutional text.');
+c='preamble';
+Q(c,1,'Which words did the 42nd Amendment (1976) add to the Preamble?',['Sovereign and Democratic','Socialist, Secular and Integrity','Justice and Liberty','Republic and Fraternity'],1,'The 42nd Amendment inserted "Socialist", "Secular" and "Integrity".');
+Q(c,2,'The Supreme Court held the Preamble is part of the Constitution in:',['Berubari Union (1960)','Kesavananda Bharati (1973)','Golaknath (1967)','Shankari Prasad (1951)'],1,'Berubari (1960) had said it was not; Kesavananda Bharati reversed that.');
+Q(c,2,'Consider: 1. The Preamble has been amended once, in 1976. 2. The Supreme Court has held it forms part of the Constitution.',S,2,'Both are correct.');
+c='basic-structure-doctrine';
+Q(c,1,'The Basic Structure doctrine was laid down in:',['Kesavananda Bharati v. State of Kerala (1973)','A.K. Gopalan v. State of Madras (1950)','Maneka Gandhi v. Union of India (1978)','S.R. Bommai v. Union of India (1994)'],0,'A 13-judge bench held Parliament may amend the Constitution but cannot destroy its basic structure.');
+c='emergency-provisions';
+Q(c,1,'President\'s Rule in a State is imposed under:',['Article 352','Article 356','Article 360','Article 368'],1,'Article 356 deals with failure of constitutional machinery in a State.');
+Q(c,1,'Financial Emergency is provided for in:',['Article 352','Article 356','Article 360','Article 368'],2,'Article 360 covers Financial Emergency; Article 352 covers National Emergency.');
+Q(c,2,'A National Emergency under Article 352 can be declared on grounds of:',['War, external aggression or armed rebellion','Failure of constitutional machinery in a State','Threat to financial stability','Any natural disaster'],0,'The 44th Amendment replaced "internal disturbance" with "armed rebellion".');
+c='indian-drainage-systems';
+Q(c,1,'Which river does NOT drain into the Bay of Bengal?',['Godavari','Krishna','Mahanadi','Narmada'],3,'The Narmada flows west into the Arabian Sea.');
+Q(c,1,'The longest river of peninsular India is the:',['Godavari','Krishna','Narmada','Kaveri'],0,'The Godavari is about 1,465 km long.');
+Q(c,2,'In Tibet the Brahmaputra is known as the:',['Tsangpo','Padma','Jamuna','Meghna'],0,'It is the Tsangpo in Tibet and the Siang or Dihang in Arunachal Pradesh.');
+c='physiographic-divisions-of-india';
+Q(c,2,'The highest peak located entirely within India is:',['Kangchenjunga','Nanda Devi','Mount Everest','Anamudi'],1,'Kangchenjunga lies on the India-Nepal border. Nanda Devi (7,816 m) is wholly in India.');
+Q(c,1,'Anamudi, the highest peak of peninsular India, lies in the:',['Western Ghats','Eastern Ghats','Aravallis','Vindhyas'],0,'Anamudi (about 2,695 m) is in the Anamalai Hills of the Western Ghats, Kerala.');
+c='indian-national-movement';
+Q(c,1,'The Indian National Congress was founded in:',['1857','1885','1905','1919'],1,'It was founded in December 1885.');
+Q(c,2,'The Lucknow Pact (1916) was between:',['Congress and the Muslim League','Congress and the British','Muslim League and the Sikhs','Swarajists and Gandhi'],0,'The two parties agreed on joint political demands.');
+Q(c,2,'Correct chronological order?',['Jallianwala Bagh, Non-Cooperation, Dandi March, Quit India','Non-Cooperation, Jallianwala Bagh, Quit India, Dandi March','Dandi March, Jallianwala Bagh, Non-Cooperation, Quit India','Jallianwala Bagh, Dandi March, Non-Cooperation, Quit India'],0,'1919, 1920, 1930, 1942.');
+Q(c,2,'The Gandhi-Irwin Pact was signed in:',['1930','1931','1932','1935'],1,'It was signed in March 1931.');
+c='monetary-policy';
+Q(c,1,'The Monetary Policy Committee has how many members?',['Four','Six','Seven','Nine'],1,'Three from the RBI and three external members named by the government.');
+Q(c,1,'The repo rate is the rate at which:',['Banks lend to the public','The RBI lends short-term funds to banks','The RBI borrows from banks','Banks lend to each other'],1,'Repo is the RBI\'s lending rate; reverse repo is its borrowing rate.');
+Q(c,2,'India\'s CPI inflation target framework (2016) is:',['2% with a band of 1%','4% with a band of 2%','6% with a band of 2%','5% with a band of 1%'],1,'The target is 4%, tolerance 2% either side. Check the current notification.');
+c='environmental-conventions';
+Q(c,1,'The Ramsar Convention (1971) deals with:',['Wetlands','The ozone layer','Desertification','Whaling'],0,'It is the treaty for conservation and wise use of wetlands.');
+Q(c,1,'The Montreal Protocol (1987) aims to phase out:',['Ozone-depleting substances','Greenhouse gases','Plastic waste','Hazardous waste trade'],0,'It controls substances such as CFCs.');
+Q(c,1,'The Paris Agreement on climate change was adopted in:',['1997','2009','2015','2021'],2,'It was adopted in December 2015.');
+c='percentages';
+Q(c,1,'20% of 250 is:',['40','50','60','25'],1,'250 x 0.20 = 50.');
+Q(c,2,'A price rises from 80 to 100. The percentage increase is:',['20%','25%','80%','125%'],1,'Increase 20 on base 80: 20/80 = 25%.');
+c='ratio-and-proportion';
+Q(c,1,'60 is divided in the ratio 2:3. The larger part is:',['24','30','36','40'],2,'3/5 of 60 = 36.');
+c='number-series';
+Q(c,1,'2, 6, 12, 20, 30, ?',['38','40','42','44'],2,'Differences 4, 6, 8, 10, 12, so the next term is 42.');
+c='time-and-work';
+Q(c,2,'A does a job in 10 days, B in 15 days. Working together they finish in:',['5 days','6 days','7 days','8 days'],1,'1/10 + 1/15 = 1/6 per day, so 6 days.');
+c='time-speed-and-distance';
+Q(c,1,'A car at 60 km/h for 2.5 hours covers:',['120 km','140 km','150 km','160 km'],2,'60 x 2.5 = 150 km.');
+Q(c,3,'100 km at 50 km/h, then 100 km at 100 km/h. Average speed?',['75 km/h','66.67 km/h','70 km/h','60 km/h'],1,'Total 200 km in 2 + 1 = 3 hours = 66.67 km/h.');
+function F(c,q,o,a,e){Q(c,2,q,o,a,e,'fill')}
+c='fundamental-rights';F(c,'The writ of ___ means "you may have the body".',['mandamus','habeas corpus','certiorari','prohibition'],1,'Habeas corpus tests the legality of a detention.');F(c,'The right to constitutional remedies is Article ___.',['21','32','226','300A'],1,'Article 32 lets a person approach the Supreme Court.');
+c='preamble';F(c,'The Preamble begins: "We, the ___ of India".',['Citizens','People','Representatives','Parliament'],1,'The Preamble opens with "We, the people of India".');
+c='emergency-provisions';F(c,'Financial Emergency is under Article ___.',['352','356','360','365'],2,'Article 360.');
+c='indian-drainage-systems';F(c,'The ___ is the longest river of peninsular India.',['Godavari','Kaveri','Tapi','Mahanadi'],0,'The Godavari, about 1,465 km.');F(c,'In Tibet the Brahmaputra is called the ___.',['Tsangpo','Padma','Meghna','Hooghly'],0,'Tsangpo in Tibet, Siang or Dihang in Arunachal Pradesh.');
+c='monetary-policy';F(c,'The rate at which the RBI lends short-term funds to banks is the ___ rate.',['reverse repo','repo','CRR','SLR'],1,'That is the repo rate.');
+c='indian-national-movement';F(c,'The Indian National Congress was founded in ___.',['1857','1885','1905','1919'],1,'December 1885.');
+c='environmental-conventions';F(c,'The ___ Protocol (1987) targets ozone-depleting substances.',['Kyoto','Montreal','Cartagena','Nagoya'],1,'The Montreal Protocol.');
+c='number-series';F(c,'The next term of 2, 6, 12, 20, 30 is ___.',['40','42','44','36'],1,'Differences rise by 2: 4, 6, 8, 10, 12, so 42.');
+window.UG_BANK=B;
+})();
