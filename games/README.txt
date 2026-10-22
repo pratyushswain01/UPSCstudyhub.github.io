@@ -1,5 +1,6 @@
 UPSC GURUKUL GAMES - folder guide
-index.html            page shell (open this)
+index.html            animated landing page + app shell (open this)
+js/landing.js         landing page: live numbers, rotating subject word, scroll reveals, demo card
 css/games.css         styling (uses the reader's colours and saved theme)
 js/app.js             views, game modes, scoring, progress, achievements
 data/catalogue.js     subjects and chapters (add a chapter title to a list)
