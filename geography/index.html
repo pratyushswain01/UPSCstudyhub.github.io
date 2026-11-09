@@ -324,42 +324,8 @@ const contours='<svg viewBox="0 0 200 260" preserveAspectRatio="xMidYMid slice" 
 const style=b=>`--c1:${b.c[0]};--c2:${b.c[1]}`;
 const cover=b=>`<div class="cov" style="${style(b)}">${contours}<i>${esc(b.badge)}</i><h4>${esc(b.title)}</h4><small>${esc(b.sub)}</small>${b.img?`<img src="${b.img}" alt="Cover of ${esc(b.title)}" loading="lazy" onerror="this.remove()">`:''}</div>`;
 const store={get(){try{return JSON.parse(localStorage.getItem('geo-done')||'{}')}catch(e){return{}}},set(k){try{const d=this.get();d[k]=!d[k];localStorage.setItem('geo-done',JSON.stringify(d))}catch(e){}}};
-/* Every catalogue chapter uses the same dynamic reader.
-   Add chapter JSON/JS files in the mapped folder; no chapter-number
-   allowlist needs updating. */
-const CHAPTER_FOLDERS = {
-  "ncert-8": "class-8",
-  "ncert-9": "class-9",
-  "ncert-10": "class-10",
-  "ncert-11a": "class-11/physical",
-  "ncert-11b": "class-11/india",
-  "mh-india": "majid-husain/india",
-  "mh-world": "majid-husain/world"
-};
-
-const chapterPath = (b, n) => {
-  const folder = CHAPTER_FOLDERS[b.id];
-  if (!folder) return null;
-  const number = String(n).padStart(2, "0");
-  return `chapters/${folder}/ch${number}.json`;
-};
-
-const chList = b => {
-  const d = store.get();
-  return `<ul class="chs">${b.ch.map((t, i) => {
-    const n = i + 1;
-    const path = chapterPath(b, n);
-    const href = path
-      ? `notes/reader.html?chapter=${path}`
-      : `#/read/${b.id}/${n}`;
-
-    return `<li>
-      <a class="${d[b.id+':'+n]?'done':''}" href="${href}">
-        <em>${n}</em>${esc(t)}
-      </a>
-    </li>`;
-  }).join('')}</ul>`;
-};
+const JSON_CHAPTERS = new Set([1,2]);
+const chList=b=>{const d=store.get();return `<ul class="chs">${b.ch.map((t,i)=>`<li><a class="${d[b.id+':'+(i+1)]?'done':''}" href="${b.id==="ncert-8"&&JSON_CHAPTERS.has(i+1)?"notes/reader.html?chapter=chapters/class-8/ch"+String(i+1).padStart(2,"0")+".json":"#/read/"+b.id+"/"+(i+1)}"><em>${i+1}</em>${esc(t)}</a></li>`).join('')}</ul>`};
 
 /* ---------- LIST VIEW ---------- */
 let group='all',openId=null;
