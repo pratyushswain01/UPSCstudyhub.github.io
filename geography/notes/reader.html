@@ -2368,7 +2368,49 @@ boot();
   document.getElementById('ugUndo').addEventListener('click',function(){var h=history.pop();if(!h)return;save(h.page,h.items);var c=pages.querySelector('.ug-pdf-page[data-page="'+h.page+'"] canvas.ug-ink');if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);drawItems(c,h.items);renderNotes(c.parentElement,h.items)}});
   document.getElementById('ugClear').addEventListener('click',function(){if(!confirm('Clear all annotations on page '+activePage+'?'))return;save(activePage,[]);var c=currentCanvas();if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);var h=c&&c.parentElement;if(h)renderNotes(h,[])});
   document.getElementById('ugGoogle').addEventListener('click',function(){var s=(window.getSelection&&window.getSelection().toString()||'').trim();if(!s)s=prompt('What topic do you want to search?')||'';if(s)window.open('https://www.google.com/search?q='+encodeURIComponent(s),'_blank','noopener')});
-  document.getElementById('ugAsk').addEventListener('click',function(){var s=(window.getSelection&&window.getSelection().toString()||'').trim();if(!s)s=prompt('Type your doubt:')||'';if(s){var q='Explain this NCERT doubt in simple language with examples: '+s;window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener')}});
+  document.getElementById('ugAsk').addEventListener('click', async function () {
+    const button = this;
+    const selected = (window.getSelection()?.toString() || '').trim();
+
+    const question = prompt(
+        'Ask Gurukul Mitra about this NCERT topic:',
+        selected
+    );
+
+    if (!question || !question.trim()) return;
+
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.textContent = 'Thinking...';
+
+    try {
+        const response = await fetch(
+            'https://gurukul-mitra-ai.pratyushkumarswain2005.workers.dev/api/chat',
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: selected
+                        ? 'Selected NCERT text: ' + selected +
+                          '\n\nMy doubt: ' + question
+                        : question
+                })
+            }
+        );
+
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+
+        const data = await response.json();
+        if (!data.reply) throw new Error('No reply received.');
+
+        alert('GURUKUL MITRA\n\n' + data.reply);
+    } catch (error) {
+        alert('Unable to connect to Gurukul Mitra: ' + error.message);
+    } finally {
+        button.disabled = false;
+        button.textContent = originalText;
+    }
+});
   pages.addEventListener('scroll',function(){var els=pages.querySelectorAll('.ug-pdf-page');var best=1,dist=Infinity;els.forEach(function(el){var d=Math.abs(el.getBoundingClientRect().top-pages.getBoundingClientRect().top);if(d<dist){dist=d;best=Number(el.dataset.page)}});activePage=best});
 })();
 </script>
