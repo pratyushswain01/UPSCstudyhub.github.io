@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
@@ -488,6 +488,22 @@ a.pn:hover{border-color:var(--accent);transform:translateY(-2px)}
 .pdfp__t small{display:block;font:400 .74rem/1.35 var(--font-sans);color:var(--muted)}
 .pdfp__bar a{font:500 .82rem var(--font-sans);white-space:nowrap}
 .pdfp__body{position:relative;flex:1;min-height:0;background:var(--paper-2)}
+/* ug-pdf-tools-v1: PDF annotation workspace */
+#ugPdfWorkspace{display:flex;flex-direction:column;overflow:hidden}
+#ugPdfWorkspace #pdfFrame{position:absolute;width:1px;height:1px;left:-10000px;top:0;opacity:0;pointer-events:none}
+.ug-pdf-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:7px;background:var(--bg);border-bottom:1px solid var(--line);z-index:2}
+.ug-pdf-toolbar button{border:1px solid var(--line-2);border-radius:7px;background:var(--paper);color:var(--ink);padding:6px 9px;font:500 11px var(--font-sans);cursor:pointer}
+.ug-pdf-toolbar button.is-active{background:var(--sage-soft);border-color:var(--accent);color:var(--sage-ink)}
+.ug-color-label{display:flex;align-items:center;gap:4px;color:var(--muted);font:11px var(--font-sans)}
+#ugColor{width:27px;height:24px;border:0;background:transparent;padding:0}
+#ugSaveStatus{margin-left:auto;color:var(--muted);font:10px var(--font-sans)}
+.ug-pdf-pages{position:relative;flex:1;min-height:0;overflow:auto;padding:16px;background:#777}
+.ug-pdf-page{position:relative;width:max-content;max-width:100%;margin:0 auto 18px;background:#fff;box-shadow:0 2px 12px #0004}
+.ug-pdf-page canvas.ug-page-render{display:block;max-width:100%;height:auto}
+.ug-pdf-page canvas.ug-ink{position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.ug-pdf-loading{padding:20px;color:#fff;font:13px var(--font-sans)}
+.ug-pdf-textnote{position:absolute;min-width:90px;max-width:220px;padding:5px 7px;border:1px solid #b08f3e;background:#fff7cf;color:#332b16;font:12px var(--font-sans);box-shadow:0 2px 7px #0002;white-space:pre-wrap;z-index:2}
+@media(max-width:719px){.ug-pdf-toolbar{gap:3px}.ug-pdf-toolbar button{padding:6px;font-size:10px}#ugSaveStatus{width:100%;margin-left:0}}
 .pdfp__body iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
 .pdfp__grip{position:absolute;left:-7px;top:0;bottom:0;width:14px;cursor:col-resize;touch-action:none;z-index:3}
 .pdfp__grip::after{content:"";position:absolute;left:5px;top:50%;width:4px;height:48px;margin-top:-24px;border-radius:3px;background:var(--line-2);transition:background-color .2s,height .2s,margin .2s}
@@ -769,7 +785,24 @@ body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk
     <a id="pdfNew" href="#" target="_blank" rel="noopener noreferrer">Open in new tab</a>
     <button class="icon-btn" id="pdfClose" type="button" aria-label="Close PDF panel"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
   </div>
-  <div class="pdfp__body"><iframe id="pdfFrame" title="NCERT chapter PDF"></iframe></div>
+  <div class="pdfp__body" id="ugPdfWorkspace" data-ug-pdf-tools-v1>
+  <div class="ug-pdf-toolbar" role="toolbar" aria-label="PDF study tools">
+    <button type="button" data-ug-tool="select" class="is-active" title="Select text">Select</button>
+    <button type="button" data-ug-tool="pen" title="Draw with pen">Pen</button>
+    <button type="button" data-ug-tool="highlight" title="Highlight / mark">Highlight</button>
+    <button type="button" data-ug-tool="eraser" title="Erase annotations">Eraser</button>
+    <button type="button" data-ug-tool="text" title="Add text note">Text</button>
+    <button type="button" id="ugUndo" title="Undo last annotation">Undo</button>
+    <button type="button" id="ugClear" title="Clear annotations on this page">Clear</button>
+    <button type="button" id="ugGoogle" title="Search selected text on Google">Ask Google</button>
+    <button type="button" id="ugAsk" title="Ask a doubt using Gurukul Mitra">Ask doubt</button>
+    <label class="ug-color-label">Colour <input id="ugColor" type="color" value="#f4d35e"></label>
+    <span id="ugSaveStatus" aria-live="polite">Annotations save on this device</span>
+  </div>
+  <div id="ugPdfPages" class="ug-pdf-pages"><p class="ug-pdf-loading">Open the NCERT PDF panel to load the page.</p></div>
+  <!-- Retained as a fallback and as the existing reader's PDF URL holder. -->
+  <iframe id="pdfFrame" title="NCERT chapter PDF" aria-hidden="true" tabindex="-1"></iframe>
+</div>
 </aside>
 
 <!-- Search -->
@@ -2303,5 +2336,41 @@ boot();
 <div id="upscg-watermark" aria-hidden="true">
   <span>UPSC GURUKUL • upscgurukul.online</span>
 </div>
+<!-- ug-pdf-tools-v1 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+(function(){
+  'use strict';
+  var workspace=document.getElementById('ugPdfWorkspace'); if(!workspace)return;
+  var frame=document.getElementById('pdfFrame'), pages=document.getElementById('ugPdfPages');
+  var tool='select', color=document.getElementById('ugColor'), activePage=1, history=[], pdfDoc=null, loading=false;
+  var key='ug-pdf-annotations:'+location.pathname+location.search;
+  function status(s){var n=document.getElementById('ugSaveStatus');if(n)n.textContent=s;}
+  function storeKey(p){return key+':page:'+p;}
+  function read(p){try{return JSON.parse(localStorage.getItem(storeKey(p))||'[]')}catch(e){return []}}
+  function save(p,items){try{localStorage.setItem(storeKey(p),JSON.stringify(items));status('Saved on this device')}catch(e){status('Storage unavailable');}}
+  function currentCanvas(){return pages.querySelector('.ug-pdf-page[data-page="'+activePage+'"] canvas.ug-ink')}
+  function setTool(t){tool=t;workspace.querySelectorAll('[data-ug-tool]').forEach(function(b){b.classList.toggle('is-active',b.getAttribute('data-ug-tool')===t)});}
+  workspace.querySelectorAll('[data-ug-tool]').forEach(function(b){b.addEventListener('click',function(){setTool(b.getAttribute('data-ug-tool'))})});
+  function drawItems(canvas,items){var c=canvas.getContext('2d');items.forEach(function(a){if(a.type==='path'){c.beginPath();c.lineCap='round';c.lineJoin='round';c.lineWidth=a.width;c.strokeStyle=a.color;c.globalAlpha=a.alpha||1;a.points.forEach(function(p,i){var x=p[0]*canvas.width,y=p[1]*canvas.height;if(!i)c.moveTo(x,y);else c.lineTo(x,y)});c.stroke();c.globalAlpha=1;} });}
+  function attachInk(canvas,page){var ctx=canvas.getContext('2d'),drawing=false,points=[],start=null;var items=read(page);drawItems(canvas,items);
+    function pos(e){var r=canvas.getBoundingClientRect();return [(e.clientX-r.left)/r.width,(e.clientY-r.top)/r.height]}
+    canvas.addEventListener('pointerdown',function(e){if(tool==='select')return;e.preventDefault();canvas.setPointerCapture(e.pointerId);drawing=true;start=pos(e);points=[start];if(tool==='text'){var note=prompt('Enter your study note:');if(note){items.push({type:'note',x:start[0],y:start[1],text:note});save(page,items);renderNotes(canvas.parentElement,items);history.push({page:page,items:items.slice(0,-1)});}drawing=false;return;}ctx.beginPath();ctx.moveTo(start[0]*canvas.width,start[1]*canvas.height);});
+    canvas.addEventListener('pointermove',function(e){if(!drawing)return;var p=pos(e);points.push(p);ctx.lineCap='round';ctx.lineJoin='round';ctx.lineWidth=(tool==='highlight'?18:3)*devicePixelRatio;ctx.strokeStyle=(tool==='eraser'?'rgba(255,255,255,1)':color.value);ctx.globalAlpha=tool==='highlight'?.30:1;ctx.lineTo(p[0]*canvas.width,p[1]*canvas.height);ctx.stroke();});
+    function finish(){if(!drawing)return;drawing=false;ctx.globalAlpha=1;if(points.length){history.push({page:page,items:items.slice()});items.push({type:'path',points:points,color:tool==='eraser'?'#ffffff':color.value,width:(tool==='highlight'?18:3)*devicePixelRatio,alpha:tool==='highlight'?.30:1});save(page,items);}}
+    canvas.addEventListener('pointerup',finish);canvas.addEventListener('pointercancel',finish);
+  }
+  function renderNotes(holder,items){holder.querySelectorAll('.ug-pdf-textnote').forEach(function(n){n.remove()});items.forEach(function(a){if(a.type!=='note')return;var n=document.createElement('div');n.className='ug-pdf-textnote';n.textContent=a.text;n.style.left=(a.x*100)+'%';n.style.top=(a.y*100)+'%';holder.appendChild(n)});}
+  async function renderDocument(url){if(loading||!url||!window.pdfjsLib)return;loading=true;status('Loading PDFâ€¦');try{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';pdfDoc=await pdfjsLib.getDocument({url:url}).promise;pages.innerHTML='';for(var p=1;p<=pdfDoc.numPages;p++){var page=await pdfDoc.getPage(p);var viewport=page.getViewport({scale:1.35});var holder=document.createElement('div');holder.className='ug-pdf-page';holder.dataset.page=p;var cv=document.createElement('canvas');cv.className='ug-page-render';cv.width=Math.floor(viewport.width);cv.height=Math.floor(viewport.height);var ink=document.createElement('canvas');ink.className='ug-ink';ink.width=cv.width;ink.height=cv.height;holder.appendChild(cv);holder.appendChild(ink);pages.appendChild(holder);await page.render({canvasContext:cv.getContext('2d'),viewport:viewport}).promise;attachInk(ink,p);renderNotes(holder,read(p));}status('Page 1 of '+pdfDoc.numPages+' Â· annotations saved locally');}catch(e){pages.innerHTML='<p class="ug-pdf-loading">PDF.js could not load this PDF. Use â€œOpen in new tabâ€ to read it. Check that the PDF URL is publicly accessible.</p>';status('PDF load failed');console.error('UPSC Gurukul PDF tools:',e);}finally{loading=false;}}
+  var observer=new MutationObserver(function(){if(!workspace.closest('[hidden]')&&frame.getAttribute('src'))renderDocument(frame.getAttribute('src').split('#')[0]);});observer.observe(frame,{attributes:true,attributeFilter:['src']});
+  // The original reader sets the iframe URL when the PDF panel is opened.
+  document.querySelectorAll('.js-pdf').forEach(function(b){b.addEventListener('click',function(){setTimeout(function(){var u=frame.getAttribute('src');if(u)renderDocument(u.split('#')[0]);},350)})});
+  document.getElementById('ugUndo').addEventListener('click',function(){var h=history.pop();if(!h)return;save(h.page,h.items);var c=pages.querySelector('.ug-pdf-page[data-page="'+h.page+'"] canvas.ug-ink');if(c){c.getContext('2d').clearRect(0,0,c.width,c.height);drawItems(c,h.items);renderNotes(c.parentElement,h.items)}});
+  document.getElementById('ugClear').addEventListener('click',function(){if(!confirm('Clear all annotations on page '+activePage+'?'))return;save(activePage,[]);var c=currentCanvas();if(c)c.getContext('2d').clearRect(0,0,c.width,c.height);var h=c&&c.parentElement;if(h)renderNotes(h,[])});
+  document.getElementById('ugGoogle').addEventListener('click',function(){var s=(window.getSelection&&window.getSelection().toString()||'').trim();if(!s)s=prompt('What topic do you want to search?')||'';if(s)window.open('https://www.google.com/search?q='+encodeURIComponent(s),'_blank','noopener')});
+  document.getElementById('ugAsk').addEventListener('click',function(){var s=(window.getSelection&&window.getSelection().toString()||'').trim();if(!s)s=prompt('Type your doubt:')||'';if(s){var q='Explain this NCERT doubt in simple language with examples: '+s;window.open('https://www.google.com/search?q='+encodeURIComponent(q),'_blank','noopener')}});
+  pages.addEventListener('scroll',function(){var els=pages.querySelectorAll('.ug-pdf-page');var best=1,dist=Infinity;els.forEach(function(el){var d=Math.abs(el.getBoundingClientRect().top-pages.getBoundingClientRect().top);if(d<dist){dist=d;best=Number(el.dataset.page)}});activePage=best});
+})();
+</script>
 </body>
 </html>
