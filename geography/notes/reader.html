@@ -491,19 +491,50 @@ a.pn:hover{border-color:var(--accent);transform:translateY(-2px)}
 /* ug-pdf-tools-v1: PDF annotation workspace */
 #ugPdfWorkspace{display:flex;flex-direction:column;overflow:hidden}
 #ugPdfWorkspace #pdfFrame{position:absolute;width:1px;height:1px;left:-10000px;top:0;opacity:0;pointer-events:none}
+
 .ug-pdf-toolbar{
   display:flex;
-  flex-wrap:wrap;
+  flex-wrap:nowrap;
   align-items:center;
-  gap:7px;
-  padding:9px;
+  gap:5px;
+  padding:5px;
   background:var(--bg);
   border-bottom:1px solid var(--line);
   z-index:2;
-  overflow-y:auto;
-  max-height:120px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  white-space:nowrap;
+  scrollbar-width:thin;
 }
 
+.ug-toolbar-group{
+  display:flex;
+  flex-wrap:nowrap;
+  flex-shrink:0;
+  align-items:center;
+  gap:4px;
+}
+
+.ug-pdf-toolbar button{
+  flex-shrink:0;
+  padding:5px 7px;
+  min-height:30px;
+  font-size:10px;
+}
+
+.ug-pdf-toolbar button span{
+  display:none;
+}
+
+.ug-pdf-toolbar .ug-toolbar-divider{
+  flex-shrink:0;
+}
+
+#ugSaveStatus{
+  display:none;
+}
+
+   
 .ug-toolbar-group{
   display:flex;
   flex-wrap:wrap;
@@ -529,7 +560,16 @@ a.pn:hover{border-color:var(--accent);transform:translateY(-2px)}
 .ug-pdf-textnote{position:absolute;min-width:90px;max-width:220px;padding:5px 7px;border:1px solid #b08f3e;background:#fff7cf;color:#332b16;font:12px var(--font-sans);box-shadow:0 2px 7px #0002;white-space:pre-wrap;z-index:2}
 @media(max-width:719px){.ug-pdf-toolbar{gap:3px}.ug-pdf-toolbar button{padding:6px;font-size:10px}#ugSaveStatus{width:100%;margin-left:0}}
 .pdfp__body iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:#fff}
-.pdfp__grip{position:absolute;left:-7px;top:0;bottom:0;width:14px;cursor:col-resize;touch-action:none;z-index:3}
+.pdfp__grip{
+  position:absolute;
+  left:-7px;
+  top:0;
+  bottom:0;
+  width:14px;
+  cursor:col-resize;
+  touch-action:none;
+  z-index:3;
+}
 .pdfp__grip::after{content:"";position:absolute;left:5px;top:50%;width:4px;height:48px;margin-top:-24px;border-radius:3px;background:var(--line-2);transition:background-color .2s,height .2s,margin .2s}
 .pdfp__grip:hover::after,.pdfp__grip:focus-visible::after,body.pdf-drag .pdfp__grip::after{background:var(--accent);height:72px;margin-top:-36px}
 body.pdf-drag{user-select:none;cursor:col-resize}
@@ -2056,7 +2096,7 @@ function run(DATA) {
 
 var CK = 'ug.reader.' + DATA.id;
 var C = Object.assign({ visited: [], completed: false, completedAt: null, pos: null, notes: '', highlights: [], answers: {}, bookmarked: false }, store.get(CK, {}));
-var G = Object.assign({ fs: 1, quick: false, pdfOpen: false, pdfW: 45 }, store.get('ug.reader.settings', {}));
+var G = Object.assign({ fs: 1, quick: false, pdfOpen: false, pdfW: 68 }, store.get('ug.reader.settings', {}));
 function saveC() { store.set(CK, C); }
 function saveG() { store.set('ug.reader.settings', G); }
 
@@ -2588,7 +2628,8 @@ function clampPct(p) {
   return Math.min(hi, Math.max(lo, p));
 }
 function applyPdfW() {
-  var p = clampPct(G.pdfW);
+  var p = clampPct(Math.max(G.pdfW, 68));
+  G.pdfW = p;
   root.style.setProperty('--pdf-w', Math.round(vw() * p / 100) + 'px');
   grip.setAttribute('aria-valuenow', String(Math.round(p)));
 }
