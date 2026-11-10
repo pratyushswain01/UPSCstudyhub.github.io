@@ -491,7 +491,31 @@ a.pn:hover{border-color:var(--accent);transform:translateY(-2px)}
 /* ug-pdf-tools-v1: PDF annotation workspace */
 #ugPdfWorkspace{display:flex;flex-direction:column;overflow:hidden}
 #ugPdfWorkspace #pdfFrame{position:absolute;width:1px;height:1px;left:-10000px;top:0;opacity:0;pointer-events:none}
-.ug-pdf-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:5px;padding:7px;background:var(--bg);border-bottom:1px solid var(--line);z-index:2}
+.ug-pdf-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:7px;
+  padding:9px;
+  background:var(--bg);
+  border-bottom:1px solid var(--line);
+  z-index:2;
+  overflow-y:auto;
+  max-height:120px;
+}
+
+.ug-toolbar-group{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:6px;
+}
+
+.ug-pdf-toolbar button{
+  min-height:36px;
+  padding:7px 11px;
+  white-space:nowrap;
+}
 .ug-pdf-toolbar button{border:1px solid var(--line-2);border-radius:7px;background:var(--paper);color:var(--ink);padding:6px 9px;font:500 11px var(--font-sans);cursor:pointer}
 .ug-pdf-toolbar button.is-active{background:var(--sage-soft);border-color:var(--accent);color:var(--sage-ink)}
 .ug-color-label{display:flex;align-items:center;gap:4px;color:var(--muted);font:11px var(--font-sans)}
@@ -514,12 +538,31 @@ body.pdf-drag .pdfp__body iframe{pointer-events:none}
   .pdfp{display:flex;flex-direction:column;position:fixed;z-index:40;right:0;top:var(--hdr-h);height:calc(100vh - var(--hdr-h));height:calc(100dvh - var(--hdr-h));width:var(--pdf-w,45%);background:var(--paper);border-left:1px solid var(--line-2);box-shadow:-12px 0 30px -24px rgba(0,0,0,.5);transition:top .3s ease,height .3s ease}
   body.pdf-open .shell{max-width:none;margin:0 var(--pdf-w,45%) 0 0;gap:28px;padding-right:clamp(16px,2.5vw,32px)}
 }
-@media (min-width:1024px) and (max-width:1699.98px){
-  body.pdf-open .shell{grid-template-columns:minmax(0,1fr)}
-  body.pdf-open .side{position:fixed;z-index:70;left:0;top:0;bottom:0;max-height:none;width:min(88vw,340px);overflow:auto;padding:1rem 1.1rem 2rem;background:var(--paper);border-right:1px solid var(--line-2);box-shadow:var(--shadow);transform:translateX(-104%);visibility:hidden;transition:transform .32s cubic-bezier(.2,.7,.2,1),visibility 0s .32s}
-  body.pdf-open .side.is-open{transform:none;visibility:visible;transition:transform .32s cubic-bezier(.2,.7,.2,1),visibility 0s}
-  body.pdf-open .side__close,body.pdf-open .menu-btn{display:inline-grid}
-  body.pdf-open .scrim:not([hidden]){display:block!important;position:fixed;inset:0;z-index:65;background:rgba(21,28,25,.45)}
+@media (min-width:720px) and (orientation:landscape){
+  .pdfp{
+    display:flex;
+    flex-direction:column;
+    position:fixed;
+    z-index:40;
+    right:0;
+    top:var(--hdr-h);
+    height:calc(100dvh - var(--hdr-h));
+    width:var(--pdf-w,45%);
+    background:var(--paper);
+    border-left:1px solid var(--line-2);
+    box-shadow:-12px 0 30px -24px rgba(0,0,0,.5);
+  }
+
+  body.pdf-open .shell{
+    max-width:none;
+    margin:0 var(--pdf-w,45%) 0 0;
+    gap:28px;
+    padding-right:clamp(16px,2.5vw,32px);
+  }
+}
+
+@media (orientation:portrait){
+  .pdfp{display:none!important}
 }
 body.quick .blk--p,body.quick .blk--list,body.quick .blk--expand,body.quick .blk--h3{display:none}
 
@@ -2521,7 +2564,9 @@ function setDrawer(open, silent) {
 
 /* ---------- NCERT PDF panel ---------- */
 var PDF = DATA.pdf;
-var mqSplit = window.matchMedia('(min-width:720px)');
+var mqSplit = window.matchMedia(
+  '(min-width:720px) and (orientation:landscape)'
+);
 var mqWide = window.matchMedia('(min-width:1700px)');
 var pane = $('#pdfPane'), frame = $('#pdfFrame'), grip = $('#pdfGrip');
 var IOS = /iP(ad|hone|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
