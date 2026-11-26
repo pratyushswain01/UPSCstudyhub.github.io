@@ -40,7 +40,7 @@
     .show-password{position:absolute;right:10px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#657086;font-size:11px;font-weight:650;cursor:pointer}
     .consent{display:flex;gap:9px;align-items:flex-start;margin:15px 0 3px;color:#68707d;font-size:11px;line-height:1.5}
     .consent input{margin:2px 0 0;accent-color:#263c60}
-    a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
+    .consent[hidden]{display:none!important}a{color:var(--blue);text-decoration:none}a:hover{text-decoration:underline}
     .error{min-height:18px;margin:11px 0;color:#b42318;font-size:12px;line-height:1.45}
     .success{min-height:18px;margin:11px 0;color:#16794b;font-size:12px;line-height:1.45}
     .primary,.google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;height:49px;border-radius:13px;font-size:14px;font-weight:650;cursor:pointer;transition:transform .15s,opacity .15s}
@@ -98,7 +98,7 @@
       mode=value;const signup=mode==="signup";
       $("title").textContent=signup?"Create your account.":"Welcome back.";
       $("sub").textContent=signup?"One account for your learning journey across supported Gurukul pages.":"Sign in to continue your preparation.";
-      $("nameWrap").hidden=!signup;$("consentWrap").hidden=!signup;$("tabLogin").setAttribute("aria-selected",String(!signup));$("tabSignup").setAttribute("aria-selected",String(signup));
+      $("nameWrap").hidden=!signup;$("consentWrap").hidden=false;$("tabLogin").setAttribute("aria-selected",String(!signup));$("tabSignup").setAttribute("aria-selected",String(signup));
       $("submit").textContent=signup?"Create account":"Sign in";$("password").autocomplete=signup?"new-password":"current-password";$("forgot").hidden=signup;showError("");
     }
     $("tabLogin").addEventListener("click",()=>setMode("login"));
@@ -109,7 +109,7 @@
       const email=$("email").value.trim(),password=$("password").value,name=$("name").value.trim();
       if(!email||!password)return showError("Enter your email address and password.");
       if(mode==="signup"&&password.length<6)return showError("Use a password with at least 6 characters.");
-      if(mode==="signup"&&!$("form").elements.consent.checked)return showError("Please accept the Privacy Notice and Terms to create an account.");
+      if(!$("form").elements.consent.checked)return showError("Please tick the box to agree to the Privacy Notice and Terms before continuing.");
       busy=true;$("submit").disabled=true;
       try{
         if(mode==="signup"){
@@ -120,7 +120,7 @@
       finally{busy=false;$("submit").disabled=false;}
     });
     $("google").addEventListener("click",async()=>{
-      if(busy)return;showError("");busy=true;$("google").disabled=true;
+      if(busy)return;showError("");if(!$("form").elements.consent.checked)return showError("Please tick the box to agree to the Privacy Notice and Terms before continuing.");busy=true;$("google").disabled=true;
       try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});await signInWithPopup(auth,provider);}
       catch(error){showError(error.code?error.code+": "+error.message:error.message||"Google sign-in failed.");}
       finally{busy=false;$("google").disabled=false;}
