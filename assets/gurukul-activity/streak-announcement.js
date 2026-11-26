@@ -1,25 +1,34 @@
 /* UPSC Gurukul — Two-hour Daily Study Streak launch notice */
 (function(){
  "use strict";
- const KEY="gurukul-streak-launch-notice-dismissed-v2",ID="gurukul-streak-launch-notice";
+ const KEY="gurukul-streak-launch-notice-dismissed-v3",ID="gurukul-streak-launch-notice";
  if(window.__GURUKUL_STREAK_NOTICE_V2__)return;window.__GURUKUL_STREAK_NOTICE_V2__=true;
  function show(){
   try{if(localStorage.getItem(KEY)==="1")return;}catch(e){}
   if(document.getElementById(ID))return;
   const style=document.createElement("style");style.textContent=`
-  #${ID}{position:fixed;inset:0;z-index:2147483002;display:grid;place-items:center;padding:16px;background:rgba(6,13,25,.72);backdrop-filter:blur(10px);font-family:Inter,system-ui,sans-serif}
-  #${ID} *{box-sizing:border-box}#${ID} .card{position:relative;width:min(100%,470px);padding:30px 26px 24px;border:1px solid rgba(230,190,105,.3);border-radius:24px;background:linear-gradient(150deg,#1a2a40,#0c1728);color:#f8fafc;box-shadow:0 28px 90px #0008}
-  #${ID} .close{position:absolute;right:14px;top:12px;width:34px;height:34px;border:1px solid #ffffff30;border-radius:50%;background:#ffffff12;color:#fff;font-size:22px;cursor:pointer}
-  #${ID} .icon{font-size:30px;margin-bottom:14px}#${ID} .eyebrow{color:#e6c57f;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
-  #${ID} h2{margin:9px 0 10px;font-size:clamp(25px,6vw,32px);line-height:1.12;color:#fff}
-  #${ID} p{color:#c5d0de;font-size:14px;line-height:1.65;margin:0}
-  #${ID} .points{display:grid;gap:11px;margin:20px 0;padding:16px;border:1px solid #ffffff1a;border-radius:16px;background:#ffffff0a}
-  #${ID} .point{font-size:12px;line-height:1.5;color:#e6edf5}#${ID} .point b{color:#f0d58c}
-  #${ID} .actions{display:flex;gap:10px}#${ID} button.action{min-height:45px;padding:0 16px;border-radius:12px;font-weight:800;cursor:pointer}
-  #${ID} .primary{flex:1;border:0;background:linear-gradient(135deg,#f0d99f,#c99a4b);color:#172337}
-  #${ID} .later{border:1px solid #ffffff30;background:transparent;color:#fff}
-  #${ID} .foot{text-align:center;font-size:10px;color:#9aaabd;margin-top:14px}
-  @media(max-width:420px){#${ID} .card{padding:25px 19px 20px}#${ID} .actions{flex-direction:column}}
+  #${ID}{position:fixed;inset:0;z-index:2147483002;display:grid;place-items:center;padding:18px;background:rgba(27,25,21,.58);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+  #${ID} *{box-sizing:border-box}
+  #${ID} .card{position:relative;width:min(100%,448px);padding:32px 30px 25px;border:1px solid #e5d6b9;border-radius:22px;background:linear-gradient(155deg,#fffdf8 0%,#f8f2e6 100%);color:#29261f;box-shadow:0 24px 70px rgba(20,17,11,.28)}
+  #${ID} .close{position:absolute;right:15px;top:15px;width:34px;height:34px;border:1px solid #ded4c2;border-radius:50%;background:#fffaf0;color:#494237;font-size:21px;line-height:1;cursor:pointer;transition:background .18s,transform .18s}
+  #${ID} .close:hover{background:#f0e6d3;transform:rotate(90deg)}
+  #${ID} .icon{display:grid;place-items:center;width:48px;height:48px;margin-bottom:20px;border:1px solid #ead8ad;border-radius:15px;background:#f6ecd5;font-size:25px}
+  #${ID} .eyebrow{color:#98702d;font-size:10px;font-weight:800;letter-spacing:2.1px;text-transform:uppercase}
+  #${ID} h2{max-width:360px;margin:10px 0 12px;color:#26231d;font-family:Georgia,"Times New Roman",serif;font-size:clamp(27px,6vw,34px);font-weight:700;line-height:1.12;letter-spacing:-.55px}
+  #${ID} p{margin:0;color:#625b4f;font-size:13.5px;line-height:1.75}
+  #${ID} .points{display:grid;gap:12px;margin:21px 0 22px;padding:17px 18px;border:1px solid #e8deca;border-radius:15px;background:rgba(255,255,255,.68)}
+  #${ID} .point{font-size:12px;line-height:1.55;color:#514a3f}
+  #${ID} .point b{color:#805b20;font-weight:800}
+  #${ID} .actions{display:flex;gap:10px}
+  #${ID} button.action{min-height:46px;padding:0 17px;border-radius:11px;font-family:inherit;font-size:12px;font-weight:800;cursor:pointer;transition:transform .18s,background .18s}
+  #${ID} button.action:hover{transform:translateY(-1px)}
+  #${ID} .primary{flex:1;border:1px solid #29261f;background:linear-gradient(135deg,#373229,#211f1a);color:#fffaf0;box-shadow:0 5px 13px rgba(41,38,31,.13)}
+  #${ID} .primary:hover{background:#171612}
+  #${ID} .later{border:1px solid #d8cdb9;background:transparent;color:#514a3f}
+  #${ID} .later:hover{background:#f0e8da}
+  #${ID} .foot{margin-top:16px;text-align:center;color:#8a806f;font-size:10px;letter-spacing:.15px}
+  @media(max-width:480px){#${ID}{padding:14px}#${ID} .card{padding:27px 21px 22px;border-radius:19px}#${ID} .points{padding:15px}#${ID} .actions{flex-direction:column}#${ID} .later{min-height:42px}}
+  @media(prefers-reduced-motion:reduce){#${ID} *,#${ID} *:before,#${ID} *:after{transition:none!important}}
   `;document.head.appendChild(style);
   const overlay=document.createElement("div");overlay.id=ID;overlay.innerHTML=`
    <section class="card" role="dialog" aria-modal="true" aria-labelledby="gsn-title">
