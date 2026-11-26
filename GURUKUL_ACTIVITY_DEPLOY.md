@@ -1,49 +1,55 @@
-# UPSC Gurukul Activity Bar
+# UPSC Gurukul Activity Bar — Free Plan
 
-The authenticated activity bar is included on the student-facing pages updated in this feature branch.
+Firebase Authentication stays on Spark. Activity storage and API run on Cloudflare Workers + D1; no Firebase Cloud Functions or Blaze upgrade is needed.
 
-## What it does
+## Behaviour and privacy
+- Compact bar appears only for signed-in students.
+- The panel shows today's active time, the last seven days and ten recent sessions.
+- Worker verifies Firebase ID-token signature, issuer, audience and expiry. UID comes only from the verified token.
+- A student can only read or write records under their own UID.
+- Only heartbeat gaps between 20 and 60 seconds are credited, capped at 45 seconds. Hidden tabs, idle time and long gaps are not credited.
+- These totals estimate active site use; they do not prove focused study.
 
-- Shows a compact activity strip above the page content.
-- Opens a private glass-style activity panel with today's active time, the previous seven days, and recent sessions.
-- Uses the Firebase Authentication UID for all activity records. A student can only request their own summary.
-- Records activity through the `gurukulActivity` callable Cloud Function in `asia-south1`.
-- Sends a heartbeat every 30 seconds. The server credits only heartbeat gaps from 20 through 60 seconds, capped at 45 seconds. Long gaps, idle time, and hidden tabs are not credited.
-- Does not read or expose another student's activity.
+## Free-tier limits
+Cloudflare Free has request and D1 row-read/write quotas. Review current limits before increasing traffic:
+- https://developers.cloudflare.com/workers/platform/limits/
+- https://developers.cloudflare.com/d1/platform/limits/
+- https://developers.cloudflare.com/d1/reference/faq/
 
-## Firestore collections
+## Windows PowerShell deployment
+Run from the repository root:
 
-The callable function uses the Admin SDK and writes:
-- `gurukulActivitySessions` — session lifecycle and credited seconds.
-- `gurukulActivityDaily` — per-user, per-India-date totals.
-- `gurukulActivityProfiles` — the user's recent-session list.
+1. Install Wrangler and sign in:
+   ```powershell
+   npm install -g wrangler
+   wrangler login
+   ```
 
-These are server-side records. The browser does not directly read or write these collections.
+2. Create the D1 database:
+   ```powershell
+   wrangler d1 create upscgurukul-activity
+   ```
+   Copy the returned database_id into cloudflare/gurukul-activity/wrangler.toml, replacing REPLACE_WITH_D1_DATABASE_ID.
 
-## Deploy (PowerShell)
+3. Apply the schema:
+   ```powershell
+   wrangler d1 migrations apply upscgurukul-activity --remote --config cloudflare/gurukul-activity/wrangler.toml
+   ```
 
-Run from the repository root after checking out this branch:
+4. Deploy:
+   ```powershell
+   wrangler deploy --config cloudflare/gurukul-activity/wrangler.toml
+   ```
 
-```powershell
-firebase login
-firebase use upscstudyhub-github
-npm --prefix functions install
-firebase deploy --only functions:gurukulActivity
-```
+5. Add custom domain activity.upscgurukul.online in Cloudflare Dashboard → Workers & Pages → upscgurukul-activity-api → Settings → Domains & Routes → Add → Custom Domain. Ensure the upscgurukul.online zone is in this Cloudflare account. If using workers.dev instead, update ACTIVITY_API in assets/gurukul-activity/activity-bar.js before publishing.
 
-The Firebase project must have Cloud Functions enabled and be on the Blaze billing plan. Review the billing and quotas in Firebase before deployment. The root `firebase.json` in this branch configures the existing `functions` directory for Node.js 24.
+6. Test:
+   ```powershell
+   Invoke-RestMethod "https://activity.upscgurukul.online/health"
+   ```
+   Expected: ok = True.
 
-## Verify
+7. Merge this branch to main so GitHub Pages publishes the updated client.
 
-1. Open a student page while signed in.
-2. Confirm the slim activity strip appears above the page banner.
-3. Keep the tab visible and interact with it for at least 30–60 seconds.
-4. Open **View activity** and confirm today's time and a recent session appear.
-5. Open a second signed-in account and confirm its activity panel shows only that account's records.
-
-## Notes
-
-- The feature branch is not live until it is merged/deployed to the hosting branch.
-- Deploy the callable function before testing activity persistence. Until then, the bar can load but server summaries and recording will report unavailable.
-- Anonymous visitors and signed-out users do not get an activity bar.
-- The timer is an activity estimate, not proof of focused study or exam preparation.
+## Important
+The existing Firebase Functions source is intentionally left untouched but this client no longer calls it. Do not deploy Functions. Keep the D1 binding named DB. Never place a service-account private key in the browser or Worker.
