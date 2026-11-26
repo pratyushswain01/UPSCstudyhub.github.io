@@ -54,7 +54,9 @@ async function touch(db,uid,b,now,end){
   const id=String(b.sessionId||"");if(!/^[a-f0-9]{24,80}$/i.test(id))throw Error("Invalid session identifier");
   const s=await db.prepare("SELECT last_heartbeat_at,seconds FROM activity_sessions WHERE session_id=? AND uid=? AND ended_at IS NULL").bind(id,uid).first();
   if(!s)return {sessionClosed:true,sessionSeconds:0,todaySeconds:await today(db,uid,indiaDate(now))};
-  const gap=now-s.last_heartbeat_at,credit=gap>=20000&&gap<=60000?Math.min(45,Math.floor(gap/1000)):0,date=indiaDate(now);
+  // Persist short active sessions too: tab switches, navigation, and mobile page exits often happen before the next 30s heartbeat.
+  // Ignore gaps over 90s to avoid crediting a suspended/background browser as active.
+  const gap=now-s.last_heartbeat_at,credit=gap>=1000&&gap<=90000?Math.min(60,Math.floor(gap/1000)):0,date=indiaDate(now);
   const statements=[db.prepare("UPDATE activity_sessions SET last_heartbeat_at=?,seconds=seconds+?,page_path=?,page_title=?,ended_at=? WHERE session_id=? AND uid=? AND ended_at IS NULL").bind(now,credit,String(b.pagePath||"/").slice(0,240),String(b.pageTitle||"UPSC Gurukul").slice(0,120),end?now:null,id,uid)];
   if(credit)statements.push(db.prepare("INSERT INTO activity_daily(uid,activity_date,seconds,sessions) VALUES(?,?,?,0) ON CONFLICT(uid,activity_date) DO UPDATE SET seconds=seconds+excluded.seconds").bind(uid,date,credit));
   await db.batch(statements);
