@@ -108,7 +108,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
     return task;
   }
   async function beginSession(){
-    if(!user||tracking||starting||document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS)return;
+    if(!user||tracking||starting||document.visibilityState!=="visible"||Date.now()-lastInteraction>=IDLE_MS)return;
     starting=true;
     const requestUser=user;
     sessionId=crypto.randomUUID().replace(/-/g,"");sessionBase=0;
@@ -117,7 +117,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
       if(data && user===requestUser){
         tracking=true;lastSyncAt=Date.now();updateBar();
         // If focus was lost while the start request was in flight, close it.
-        if(document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS){
+        if(document.visibilityState!=="visible"||Date.now()-lastInteraction>=IDLE_MS){
           await send("end");tracking=false;sessionId=null;updateBar();
         }
       }else if(sessionId){sessionId=null;tracking=false;updateBar();}
@@ -125,7 +125,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
   }
   async function heartbeat(){
     if(!user)return;
-    const eligible=document.visibilityState==="visible"&&document.hasFocus()&&Date.now()-lastInteraction<IDLE_MS;
+    const eligible=document.visibilityState==="visible"&&Date.now()-lastInteraction<IDLE_MS;
     if(!eligible){if(tracking)await send("end");tracking=false;sessionId=null;updateBar();return;}
     if(!tracking){await beginSession();return;}
     await send("heartbeat");
@@ -144,7 +144,6 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
       else if(document.visibilityState==="visible"){lastInteraction=Date.now();beginSession();}
     });
     window.addEventListener("focus",()=>{lastInteraction=Date.now();beginSession();});
-    window.addEventListener("blur",()=>{if(tracking){send("end");tracking=false;sessionId=null;updateBar();}});
     window.addEventListener("pagehide",()=>{if(tracking)send("end");});
   }
   async function boot(){
