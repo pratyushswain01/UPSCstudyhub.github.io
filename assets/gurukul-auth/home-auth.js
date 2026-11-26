@@ -74,7 +74,7 @@ import {
     $("[data-mode=login]").setAttribute("aria-selected",String(mode==="login"));$("[data-mode=signup]").setAttribute("aria-selected",String(mode==="signup"));
     $("form button[type=submit]").textContent=mode==="signup"?"Create account":"Sign in";$("#ug-auth-password").autocomplete=mode==="signup"?"new-password":"current-password";showError();
   };
-  button.addEventListener("click",()=>{setMode("login");open();});
+  button.addEventListener("click",()=>{if(currentUser){location.href="/account.html";return;}setMode("login");open();});
   $(".ug-auth-close").addEventListener("click",close);
   backdrop.addEventListener("click",e=>{if(e.target===backdrop)close();});
   document.addEventListener("keydown",e=>{if(e.key==="Escape"&&backdrop.classList.contains("is-open"))close();});
