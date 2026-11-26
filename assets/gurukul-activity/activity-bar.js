@@ -1,18 +1,9 @@
-import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { auth, watchUser } from "/auth/firebase-auth.js";
 
 (() => {
   "use strict";
   if (window.__GURUKUL_ACTIVITY_BAR__) return;
   window.__GURUKUL_ACTIVITY_BAR__ = true;
-  const FIREBASE = {
-    apiKey: "AIzaSyBoPtr3d8se-fcGXkzixG8OE7dFvYjPcs4",
-    authDomain: "upscstudyhub-github.firebaseapp.com",
-    projectId: "upscstudyhub-github",
-    storageBucket: "upscstudyhub-github.firebasestorage.app",
-    messagingSenderId: "451692540885",
-    appId: "1:451692540885:web:b425e85128e5de97c7c35c"
-  };
   const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
   let user=null, callActivity=null, sessionId=null, tracking=false, starting=false;
@@ -148,8 +139,6 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
   }
   async function boot(){
     try{
-      const app=getApps().length?getApp():initializeApp(FIREBASE);
-      const auth=getAuth(app);
       callActivity=async (payload,authUser=user)=>{
         if(!authUser) throw new Error("Sign in required");
         const token=await authUser.getIdToken();
@@ -159,7 +148,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
         return {data:result};
       };
       mountStyles();mountBar();initTracking();
-      onAuthStateChanged(auth,async nextUser=>{
+      watchUser(async nextUser=>{
         user=nextUser;
         if(!user){if(tracking)await send("end");tracking=false;sessionId=null;if(root)root.hidden=true;closeModal();return;}
         if(root)root.hidden=false;lastInteraction=Date.now();await loadSummary();await beginSession();
