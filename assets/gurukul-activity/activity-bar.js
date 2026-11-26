@@ -15,7 +15,8 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
   };
   const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
-  let user=null, callActivity=null, sessionId=null, tracking=false, busy=false;
+  let user=null, callActivity=null, sessionId=null, tracking=false, starting=false;
+  let requestQueue=Promise.resolve();
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
   let summary=null, heartbeatTimer=null, uiTimer=null, root=null, modal=null;
 
@@ -87,22 +88,40 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
     }
   }
   async function send(action){
-    if(!callActivity||!user||!sessionId||busy)return null; busy=true;
-    try{
-      const data=(await callActivity(Object.assign({action,sessionId},pageInfo()))).data||{};
-      if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
-      if(typeof data.sessionSeconds==="number")sessionBase=data.sessionSeconds;
-      lastSyncAt=Date.now();
-      if(data.sessionClosed){tracking=false;sessionId=null;}
-      updateBar();renderSummary();return data;
-    }catch(e){console.warn("[Gurukul Activity] Sync failed:",e);return null;}
-    finally{busy=false;}
+    if(!callActivity||!user||!sessionId)return null;
+    // Capture the session identity now. The request queue guarantees that
+    // heartbeat/end requests are not silently discarded during another fetch.
+    const requestUser=user, requestSessionId=sessionId;
+    const payload=Object.assign({action,sessionId:requestSessionId},pageInfo());
+    const run=async()=>{
+      try{
+        const data=(await callActivity(payload,requestUser)).data||{};
+        if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
+        if(typeof data.sessionSeconds==="number")sessionBase=data.sessionSeconds;
+        lastSyncAt=Date.now();
+        if(data.sessionClosed && sessionId===requestSessionId){tracking=false;sessionId=null;}
+        updateBar();renderSummary();return data;
+      }catch(e){console.warn("[Gurukul Activity] Sync failed ("+action+"):",e);return null;}
+    };
+    const task=requestQueue.then(run,run);
+    requestQueue=task.then(()=>undefined,()=>undefined);
+    return task;
   }
   async function beginSession(){
-    if(!user||tracking||busy||document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS)return;
+    if(!user||tracking||starting||document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS)return;
+    starting=true;
+    const requestUser=user;
     sessionId=crypto.randomUUID().replace(/-/g,"");sessionBase=0;
-    const data=await send("start");
-    if(data){tracking=true;lastSyncAt=Date.now();updateBar();}else sessionId=null;
+    try{
+      const data=await send("start");
+      if(data && user===requestUser){
+        tracking=true;lastSyncAt=Date.now();updateBar();
+        // If focus was lost while the start request was in flight, close it.
+        if(document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS){
+          await send("end");tracking=false;sessionId=null;updateBar();
+        }
+      }else if(sessionId){sessionId=null;tracking=false;updateBar();}
+    }finally{starting=false;}
   }
   async function heartbeat(){
     if(!user)return;
@@ -132,9 +151,9 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
     try{
       const app=getApps().length?getApp():initializeApp(FIREBASE);
       const auth=getAuth(app);
-      callActivity=async payload=>{
-        if(!user) throw new Error("Sign in required");
-        const token=await user.getIdToken();
+      callActivity=async (payload,authUser=user)=>{
+        if(!authUser) throw new Error("Sign in required");
+        const token=await authUser.getIdToken();
         const response=await fetch(ACTIVITY_API+"/api/activity",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(payload),keepalive:payload.action==="end"});
         const result=await response.json().catch(()=>({error:"Invalid server response"}));
         if(!response.ok) throw new Error(result.error||"Activity service unavailable");
