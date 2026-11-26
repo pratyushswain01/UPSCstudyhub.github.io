@@ -26,7 +26,7 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
   function mountBar(){
     if(root||!document.body) return;
     root=document.createElement("div"); root.id="gurukul-activity-bar";
-    root.innerHTML='<button class="ga-trigger" type="button" aria-haspopup="dialog" aria-expanded="false"><span class="ga-live-dot"></span><span class="ga-trigger-label">GURUKUL ACTIVITY</span><span class="ga-trigger-time" data-ga-time>Today 00:00:00</span><span class="ga-trigger-open">View activity <span aria-hidden="true">↗</span></span></button>';
+    root.innerHTML='<button class="ga-trigger" type="button" aria-haspopup="dialog" aria-expanded="false"><span class="ga-live-dot"></span><span class="ga-trigger-label">GURUKUL ACTIVITY</span><span class="ga-trigger-time" data-ga-time>Today 00:00:00</span><span class="ga-streak-pill" data-ga-streak-pill>🔥 <b data-ga-bar-streak>0 day streak</b><small data-ga-bar-goal>30 min daily goal</small></span><span class="ga-trigger-open">View activity <span aria-hidden="true">↗</span></span></button>';
     const first=document.body.firstElementChild;
     if(first) document.body.insertBefore(root,first); else document.body.appendChild(root);
     root.querySelector(".ga-trigger").addEventListener("click",openModal);
@@ -132,6 +132,10 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
   function interaction(){lastInteraction=Date.now();if(user&&!tracking&&document.visibilityState==="visible")beginSession();}
   function updateBar(){
     if(!root)return;const t=root.querySelector("[data-ga-time]");if(t)t.textContent="Today "+fmt(todaySeconds());
+    const streak=summary?.streak||{},goal=streak.goalSeconds||1800,today=todaySeconds(),done=today>=goal;
+    const current=(streak.current||0)+(done&&!streak.todayCompleted?1:0);
+    const streakNode=root.querySelector("[data-ga-bar-streak]");if(streakNode)streakNode.textContent=current+" day"+(current===1?"":"s")+" streak";
+    const goalNode=root.querySelector("[data-ga-bar-goal]");if(goalNode)goalNode.textContent=done?"Daily goal complete":Math.ceil(Math.max(0,goal-today)/60)+" min left today";
     root.querySelector(".ga-live-dot")?.classList.toggle("is-active",tracking);
   }
   function initTracking(){
