@@ -63,7 +63,7 @@ async function touch(db,uid,b,now,end){
   const updated=await db.prepare("SELECT seconds FROM activity_sessions WHERE session_id=? AND uid=?").bind(id,uid).first();
   return {sessionSeconds:updated?updated.seconds:0,todaySeconds:await today(db,uid,date),sessionClosed:end};
 }
-const STREAK_GOAL_SECONDS=1800;
+const STREAK_GOAL_SECONDS=7200; // 2 hours of verified active study per India calendar day
 function shiftDate(date,delta){
   const d=new Date(date+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+delta);return d.toISOString().slice(0,10);
 }
