@@ -65,7 +65,7 @@ import {
   const close=()=>{backdrop.classList.remove("is-open");document.body.style.overflow="";button.focus();};
   const setMode=next=>{
     mode=next;
-    $("[data-name-wrap]").hidden=mode!=="signup";$("[data-consent-wrap]").hidden=mode!=="signup";
+    $("[data-name-wrap]").hidden=mode!=="signup";$("[data-consent-wrap]").hidden=false;
     $(".ug-auth-tabs").hidden=!!currentUser;$("form").hidden=!!currentUser;$(".ug-auth-google").hidden=!!currentUser;
     $("[data-reset]").hidden=!!currentUser||mode==="signup";$("[data-signout]").hidden=!currentUser;
     $(".ug-auth-account").hidden=!currentUser;$(".ug-auth-account").textContent=currentUser?"Signed in as "+(currentUser.email||currentUser.displayName||"student"):"";
@@ -82,8 +82,8 @@ import {
   $("form").addEventListener("submit",async e=>{
     e.preventDefault();showError();const form=e.currentTarget,data=new FormData(form),email=String(data.get("email")||"").trim(),password=String(data.get("password")||""),submit=$("form button[type=submit]");submit.disabled=true;
     try{
+      if(!form.elements.consent.checked)throw new Error("Please tick the box to agree to the Privacy Notice and Terms before continuing.");
       if(mode==="signup"){
-        if(!form.elements.consent.checked)throw new Error("Please accept the Privacy Notice and Terms to create an account.");
         const credential=await createUserWithEmailAndPassword(auth,email,password);const name=String(data.get("name")||"").trim();if(name)await updateProfile(credential.user,{displayName:name});
         try{localStorage.setItem("ug_consent_record",JSON.stringify({email,purposes:["account"],ts:Date.now(),v:1}));}catch(_){}
       }else await signInWithEmailAndPassword(auth,email,password);
@@ -92,7 +92,7 @@ import {
     finally{submit.disabled=false;}
   });
   $(".ug-auth-google").addEventListener("click",async()=>{
-    showError();try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});await signInWithPopup(auth,provider);close();}
+    showError();if(!$("#ug-auth-email").form.elements.consent.checked)return showError("Please tick the box to agree to the Privacy Notice and Terms before continuing.");try{const provider=new GoogleAuthProvider();provider.setCustomParameters({prompt:"select_account"});await signInWithPopup(auth,provider);close();}
     catch(error){showError(error.code?error.code+": "+error.message:error.message);}
   });
   $("[data-reset]").addEventListener("click",async()=>{
