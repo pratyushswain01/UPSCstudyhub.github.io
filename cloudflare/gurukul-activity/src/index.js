@@ -63,13 +63,30 @@ async function touch(db,uid,b,now,end){
   const updated=await db.prepare("SELECT seconds FROM activity_sessions WHERE session_id=? AND uid=?").bind(id,uid).first();
   return {sessionSeconds:updated?updated.seconds:0,todaySeconds:await today(db,uid,date),sessionClosed:end};
 }
+const STREAK_GOAL_SECONDS=1800;
+function shiftDate(date,delta){
+  const d=new Date(date+"T12:00:00Z");d.setUTCDate(d.getUTCDate()+delta);return d.toISOString().slice(0,10);
+}
 async function getSummary(db,uid,now){
   const todayDate=indiaDate(now),from=indiaDate(now-6*86400000);
-  const r=await db.prepare("SELECT activity_date,seconds FROM activity_daily WHERE uid=? AND activity_date>=? AND activity_date<=? ORDER BY activity_date").bind(uid,from,todayDate).all();
-  const map=new Map((r.results||[]).map(x=>[x.activity_date,x.seconds])),days=[];
-  for(let i=6;i>=0;i--){const d=indiaDate(now-i*86400000);days.push({date:d,label:label(d),seconds:map.get(d)||0});}
+  const r=await db.prepare("SELECT activity_date,seconds FROM activity_daily WHERE uid=? AND activity_date<=? ORDER BY activity_date").bind(uid,todayDate).all();
+  const allRows=r.results||[],map=new Map(allRows.map(x=>[x.activity_date,x.seconds])),days=[];
+  for(let i=6;i>=0;i--){const d=shiftDate(todayDate,-i);days.push({date:d,label:label(d),seconds:map.get(d)||0});}
+  // A streak is earned only after the daily active-time target is reached.
+  // Before today's target is reached, yesterday's completed streak remains alive for the rest of today.
+  let cursor=map.get(todayDate)>=STREAK_GOAL_SECONDS?todayDate:shiftDate(todayDate,-1);
+  let current=0;
+  while((map.get(cursor)||0)>=STREAK_GOAL_SECONDS){current++;cursor=shiftDate(cursor,-1);}
+  let best=0,run=0,previous=null;
+  for(const row of allRows){
+    if((row.seconds||0)<STREAK_GOAL_SECONDS){run=0;previous=row.activity_date;continue;}
+    run=previous&&shiftDate(previous,1)===row.activity_date?run+1:1;
+    best=Math.max(best,run);previous=row.activity_date;
+  }
+  const todaySeconds=map.get(todayDate)||0;
+  const streak={goalSeconds:STREAK_GOAL_SECONDS,todaySeconds,remainingSeconds:Math.max(0,STREAK_GOAL_SECONDS-todaySeconds),todayCompleted:todaySeconds>=STREAK_GOAL_SECONDS,current,best};
   const s=await db.prepare("SELECT started_at,seconds,page_path,page_title FROM activity_sessions WHERE uid=? ORDER BY started_at DESC LIMIT 10").bind(uid).all();
-  return {todaySeconds:map.get(todayDate)||0,days,recentSessions:(s.results||[]).map(x=>({startedAt:x.started_at,durationSeconds:x.seconds,pagePath:x.page_path,title:x.page_title}))};
+  return {todaySeconds,days,streak,recentSessions:(s.results||[]).map(x=>({startedAt:x.started_at,durationSeconds:x.seconds,pagePath:x.page_path,title:x.page_title}))};
 }
 export default {async fetch(request,env){
   const origin=request.headers.get("Origin")||"";
