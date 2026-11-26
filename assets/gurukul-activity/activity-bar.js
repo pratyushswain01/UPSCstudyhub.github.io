@@ -13,7 +13,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
     messagingSenderId: "451692540885",
     appId: "1:451692540885:web:b425e85128e5de97c7c35c"
   };
-  const ACTIVITY_API = "https://activity.upscgurukul.online";
+  const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
   let user=null, callActivity=null, sessionId=null, tracking=false, busy=false;
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
