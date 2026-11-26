@@ -1,6 +1,5 @@
 import { getApp, getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js";
 
 (() => {
   "use strict";
@@ -14,6 +13,7 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
     messagingSenderId: "451692540885",
     appId: "1:451692540885:web:b425e85128e5de97c7c35c"
   };
+  const ACTIVITY_API = "https://activity.upscgurukul.online";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
   let user=null, callActivity=null, sessionId=null, tracking=false, busy=false;
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
@@ -131,8 +131,15 @@ import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/
   async function boot(){
     try{
       const app=getApps().length?getApp():initializeApp(FIREBASE);
-      const auth=getAuth(app), functions=getFunctions(app,"asia-south1");
-      callActivity=httpsCallable(functions,"gurukulActivity");
+      const auth=getAuth(app);
+      callActivity=async payload=>{
+        if(!user) throw new Error("Sign in required");
+        const token=await user.getIdToken();
+        const response=await fetch(ACTIVITY_API+"/api/activity",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(payload),keepalive:payload.action==="end"});
+        const result=await response.json().catch(()=>({error:"Invalid server response"}));
+        if(!response.ok) throw new Error(result.error||"Activity service unavailable");
+        return {data:result};
+      };
       mountStyles();mountBar();initTracking();
       onAuthStateChanged(auth,async nextUser=>{
         user=nextUser;
