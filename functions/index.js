@@ -65,7 +65,7 @@ exports.gurukulActivity=onCall({region:"asia-south1",maxInstances:10},async requ
     if(session.endedAt)return {todaySeconds:daySeconds,sessionSeconds:Number(session.totalSeconds||0),sessionClosed:true};
     const lastMs=session.lastHeartbeatAt&&session.lastHeartbeatAt.toMillis?session.lastHeartbeatAt.toMillis():nowMs;
     const gap=Math.floor((nowMs-lastMs)/1000);
-    const credited=gap>0&&gap<=60?Math.min(gap,45):0;
+    const credited=gap>=20&&gap<=60?Math.min(gap,45):0;
     const total=Number(session.totalSeconds||0)+credited, closed=action==="end";
     tx.update(sessionRef,{lastHeartbeatAt:now,lastPagePath:pagePath,lastPageTitle:pageTitle,totalSeconds:total,...(closed?{endedAt:now}:{})});
     tx.set(dayRef,{uid,date,seconds:daySeconds+credited,sessions:daySessions,updatedAt:now},{merge:true});
