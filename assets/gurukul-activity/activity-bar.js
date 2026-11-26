@@ -13,6 +13,7 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
 
   const esc = v => String(v || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt = n => { n=Math.max(0,Math.floor(n||0)); return [Math.floor(n/3600),Math.floor((n%3600)/60),n%60].map(v=>String(v).padStart(2,"0")).join(":"); };
+  const fmtCompact = n => { n=Math.max(0,Math.floor(n||0)); if(n<60)return n+"s"; if(n<3600)return Math.floor(n/60)+"m "+(n%60)+"s"; return Math.floor(n/3600)+"h "+Math.floor((n%3600)/60)+"m"; };
   const liveExtra = () => tracking && document.visibilityState==="visible" && Date.now()-lastInteraction<IDLE_MS ? Math.max(0,Math.floor((Date.now()-lastSyncAt)/1000)) : 0;
   const todaySeconds = () => todayBase + liveExtra();
   const pageInfo = () => ({pagePath:location.pathname.slice(0,240),pageTitle:(document.title||"UPSC Gurukul").slice(0,120)});
@@ -53,7 +54,7 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
     if(!modal)return; modal.querySelector("[data-ga-today]").textContent=fmt(todaySeconds());
     if(!summary)return;
     const days=summary.days||[], total=days.reduce((a,d)=>a+(d.seconds||0),0);
-    modal.querySelector("[data-ga-week]").textContent=Math.floor(total/3600)+"h "+Math.floor((total%3600)/60)+"m";
+    modal.querySelector("[data-ga-week]").textContent=fmtCompact(total);
     modal.querySelector("[data-ga-days]").textContent=days.filter(d=>d.seconds>0).length+" active days";
     const max=Math.max(3600,...days.map(d=>d.seconds||0));
     modal.querySelector("[data-ga-week-bars]").innerHTML=days.map(d=>{
@@ -63,7 +64,7 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
     const sessions=summary.recentSessions||[];
     modal.querySelector("[data-ga-sessions]").innerHTML=sessions.length?sessions.map(s=>{
       const date=s.startedAt?new Date(s.startedAt).toLocaleString("en-IN",{day:"numeric",month:"short",hour:"numeric",minute:"2-digit"}):"Recent session";
-      return '<div class="ga-session"><span class="ga-session-icon">◷</span><div class="ga-session-copy"><strong>'+esc(s.title||"Study session")+'</strong><small>'+esc(date)+' · '+esc(s.pagePath||"Gurukul")+'</small></div><span class="ga-session-duration">'+(s.durationSeconds!=null?fmt(s.durationSeconds):"Recorded")+'</span></div>';
+      return '<div class="ga-session"><span class="ga-session-icon">◷</span><div class="ga-session-copy"><strong>'+esc(s.title||"Study session")+'</strong><small>'+esc(date)+' · '+esc(s.pagePath||"Gurukul")+'</small></div><span class="ga-session-duration">'+(s.durationSeconds>0?fmt(s.durationSeconds):"Under 20s")+'</span></div>';
     }).join(""):'<div class="ga-empty">Your study sessions will appear here as you use Gurukul.</div>';
   }
   async function loadSummary(){
