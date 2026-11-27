@@ -7,6 +7,8 @@
   const API_BASE = "https://gurukul-mitra-ai.pratyushkumarswain2005.workers.dev";
   const MAX_HISTORY = 8;
   const history = [];
+  const pageContext = { title: (document.title || 'UPSC Gurukul').slice(0, 100), path: (location.pathname || '/').split('?')[0].slice(0, 80) };
+  const pageGuide = (() => { const p = pageContext.path.toLowerCase(); if (p.includes('test') || p.includes('quiz')) return 'You are on a practice or test page. I can help explain instructions, revise a topic, or review answers after you finish.'; if (p.includes('geography') || p.includes('notes')) return 'You are in the learning and notes area. I can explain a concept, make revision points, or quiz you on this topic.'; if (p.includes('planner') || p.includes('schedule')) return 'You are in a planning area. I can help organise today’s study blocks and revision priorities.'; if (p.includes('activity') || p.includes('account')) return 'You are viewing your account or activity. I can explain your study streak and two-hour daily target.'; return 'I can guide you around UPSC Gurukul, help plan your study, explain UPSC topics, or give you a quick practice question.'; })();
 
   const fallbackAnswers = [
     {
@@ -190,6 +192,7 @@
       <strong>Namaste, Aspirant!</strong>
       <p>“Your journey to civil services starts with one good question. I'm Gurukul Mitra, your UPSC companion—here to help you learn, plan, practise, and move forward with confidence.”</p>
       <p class="gm-question">What shall we work on today?</p>
+      <p class="gm-page-guide">${pageGuide}</p>
     `;
 
     const suggestions = document.createElement("div");
@@ -317,7 +320,8 @@
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             message,
-            history: history.slice(-MAX_HISTORY)
+            history: history.slice(-MAX_HISTORY),
+            context: pageContext
           }),
           signal: controller.signal
         });
