@@ -57,7 +57,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
     const days=summary.days||[], total=days.reduce((a,d)=>a+(d.seconds||0),0);
     modal.querySelector("[data-ga-week]").textContent=fmtCompact(total);
     const streak=summary.streak||{goalSeconds:7200,current:0,best:0};
-    const goal=streak.goalSeconds||1800, today=todaySeconds(), completed=today>=goal;
+    const goal=Number(streak.goalSeconds)||DAILY_GOAL_SECONDS, today=todaySeconds(), completed=today>=goal;
     modal.querySelector("[data-ga-streak-current]").textContent=String((streak.current||0)+(completed&& !streak.todayCompleted?1:0));
     modal.querySelector("[data-ga-streak-best]").textContent="Best: "+Math.max(streak.best||0,(streak.current||0)+(completed&&!streak.todayCompleted?1:0))+" days";
     modal.querySelector("[data-ga-streak-status]").textContent=completed?"GOAL COMPLETED":"IN PROGRESS";
