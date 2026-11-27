@@ -172,6 +172,7 @@
   sideTab.addEventListener("click", () => {
     setOpen(true);
   });
+  document.addEventListener("ug:open-mitra", () => setOpen(true));
 // ---------- Welcome inside panel ----------
   function showWelcome() {
     if (hasConversation || messages.querySelector(".gm-msg")) return;
