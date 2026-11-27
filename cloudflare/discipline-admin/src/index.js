@@ -60,7 +60,8 @@ async function attachStudentNames(users,env){
   while(cursor<users.length){
    const user=users[cursor++];
    try{
-    const r=await fetch(base+encodeURIComponent(user.uid),{headers:{Authorization:"Bearer "+token}});
+    let r=await fetch(base+encodeURIComponent(user.uid),{headers:{Authorization:"Bearer "+token}});
+    if(!r.ok)r=await fetch("https://firestore.googleapis.com/v1/projects/"+PROJECT_ID+"/databases/(default)/documents/users/"+encodeURIComponent(user.uid),{headers:{Authorization:"Bearer "+token}});
     if(!r.ok){user.display_name="";continue;}
     const doc=await r.json(),f=doc.fields||{};
     user.display_name=f.displayName?.stringValue||f.name?.stringValue||"";
