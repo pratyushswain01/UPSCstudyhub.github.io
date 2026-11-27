@@ -1,6 +1,7 @@
 const MAX_BODY_BYTES = 12_000;
 const MAX_MESSAGE_CHARS = 1800;
 const MAX_HISTORY_ITEMS = 8;
+const MAX_CONTEXT_CHARS = 180;
 
 const SYSTEM_PROMPT = `You are Gurukul Mitra, the friendly study assistant for UPSC Gurukul.
 Help UPSC aspirants with concepts, study planning, quizzes, and navigating the website.
@@ -75,6 +76,11 @@ export default {
       return json({ error: `Message must be 1-${MAX_MESSAGE_CHARS} characters` }, 400, headers);
     }
 
+    const pageContext = payload.context && typeof payload.context === 'object' ? {
+      title: String(payload.context.title || '').replace(/[<>]/g, '').slice(0, 100),
+      path: String(payload.context.path || '').replace(/[^a-zA-Z0-9/_-]/g, '').slice(0, 80)
+    } : null;
+
     const history = Array.isArray(payload.history)
       ? payload.history.slice(-MAX_HISTORY_ITEMS).filter(m =>
           m && ["user", "assistant"].includes(m.role) &&
@@ -88,8 +94,11 @@ export default {
 
     try {
       const model = env.MODEL || "@cf/meta/llama-3.1-8b-instruct";
+      const contextualPrompt = pageContext
+        ? `\n\nCurrent page context (metadata only; not screen contents): page title: ${pageContext.title || "Unknown"}; path: ${pageContext.path || "/"}. Use this only to make navigation guidance relevant. Do not claim to see screen contents, private account data, or actions that were not provided.`
+        : "";
       const messages = [
-        { role: "system", content: SYSTEM_PROMPT },
+        { role: "system", content: SYSTEM_PROMPT + contextualPrompt },
         ...history.map(m => ({ role: m.role, content: m.content })),
         { role: "user", content: message }
       ];
