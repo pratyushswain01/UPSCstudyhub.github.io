@@ -31,6 +31,33 @@ import {
     .ug-auth-account{padding:15px!important;background:#fff!important;border:1px solid #e4e6eb!important;border-radius:14px!important;overflow-wrap:anywhere!important;color:#3d4552!important;font-size:13px!important}
     .ug-auth-card a{color:#365d9b!important;text-decoration:underline!important}
     @media(max-width:520px){.ug-home-account{padding:8px 11px!important;font-size:12px!important}.ug-auth-card{padding:23px!important;border-radius:23px!important}}
+
+    .ug-auth-card{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;width:min(100%,1040px)!important;max-height:min(92dvh,720px)!important;min-height:min(660px,86dvh)!important;overflow:hidden!important;padding:0!important;border-radius:28px!important;background:#fff!important;box-shadow:0 30px 100px rgba(0,0,0,.24)!important}
+    .ug-auth-story{position:relative;isolation:isolate;display:flex;flex-direction:column;justify-content:space-between;min-width:0;padding:clamp(28px,4vw,52px)!important;overflow:hidden!important;color:#f8fafc!important;background:linear-gradient(150deg,#18243a 0%,#101c2e 58%,#12303a 100%)!important}
+    .ug-auth-story:before,.ug-auth-story:after{content:"";position:absolute;z-index:-1;border-radius:50%;pointer-events:none}
+    .ug-auth-story:before{width:460px;height:460px;right:-210px;top:-150px;background:radial-gradient(circle,rgba(221,185,112,.25),transparent 68%)}
+    .ug-auth-story:after{width:400px;height:400px;left:-210px;bottom:-210px;background:radial-gradient(circle,rgba(48,144,151,.22),transparent 70%)}
+    .ug-auth-brand{display:flex;align-items:center;gap:11px;color:#fff!important;text-decoration:none!important;font-size:14px;font-weight:750}
+    .ug-auth-brand img{width:42px;height:42px;object-fit:contain;padding:4px;border-radius:12px;background:rgba(255,255,255,.09)}
+    .ug-auth-brand small{display:block;margin-top:3px;color:#bac5d4;font-size:9px;font-weight:550;letter-spacing:1.5px}
+    .ug-auth-story-copy{max-width:410px;margin:42px 0}
+    .ug-auth-eyebrow{color:#e5c783;font-size:10px;font-weight:850;letter-spacing:2px}
+    .ug-auth-story-copy h2{margin:14px 0 16px!important;color:#fff!important;font-size:clamp(36px,4vw,53px)!important;line-height:1.03!important;letter-spacing:-2.4px!important;font-weight:780!important}
+    .ug-auth-story-copy p{margin:0;color:#c3cedb;font-size:14px;line-height:1.75}
+    .ug-auth-story-foot{color:#a7b4c4;font-size:10px;line-height:1.7}
+    .ug-auth-panel{position:relative;display:flex;flex-direction:column;justify-content:center;min-width:0;overflow:auto;padding:clamp(28px,4vw,54px)!important;background:#fff!important}
+    .ug-auth-panel h2{padding-right:35px!important;font-size:clamp(28px,3vw,34px)!important}
+    .ug-auth-close{position:absolute!important;top:22px!important;right:22px!important;float:none!important}
+    .ug-auth-panel .ug-auth-sub{margin-bottom:22px!important}
+    .ug-auth-input{min-height:47px!important}
+    .ug-auth-action{min-height:48px!important}
+    .ug-auth-or{display:flex;align-items:center;gap:12px;margin:15px 0 0;color:#9aa1ac;font-size:10px}
+    .ug-auth-or:before,.ug-auth-or:after{content:"";height:1px;flex:1;background:#e6e8ed}
+    .ug-auth-reset{align-self:flex-start;margin-top:15px;padding:5px 0;border:0;background:transparent;color:#365d9b;font-size:11px;cursor:pointer}
+    .ug-auth-note{margin-top:15px!important}
+    .ug-auth-google{margin-top:10px!important}
+    @media(min-width:761px) and (max-width:1000px){.ug-auth-card{grid-template-columns:.82fr 1.18fr!important;width:min(96vw,940px)!important;min-height:620px!important}.ug-auth-story{padding:28px!important}.ug-auth-story-copy h2{font-size:38px!important}.ug-auth-panel{padding:34px!important}}
+    @media(max-width:760px){.ug-auth-card{display:block!important;width:min(100%,460px)!important;min-height:0!important;max-height:92dvh!important;overflow:auto!important;padding:23px!important;border-radius:23px!important}.ug-auth-story{display:none!important}.ug-auth-panel{display:block!important;overflow:visible!important;padding:0!important}.ug-auth-close{top:0!important;right:0!important}.ug-auth-panel h2{font-size:27px!important}.ug-auth-panel .ug-auth-sub{padding-right:28px}.ug-auth-or{margin-top:13px}}
   `;
   document.head.appendChild(style);
   const button=document.getElementById("ug-home-account");
@@ -39,23 +66,31 @@ import {
   backdrop.className="ug-auth-backdrop";
   backdrop.innerHTML=`
     <section class="ug-auth-card" role="dialog" aria-modal="true" aria-labelledby="ug-auth-title">
-      <button type="button" class="ug-auth-close" aria-label="Close">×</button>
-      <h2 id="ug-auth-title">Your next chapter starts here.</h2>
-      <p class="ug-auth-sub">Sign in to continue your preparation with UPSC Gurukul.</p>
-      <div class="ug-auth-tabs"><button type="button" data-mode="login" aria-selected="true">Sign in</button><button type="button" data-mode="signup" aria-selected="false">Create account</button></div>
-      <div class="ug-auth-account" hidden></div>
-      <form>
-        <div data-name-wrap hidden><label class="ug-auth-field" for="ug-auth-name">Full name</label><input class="ug-auth-input" id="ug-auth-name" name="name" autocomplete="name"></div>
-        <label class="ug-auth-field" for="ug-auth-email">Email address</label><input class="ug-auth-input" id="ug-auth-email" name="email" type="email" required autocomplete="email" placeholder="you@example.com">
-        <label class="ug-auth-field" for="ug-auth-password">Password</label><input class="ug-auth-input" id="ug-auth-password" name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="At least 6 characters">
-        <label class="ug-auth-check" data-consent-wrap hidden><input type="checkbox" name="consent"><span>I agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms</a>.</span></label>
-        <p class="ug-auth-error" role="status" aria-live="polite"></p>
-        <button class="ug-auth-action" type="submit">Sign in</button>
-      </form>
-      <button type="button" class="ug-auth-action ug-auth-google">Continue with Google</button>
-      <button type="button" class="ug-auth-action" data-signout hidden>Sign out</button>
-      <button type="button" class="ug-auth-action" data-reset style="background:transparent!important;color:#626976!important">Forgot password?</button>
-      <p class="ug-auth-note">Your account works across supported UPSC Gurukul pages. Your study activity is private to your account.</p>
+      <aside class="ug-auth-story">
+        <a class="ug-auth-brand" href="/homeUPSChub.html"><img src="/assets/upsc-gurukul-logo.png" alt=""><span>UPSC गुरुकुल<small>LEARN WITH PURPOSE</small></span></a>
+        <div class="ug-auth-story-copy"><span class="ug-auth-eyebrow">YOUR PREPARATION, IN ONE PLACE</span><h2>Build the habits.<br>Earn the result.</h2><p>A calmer, more focused space for your UPSC journey — with learning resources, tests, notes and your personal study progress.</p></div>
+        <div class="ug-auth-story-foot">A thoughtful learning companion for every serious aspirant.<br>© UPSC गुरुकुल</div>
+      </aside>
+      <div class="ug-auth-panel">
+        <button type="button" class="ug-auth-close" aria-label="Close">×</button>
+        <h2 id="ug-auth-title">Welcome back.</h2>
+        <p class="ug-auth-sub">Sign in to continue your preparation with UPSC Gurukul.</p>
+        <div class="ug-auth-tabs"><button type="button" data-mode="login" aria-selected="true">Sign in</button><button type="button" data-mode="signup" aria-selected="false">Create account</button></div>
+        <div class="ug-auth-account" hidden></div>
+        <form>
+          <div data-name-wrap hidden><label class="ug-auth-field" for="ug-auth-name">Full name</label><input class="ug-auth-input" id="ug-auth-name" name="name" autocomplete="name" placeholder="Your full name"></div>
+          <label class="ug-auth-field" for="ug-auth-email">Email address</label><input class="ug-auth-input" id="ug-auth-email" name="email" type="email" required autocomplete="email" placeholder="you@example.com">
+          <label class="ug-auth-field" for="ug-auth-password">Password</label><input class="ug-auth-input" id="ug-auth-password" name="password" type="password" required minlength="6" autocomplete="current-password" placeholder="Enter your password">
+          <label class="ug-auth-check" data-consent-wrap hidden><input type="checkbox" name="consent"><span>I agree to the <a href="/privacy.html" target="_blank" rel="noopener">Privacy Notice</a> and <a href="/terms.html" target="_blank" rel="noopener">Terms</a>.</span></label>
+          <p class="ug-auth-error" role="status" aria-live="polite"></p>
+          <button class="ug-auth-action" type="submit">Sign in</button>
+        </form>
+        <div class="ug-auth-or"><span>or continue with</span></div>
+        <button type="button" class="ug-auth-action ug-auth-google">Continue with Google</button>
+        <button type="button" class="ug-auth-action" data-signout hidden>Sign out</button>
+        <button type="button" class="ug-auth-reset" data-reset>Forgot password?</button>
+        <p class="ug-auth-note">Your account works across supported UPSC Gurukul pages. Your study activity is private to your account.</p>
+      </div>
     </section>`;
   document.body.appendChild(backdrop);
   const $=s=>backdrop.querySelector(s);
