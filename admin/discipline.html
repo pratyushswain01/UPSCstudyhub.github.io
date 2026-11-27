@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f6f3eb"><title>Discipline Monitor | UPSC Gurukul</title>
+<style>
+:root{color-scheme:light;--ink:#25251f;--muted:#777568;--paper:#fbf9f3;--line:#e8e1d4;--gold:#9b7944;--red:#a8493d;--green:#547b5e}
+*{box-sizing:border-box}body{margin:0;background:#f4f0e7;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}header{position:sticky;top:0;z-index:5;background:#fbf9f3ed;border-bottom:1px solid var(--line);backdrop-filter:blur(14px)}.nav{max-width:1200px;margin:auto;padding:16px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px}.brand{font-weight:850;text-decoration:none;color:var(--ink)}.brand small{display:block;color:var(--muted);font-size:10px;letter-spacing:1.4px;text-transform:uppercase}main{width:min(1200px,calc(100% - 32px));margin:30px auto 70px}.eyebrow{font-size:10px;font-weight:850;letter-spacing:1.8px;color:var(--gold)}h1{font:700 clamp(30px,5vw,44px)/1.1 Georgia,serif;margin:8px 0}.lead{color:var(--muted);font-size:14px;margin:0 0 24px}.toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 18px}.btn{border:1px solid #d8cfbf;background:#fffdf8;color:#514a3c;border-radius:10px;padding:10px 14px;font-weight:750;font-size:12px;cursor:pointer}.btn.primary{background:#927344;color:white;border-color:#927344}.updated{color:var(--muted);font-size:11px}.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:18px}.card{background:var(--paper);border:1px solid var(--line);border-radius:17px;padding:18px;box-shadow:0 10px 28px #45371a08}.metric{font:700 30px Georgia,serif;margin:8px 0 2px}.metric-label{font-size:11px;color:var(--muted)}.table-card{padding:0;overflow:hidden}.table-head{padding:18px 18px 12px;display:flex;justify-content:space-between;align-items:center;gap:12px}.table-head h2{font-size:16px;margin:0}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;min-width:900px}th,td{text-align:left;padding:13px 15px;border-top:1px solid var(--line);font-size:12px;white-space:nowrap}th{font-size:10px;color:var(--muted);letter-spacing:.7px;text-transform:uppercase;background:#f7f3eb}td.uid{font-family:ui-monospace,monospace;font-size:10px;color:#5e594f}.status{display:inline-flex;padding:5px 9px;border-radius:99px;font-size:10px;font-weight:850;text-transform:uppercase}.status.active{color:var(--green);background:#eaf1e8}.status.restricted{color:var(--red);background:#f7e9e5}.status.recovery{color:#8b6b31;background:#f5efdf}.empty,.message{padding:24px;text-align:center;color:var(--muted);font-size:13px}.error{color:var(--red)}.foot{color:var(--muted);font-size:11px;line-height:1.6;margin-top:15px}@media(max-width:760px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nav{padding:13px 16px}main{margin-top:23px}}@media(max-width:390px){.grid{gap:8px}.card{padding:13px}.metric{font-size:25px}}
+</style></head><body>
+<header><div class="nav"><a class="brand" href="/homeUPSChub.html">UPSC गुरुकुल<small>Admin · Discipline monitor</small></a><a href="/account.html" style="color:#78623d;text-decoration:none;font-size:12px;font-weight:700">My account ↗</a></div></header>
+<main><div class="eyebrow">ADMINISTRATION / STUDENT CONSISTENCY</div><h1>Discipline monitor</h1><p class="lead">A live overview of study activity, missed-target restrictions and recovery progress recorded by Gurukul.</p>
+<div class="toolbar"><button class="btn primary" id="refresh">↻ Refresh data</button><span class="updated" id="updated">Waiting for secure admin verification…</span></div>
+<section class="grid">
+ <article class="card"><div class="eyebrow">TRACKED USERS</div><div class="metric" id="total">—</div><div class="metric-label">Accounts with activity records</div></article>
+ <article class="card"><div class="eyebrow">RESTRICTED</div><div class="metric" id="restricted">—</div><div class="metric-label">Access currently restricted</div></article>
+ <article class="card"><div class="eyebrow">RECOVERING</div><div class="metric" id="recovering">—</div><div class="metric-label">Completing the 2-hour recovery</div></article>
+ <article class="card"><div class="eyebrow">IST DATE</div><div class="metric" id="today" style="font-size:21px">—</div><div class="metric-label">Current reporting day</div></article>
+</section>
+<section class="card table-card"><div class="table-head"><h2>Student discipline records</h2><span class="updated" id="count">0 records</span></div><div class="table-wrap"><table><thead><tr><th>Firebase UID</th><th>Status</th><th>Today</th><th>Last 7 days</th><th>Recovery progress</th><th>Grace days · 30d</th><th>Last activity</th><th>Evaluated through</th></tr></thead><tbody id="rows"><tr><td colspan="8" class="message">Loading secure student records…</td></tr></tbody></table></div></section>
+<p class="foot">Privacy and access: student records are fetched only after Firebase authentication. The admin Worker independently verifies the Firebase token and checks the two authorised administrator UIDs. Only users with activity or discipline records appear here; this is not a complete Firebase user directory. Study time is an estimate of active site use, not proof of focused learning.</p>
+</main>
+<script type="module">
+import {auth,watchUser} from "/auth/firebase-auth.js";
+const API="https://upscgurukul-discipline-admin.pratyushkumarswain2005.workers.dev";
+const $=id=>document.getElementById(id);
+const fmt=s=>{s=Math.max(0,Math.floor(Number(s)||0));return Math.floor(s/3600)+"h "+Math.floor(s%3600/60)+"m";};
+let currentUser=null,busy=false;
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+async function refresh(){
+ if(!currentUser||busy)return;busy=true;$("refresh").disabled=true;$("updated").textContent="Fetching latest records…";
+ try{
+  const token=await currentUser.getIdToken(true);
+  const r=await fetch(API+"/api/admin/discipline",{headers:{Authorization:"Bearer "+token}});
+  const data=await r.json();if(!r.ok)throw new Error(data.error||"Could not load dashboard");
+  $("total").textContent=data.totalUsers;$("restricted").textContent=data.restrictedUsers;$("recovering").textContent=data.recoveringUsers;$("today").textContent=data.today;$("count").textContent=data.users.length+" records";
+  $("rows").innerHTML=data.users.length?data.users.map(u=>{
+   const status=u.restricted?"restricted":u.status;
+   const pct=Math.min(100,Math.round((Number(u.recovery_seconds)||0)/7200*100));
+   const last=u.last_session_at?new Date(Number(u.last_session_at)).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):"No session";
+   return '<tr><td class="uid" title="'+esc(u.uid)+'">'+esc(u.uid)+'</td><td><span class="status '+status+'">'+status+'</span></td><td>'+fmt(u.today_seconds)+'</td><td>'+fmt(u.week_seconds)+'</td><td>'+fmt(u.recovery_seconds)+' / 2h ('+pct+'%)</td><td>'+Number(u.grace_events_30d||0)+'</td><td>'+esc(last)+'</td><td>'+esc(u.last_evaluated_date||"—")+'</td></tr>';
+  }).join(""):'<tr><td colspan="8" class="empty">No activity or discipline records found yet.</td></tr>';
+  $("updated").textContent="Updated "+new Date().toLocaleTimeString("en-IN")+" · Secure admin access verified";
+ }catch(e){$("rows").innerHTML='<tr><td colspan="8" class="message error">'+esc(e.message)+'</td></tr>';$("updated").textContent="Could not refresh";}finally{busy=false;$("refresh").disabled=false;}
+}
+watchUser(user=>{
+ currentUser=user;
+ if(!user){location.replace("/auth/login.html?next="+encodeURIComponent("/admin/discipline.html"));return;}
+ refresh();
+});
+$("refresh").addEventListener("click",refresh);
+</script></body></html>
