@@ -82,6 +82,7 @@
             <span>Online</span>
           </div>
         </div>
+        <button class="gm-expand" type="button" aria-label="Switch to compact assistant" title="Switch view">↗</button>
         <button class="gm-close" type="button" aria-label="Close assistant">×</button>
       </header>
       <div class="gm-messages" aria-live="polite"></div>
@@ -103,6 +104,7 @@
   const launcher = root.querySelector(".gm-launcher");
   const panel = root.querySelector(".gm-panel");
   const closeBtn = root.querySelector(".gm-close");
+  const expandBtn = root.querySelector(".gm-expand");
   const form = root.querySelector(".gm-compose");
   const input = root.querySelector(".gm-input");
   const sendBtn = root.querySelector(".gm-send");
@@ -189,10 +191,32 @@
     const welcome = document.createElement("div");
     welcome.className = "gm-welcome";
     welcome.innerHTML = `
-      <strong>Namaste, Aspirant!</strong>
+      <div class="gm-robot-stage" aria-label="Gurukul Mitra AI robot">
+        <div class="gm-robot-aura"></div>
+        <svg class="gm-robot" viewBox="0 0 220 220" role="img" aria-label="Friendly Gurukul Mitra robot">
+          <defs>
+            <linearGradient id="gmBotShell" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fffdf6"/><stop offset="1" stop-color="#dfe9df"/></linearGradient>
+            <linearGradient id="gmBotGold" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e8ce91"/><stop offset="1" stop-color="#b58a43"/></linearGradient>
+          </defs>
+          <path d="M110 28V16" stroke="#a8874b" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="110" cy="12" r="7" fill="#d9b66f" class="gm-robot-signal"/>
+          <rect x="48" y="47" width="124" height="104" rx="38" fill="url(#gmBotShell)" stroke="#b9c8bc" stroke-width="3"/>
+          <rect x="61" y="66" width="98" height="62" rx="25" fill="#183d36"/>
+          <ellipse cx="87" cy="95" rx="8" ry="11" fill="#e8cf98" class="gm-robot-eye"/>
+          <ellipse cx="133" cy="95" rx="8" ry="11" fill="#e8cf98" class="gm-robot-eye"/>
+          <path d="M92 112Q110 126 128 112" fill="none" stroke="#f2e4c2" stroke-width="4" stroke-linecap="round"/>
+          <path d="M48 82L29 91V119L49 126M172 82L191 91V119L171 126" fill="none" stroke="#b9c8bc" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="72" y="145" width="76" height="39" rx="17" fill="url(#gmBotShell)" stroke="#b9c8bc" stroke-width="3"/>
+          <circle cx="110" cy="164" r="7" fill="url(#gmBotGold)"/>
+          <path d="M82 185L72 199M138 185L148 199" stroke="#b9c8bc" stroke-width="9" stroke-linecap="round"/>
+          <path d="M92 202H128" stroke="#b58a43" stroke-width="5" stroke-linecap="round"/>
+        </svg>
+        <span class="gm-robot-orbit gm-orbit-one"></span><span class="gm-robot-orbit gm-orbit-two"></span>
+      </div>
+      <div class="gm-welcome-copy"><strong>Namaste, Aspirant!</strong>
       <p>“Your journey to civil services starts with one good question. I'm Gurukul Mitra, your UPSC companion—here to help you learn, plan, practise, and move forward with confidence.”</p>
       <p class="gm-question">What shall we work on today?</p>
-      <p class="gm-page-guide">${pageGuide}</p>
+      <p class="gm-page-guide">${pageGuide}</p></div>
     `;
 
     const suggestions = document.createElement("div");
@@ -222,8 +246,17 @@
     messages.appendChild(suggestions);
   }
 
+  function setFullScreen(full) {
+    panel.classList.toggle("gm-fullscreen", full);
+    expandBtn.textContent = full ? "↙" : "↗";
+    expandBtn.setAttribute("aria-label", full ? "Switch to compact assistant" : "Switch to full-screen assistant");
+    expandBtn.title = full ? "Switch to compact view" : "Open full-screen experience";
+  }
+
   function setOpen(open) {
     panel.classList.toggle("gm-open", open);
+    if (open) setFullScreen(true);
+    else setFullScreen(false);
     launcher.setAttribute("aria-expanded", String(open));
 
     if (open) {
@@ -239,6 +272,10 @@
 
   launcher.addEventListener("click", () => {
     setOpen(!panel.classList.contains("gm-open"));
+  });
+
+  expandBtn.addEventListener("click", () => {
+    setFullScreen(!panel.classList.contains("gm-fullscreen"));
   });
 
   closeBtn.addEventListener("click", () => {
