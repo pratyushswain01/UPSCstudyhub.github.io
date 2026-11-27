@@ -3,6 +3,10 @@
   if (window.__gurukulMitraLoaded) return;
   window.__gurukulMitraLoaded = true;
 
+
+  // Keep the activity-aware study supervisor available wherever Gurukul Mitra is installed.
+  if (!document.querySelector("script[data-gm-supervisor]")) { const supervisor = document.createElement("script"); supervisor.src = "/gurukul-mitra/study-supervisor.js?v=20261127-1"; supervisor.defer = true; supervisor.dataset.gmSupervisor = "1"; (document.body || document.head).appendChild(supervisor); }
+
   // Cloudflare Worker endpoint
   const API_BASE = "https://gurukul-mitra-ai.pratyushkumarswain2005.workers.dev";
   const MAX_HISTORY = 8;
