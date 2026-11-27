@@ -32,9 +32,12 @@ const app = getApps().length ? getApp() : initializeApp(FB);
 export const auth = getAuth(app);
 
 // Keep session across tabs/pages (and app WebView on same domain)
-setPersistence(auth, browserLocalPersistence).catch(() => {
-  /* ignore if storage blocked */
-});
+// Complete persistence initialisation before any page makes an auth redirect decision.
+export const authReady = setPersistence(auth, browserLocalPersistence)
+  .catch((error) => {
+    console.warn("[UPSC Gurukul auth] Persistent storage unavailable; using Firebase fallback.", error);
+  })
+  .then(() => auth.authStateReady());
 
 export {
   onAuthStateChanged,
@@ -50,7 +53,18 @@ export {
 
 /** Subscribe to auth state on any page */
 export function watchUser(callback) {
-  return onAuthStateChanged(auth, callback);
+  let unsubscribe = () => {};
+  let cancelled = false;
+  authReady.then(() => {
+    if (!cancelled) unsubscribe = onAuthStateChanged(auth, callback);
+  }).catch((error) => {
+    console.error("[UPSC Gurukul auth] Could not restore authentication state.", error);
+    if (!cancelled) callback(null);
+  });
+  return () => {
+    cancelled = true;
+    unsubscribe();
+  };
 }
 
 /** Friendly error text for UI */
