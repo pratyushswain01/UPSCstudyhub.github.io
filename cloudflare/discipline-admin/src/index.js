@@ -33,6 +33,42 @@ async function verifyAdmin(request){
  return c.sub;
 }
 function istDate(ms){const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date(ms));const o=Object.fromEntries(parts.map(x=>[x.type,x.value]));return o.year+"-"+o.month+"-"+o.day;}
+
+let googleTokenCache=null,googleTokenExpiry=0;
+function pemBytes(pem){const b=pem.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"");return Uint8Array.from(atob(b),c=>c.charCodeAt(0));}
+function b64url(bytes){let s="";for(const b of new Uint8Array(bytes))s+=String.fromCharCode(b);return btoa(s).replace(/=/g,"").replace(/\\+/g,"-").replace(/\\//g,"_");}
+async function getGoogleAccessToken(env){
+ if(googleTokenCache&&Date.now()<googleTokenExpiry-60000)return googleTokenCache;
+ if(!env.FIREBASE_SERVICE_ACCOUNT_JSON)throw Error("Student names are not configured yet. Add FIREBASE_SERVICE_ACCOUNT_JSON to this Worker.");
+ const sa=JSON.parse(env.FIREBASE_SERVICE_ACCOUNT_JSON);
+ if(!sa.client_email||!sa.private_key)throw Error("Firebase service account secret is invalid");
+ const now=Math.floor(Date.now()/1000),header=b64url(new TextEncoder().encode(JSON.stringify({alg:"RS256",typ:"JWT"})));
+ const claim=b64url(new TextEncoder().encode(JSON.stringify({iss:sa.client_email,scope:"https://www.googleapis.com/auth/datastore",aud:"https://oauth2.googleapis.com/token",iat:now,exp:now+3600})));
+ const unsigned=header+"."+claim;
+ const key=await crypto.subtle.importKey("pkcs8",pemBytes(sa.private_key),{name:"RSASSA-PKCS1-v1_5",hash:"SHA-256"},false,["sign"]);
+ const sig=await crypto.subtle.sign("RSASSA-PKCS1-v1_5",key,new TextEncoder().encode(unsigned));
+ const assertion=unsigned+"."+b64url(sig);
+ const form=new URLSearchParams({grant_type:"urn:ietf:params:oauth:grant-type:jwt-bearer",assertion});
+ const r=await fetch("https://oauth2.googleapis.com/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:form});
+ const data=await r.json();if(!r.ok||!data.access_token)throw Error("Could not authenticate the Firebase service account");
+ googleTokenCache=data.access_token;googleTokenExpiry=Date.now()+Number(data.expires_in||3600)*1000;return googleTokenCache;
+}
+async function attachStudentNames(users,env){
+ const token=await getGoogleAccessToken(env),base="https://firestore.googleapis.com/v1/projects/"+PROJECT_ID+"/databases/(default)/documents/artifacts/default-app-id/users/";
+ let cursor=0;
+ await Promise.all(Array.from({length:Math.min(8,users.length)},async()=>{
+  while(cursor<users.length){
+   const user=users[cursor++];
+   try{
+    const r=await fetch(base+encodeURIComponent(user.uid),{headers:{Authorization:"Bearer "+token}});
+    if(!r.ok){user.display_name="";continue;}
+    const doc=await r.json(),f=doc.fields||{};
+    user.display_name=f.displayName?.stringValue||f.name?.stringValue||"";
+   }catch{user.display_name="";}
+  }
+ }));
+}
+
 export default {async fetch(request,env){
  const origin=request.headers.get("Origin")||"";
  if(request.method==="OPTIONS")return ALLOWED_ORIGINS.has(origin)?new Response(null,{status:204,headers:{"Access-Control-Allow-Origin":origin,"Access-Control-Allow-Methods":"GET, OPTIONS","Access-Control-Allow-Headers":"Authorization, Content-Type","Access-Control-Max-Age":"86400","Vary":"Origin"}}):new Response(null,{status:403});
@@ -78,7 +114,8 @@ export default {async fetch(request,env){
    ORDER BY restricted DESC, today_seconds ASC, last_session_at DESC
    LIMIT 500
   `).bind(today,today,today,Date.now()-30*86400000).all();
-  const users=(q.results||[]).map(x=>({...x,uid:String(x.uid),status:x.restricted?"restricted":(x.recovery_seconds>0&&x.recovery_seconds<7200?"recovery":"active")}));
+  const users=(q.results||[]).map(x=>({...x,uid:String(x.uid),status:x.restricted?"restricted":(x.recovery_seconds>0&&x.recovery_seconds<7200?"recovery":"active"),display_name:""}));
+  try{await attachStudentNames(users,env);}catch(nameError){console.warn("Student name lookup unavailable:",nameError?.message||nameError);}
   return response({ok:true,today,adminUid,totalUsers:users.length,restrictedUsers:users.filter(x=>x.restricted).length,recoveringUsers:users.filter(x=>x.status==="recovery").length,users},200,origin);
  }catch(e){const message=e?.message||"Admin service error";const code=/Authentication|token|signature|signing key/i.test(message)?401:/Admin access/i.test(message)?403:500;return response({error:message},code,origin);}
 }};
