@@ -6,6 +6,7 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
   window.__GURUKUL_ACTIVITY_BAR__ = true;
 const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
+  const DAILY_GOAL_SECONDS = 2 * 60 * 60;
   let user=null, callActivity=null, sessionId=null, tracking=false, starting=false;
   let requestQueue=Promise.resolve();
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
@@ -132,7 +133,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   function interaction(){lastInteraction=Date.now();if(user&&!tracking&&document.visibilityState==="visible")beginSession();}
   function updateBar(){
     if(!root)return;const t=root.querySelector("[data-ga-time]");if(t)t.textContent="Today "+fmt(todaySeconds());
-    const streak=summary?.streak||{},goal=streak.goalSeconds||1800,today=todaySeconds(),done=today>=goal;
+    const streak=summary?.streak||{},goal=Number(streak.goalSeconds)||DAILY_GOAL_SECONDS,today=todaySeconds(),done=today>=goal;
     const current=(streak.current||0)+(done&&!streak.todayCompleted?1:0);
     const streakNode=root.querySelector("[data-ga-bar-streak]");if(streakNode)streakNode.textContent=current+" day"+(current===1?"":"s")+" streak";
     const goalNode=root.querySelector("[data-ga-bar-goal]");if(goalNode)goalNode.textContent=done?"Daily goal complete":Math.ceil(Math.max(0,goal-today)/60)+" min left today";
