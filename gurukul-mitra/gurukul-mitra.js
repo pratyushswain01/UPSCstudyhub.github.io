@@ -66,7 +66,7 @@
       </div>
 
       <button class="gm-launcher" type="button" aria-label="Open Gurukul Mitra assistant" aria-expanded="false">
-        <span class="gm-mark" aria-hidden="true">ॐ</span>
+        <span class="gm-mark" aria-hidden="true"><svg viewBox="0 0 48 48" class="gm-mini-robot" aria-hidden="true"><path d="M24 7V4" stroke="#e8ce91" stroke-width="3" stroke-linecap="round"/><circle cx="24" cy="3.5" r="3" fill="#e8ce91"/><rect x="7" y="10" width="34" height="29" rx="11" fill="#f8f7ef" stroke="#d5e0d6" stroke-width="2"/><rect x="11" y="15" width="26" height="17" rx="7" fill="#183d36"/><circle cx="18" cy="23" r="2.5" fill="#e8ce91"/><circle cx="30" cy="23" r="2.5" fill="#e8ce91"/><path d="M19 28Q24 32 29 28" fill="none" stroke="#f2e4c2" stroke-width="1.8" stroke-linecap="round"/><path d="M7 20L3 23V29L7 31M41 20L45 23V29L41 31" fill="none" stroke="#d5e0d6" stroke-width="3" stroke-linecap="round"/></svg></span>
         <span class="gm-launcher-label">Gurukul Mitra</span>
       </button>
     </div>
@@ -144,23 +144,17 @@
   }
 
   function hideLauncher() {
-    if (!panel.classList.contains("gm-open")) {
-      launcherWrap.classList.add("gm-launcher-hidden");
-    }
+    // Keep the small robot visible for the entire visit.
+    launcherWrap.classList.remove("gm-launcher-hidden");
   }
 
   function revealLauncherTemporarily() {
     launcherWrap.classList.remove("gm-launcher-hidden");
-    if (launcherHideTimer) clearTimeout(launcherHideTimer);
-    if (!panel.classList.contains("gm-open")) {
-      launcherHideTimer = setTimeout(hideLauncher, 6500);
-    }
   }
 
-  // Keep the greeting brief; hide the large launcher after initial attention.
-  setTimeout(showBubble, 1200);
-  setTimeout(hideBubble, 6500);
-  setTimeout(hideLauncher, 8500);
+  // The greeting is brief; the robot itself remains visible.
+  setTimeout(showBubble, 900);
+  setTimeout(hideBubble, 7000);
 
   bubbleClose.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -266,7 +260,7 @@
       if (!hasConversation) showWelcome();
       setTimeout(() => input.focus(), 80);
     } else {
-      launcherHideTimer = setTimeout(hideLauncher, 6500);
+      launcherWrap.classList.remove("gm-launcher-hidden");
     }
   }
 
@@ -398,6 +392,42 @@
       messages.scrollTop = messages.scrollHeight;
     }
   }
+
+
+  // Contextual guidance uses page metadata and the control the visitor activates.
+  // It does not capture screenshots, monitor keystrokes, or inspect private screen content.
+  let guideTimer = null;
+  function guideVisitor(message) {
+    if (!message || panel.classList.contains("gm-open")) return;
+    const textNode = bubble.querySelector(".gm-bubble-text");
+    if (textNode) textNode.innerHTML = '<strong>Gurukul Mitra</strong>' + message + '<br><span class="gm-bubble-cta">Tap my robot for help →</span>';
+    bubble.classList.add("gm-bubble-visible");
+    if (guideTimer) clearTimeout(guideTimer);
+    guideTimer = setTimeout(() => bubble.classList.remove("gm-bubble-visible"), 5200);
+  }
+  function guidanceForControl(el) {
+    const raw = (el.getAttribute("aria-label") || el.innerText || el.getAttribute("title") || el.textContent || "");
+    const label = String(raw).trim().replace(/\s+/g, " ").slice(0, 90).toLowerCase();
+    if (!label) return "";
+    if (/test|quiz|mock|practice|submit/.test(label)) return "Starting practice? Read each question carefully, watch your time, and review explanations when you finish.";
+    if (/note|read|chapter|geography|history|polity|economy/.test(label)) return "Opening study material? I can explain difficult points, create revision notes, or quiz you on this topic.";
+    if (/planner|schedule|calendar|task/.test(label)) return "Planning your study? I can help divide your syllabus into realistic daily targets and revision blocks.";
+    if (/download|pdf|resource|library/.test(label)) return "Need help with this resource? Tap my robot and I can guide you through it.";
+    if (/login|sign in|account|profile/.test(label)) return "Need help with your account? I can guide you without asking for your password.";
+    return "";
+  }
+  document.addEventListener("click", (event) => {
+    const el = event.target && event.target.closest ? event.target.closest("a,button,[role='button']") : null;
+    if (!el || root.contains(el)) return;
+    const message = guidanceForControl(el);
+    if (message) guideVisitor(message);
+  }, true);
+  document.addEventListener("focusin", (event) => {
+    const el = event.target;
+    if (!el || root.contains(el) || !el.matches || !el.matches("input,textarea,select")) return;
+    const hint = el.getAttribute("placeholder") || el.getAttribute("aria-label") || "";
+    if (hint) guideVisitor("Need help with this form? I can explain what to enter and help you plan the next step.");
+  }, true);
 
   form.addEventListener("submit", (e) => {
     e.preventDefault();
