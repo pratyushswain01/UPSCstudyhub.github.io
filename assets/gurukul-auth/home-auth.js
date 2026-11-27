@@ -57,6 +57,12 @@ import {
     .ug-auth-note{margin-top:15px!important}
     .ug-auth-google{margin-top:10px!important}
     @media(min-width:761px) and (max-width:1000px){.ug-auth-card{grid-template-columns:.82fr 1.18fr!important;width:min(96vw,940px)!important;min-height:620px!important}.ug-auth-story{padding:28px!important}.ug-auth-story-copy h2{font-size:38px!important}.ug-auth-panel{padding:34px!important}}
+    @media(min-width:761px){
+      .ug-auth-card{min-height:0!important;height:min(92dvh,760px)!important;max-height:92dvh!important;overflow:hidden!important}
+      .ug-auth-panel{justify-content:flex-start!important;overflow-y:auto!important;overscroll-behavior:contain!important;padding-top:62px!important;padding-bottom:30px!important}
+      .ug-auth-panel form{flex:0 0 auto!important}
+      .ug-auth-panel .ug-auth-note{padding-bottom:4px!important}
+    }
     @media(max-width:760px){.ug-auth-card{display:block!important;width:min(100%,460px)!important;min-height:0!important;max-height:92dvh!important;overflow:auto!important;padding:23px!important;border-radius:23px!important}.ug-auth-story{display:none!important}.ug-auth-panel{display:block!important;overflow:visible!important;padding:0!important}.ug-auth-close{top:0!important;right:0!important}.ug-auth-panel h2{font-size:27px!important}.ug-auth-panel .ug-auth-sub{padding-right:28px}.ug-auth-or{margin-top:13px}}
   `;
   document.head.appendChild(style);
