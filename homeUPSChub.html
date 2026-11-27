@@ -420,6 +420,10 @@
         .ug-sidebar-tool span{font-weight:650}
         .ug-sidebar-tool small{margin-left:auto;color:var(--text-secondary-light);font-size:10px}
         .ug-sidebar-tool.is-enabled span{color:#16845b}
+        html.ug-home-app-shell #gurukul-mitra-root .gm-launcher-wrap,
+        html.ug-home-app-shell #gurukul-mitra-root .gm-side-tab { display:none !important; }
+        html.ug-home-app-shell #upscgurukul-enable-push { display:none !important; }
+        html.ug-home-app-shell .ug-sidebar-tool:disabled { opacity:.75; cursor:default; }
         /* Sidebar */
         .sidebar-overlay { position: fixed; inset: 0; background: rgba(6,6,20,0.55); backdrop-filter: blur(2px); z-index: 1001; display: none; }
         .sidebar-overlay.active { display: block; }
@@ -840,6 +844,7 @@ h1, h2, h3, .text-2xl, .text-3xl, .text-4xl {
 </head>
 
 <body class="font-body">
+<script>document.documentElement.classList.add("ug-home-app-shell");</script>
 
 <script type="application/ld+json">
 { "@context": "https://schema.org", "@type": "Organization", "name": "UPSC गुरुकुल", "url": "https://upscgurukul.online",
@@ -1341,7 +1346,7 @@ document.addEventListener('DOMContentLoaded', () => {
 <script src="/festival/independence_day/independence-day.js"></script>
 <script src="/festival/independence_day/independence-reminder.js"></script>
 <script src="/latest-release.js?v=1" defer></script>
-<script type="module" src="/upscgurukul-push-registration.js"></script>
+<script type="module" src="/upscgurukul-push-registration.js?v=20261127-sidebar-only-2"></script>
 <script src="/upscgurukul-debug.js?v=1"></script>
 <script src="/upscgurukul-dev-lockdown.js?v=9"></script>
 
@@ -1368,10 +1373,6 @@ document.addEventListener('DOMContentLoaded', () => {
 <!-- UPSC Gurukul authenticated activity bar -->
 <script type="module" src="/assets/gurukul-activity/activity-bar.js?v=20261127-goalfix"></script>
 <script defer src="/assets/gurukul-activity/streak-announcement.js?v=3"></script>
-</body>
-</html>
-
-<script src="/gurukul-mitra/gurukul-mitra.js?v=20261127-robot-guide" defer></script>
 <script>
 document.addEventListener("click",function(event){
  const notify=event.target.closest("#ug-sidebar-notifications");
@@ -1379,8 +1380,16 @@ document.addEventListener("click",function(event){
  if(!notify&&!mitra)return;
  document.getElementById("close-btn")?.click();
  if(notify){document.dispatchEvent(new CustomEvent("ug:enable-notifications"));return;}
- document.querySelector("#gurukul-mitra-root .gm-launcher")?.click();
+ document.dispatchEvent(new CustomEvent("ug:open-mitra"));
 });
+const removeLegacyPush=()=>document.querySelectorAll("#upscgurukul-enable-push").forEach(el=>el.remove());
+removeLegacyPush();
+new MutationObserver(removeLegacyPush).observe(document.documentElement,{childList:true,subtree:true});
 </script>
+</body>
+</html>
+
+<script src="/gurukul-mitra/gurukul-mitra.js?v=20261127-sidebar-only-2" defer></script>
+
 
 
