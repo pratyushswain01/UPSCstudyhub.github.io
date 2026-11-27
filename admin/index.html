@@ -20,7 +20,25 @@ const API="https://upscgurukul-push-admin.pratyushkumarswain2005.workers.dev";
 const $=id=>document.getElementById(id);let user=null,busy=false;
 async function api(path,options={}){if(!user)throw Error("Administrator session unavailable");const token=await user.getIdToken(true);const r=await fetch(API+path,{...options,headers:{Authorization:"Bearer "+token,"Content-Type":"application/json",...(options.headers||{})}});const d=await r.json();if(!r.ok)throw Error(d.error||"Request failed");return d;}
 async function refresh(){try{const d=await api("/api/admin/push/stats");$("devices").textContent=d.subscribedDevices;}catch(e){$("result").textContent=e.message;$("result").className="status error";}}
-watchUser(u=>{user=u;if(!u){location.replace("/auth/login.html?next="+encodeURIComponent("/admin/index.html"));return;}$("authState").textContent="Signed in · server verifies administrator permissions";refresh();});
+watchUser(u=>{
+ user=u;
+ if(!u){
+  $("authState").textContent="No active session detected on this domain.";
+  $("result").textContent="Your login session was not restored. Sign in once, then return here. If this repeats, check that you are using the same website address (www or non-www) for both login and admin.";
+  $("result").className="status error";
+  const login=document.createElement("a");
+  login.href="/auth/login.html?next="+encodeURIComponent("/admin/index.html");
+  login.textContent="Sign in to UPSC Gurukul";
+  login.style.cssText="display:inline-block;margin-top:10px;color:#927344;font-weight:750";
+  $("result").appendChild(document.createElement("br"));
+  $("result").appendChild(login);
+  $("send").disabled=true;
+  return;
+ }
+ $("authState").textContent="Signed in · server verifies administrator permissions";
+ $("send").disabled=false;
+ refresh();
+});
 $("refresh").onclick=refresh;
 $("send").onclick=async()=>{if(busy)return;const title=$("title").value.trim(),body=$("body").value.trim(),url=$("url").value.trim();if(!title||!body){$("result").textContent="Enter both a title and message.";$("result").className="status error";return;}if(!confirm("Send this notification to every opted-in device?"))return;busy=true;$("send").disabled=true;$("send").textContent="Sending…";$("result").textContent="Sending through Firebase Cloud Messaging…";$("result").className="status";try{const d=await api("/api/admin/push/send",{method:"POST",body:JSON.stringify({title,body,url,target:"all"})});$("result").textContent="FCM accepted: "+d.sent+"\nFailed: "+d.failed+"\nTargeted devices: "+d.targeted+(d.errors?.length?"\nErrors: "+d.errors.join("\n"):"");$("result").className="status "+(d.failed?"error":"success");await refresh();}catch(e){$("result").textContent=e.message;$("result").className="status error";}finally{busy=false;$("send").disabled=false;$("send").textContent="Send push notification";}};
 </script></body></html>
