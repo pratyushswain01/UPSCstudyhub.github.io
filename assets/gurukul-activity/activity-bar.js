@@ -4,9 +4,7 @@ import { auth, watchUser } from "/auth/firebase-auth.js";
   "use strict";
   if (window.__GURUKUL_ACTIVITY_BAR__) return;
   window.__GURUKUL_ACTIVITY_BAR__ = true;
-  // Add the study supervisor on every page that already has the Gurukul activity bar.
-  if (!document.querySelector("script[data-gm-supervisor]")) { const supervisor = document.createElement("script"); supervisor.src = "/gurukul-mitra/study-supervisor.js?v=20261127-1"; supervisor.defer = true; supervisor.dataset.gmSupervisor = "1"; (document.body || document.head).appendChild(supervisor); }
-  const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
+const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
   let user=null, callActivity=null, sessionId=null, tracking=false, starting=false;
   let requestQueue=Promise.resolve();
