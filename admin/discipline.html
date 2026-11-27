@@ -15,7 +15,7 @@
  <article class="card"><div class="eyebrow">RECOVERING</div><div class="metric" id="recovering">—</div><div class="metric-label">Completing the 2-hour recovery</div></article>
  <article class="card"><div class="eyebrow">IST DATE</div><div class="metric" id="today" style="font-size:21px">—</div><div class="metric-label">Current reporting day</div></article>
 </section>
-<section class="card table-card"><div class="table-head"><h2>Student discipline records</h2><span class="updated" id="count">0 records</span></div><div class="table-wrap"><table><thead><tr><th>Firebase UID</th><th>Status</th><th>Today</th><th>Last 7 days</th><th>Recovery progress</th><th>Grace days · 30d</th><th>Last activity</th><th>Evaluated through</th></tr></thead><tbody id="rows"><tr><td colspan="8" class="message">Loading secure student records…</td></tr></tbody></table></div></section>
+<section class="card table-card"><div class="table-head"><h2>Student discipline records</h2><span class="updated" id="count">0 records</span></div><div class="table-wrap"><table><thead><tr><th>Student</th><th>Firebase UID</th><th>Status</th><th>Today</th><th>Last 7 days</th><th>Recovery progress</th><th>Grace days · 30d</th><th>Last activity</th><th>Evaluated through</th></tr></thead><tbody id="rows"><tr><td colspan="9" class="message">Loading secure student records…</td></tr></tbody></table></div></section>
 <p class="foot">Privacy and access: student records are fetched only after Firebase authentication. The admin Worker independently verifies the Firebase token and checks the two authorised administrator UIDs. Only users with activity or discipline records appear here; this is not a complete Firebase user directory. Study time is an estimate of active site use, not proof of focused learning.</p>
 </main>
 <script type="module">
@@ -36,10 +36,11 @@ async function refresh(){
    const status=u.restricted?"restricted":u.status;
    const pct=Math.min(100,Math.round((Number(u.recovery_seconds)||0)/7200*100));
    const last=u.last_session_at?new Date(Number(u.last_session_at)).toLocaleString("en-IN",{dateStyle:"medium",timeStyle:"short"}):"No session";
-   return '<tr><td class="uid" title="'+esc(u.uid)+'">'+esc(u.uid)+'</td><td><span class="status '+status+'">'+status+'</span></td><td>'+fmt(u.today_seconds)+'</td><td>'+fmt(u.week_seconds)+'</td><td>'+fmt(u.recovery_seconds)+' / 2h ('+pct+'%)</td><td>'+Number(u.grace_events_30d||0)+'</td><td>'+esc(last)+'</td><td>'+esc(u.last_evaluated_date||"—")+'</td></tr>';
-  }).join(""):'<tr><td colspan="8" class="empty">No activity or discipline records found yet.</td></tr>';
+   const studentName=u.display_name||"Name not saved";
+   return '<tr><td><strong>'+esc(studentName)+'</strong></td><td class="uid" title="'+esc(u.uid)+'">'+esc(u.uid)+'</td><td><span class="status '+status+'">'+status+'</span></td><td>'+fmt(u.today_seconds)+'</td><td>'+fmt(u.week_seconds)+'</td><td>'+fmt(u.recovery_seconds)+' / 2h ('+pct+'%)</td><td>'+Number(u.grace_events_30d||0)+'</td><td>'+esc(last)+'</td><td>'+esc(u.last_evaluated_date||"—")+'</td></tr>';
+  }).join(""):'<tr><td colspan="9" class="empty">No activity or discipline records found yet.</td></tr>';
   $("updated").textContent="Updated "+new Date().toLocaleTimeString("en-IN")+" · Secure admin access verified";
- }catch(e){$("rows").innerHTML='<tr><td colspan="8" class="message error">'+esc(e.message)+'</td></tr>';$("updated").textContent="Could not refresh";}finally{busy=false;$("refresh").disabled=false;}
+ }catch(e){$("rows").innerHTML='<tr><td colspan="9" class="message error">'+esc(e.message)+'</td></tr>';$("updated").textContent="Could not refresh";}finally{busy=false;$("refresh").disabled=false;}
 }
 watchUser(user=>{
  currentUser=user;
