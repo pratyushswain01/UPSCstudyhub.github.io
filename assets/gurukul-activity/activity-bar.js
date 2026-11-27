@@ -11,6 +11,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   let requestQueue=Promise.resolve();
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
   let summary=null, heartbeatTimer=null, uiTimer=null, root=null, modal=null;
+  let discipline=null, disciplineRoot=null, disciplineStyle=null;
 
   const esc = v => String(v || "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
   const fmt = n => { n=Math.max(0,Math.floor(n||0)); return [Math.floor(n/3600),Math.floor((n%3600)/60),n%60].map(v=>String(v).padStart(2,"0")).join(":"); };
@@ -19,6 +20,76 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   const todaySeconds = () => todayBase + liveExtra();
   const pageInfo = () => ({pagePath:location.pathname.slice(0,240),pageTitle:(document.title||"UPSC Gurukul").slice(0,120)});
 
+  function isRecoveryPage(){
+    return /recovery|study-material|materials|geography|ncert|notes|reader|pdf|preplibrary|library|current-affairs|revision|mapping/i.test(location.pathname);
+  }
+  function mountDisciplineStyles(){
+    if(disciplineStyle)return;
+    disciplineStyle=document.createElement("style");
+    disciplineStyle.id="gurukul-discipline-style";
+    disciplineStyle.textContent=`
+      #gurukul-discipline-panel{position:fixed;z-index:2147483000;left:16px;right:16px;top:16px;margin:auto;width:min(560px,calc(100% - 32px));padding:20px;border:1px solid rgba(222,190,122,.35);border-radius:20px;background:linear-gradient(145deg,#17263a,#0c1726);color:#f8fafc;box-shadow:0 24px 80px rgba(0,0,0,.42);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+      #gurukul-discipline-panel *{box-sizing:border-box}
+      #gurukul-discipline-panel .gd-kicker{color:#e4c989;font-size:10px;font-weight:800;letter-spacing:1.5px}
+      #gurukul-discipline-panel h2{margin:7px 0;color:#fff;font-size:22px;line-height:1.2}
+      #gurukul-discipline-panel p{margin:7px 0;color:#c2ccda;font-size:13px}
+      #gurukul-discipline-panel .gd-time{margin:13px 0 4px;color:#f2d795;font-size:30px;font-weight:800;font-variant-numeric:tabular-nums}
+      #gurukul-discipline-panel .gd-track{height:8px;overflow:hidden;border-radius:20px;background:rgba(255,255,255,.13)}
+      #gurukul-discipline-panel .gd-track i{display:block;height:100%;width:0;background:linear-gradient(90deg,#b88b45,#f1d48e);transition:width .2s}
+      #gurukul-discipline-panel .gd-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+      #gurukul-discipline-panel a{display:inline-flex;align-items:center;min-height:37px;padding:0 12px;border:1px solid rgba(230,204,145,.3);border-radius:10px;color:#f5dfae;text-decoration:none;font-size:12px;font-weight:700;background:rgba(255,255,255,.06)}
+      #gurukul-discipline-panel.gd-lock{top:50%;transform:translateY(-50%);width:min(520px,calc(100% - 32px))}
+      #gurukul-discipline-shade{position:fixed;z-index:2147482999;inset:0;background:rgba(5,10,18,.88);backdrop-filter:blur(12px)}
+      body.gd-discipline-locked{overflow:hidden!important}
+      @media(max-width:560px){#gurukul-discipline-panel{top:10px;left:10px;right:10px;width:auto;padding:17px}#gurukul-discipline-panel.gd-lock{top:50%;left:16px;right:16px;width:auto}}
+    `;
+    document.head.appendChild(disciplineStyle);
+  }
+  function renderDiscipline(next){
+    if(next)discipline=next;
+    const restricted=!!(discipline&&discipline.restricted&&!discipline.isAdmin);
+    if(!restricted){
+      disciplineRoot?.remove();disciplineRoot=null;
+      document.getElementById("gurukul-discipline-shade")?.remove();
+      document.body.classList.remove("gd-discipline-locked");
+      return;
+    }
+    mountDisciplineStyles();
+    if(!disciplineRoot){
+      disciplineRoot=document.createElement("section");
+      disciplineRoot.id="gurukul-discipline-panel";
+      document.body.appendChild(disciplineRoot);
+    }
+    const recovery=isRecoveryPage();
+    const seconds=Math.max(0,Number(discipline.recoverySeconds)||0);
+    const percent=Math.min(100,Math.round(seconds/DAILY_GOAL_SECONDS*100));
+    const remaining=Math.max(0,DAILY_GOAL_SECONDS-seconds);
+    disciplineRoot.className=recovery?"":"gd-lock";
+    disciplineRoot.innerHTML=
+      '<div class="gd-kicker">UPSC GURUKUL · DISCIPLINE RECOVERY</div>'+
+      '<h2>'+(recovery?'Recovery study in progress':'Access temporarily restricted')+'</h2>'+
+      '<p>'+(recovery?'Continue studying on this approved materials page. Your recovery time is counted while this page is visible and active.':'Your daily study target was missed after your grace day was used. Complete two fresh hours of active study to restore normal access.')+'</p>'+
+      '<div class="gd-time">'+fmt(seconds)+' <span style="font-size:13px;color:#b9c4d3;font-weight:600">/ 02:00:00</span></div>'+
+      '<div class="gd-track"><i style="width:'+percent+'%"></i></div>'+
+      '<p>'+(remaining>0?fmt(remaining)+' remaining to restore access':'Recovery target complete. Refreshing your status…')+'</p>'+
+      '<div class="gd-links">'+
+      '<a href="/notes.html">Study Notes</a>'+
+      '<a href="/mapping.html">Mapping Practice</a>'+
+      '<a href="/revision.html">Revision Tools</a>'+
+      '<a href="/notes/index.html">Notes Library</a>'+
+      '</div>';
+    if(recovery){
+      document.getElementById("gurukul-discipline-shade")?.remove();
+      document.body.classList.remove("gd-discipline-locked");
+    }else{
+      if(!document.getElementById("gurukul-discipline-shade")){
+        const shade=document.createElement("div");
+        shade.id="gurukul-discipline-shade";
+        document.body.appendChild(shade);
+      }
+      document.body.classList.add("gd-discipline-locked");
+    }
+  }
   function mountStyles(){
     if(document.getElementById("gurukul-activity-style")) return;
     const link=document.createElement("link"); link.id="gurukul-activity-style"; link.rel="stylesheet";
@@ -81,6 +152,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
     if(holder)holder.innerHTML='<div class="ga-loading">Loading your activity…</div>';
     try{
       summary=(await callActivity({action:"summary"})).data;
+      discipline=summary.discipline||null; renderDiscipline(discipline);
       todayBase=summary.todaySeconds||0; lastSyncAt=Date.now(); renderSummary(); updateBar();
     }catch(e){
       console.warn("[Gurukul Activity] Summary unavailable:",e);
@@ -98,6 +170,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
         const data=(await callActivity(payload,requestUser)).data||{};
         if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
         if(typeof data.sessionSeconds==="number")sessionBase=data.sessionSeconds;
+        if(data.discipline)renderDiscipline(data.discipline);
         lastSyncAt=Date.now();
         if(data.sessionClosed && sessionId===requestSessionId){tracking=false;sessionId=null;}
         updateBar();renderSummary();return data;
