@@ -20,7 +20,7 @@ async function verify(request){
  if(!await crypto.subtle.verify("RSASSA-PKCS1-v1_5",key,b64(p[2]),new TextEncoder().encode(p[0]+"."+p[1])))throw Error("Invalid token signature");
  return c.sub;
 }
-function pem(p){return Uint8Array.from(atob(p.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g,"")),c=>c.charCodeAt(0));}
+function pem(p){return Uint8Array.from(atob(p.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g,"")),c=>c.charCodeAt(0));}
 async function googleToken(env){
  if(accessToken&&Date.now()<accessUntil-60000)return accessToken;
  if(!env.FIREBASE_SERVICE_ACCOUNT_JSON)throw Error("Missing FIREBASE_SERVICE_ACCOUNT_JSON Worker secret");
