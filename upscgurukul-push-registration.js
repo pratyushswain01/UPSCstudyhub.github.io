@@ -82,50 +82,32 @@ async function registerPush() {
   return platform;
 }
 
-function addEnableButton() {
-  if (document.getElementById("upscgurukul-enable-push")) return;
-
-  const button = document.createElement("button");
-  button.id = "upscgurukul-enable-push";
-  button.type = "button";
-  button.textContent = "Enable notifications";
-  button.setAttribute("aria-label", "Enable UPSC Gurukul push notifications");
-  Object.assign(button.style, {
-    position: "fixed",
-    right: "16px",
-    bottom: "20px",
-    zIndex: "2147483647",
-    padding: "12px 16px",
-    border: "0",
-    borderRadius: "999px",
-    background: "#173f8a",
-    color: "#ffffff",
-    fontSize: "14px",
-    fontWeight: "600",
-    boxShadow: "0 4px 16px rgba(0,0,0,.22)",
-    cursor: "pointer"
-  });
-
-  button.addEventListener("click", async () => {
-    button.disabled = true;
-    button.textContent = "Registering...";
-    try {
-      const platform = await registerPush();
-      button.textContent = "Notifications enabled ✓";
-      button.title = "Registered as " + platform;
-      setTimeout(() => button.remove(), 3000);
-    } catch (error) {
-      console.error("[UPSC Gurukul push]", error);
-      button.disabled = false;
-      button.textContent = "Retry notifications";
-      button.title = error?.message || "Registration failed";
-      alert("Push registration failed:\n" + (error?.message || "Unknown error"));
-    }
-  });
-
-  document.body.appendChild(button);
+function updateSidebarButton(label, enabled = false) {
+  const button = document.getElementById("ug-sidebar-notifications");
+  if (!button) return;
+  const span = button.querySelector("span");
+  if (span) span.textContent = label;
+  button.classList.toggle("is-enabled", enabled);
+  button.disabled = enabled;
 }
-
+let registering = false;
+async function enableFromSidebar() {
+  if (registering) return;
+  registering = true;
+  const button = document.getElementById("ug-sidebar-notifications");
+  if (button) { button.disabled = true; const span=button.querySelector("span"); if(span)span.textContent="Enabling notifications…"; }
+  try {
+    const platform = await registerPush();
+    updateSidebarButton("Notifications enabled ✓", true);
+    console.info("[UPSC Gurukul] Notifications enabled on", platform);
+  } catch (error) {
+    console.error("[UPSC Gurukul push]", error);
+    updateSidebarButton("Retry notifications", false);
+    if (button) button.disabled = false;
+    alert("Push registration failed:\\n" + (error?.message || "Unknown error"));
+  } finally { registering = false; }
+}
+document.addEventListener("ug:enable-notifications", enableFromSidebar);
 // Run as soon as possible
 if (document.readyState === "loading") {
   window.addEventListener("DOMContentLoaded", init);
@@ -135,14 +117,10 @@ if (document.readyState === "loading") {
 
 function init() {
   if (Notification.permission === "granted") {
-    registerPush()
-      .then(() => {
-        document.getElementById("upscgurukul-enable-push")?.remove();
-        console.info("[UPSC Gurukul] Auto-registered.");
-      })
-      .catch(() => addEnableButton());
+    registerPush().then(() => updateSidebarButton("Notifications enabled ✓", true))
+      .catch(() => updateSidebarButton("Enable notifications", false));
   } else {
-    addEnableButton();
+    updateSidebarButton("Enable notifications", false);
   }
 }
 
