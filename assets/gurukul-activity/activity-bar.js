@@ -98,7 +98,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   function mountBar(){
     if(root||!document.body) return;
     root=document.createElement("div"); root.id="gurukul-activity-bar";
-    root.innerHTML='<button class="ga-trigger" type="button" aria-haspopup="dialog" aria-expanded="false"><span class="ga-live-dot"></span><span class="ga-trigger-label">GURUKUL ACTIVITY</span><span class="ga-trigger-time" data-ga-time>Today 00:00:00</span><span class="ga-streak-pill" data-ga-streak-pill>🔥 <b data-ga-bar-streak>0 day streak</b><small data-ga-bar-goal>2 hr daily goal</small></span><span class="ga-trigger-open">View activity <span aria-hidden="true">↗</span></span></button>';
+    root.innerHTML='<button class="ga-trigger" type="button" aria-haspopup="dialog" aria-expanded="false"><span class="ga-live-dot"></span><span class="ga-trigger-label">GURUKUL ACTIVITY</span><span class="ga-trigger-time" data-ga-time>Today 00:00:00</span><span class="ga-streak-pill" data-ga-streak-pill>🔥 <b data-ga-bar-streak>0 day streak</b><small data-ga-bar-goal>2 hr daily goal</small></span><span class="ga-trigger-open">View activity <span aria-hidden="true">↗</span></span></button><a class="ga-admin-check" href="/admin/discipline.html" hidden>Check data <span aria-hidden="true">↗</span></a>';
     const first=document.body.firstElementChild;
     if(first) document.body.insertBefore(root,first); else document.body.appendChild(root);
     root.querySelector(".ga-trigger").addEventListener("click",openModal);
@@ -236,8 +236,9 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
       mountStyles();mountBar();initTracking();
       watchUser(async nextUser=>{
         user=nextUser;
-        if(!user){if(tracking)await send("end");tracking=false;sessionId=null;if(root)root.hidden=true;closeModal();return;}
-        if(root)root.hidden=false;lastInteraction=Date.now();await loadSummary();await beginSession();
+        if(!user){if(tracking)await send("end");tracking=false;sessionId=null;if(root){root.hidden=true;const adminLink=root.querySelector(".ga-admin-check");if(adminLink)adminLink.hidden=true;}closeModal();return;}
+        if(root){root.hidden=false;const adminLink=root.querySelector(".ga-admin-check");if(adminLink)adminLink.hidden=!["W0IMog3J0wca3KOYjNqnOxCSxhJ3","t7ogzAcEJeO0UD8x3OkWzGiA3OF2"].includes(user.uid);}
+        lastInteraction=Date.now();await loadSummary();await beginSession();
       });
     }catch(e){console.error("[Gurukul Activity] Could not initialize:",e);}
   }
