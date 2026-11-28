@@ -6,7 +6,7 @@ import { watchUser } from "/auth/firebase-auth.js";
 
   // The public root landing page remains available to everyone.
   const path = location.pathname.replace(/\\/+$/, "") || "/";
-  if (path === "/" || path === "/index.html" || path === "/auth/login.html") return;
+  if (path === "/" || path === "/index.html" || path === "/auth/login.html" || path === "/homeUPSChub.html") return;
 
   const ADMIN_UIDS = new Set(["W0IMog3J0wca3KOYjNqnOxCSxhJ3","t7ogzAcEJeO0UD8x3OkWzGiA3OF2"]);
   const style = document.createElement("style");
