@@ -1,7 +1,7 @@
 window.__UG_CHAPTERS = window.__UG_CHAPTERS || {};
 window.__UG_CHAPTERS["class-9/ch03.json"] = {
   "pdf": {
-    "href": "https://ncert.nic.in/textbook/pdf/iess103.pdf",
+    "href": "https://ncert.nic.in/textbook/pdf/iess1003.pdf",
     "title": "NCERT Class 9 Contemporary India–I · Chapter 3: Drainage"
   },
   "schemaVersion": 1,
@@ -12,116 +12,277 @@ window.__UG_CHAPTERS["class-9/ch03.json"] = {
     "subject": "Geography",
     "chapterNo": 3,
     "title": "Drainage",
-    "intro": "Drainage systems, Himalayan and Peninsular rivers, lakes, river pollution and conservation.",
+    "intro": "The drainage systems of India, Himalayan and Peninsular rivers, river basins, lakes, inland drainage and the need for water and river conservation.",
     "subjectHref": "../../index.html",
     "prev": "chapters/class-9/ch02.json",
     "next": "chapters/class-9/ch04.json"
   },
   "objectives": [
-    "Drainage systems, Himalayan and Peninsular rivers, lakes, river pollution and conservation.",
-    "Explain the major geographical features and processes described in the chapter.",
-    "Use maps and examples to connect physical geography with people and places."
+    "Explain drainage using geographical concepts and Indian examples.",
+    "Identify the important terms, patterns, processes and locations in this chapter.",
+    "Interpret maps, tables and geographical evidence.",
+    "Connect the chapter with human life, environment and regional development."
   ],
   "sections": [
     {
-      "id": "overview",
-      "title": "Key Concepts",
+      "id": "section-1",
+      "title": "Drainage and Drainage Systems",
       "blocks": [
         {
           "type": "p",
-          "text": "A drainage basin is the area drained by a river and its tributaries. The boundary separating basins is a water divide."
+          "text": "Drainage describes the river system of an area. A river and its tributaries form a drainage system, while the area drained by a river and its tributaries is called a drainage basin."
+        },
+        {
+          "type": "def",
+          "term": "Drainage basin",
+          "text": "The area from which a river and its tributaries collect surface runoff."
+        },
+        {
+          "type": "def",
+          "term": "Water divide",
+          "text": "An elevated ridge or upland that separates two drainage basins. The Ambala region is an important water divide between the Indus and Ganga systems."
         },
         {
           "type": "p",
-          "text": "Himalayan rivers are generally perennial because they receive water from rainfall and melting snow. The Indus, Ganga and Brahmaputra are major systems."
+          "text": "The drainage pattern depends on slope, geological structure, rock resistance, climate and the history of landform development."
         },
         {
-          "type": "p",
-          "text": "Most Peninsular rivers are seasonal and depend more heavily on rainfall. The Narmada and Tapi flow westwards through rift valleys; the Godavari, Krishna, Kaveri and Mahanadi flow eastwards."
-        },
-        {
-          "type": "p",
-          "text": "Lakes support ecosystems, regulate river flow and provide water. Pollution, untreated sewage and industrial waste threaten river health."
+          "type": "example",
+          "title": "Common drainage patterns",
+          "text": "Dendritic drainage resembles tree branches; trellis drainage develops where hard and soft rocks occur in parallel bands; radial drainage flows outward from a central highland."
         }
       ]
     },
     {
-      "id": "importance",
-      "title": "Why This Chapter Matters",
+      "id": "section-2",
+      "title": "The Himalayan Rivers",
       "blocks": [
         {
           "type": "p",
-          "text": "Drainage systems, Himalayan and Peninsular rivers, lakes, river pollution and conservation."
+          "text": "The Himalayan river systems are generally perennial because they receive water from both rainfall and melting snow and glaciers. Their long courses cross mountains, plains and deltas."
+        },
+        {
+          "type": "p",
+          "text": "The Indus rises near Lake Mansarovar in the Tibetan region and flows through Ladakh before entering Pakistan. Its major tributaries include the Jhelum, Chenab, Ravi, Beas and Sutlej."
+        },
+        {
+          "type": "p",
+          "text": "The Ganga system begins with the headstreams Bhagirathi and Alaknanda, which meet at Devprayag. The river is joined by major tributaries such as the Yamuna, Ghaghara, Gandak, Kosi and Son."
+        },
+        {
+          "type": "p",
+          "text": "The Brahmaputra rises in Tibet, where it is known as the Tsangpo. It enters Arunachal Pradesh as the Siang/Dihang and flows through Assam before entering Bangladesh."
         },
         {
           "type": "callout",
-          "title": "Revision focus",
-          "text": "Connect the geographical patterns in this chapter with maps, regional examples and human activities in India."
+          "title": "River behaviour",
+          "text": "Himalayan rivers carry large sediment loads, create extensive floodplains and often change course in their lower reaches."
+        }
+      ]
+    },
+    {
+      "id": "section-3",
+      "title": "The Peninsular Rivers",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Most Peninsular rivers depend mainly on monsoon rainfall. Their courses are generally shorter and more fixed than those of Himalayan rivers because they flow across an older and more stable plateau."
+        },
+        {
+          "type": "p",
+          "text": "The Narmada and Tapi flow westwards through rift valleys and enter the Arabian Sea through estuaries. The Godavari is the largest Peninsular river basin and is often called the Dakshin Ganga."
+        },
+        {
+          "type": "p",
+          "text": "The Mahanadi, Godavari, Krishna and Kaveri flow eastwards and form deltas before entering the Bay of Bengal. Their water is important for irrigation, drinking supply, industry and hydroelectricity."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "River",
+            "Direction / outlet",
+            "Important fact"
+          ],
+          "rows": [
+            [
+              "Narmada",
+              "West to Arabian Sea",
+              "Flows through a rift valley"
+            ],
+            [
+              "Tapi",
+              "West to Arabian Sea",
+              "Flows through a rift valley"
+            ],
+            [
+              "Godavari",
+              "East to Bay of Bengal",
+              "Largest Peninsular river basin"
+            ],
+            [
+              "Krishna",
+              "East to Bay of Bengal",
+              "Major irrigation basin"
+            ],
+            [
+              "Kaveri",
+              "East to Bay of Bengal",
+              "Important southern river system"
+            ],
+            [
+              "Mahanadi",
+              "East to Bay of Bengal",
+              "Forms a delta in Odisha"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-4",
+      "title": "Lakes and Their Importance",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Lakes may be formed by tectonic movements, glaciers, river action, coastal processes or human activity. Some are freshwater lakes, while others are saline or brackish."
+        },
+        {
+          "type": "p",
+          "text": "Wular in Jammu and Kashmir is a major freshwater lake. Dal is also located in Kashmir. Sambhar in Rajasthan is a salt lake. Chilika in Odisha is a brackish-water lagoon, and Pulicat lies along the Andhra Pradesh–Tamil Nadu coast."
+        },
+        {
+          "type": "p",
+          "text": "Lakes regulate river flow, store water, support fisheries and tourism, recharge groundwater and provide habitats for birds and aquatic life."
+        },
+        {
+          "type": "example",
+          "title": "Chilika Lake",
+          "text": "Chilika is a large brackish lagoon on the Odisha coast. It supports fisheries, migratory birds and local livelihoods, making wetland conservation important."
+        }
+      ]
+    },
+    {
+      "id": "section-5",
+      "title": "River Pollution and Conservation",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Rivers are stressed by untreated sewage, industrial effluents, agricultural runoff, solid waste, excessive water withdrawal and encroachment on floodplains."
+        },
+        {
+          "type": "p",
+          "text": "Pollution reduces dissolved oxygen, harms aquatic organisms and affects drinking water, irrigation, fisheries and public health. Dams and barrages can alter sediment movement and river ecology, so planning must consider both benefits and impacts."
+        },
+        {
+          "type": "p",
+          "text": "River conservation requires sewage treatment, industrial compliance, efficient irrigation, protection of wetlands and floodplains, environmental flows, community participation and monitoring."
+        },
+        {
+          "type": "callout",
+          "title": "Remember",
+          "text": "A river is not only a channel carrying water; it is an interconnected ecosystem supporting people, agriculture, biodiversity and landscapes."
         }
       ]
     }
   ],
   "revision": {
     "takeaways": [
-      "A drainage basin is the area drained by a river and its tributaries. The boundary separating basins is a water divide.",
-      "Himalayan rivers are generally perennial because they receive water from rainfall and melting snow. The Indus, Ganga and Brahmaputra are major systems.",
-      "Most Peninsular rivers are seasonal and depend more heavily on rainfall. The Narmada and Tapi flow westwards through rift valleys; the Godavari, Krishna, Kaveri and Mahanadi flow eastwards.",
-      "Lakes support ecosystems, regulate river flow and provide water. Pollution, untreated sewage and industrial waste threaten river health."
+      "Drainage and Drainage Systems: Drainage describes the river system of an area. A river and its tributaries form a drainage system, while the area drained by a river and its tributaries is called a drainage basin. The drainage pattern depends on slope, geological structure, rock resistance, ",
+      "The Himalayan Rivers: The Himalayan river systems are generally perennial because they receive water from both rainfall and melting snow and glaciers. Their long courses cross mountains, plains and deltas. The Indus rises near Lake Mansarovar in the Tibetan region and flows through",
+      "The Peninsular Rivers: Most Peninsular rivers depend mainly on monsoon rainfall. Their courses are generally shorter and more fixed than those of Himalayan rivers because they flow across an older and more stable plateau. The Narmada and Tapi flow westwards through rift valleys and ",
+      "Lakes and Their Importance: Lakes may be formed by tectonic movements, glaciers, river action, coastal processes or human activity. Some are freshwater lakes, while others are saline or brackish. Wular in Jammu and Kashmir is a major freshwater lake. Dal is also located in Kashmir. Sambh",
+      "River Pollution and Conservation: Rivers are stressed by untreated sewage, industrial effluents, agricultural runoff, solid waste, excessive water withdrawal and encroachment on floodplains. Pollution reduces dissolved oxygen, harms aquatic organisms and affects drinking water, irrigation, fis"
     ],
-    "summary": "A drainage basin is the area drained by a river and its tributaries. The boundary separating basins is a water divide. Himalayan rivers are generally perennial because they receive water from rainfall and melting snow. The Indus, Ganga and Brahmaputra are major systems. Most Peninsular rivers are seasonal and depend more heavily on rainfall. The Narmada and Tapi flow westwards through rift valleys; the Godavari, Krishna, Kaveri and Mahanadi flow eastwards. Lakes support ecosystems, regulate river flow and provide water. Pollution, untreated sewage and industrial waste threaten river health.",
+    "summary": "Drainage describes the river system of an area. A river and its tributaries form a drainage system, while the area drained by a river and its tributaries is called a drainage basin. The area from which a river and its tributaries collect surface runoff. An elevated ridge or upland that separates two drainage basins. The Ambala region is an important water divide between the Indus and Ganga systems. The drainage pattern depends on slope, geological structure, rock resistance, climate and the history of landform development. Dendritic drainage resembles tree branches; trellis drainage develops where hard and soft rocks occur in parallel bands; radial drainage flows outward from a central highland. The Himalayan river systems are generally perennial because they receive water from both rainfall and melting snow and glaciers. Their long courses cross mountains, plains and deltas. The Indus rises near Lake Mansarovar in the Tibetan region and flows through Ladakh before entering Pakistan. Its major tributaries include the Jhelum, Chenab, Ravi, Beas and Sutlej. The Ganga system begins with the headstreams Bhagirathi and Alaknanda, which meet at Devprayag. The river is joined by major tributaries such as the Yamuna, Ghaghara, Gandak, Kosi and Son. The Brahmaputra rises in Tibet, where it is known as the Tsangpo. It enters Arunachal Pradesh as the Siang/Dihang and flows through Assam before entering Bangladesh. Himalayan rivers carry large sediment loads, create extensive floodplains and often change course in their lower reaches. Most Peninsular rivers depend mainly on monsoon rainfall. Their courses are generally shorter and more fixed than those of Himalayan rivers because they flow across an older and more stable plateau. The Narmada and Tapi flow westwards through rift valleys and enter the Arabian Sea through estuaries. The Godavari is the largest Peninsular river basin and is often called the Dakshin Ganga. The Mahanadi, Godavari, Krishna and Kaveri flow eastwards and form deltas before entering the Bay of Bengal. Their water is important for irrigation, drinking supply, industry and hydroelectricity. Lakes may be formed by tectonic movements, glaciers, river action, coastal processes or human activity. Some are freshwater lakes, while others are saline or brackish. Wular in Jammu and Kashmir is a major freshwater lake. Dal is also located in Kashmir. Sambhar in Rajasthan is a salt lake. Chilika in Odisha is a brackish-water lagoon, and Pulicat lies along the Andhra Pradesh–Tamil Nadu coast. Lakes regulate river flow, store water, support fisheries and tourism, recharge groundwater and provide habitats for birds and aquatic life. Chilika is a large brackish lagoon on the Odisha coast. It supports fisheries, migratory birds and local livelihoods, making wetland conservation important. Rivers are stressed by untreated sewage, industrial effluents, agricultural runoff, solid waste, excessive water withdrawal and encroachment on floodplains. Pollution reduces dissolved oxygen, harms aquatic organisms and affects drinking water, irrigation, fisheries and public health. Dams and barrages can alter sediment movement and river ecology, so planning must consider both benefits and impacts. River conservation requires sewage treatment, industrial compliance, efficient irrigation, protection of wetlands and floodplains, environmental flows, community participation and monitoring. A river is not only a channel carrying water; it is an interconnected ecosystem supporting people, agriculture, biodiversity and landscapes.",
     "flashcards": [
       {
-        "q": [
-          "What is a water divide?",
-          "An elevated area separating two drainage basins."
-        ],
-        "a": [
-          "Name two major west-flowing Peninsular rivers.",
-          "Narmada and Tapi."
-        ]
+        "q": "What is the central idea of \"Drainage and Drainage Systems\"?",
+        "a": "Drainage describes the river system of an area. A river and its tributaries form a drainage system, while the area drained by a river and its tributaries is called a drainage basin. The drainage pattern depends on slope, geological structure, rock resistance, climate and the history of landform development."
       },
       {
-        "q": "What should you use alongside these notes?",
-        "a": "The official NCERT chapter PDF, maps, diagrams and textbook exercises."
+        "q": "What is the central idea of \"The Himalayan Rivers\"?",
+        "a": "The Himalayan river systems are generally perennial because they receive water from both rainfall and melting snow and glaciers. Their long courses cross mountains, plains and deltas. The Indus rises near Lake Mansarovar in the Tibetan region and flows through Ladakh before entering Pakistan. Its major tributaries include the Jhelum, Chenab, Ravi, Beas and Sutlej. The Ganga system begins with the headstreams Bhagirathi and Alaknanda, which meet at Devprayag. The river is joined by major tributaries such as the Yamuna, Ghaghara, Gandak, Kosi and"
+      },
+      {
+        "q": "What is the central idea of \"The Peninsular Rivers\"?",
+        "a": "Most Peninsular rivers depend mainly on monsoon rainfall. Their courses are generally shorter and more fixed than those of Himalayan rivers because they flow across an older and more stable plateau. The Narmada and Tapi flow westwards through rift valleys and enter the Arabian Sea through estuaries. The Godavari is the largest Peninsular river basin and is often called the Dakshin Ganga. The Mahanadi, Godavari, Krishna and Kaveri flow eastwards and form deltas before entering the Bay of Bengal. Their water is important for irrigation, drinking "
+      },
+      {
+        "q": "What is the central idea of \"Lakes and Their Importance\"?",
+        "a": "Lakes may be formed by tectonic movements, glaciers, river action, coastal processes or human activity. Some are freshwater lakes, while others are saline or brackish. Wular in Jammu and Kashmir is a major freshwater lake. Dal is also located in Kashmir. Sambhar in Rajasthan is a salt lake. Chilika in Odisha is a brackish-water lagoon, and Pulicat lies along the Andhra Pradesh–Tamil Nadu coast. Lakes regulate river flow, store water, support fisheries and tourism, recharge groundwater and provide habitats for birds and aquatic life."
+      },
+      {
+        "q": "What is the central idea of \"River Pollution and Conservation\"?",
+        "a": "Rivers are stressed by untreated sewage, industrial effluents, agricultural runoff, solid waste, excessive water withdrawal and encroachment on floodplains. Pollution reduces dissolved oxygen, harms aquatic organisms and affects drinking water, irrigation, fisheries and public health. Dams and barrages can alter sediment movement and river ecology, so planning must consider both benefits and impacts. River conservation requires sewage treatment, industrial compliance, efficient irrigation, protection of wetlands and floodplains, environmental f"
       }
     ]
   },
   "questions": [
     {
       "id": "q1",
-      "q": [
-        "What is a water divide?",
-        "An elevated area separating two drainage basins."
-      ],
+      "q": "Which statement best describes drainage and drainage systems?",
       "options": [
-        [
-          "Name two major west-flowing Peninsular rivers.",
-          "Narmada and Tapi."
-        ],
-        "None of these",
-        "All options are incorrect",
-        "Cannot be determined"
+        "Drainage describes the river system of an area. A river and its tributaries form a drainage system, while the area drained by a river and its tributaries is called a drai",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
       ],
       "answer": 0,
-      "why": [
-        "Name two major west-flowing Peninsular rivers.",
-        "Narmada and Tapi."
-      ],
-      "ref": "overview"
+      "why": "Drainage describes the river system of an area. A river and its tributaries form a drainage system, while the area drained by a river and its tributaries is called a drainage basin.",
+      "ref": "section-1"
     },
     {
       "id": "q2",
-      "q": "Which is the best way to revise this chapter?",
+      "q": "Which statement best describes the himalayan rivers?",
       "options": [
-        "Read only the title",
-        "Study the NCERT text with maps and these notes",
-        "Skip examples",
-        "Memorise unrelated facts"
+        "The Himalayan river systems are generally perennial because they receive water from both rainfall and melting snow and glaciers. Their long courses cross mountains, plain",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
       ],
-      "answer": 1,
-      "why": "Maps, examples and textbook activities help build geographical understanding.",
-      "ref": "importance"
+      "answer": 0,
+      "why": "The Himalayan river systems are generally perennial because they receive water from both rainfall and melting snow and glaciers. Their long courses cross mountains, plains and deltas.",
+      "ref": "section-2"
+    },
+    {
+      "id": "q3",
+      "q": "Which statement best describes the peninsular rivers?",
+      "options": [
+        "Most Peninsular rivers depend mainly on monsoon rainfall. Their courses are generally shorter and more fixed than those of Himalayan rivers because they flow across an ol",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
+      ],
+      "answer": 0,
+      "why": "Most Peninsular rivers depend mainly on monsoon rainfall. Their courses are generally shorter and more fixed than those of Himalayan rivers because they flow across an older and more stable plateau.",
+      "ref": "section-3"
+    },
+    {
+      "id": "q4",
+      "q": "Which statement best describes lakes and their importance?",
+      "options": [
+        "Lakes may be formed by tectonic movements, glaciers, river action, coastal processes or human activity. Some are freshwater lakes, while others are saline or brackish.",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
+      ],
+      "answer": 0,
+      "why": "Lakes may be formed by tectonic movements, glaciers, river action, coastal processes or human activity. Some are freshwater lakes, while others are saline or brackish.",
+      "ref": "section-4"
+    },
+    {
+      "id": "q5",
+      "q": "Which statement best describes river pollution and conservation?",
+      "options": [
+        "Rivers are stressed by untreated sewage, industrial effluents, agricultural runoff, solid waste, excessive water withdrawal and encroachment on floodplains.",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
+      ],
+      "answer": 0,
+      "why": "Rivers are stressed by untreated sewage, industrial effluents, agricultural runoff, solid waste, excessive water withdrawal and encroachment on floodplains.",
+      "ref": "section-5"
     }
   ],
-  "sourceNote": "Original supplementary revision notes for the older NCERT Contemporary India–I textbook. The official NCERT PDF is linked above; use it for the complete textbook text, maps, diagrams, activities and exercises."
+  "sourceNote": "Detailed original supplementary study notes prepared for the older NCERT Contemporary India–I textbook. The PDF button opens the official NCERT chapter. Use the textbook for its original maps, diagrams, activities and end-of-chapter exercises. Census figures and other dated textbook data are labelled by their reference year."
 };
