@@ -1,0 +1,127 @@
+window.__UG_CHAPTERS = window.__UG_CHAPTERS || {};
+window.__UG_CHAPTERS["class-9/ch06.json"] = {
+  "pdf": {
+    "href": "https://ncert.nic.in/textbook/pdf/iess106.pdf",
+    "title": "NCERT Class 9 Contemporary India–I · Chapter 6: Population"
+  },
+  "schemaVersion": 1,
+  "id": "class-9-geography-ch06",
+  "demo": false,
+  "meta": {
+    "class": "9",
+    "subject": "Geography",
+    "chapterNo": 6,
+    "title": "Population",
+    "intro": "Population size, distribution, density, growth, age composition, sex ratio, literacy and occupational structure.",
+    "subjectHref": "../../index.html",
+    "prev": "chapters/class-9/ch05.json",
+    "next": null
+  },
+  "objectives": [
+    "Population size, distribution, density, growth, age composition, sex ratio, literacy and occupational structure.",
+    "Explain the major geographical features and processes described in the chapter.",
+    "Use maps and examples to connect physical geography with people and places."
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Key Concepts",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Population is unevenly distributed because relief, climate, water availability, soil, transport, jobs and urbanisation differ across regions."
+        },
+        {
+          "type": "p",
+          "text": "Population density is the number of persons per unit area, usually expressed as persons per square kilometre."
+        },
+        {
+          "type": "p",
+          "text": "Population change is shaped by birth rate, death rate and migration. Age composition, sex ratio and literacy help explain population characteristics."
+        },
+        {
+          "type": "p",
+          "text": "A healthy, educated and skilled population is an important resource. Population data helps governments plan schools, healthcare, housing, transport and employment."
+        }
+      ]
+    },
+    {
+      "id": "importance",
+      "title": "Why This Chapter Matters",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Population size, distribution, density, growth, age composition, sex ratio, literacy and occupational structure."
+        },
+        {
+          "type": "callout",
+          "title": "Revision focus",
+          "text": "Connect the geographical patterns in this chapter with maps, regional examples and human activities in India."
+        }
+      ]
+    }
+  ],
+  "revision": {
+    "takeaways": [
+      "Population is unevenly distributed because relief, climate, water availability, soil, transport, jobs and urbanisation differ across regions.",
+      "Population density is the number of persons per unit area, usually expressed as persons per square kilometre.",
+      "Population change is shaped by birth rate, death rate and migration. Age composition, sex ratio and literacy help explain population characteristics.",
+      "A healthy, educated and skilled population is an important resource. Population data helps governments plan schools, healthcare, housing, transport and employment."
+    ],
+    "summary": "Population is unevenly distributed because relief, climate, water availability, soil, transport, jobs and urbanisation differ across regions. Population density is the number of persons per unit area, usually expressed as persons per square kilometre. Population change is shaped by birth rate, death rate and migration. Age composition, sex ratio and literacy help explain population characteristics. A healthy, educated and skilled population is an important resource. Population data helps governments plan schools, healthcare, housing, transport and employment.",
+    "flashcards": [
+      {
+        "q": [
+          "What does population density measure?",
+          "The number of persons living per unit area."
+        ],
+        "a": [
+          "What are the three main components of population change?",
+          "Births, deaths and migration."
+        ]
+      },
+      {
+        "q": "What should you use alongside these notes?",
+        "a": "The official NCERT chapter PDF, maps, diagrams and textbook exercises."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "q": [
+        "What does population density measure?",
+        "The number of persons living per unit area."
+      ],
+      "options": [
+        [
+          "What are the three main components of population change?",
+          "Births, deaths and migration."
+        ],
+        "None of these",
+        "All options are incorrect",
+        "Cannot be determined"
+      ],
+      "answer": 0,
+      "why": [
+        "What are the three main components of population change?",
+        "Births, deaths and migration."
+      ],
+      "ref": "overview"
+    },
+    {
+      "id": "q2",
+      "q": "Which is the best way to revise this chapter?",
+      "options": [
+        "Read only the title",
+        "Study the NCERT text with maps and these notes",
+        "Skip examples",
+        "Memorise unrelated facts"
+      ],
+      "answer": 1,
+      "why": "Maps, examples and textbook activities help build geographical understanding.",
+      "ref": "importance"
+    }
+  ],
+  "sourceNote": "Original supplementary revision notes for the older NCERT Contemporary India–I textbook. The official NCERT PDF is linked above; use it for the complete textbook text, maps, diagrams, activities and exercises."
+};
