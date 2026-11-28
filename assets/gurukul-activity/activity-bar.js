@@ -161,7 +161,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
       discipline=summary.discipline||null; renderDiscipline(discipline);
       const savedSeconds=Math.max(0,Number(summary.todaySeconds)||0);
       const displayedNow=todaySeconds();
-      todayBase=tracking?Math.max(savedSeconds,displayedNow):savedSeconds;
+      todayBase=Math.max(savedSeconds,displayedNow);
       lastSyncAt=Date.now(); renderSummary(); updateBar();
     }catch(e){
       console.warn("[Gurukul Activity] Summary unavailable:",e);
@@ -192,6 +192,9 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   async function endSession(){
     const endingId=sessionId,endingUser=user;
     if(!endingId||!endingUser)return;
+    // Preserve seconds accumulated locally since the last server heartbeat.
+    todayBase=todaySeconds();
+    lastSyncAt=Date.now();
     tracking=false;sessionId=null;updateBar();
     await send("end",endingId,endingUser);
   }
