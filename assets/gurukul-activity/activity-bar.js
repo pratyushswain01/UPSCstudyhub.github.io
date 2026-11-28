@@ -1,4 +1,4 @@
-import "/assets/maintenance-gate.js";
+import "/assets/maintenance-gate.js?v=admin-only-20261128-2";
 import { auth, watchUser } from "/auth/firebase-auth.js";
 
 (() => {
