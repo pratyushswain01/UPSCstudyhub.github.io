@@ -16,6 +16,7 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
   const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.workers.dev";
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
   let user=null, callActivity=null, sessionId=null, tracking=false, busy=false;
+  let requestQueue=Promise.resolve(), starting=false, resuming=false;
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
   let summary=null, heartbeatTimer=null, uiTimer=null, root=null, modal=null;
 
@@ -86,55 +87,132 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
       if(holder)holder.innerHTML='<div class="ga-empty">Activity summary is temporarily unavailable. Please try again.</div>';
     }
   }
-  async function send(action){
-    if(!callActivity||!user||!sessionId||busy)return null; busy=true;
-    try{
-      const data=(await callActivity(Object.assign({action,sessionId},pageInfo()))).data||{};
-      if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
-      if(typeof data.sessionSeconds==="number")sessionBase=data.sessionSeconds;
-      lastSyncAt=Date.now();
-      if(data.sessionClosed){tracking=false;sessionId=null;}
-      updateBar();renderSummary();return data;
-    }catch(e){console.warn("[Gurukul Activity] Sync failed:",e);return null;}
-    finally{busy=false;}
+  async function send(action,targetSessionId=sessionId){
+    if(!callActivity||!user)return null;
+    if(action!=="summary"&&!targetSessionId)return null;
+
+    const requestUser=user;
+    const payload=action==="summary"
+      ? {action:"summary"}
+      : Object.assign({action,sessionId:targetSessionId},pageInfo());
+
+    const task=requestQueue.then(async()=>{
+      if(user!==requestUser)return null;
+      try{
+        const data=(await callActivity(payload,requestUser)).data||{};
+        if(user===requestUser){
+          if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
+          if(typeof data.sessionSeconds==="number"&&sessionId===targetSessionId)sessionBase=data.sessionSeconds;
+          lastSyncAt=Date.now();
+          if(data.sessionClosed&&sessionId===targetSessionId){
+            tracking=false;
+            sessionId=null;
+          }
+          updateBar();
+          renderSummary();
+        }
+        return data;
+      }catch(e){
+        console.warn("[Gurukul Activity] Sync failed:",e);
+        return null;
+      }
+    });
+
+    requestQueue=task.then(()=>undefined,()=>undefined);
+    return task;
   }
+
+  async function endSession(){
+    const endingId=sessionId;
+    if(!endingId)return;
+    tracking=false;
+    sessionId=null;
+    updateBar();
+    await send("end",endingId);
+  }
+
   async function beginSession(){
-    if(!user||tracking||busy||document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS)return;
-    sessionId=crypto.randomUUID().replace(/-/g,"");sessionBase=0;
-    const data=await send("start");
-    if(data){tracking=true;lastSyncAt=Date.now();updateBar();}else sessionId=null;
+    if(starting||!user||tracking||sessionId||document.visibilityState!=="visible"||!document.hasFocus()||Date.now()-lastInteraction>=IDLE_MS)return;
+    starting=true;
+    const newSessionId=crypto.randomUUID().replace(/-/g,"");
+    sessionId=newSessionId;
+    sessionBase=0;
+    try{
+      const data=await send("start",newSessionId);
+      if(data&&user&&sessionId===newSessionId){
+        tracking=true;
+        lastSyncAt=Date.now();
+        updateBar();
+      }else if(sessionId===newSessionId){
+        sessionId=null;
+        tracking=false;
+      }
+    }finally{
+      starting=false;
+    }
   }
+
   async function heartbeat(){
     if(!user)return;
     const eligible=document.visibilityState==="visible"&&document.hasFocus()&&Date.now()-lastInteraction<IDLE_MS;
-    if(!eligible){if(tracking)await send("end");tracking=false;sessionId=null;updateBar();return;}
-    if(!tracking){await beginSession();return;}
+    if(!eligible){
+      await endSession();
+      return;
+    }
+    if(!tracking){
+      await beginSession();
+      return;
+    }
     await send("heartbeat");
   }
+
   function interaction(){lastInteraction=Date.now();if(user&&!tracking&&document.visibilityState==="visible")beginSession();}
   function updateBar(){
     if(!root)return;const t=root.querySelector("[data-ga-time]");if(t)t.textContent="Today "+fmt(todaySeconds());
     root.querySelector(".ga-live-dot")?.classList.toggle("is-active",tracking);
   }
+  async function resumeTracking(){
+    if(resuming||!user||document.visibilityState!=="visible")return;
+    resuming=true;
+    lastInteraction=Date.now();
+    try{
+      await requestQueue;
+      await loadSummary();
+      await beginSession();
+    }finally{
+      resuming=false;
+    }
+  }
+
   function initTracking(){
     heartbeatTimer=setInterval(heartbeat,HEARTBEAT_MS);
-    uiTimer=setInterval(()=>{updateBar();if(modal&&!modal.hidden)renderSummary();if(user&&tracking&&Date.now()-lastInteraction>=IDLE_MS)heartbeat();},1000);
-    ["pointerdown","keydown","scroll","touchstart","click"].forEach(n=>document.addEventListener(n,interaction,{passive:true,capture:true}));
+    uiTimer=setInterval(()=>{
+      updateBar();
+      if(modal&&!modal.hidden)renderSummary();
+      if(user&&tracking&&Date.now()-lastInteraction>=IDLE_MS)heartbeat();
+    },1000);
+
+    ["pointerdown","keydown","scroll","touchstart","click"].forEach(n=>
+      document.addEventListener(n,interaction,{passive:true,capture:true})
+    );
+
     document.addEventListener("visibilitychange",()=>{
-      if(document.visibilityState==="hidden"&&tracking){send("end");tracking=false;sessionId=null;updateBar();}
-      else if(document.visibilityState==="visible"){lastInteraction=Date.now();beginSession();}
+      if(document.visibilityState==="hidden")endSession();
+      else resumeTracking();
     });
-    window.addEventListener("focus",()=>{lastInteraction=Date.now();beginSession();});
-    window.addEventListener("blur",()=>{if(tracking){send("end");tracking=false;sessionId=null;updateBar();}});
-    window.addEventListener("pagehide",()=>{if(tracking)send("end");});
+
+    window.addEventListener("focus",resumeTracking);
+    window.addEventListener("blur",endSession);
+    window.addEventListener("pagehide",endSession);
   }
+
   async function boot(){
     try{
       const app=getApps().length?getApp():initializeApp(FIREBASE);
       const auth=getAuth(app);
-      callActivity=async payload=>{
-        if(!user) throw new Error("Sign in required");
-        const token=await user.getIdToken();
+      callActivity=async (payload,authUser=user)=>{
+        if(!authUser) throw new Error("Sign in required");
+        const token=await authUser.getIdToken();
         const response=await fetch(ACTIVITY_API+"/api/activity",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},body:JSON.stringify(payload),keepalive:payload.action==="end"});
         const result=await response.json().catch(()=>({error:"Invalid server response"}));
         if(!response.ok) throw new Error(result.error||"Activity service unavailable");
@@ -142,9 +220,28 @@ import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/
       };
       mountStyles();mountBar();initTracking();
       onAuthStateChanged(auth,async nextUser=>{
+        const previousUser=user;
+
+        if(previousUser&&sessionId&&previousUser.uid!==nextUser?.uid){
+          await send("end",sessionId);
+          tracking=false;
+          sessionId=null;
+        }
+
         user=nextUser;
-        if(!user){if(tracking)await send("end");tracking=false;sessionId=null;if(root)root.hidden=true;closeModal();return;}
-        if(root)root.hidden=false;lastInteraction=Date.now();await loadSummary();await beginSession();
+
+        if(!user){
+          tracking=false;
+          sessionId=null;
+          if(root)root.hidden=true;
+          closeModal();
+          return;
+        }
+
+        if(root)root.hidden=false;
+        lastInteraction=Date.now();
+        await loadSummary();
+        await beginSession();
       });
     }catch(e){console.error("[Gurukul Activity] Could not initialize:",e);}
   }
