@@ -1,3 +1,4 @@
+import "/assets/maintenance-gate.js";
 import { auth, watchUser } from "/auth/firebase-auth.js";
 
 (() => {
