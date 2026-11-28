@@ -148,12 +148,21 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   }
   async function loadSummary(){
     if(!callActivity||!user)return;
+    const requestUser=user;
+    // Keep the time already visible before refreshing. The summary endpoint
+    // contains persisted seconds only; it may not include the live interval
+    // since the last heartbeat yet.
+    const displayedBeforeRefresh=todaySeconds();
     const holder=modal?.querySelector("[data-ga-sessions]");
     if(holder)holder.innerHTML='<div class="ga-loading">Loading your activity…</div>';
     try{
-      summary=(await callActivity({action:"summary"})).data;
+      const fresh=(await callActivity({action:"summary"},requestUser)).data;
+      if(user!==requestUser)return;
+      summary=fresh;
       discipline=summary.discipline||null; renderDiscipline(discipline);
-      todayBase=summary.todaySeconds||0; lastSyncAt=Date.now(); renderSummary(); updateBar();
+      const savedSeconds=Math.max(0,Number(summary.todaySeconds)||0);
+      todayBase=tracking?Math.max(savedSeconds,displayedBeforeRefresh):savedSeconds;
+      lastSyncAt=Date.now(); renderSummary(); updateBar();
     }catch(e){
       console.warn("[Gurukul Activity] Summary unavailable:",e);
       if(holder)holder.innerHTML='<div class="ga-empty">Activity summary is temporarily unavailable. Please try again.</div>';
