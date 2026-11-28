@@ -8,7 +8,7 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
   const HEARTBEAT_MS = 30000, IDLE_MS = 120000;
   const DAILY_GOAL_SECONDS = 2 * 60 * 60;
   let user=null, callActivity=null, sessionId=null, tracking=false, starting=false;
-  let requestQueue=Promise.resolve();
+  let requestQueue=Promise.resolve(), resuming=false;
   let lastInteraction=Date.now(), lastSyncAt=Date.now(), todayBase=0, sessionBase=0;
   let summary=null, heartbeatTimer=null, uiTimer=null, root=null, modal=null;
   let discipline=null, disciplineRoot=null, disciplineStyle=null;
@@ -159,49 +159,54 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
       if(holder)holder.innerHTML='<div class="ga-empty">Activity summary is temporarily unavailable. Please try again.</div>';
     }
   }
-  async function send(action){
-    if(!callActivity||!user||!sessionId)return null;
-    // Capture the session identity now. The request queue guarantees that
-    // heartbeat/end requests are not silently discarded during another fetch.
-    const requestUser=user, requestSessionId=sessionId;
-    const payload=Object.assign({action,sessionId:requestSessionId},pageInfo());
+  async function send(action,targetSessionId=sessionId,requestUser=user){
+    if(!callActivity||!requestUser||!targetSessionId)return null;
+    const payload=Object.assign({action,sessionId:targetSessionId},pageInfo());
     const run=async()=>{
       try{
         const data=(await callActivity(payload,requestUser)).data||{};
-        if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
-        if(typeof data.sessionSeconds==="number")sessionBase=data.sessionSeconds;
-        if(data.discipline)renderDiscipline(data.discipline);
-        lastSyncAt=Date.now();
-        if(data.sessionClosed && sessionId===requestSessionId){tracking=false;sessionId=null;}
-        updateBar();renderSummary();return data;
+        if(user===requestUser){
+          if(typeof data.todaySeconds==="number")todayBase=data.todaySeconds;
+          if(typeof data.sessionSeconds==="number"&&sessionId===targetSessionId)sessionBase=data.sessionSeconds;
+          if(data.discipline)renderDiscipline(data.discipline);
+          lastSyncAt=Date.now();
+          if(data.sessionClosed&&sessionId===targetSessionId){tracking=false;sessionId=null;}
+          updateBar();renderSummary();
+        }
+        return data;
       }catch(e){console.warn("[Gurukul Activity] Sync failed ("+action+"):",e);return null;}
     };
     const task=requestQueue.then(run,run);
     requestQueue=task.then(()=>undefined,()=>undefined);
     return task;
   }
+  async function endSession(){
+    const endingId=sessionId,endingUser=user;
+    if(!endingId||!endingUser)return;
+    tracking=false;sessionId=null;updateBar();
+    await send("end",endingId,endingUser);
+  }
   async function beginSession(){
-    if(!user||tracking||starting||document.visibilityState!=="visible"||Date.now()-lastInteraction>=IDLE_MS)return;
+    if(!user||tracking||starting||sessionId||document.visibilityState!=="visible"||Date.now()-lastInteraction>=IDLE_MS)return;
     starting=true;
-    const requestUser=user;
-    sessionId=crypto.randomUUID().replace(/-/g,"");sessionBase=0;
+    const requestUser=user,newSessionId=crypto.randomUUID().replace(/-/g,"");
+    sessionId=newSessionId;sessionBase=0;
     try{
-      const data=await send("start");
-      if(data && user===requestUser){
+      const data=await send("start",newSessionId,requestUser);
+      if(data&&user===requestUser&&sessionId===newSessionId){
         tracking=true;lastSyncAt=Date.now();updateBar();
-        // If focus was lost while the start request was in flight, close it.
-        if(document.visibilityState!=="visible"||Date.now()-lastInteraction>=IDLE_MS){
-          await send("end");tracking=false;sessionId=null;updateBar();
-        }
-      }else if(sessionId){sessionId=null;tracking=false;updateBar();}
+        if(document.visibilityState!=="visible"||Date.now()-lastInteraction>=IDLE_MS)await endSession();
+      }else if(sessionId===newSessionId){
+        sessionId=null;tracking=false;updateBar();
+      }
     }finally{starting=false;}
   }
   async function heartbeat(){
     if(!user)return;
     const eligible=document.visibilityState==="visible"&&Date.now()-lastInteraction<IDLE_MS;
-    if(!eligible){if(tracking)await send("end");tracking=false;sessionId=null;updateBar();return;}
+    if(!eligible){await endSession();return;}
     if(!tracking){await beginSession();return;}
-    await send("heartbeat");
+    await send("heartbeat",sessionId,user);
   }
   function interaction(){lastInteraction=Date.now();if(user&&!tracking&&document.visibilityState==="visible")beginSession();}
   function updateBar(){
@@ -212,16 +217,26 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
     const goalNode=root.querySelector("[data-ga-bar-goal]");if(goalNode)goalNode.textContent=done?"Daily goal complete":Math.ceil(Math.max(0,goal-today)/60)+" min left today";
     root.querySelector(".ga-live-dot")?.classList.toggle("is-active",tracking);
   }
+  async function resumeTracking(){
+    if(!user||resuming||document.visibilityState!=="visible")return;
+    resuming=true;lastInteraction=Date.now();
+    try{
+      await requestQueue;
+      await loadSummary();
+      if(tracking&&sessionId)await send("heartbeat",sessionId,user);
+      else await beginSession();
+    }finally{resuming=false;}
+  }
   function initTracking(){
     heartbeatTimer=setInterval(heartbeat,HEARTBEAT_MS);
     uiTimer=setInterval(()=>{updateBar();if(modal&&!modal.hidden)renderSummary();if(user&&tracking&&Date.now()-lastInteraction>=IDLE_MS)heartbeat();},1000);
     ["pointerdown","keydown","scroll","touchstart","click"].forEach(n=>document.addEventListener(n,interaction,{passive:true,capture:true}));
     document.addEventListener("visibilitychange",()=>{
-      if(document.visibilityState==="hidden"&&tracking){send("end");tracking=false;sessionId=null;updateBar();}
-      else if(document.visibilityState==="visible"){lastInteraction=Date.now();beginSession();}
+      if(document.visibilityState==="hidden")endSession();
+      else resumeTracking();
     });
-    window.addEventListener("focus",()=>{lastInteraction=Date.now();beginSession();});
-    window.addEventListener("pagehide",()=>{if(tracking)send("end");});
+    window.addEventListener("focus",resumeTracking);
+    window.addEventListener("pagehide",endSession);
   }
   async function boot(){
     try{
@@ -235,8 +250,14 @@ const ACTIVITY_API = "https://upscgurukul-activity-api.pratyushkumarswain2005.wo
       };
       mountStyles();mountBar();initTracking();
       watchUser(async nextUser=>{
+        const previousUser=user;
+        if(previousUser&&sessionId&&previousUser.uid!==nextUser?.uid)await endSession();
         user=nextUser;
-        if(!user){if(tracking)await send("end");tracking=false;sessionId=null;if(root){root.hidden=true;const adminLink=root.querySelector(".ga-admin-check");if(adminLink)adminLink.hidden=true;}closeModal();return;}
+        if(!user){
+          tracking=false;sessionId=null;
+          if(root){root.hidden=true;const adminLink=root.querySelector(".ga-admin-check");if(adminLink)adminLink.hidden=true;}
+          closeModal();return;
+        }
         if(root){root.hidden=false;const isAdmin=["W0IMog3J0wca3KOYjNqnOxCSxhJ3","t7ogzAcEJeO0UD8x3OkWzGiA3OF2"].includes(user.uid);const adminLink=root.querySelector(".ga-admin-check");if(adminLink)adminLink.hidden=!isAdmin;const modalAdminLink=modal?.querySelector(".ga-admin-check-modal");if(modalAdminLink)modalAdminLink.hidden=!isAdmin;}
         lastInteraction=Date.now();await loadSummary();await beginSession();
       });
