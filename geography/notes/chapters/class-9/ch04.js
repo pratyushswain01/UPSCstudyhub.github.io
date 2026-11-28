@@ -1,0 +1,127 @@
+window.__UG_CHAPTERS = window.__UG_CHAPTERS || {};
+window.__UG_CHAPTERS["class-9/ch04.json"] = {
+  "pdf": {
+    "href": "https://ncert.nic.in/textbook/pdf/iess104.pdf",
+    "title": "NCERT Class 9 Contemporary India–I · Chapter 4: Climate"
+  },
+  "schemaVersion": 1,
+  "id": "class-9-geography-ch04",
+  "demo": false,
+  "meta": {
+    "class": "9",
+    "subject": "Geography",
+    "chapterNo": 4,
+    "title": "Climate",
+    "intro": "Climate controls, monsoon mechanism, seasons, rainfall distribution and the importance of monsoon.",
+    "subjectHref": "../../index.html",
+    "prev": "chapters/class-9/ch03.json",
+    "next": "chapters/class-9/ch05.json"
+  },
+  "objectives": [
+    "Climate controls, monsoon mechanism, seasons, rainfall distribution and the importance of monsoon.",
+    "Explain the major geographical features and processes described in the chapter.",
+    "Use maps and examples to connect physical geography with people and places."
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Key Concepts",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "India’s climate is strongly influenced by latitude, altitude, pressure and winds, distance from the sea, ocean currents and relief."
+        },
+        {
+          "type": "p",
+          "text": "The Himalayas influence climate by blocking cold winds from Central Asia and forcing moisture-bearing winds to rise. The Thar region and seasonal pressure differences contribute to monsoon circulation."
+        },
+        {
+          "type": "p",
+          "text": "The four broad seasons are cold weather (winter), hot weather (summer), advancing southwest monsoon and retreating monsoon."
+        },
+        {
+          "type": "p",
+          "text": "Rainfall varies greatly: windward slopes of the Western Ghats and parts of the northeast receive heavy rain, while western Rajasthan and the rain-shadow areas receive much less."
+        }
+      ]
+    },
+    {
+      "id": "importance",
+      "title": "Why This Chapter Matters",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Climate controls, monsoon mechanism, seasons, rainfall distribution and the importance of monsoon."
+        },
+        {
+          "type": "callout",
+          "title": "Revision focus",
+          "text": "Connect the geographical patterns in this chapter with maps, regional examples and human activities in India."
+        }
+      ]
+    }
+  ],
+  "revision": {
+    "takeaways": [
+      "India’s climate is strongly influenced by latitude, altitude, pressure and winds, distance from the sea, ocean currents and relief.",
+      "The Himalayas influence climate by blocking cold winds from Central Asia and forcing moisture-bearing winds to rise. The Thar region and seasonal pressure differences contribute to monsoon circulation.",
+      "The four broad seasons are cold weather (winter), hot weather (summer), advancing southwest monsoon and retreating monsoon.",
+      "Rainfall varies greatly: windward slopes of the Western Ghats and parts of the northeast receive heavy rain, while western Rajasthan and the rain-shadow areas receive much less."
+    ],
+    "summary": "India’s climate is strongly influenced by latitude, altitude, pressure and winds, distance from the sea, ocean currents and relief. The Himalayas influence climate by blocking cold winds from Central Asia and forcing moisture-bearing winds to rise. The Thar region and seasonal pressure differences contribute to monsoon circulation. The four broad seasons are cold weather (winter), hot weather (summer), advancing southwest monsoon and retreating monsoon. Rainfall varies greatly: windward slopes of the Western Ghats and parts of the northeast receive heavy rain, while western Rajasthan and the rain-shadow areas receive much less.",
+    "flashcards": [
+      {
+        "q": [
+          "Which winds bring most of India’s annual rainfall?",
+          "The southwest monsoon winds."
+        ],
+        "a": [
+          "Name the four broad seasons of India.",
+          "Cold weather, hot weather, advancing southwest monsoon and retreating monsoon."
+        ]
+      },
+      {
+        "q": "What should you use alongside these notes?",
+        "a": "The official NCERT chapter PDF, maps, diagrams and textbook exercises."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "q": [
+        "Which winds bring most of India’s annual rainfall?",
+        "The southwest monsoon winds."
+      ],
+      "options": [
+        [
+          "Name the four broad seasons of India.",
+          "Cold weather, hot weather, advancing southwest monsoon and retreating monsoon."
+        ],
+        "None of these",
+        "All options are incorrect",
+        "Cannot be determined"
+      ],
+      "answer": 0,
+      "why": [
+        "Name the four broad seasons of India.",
+        "Cold weather, hot weather, advancing southwest monsoon and retreating monsoon."
+      ],
+      "ref": "overview"
+    },
+    {
+      "id": "q2",
+      "q": "Which is the best way to revise this chapter?",
+      "options": [
+        "Read only the title",
+        "Study the NCERT text with maps and these notes",
+        "Skip examples",
+        "Memorise unrelated facts"
+      ],
+      "answer": 1,
+      "why": "Maps, examples and textbook activities help build geographical understanding.",
+      "ref": "importance"
+    }
+  ],
+  "sourceNote": "Original supplementary revision notes for the older NCERT Contemporary India–I textbook. The official NCERT PDF is linked above; use it for the complete textbook text, maps, diagrams, activities and exercises."
+};
