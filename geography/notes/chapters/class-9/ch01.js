@@ -1,0 +1,127 @@
+window.__UG_CHAPTERS = window.__UG_CHAPTERS || {};
+window.__UG_CHAPTERS["class-9/ch01.json"] = {
+  "pdf": {
+    "href": "https://ncert.nic.in/textbook/pdf/iess101.pdf",
+    "title": "NCERT Class 9 Contemporary India–I · Chapter 1: India – Size and Location"
+  },
+  "schemaVersion": 1,
+  "id": "class-9-geography-ch01",
+  "demo": false,
+  "meta": {
+    "class": "9",
+    "subject": "Geography",
+    "chapterNo": 1,
+    "title": "India – Size and Location",
+    "intro": "Location, latitudinal and longitudinal extent, standard meridian, size and India’s position in Asia and the world.",
+    "subjectHref": "../../index.html",
+    "prev": null,
+    "next": "chapters/class-9/ch02.json"
+  },
+  "objectives": [
+    "Location, latitudinal and longitudinal extent, standard meridian, size and India’s position in Asia and the world.",
+    "Explain the major geographical features and processes described in the chapter.",
+    "Use maps and examples to connect physical geography with people and places."
+  ],
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Key Concepts",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "India lies entirely in the Northern Hemisphere. Its mainland extends roughly from 8°4′N to 37°6′N and 68°7′E to 97°25′E."
+        },
+        {
+          "type": "p",
+          "text": "The Tropic of Cancer passes almost through the middle of the country. The Standard Meridian of India is 82°30′E."
+        },
+        {
+          "type": "p",
+          "text": "India’s central position at the head of the Indian Ocean connects routes between Europe, Africa, West Asia and East and Southeast Asia."
+        },
+        {
+          "type": "p",
+          "text": "The north–south and east–west extent influence climate, time and regional diversity."
+        }
+      ]
+    },
+    {
+      "id": "importance",
+      "title": "Why This Chapter Matters",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Location, latitudinal and longitudinal extent, standard meridian, size and India’s position in Asia and the world."
+        },
+        {
+          "type": "callout",
+          "title": "Revision focus",
+          "text": "Connect the geographical patterns in this chapter with maps, regional examples and human activities in India."
+        }
+      ]
+    }
+  ],
+  "revision": {
+    "takeaways": [
+      "India lies entirely in the Northern Hemisphere. Its mainland extends roughly from 8°4′N to 37°6′N and 68°7′E to 97°25′E.",
+      "The Tropic of Cancer passes almost through the middle of the country. The Standard Meridian of India is 82°30′E.",
+      "India’s central position at the head of the Indian Ocean connects routes between Europe, Africa, West Asia and East and Southeast Asia.",
+      "The north–south and east–west extent influence climate, time and regional diversity."
+    ],
+    "summary": "India lies entirely in the Northern Hemisphere. Its mainland extends roughly from 8°4′N to 37°6′N and 68°7′E to 97°25′E. The Tropic of Cancer passes almost through the middle of the country. The Standard Meridian of India is 82°30′E. India’s central position at the head of the Indian Ocean connects routes between Europe, Africa, West Asia and East and Southeast Asia. The north–south and east–west extent influence climate, time and regional diversity.",
+    "flashcards": [
+      {
+        "q": [
+          "What is India’s Standard Meridian?",
+          "82°30′E."
+        ],
+        "a": [
+          "The Tropic of Cancer passes through which part of India?",
+          "Almost through the middle of the country."
+        ]
+      },
+      {
+        "q": "What should you use alongside these notes?",
+        "a": "The official NCERT chapter PDF, maps, diagrams and textbook exercises."
+      }
+    ]
+  },
+  "questions": [
+    {
+      "id": "q1",
+      "q": [
+        "What is India’s Standard Meridian?",
+        "82°30′E."
+      ],
+      "options": [
+        [
+          "The Tropic of Cancer passes through which part of India?",
+          "Almost through the middle of the country."
+        ],
+        "None of these",
+        "All options are incorrect",
+        "Cannot be determined"
+      ],
+      "answer": 0,
+      "why": [
+        "The Tropic of Cancer passes through which part of India?",
+        "Almost through the middle of the country."
+      ],
+      "ref": "overview"
+    },
+    {
+      "id": "q2",
+      "q": "Which is the best way to revise this chapter?",
+      "options": [
+        "Read only the title",
+        "Study the NCERT text with maps and these notes",
+        "Skip examples",
+        "Memorise unrelated facts"
+      ],
+      "answer": 1,
+      "why": "Maps, examples and textbook activities help build geographical understanding.",
+      "ref": "importance"
+    }
+  ],
+  "sourceNote": "Original supplementary revision notes for the older NCERT Contemporary India–I textbook. The official NCERT PDF is linked above; use it for the complete textbook text, maps, diagrams, activities and exercises."
+};
