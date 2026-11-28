@@ -1,7 +1,7 @@
 window.__UG_CHAPTERS = window.__UG_CHAPTERS || {};
 window.__UG_CHAPTERS["class-9/ch04.json"] = {
   "pdf": {
-    "href": "https://ncert.nic.in/textbook/pdf/iess104.pdf",
+    "href": "https://ncert.nic.in/textbook/pdf/iess1004.pdf",
     "title": "NCERT Class 9 Contemporary India–I · Chapter 4: Climate"
   },
   "schemaVersion": 1,
@@ -12,116 +12,300 @@ window.__UG_CHAPTERS["class-9/ch04.json"] = {
     "subject": "Geography",
     "chapterNo": 4,
     "title": "Climate",
-    "intro": "Climate controls, monsoon mechanism, seasons, rainfall distribution and the importance of monsoon.",
+    "intro": "The difference between weather and climate, climatic controls, the monsoon mechanism, India’s four seasons, rainfall distribution and the influence of climate on life.",
     "subjectHref": "../../index.html",
     "prev": "chapters/class-9/ch03.json",
     "next": "chapters/class-9/ch05.json"
   },
   "objectives": [
-    "Climate controls, monsoon mechanism, seasons, rainfall distribution and the importance of monsoon.",
-    "Explain the major geographical features and processes described in the chapter.",
-    "Use maps and examples to connect physical geography with people and places."
+    "Explain climate using geographical concepts and Indian examples.",
+    "Identify the important terms, patterns, processes and locations in this chapter.",
+    "Interpret maps, tables and geographical evidence.",
+    "Connect the chapter with human life, environment and regional development."
   ],
   "sections": [
     {
-      "id": "overview",
-      "title": "Key Concepts",
+      "id": "section-1",
+      "title": "Weather, Climate and Monsoon",
       "blocks": [
         {
           "type": "p",
-          "text": "India’s climate is strongly influenced by latitude, altitude, pressure and winds, distance from the sea, ocean currents and relief."
+          "text": "Weather is the state of the atmosphere over a place at a particular time. Climate is the average pattern of weather conditions and their variations over a large area for a long period, conventionally around 30 years or more."
         },
         {
           "type": "p",
-          "text": "The Himalayas influence climate by blocking cold winds from Central Asia and forcing moisture-bearing winds to rise. The Thar region and seasonal pressure differences contribute to monsoon circulation."
+          "text": "The main elements of weather and climate are temperature, atmospheric pressure, wind, humidity and precipitation. Weather may change within hours, while climate describes longer-term patterns."
+        },
+        {
+          "type": "def",
+          "term": "Monsoon",
+          "text": "A seasonal reversal in the direction of prevailing winds, associated with seasonal differences in heating and pressure between land and sea."
         },
         {
           "type": "p",
-          "text": "The four broad seasons are cold weather (winter), hot weather (summer), advancing southwest monsoon and retreating monsoon."
-        },
-        {
-          "type": "p",
-          "text": "Rainfall varies greatly: windward slopes of the Western Ghats and parts of the northeast receive heavy rain, while western Rajasthan and the rain-shadow areas receive much less."
+          "text": "India has a monsoon-type climate, but temperature and rainfall vary widely from region to region because of latitude, altitude, relief, distance from the sea and atmospheric circulation."
         }
       ]
     },
     {
-      "id": "importance",
-      "title": "Why This Chapter Matters",
+      "id": "section-2",
+      "title": "Climatic Controls and Factors Affecting India",
       "blocks": [
         {
           "type": "p",
-          "text": "Climate controls, monsoon mechanism, seasons, rainfall distribution and the importance of monsoon."
+          "text": "The six major controls of climate are latitude, altitude, pressure and wind system, distance from the sea, ocean currents and relief features."
+        },
+        {
+          "type": "p",
+          "text": "Latitude affects the angle and intensity of solar energy. Altitude generally lowers temperature with increasing height. Coastal areas experience a moderating influence from the sea, while interiors often have greater seasonal temperature extremes."
+        },
+        {
+          "type": "p",
+          "text": "Pressure and wind systems transport heat and moisture. Ocean currents can warm or cool nearby coasts when onshore winds carry their influence inland. Mountains can block winds, force air to rise and produce orographic rainfall."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Control",
+            "Effect on climate",
+            "Indian example"
+          ],
+          "rows": [
+            [
+              "Latitude",
+              "Controls solar energy received",
+              "Tropical south and subtropical north"
+            ],
+            [
+              "Altitude",
+              "Temperature generally decreases with height",
+              "Cooler Himalayan stations"
+            ],
+            [
+              "Distance from sea",
+              "Coastal moderation; continental extremes inland",
+              "Mumbai vs interior north India"
+            ],
+            [
+              "Relief",
+              "Blocks winds and creates rain shadows",
+              "Western Ghats"
+            ],
+            [
+              "Pressure and winds",
+              "Move heat and moisture",
+              "Seasonal monsoon reversal"
+            ],
+            [
+              "Ocean currents",
+              "Modify coastal temperature and moisture",
+              "Indian Ocean circulation"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-3",
+      "title": "Mechanism of the Monsoon",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "During summer, intense heating creates low pressure over northwestern India and adjoining interior Asia. The Indian Ocean remains relatively higher in pressure, encouraging moisture-bearing winds to move towards the subcontinent."
+        },
+        {
+          "type": "p",
+          "text": "Southeast trade winds from the southern hemisphere cross the Equator and are deflected to the right by the Coriolis force. They reach India as the southwest monsoon and split into the Arabian Sea and Bay of Bengal branches."
+        },
+        {
+          "type": "p",
+          "text": "The Arabian Sea branch gives heavy rainfall along the windward side of the Western Ghats and advances towards northwestern India. The Bay of Bengal branch moves towards northeast India and then westward along the Ganga plains."
+        },
+        {
+          "type": "p",
+          "text": "The monsoon does not produce continuous rain everywhere. Active and break phases, depressions, local relief and changing circulation create variations in rainfall."
         },
         {
           "type": "callout",
-          "title": "Revision focus",
-          "text": "Connect the geographical patterns in this chapter with maps, regional examples and human activities in India."
+          "title": "Coriolis force",
+          "text": "An apparent deflection caused by Earth’s rotation: moving air is deflected to the right in the Northern Hemisphere and to the left in the Southern Hemisphere."
+        }
+      ]
+    },
+    {
+      "id": "section-4",
+      "title": "The Four Seasons of India",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "The cold weather season generally extends from mid-November to February in northern India. Northeast trade winds prevail; most regions are dry, but western disturbances bring winter rain to northwestern plains and snowfall in the Himalayas. Tamil Nadu receives some rainfall from northeast winds after they cross the Bay of Bengal."
+        },
+        {
+          "type": "p",
+          "text": "The hot weather season extends broadly from March to May. Temperatures rise, low pressure develops over northwestern India, and local storms occur. Loo is a hot, dry wind in northern and northwestern India. Pre-monsoon showers benefit parts of southern India."
+        },
+        {
+          "type": "p",
+          "text": "The advancing southwest monsoon is the main rainy season, broadly from June to September. The monsoon arrives first over the Kerala coast and advances across the country. Rainfall is concentrated in this period for much of India."
+        },
+        {
+          "type": "p",
+          "text": "The retreating monsoon occurs mainly during October and November. The monsoon withdraws from northwestern India; low-pressure systems and cyclones over the Bay of Bengal can bring rain to the eastern coast, especially Tamil Nadu."
+        },
+        {
+          "type": "table",
+          "headers": [
+            "Season",
+            "Broad months",
+            "Characteristic"
+          ],
+          "rows": [
+            [
+              "Cold weather",
+              "December–February",
+              "Cool, mostly dry; western disturbances"
+            ],
+            [
+              "Hot weather",
+              "March–May",
+              "High temperatures, loo and local storms"
+            ],
+            [
+              "Advancing monsoon",
+              "June–September",
+              "Southwest monsoon rainfall"
+            ],
+            [
+              "Retreating monsoon",
+              "October–November",
+              "Withdrawal; cyclonic rain on east coast"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "section-5",
+      "title": "Distribution of Rainfall and Climate’s Influence",
+      "blocks": [
+        {
+          "type": "p",
+          "text": "Rainfall is unevenly distributed. The windward Western Ghats and parts of northeastern India receive very heavy rainfall, while western Rajasthan, Ladakh and rain-shadow areas receive much less."
+        },
+        {
+          "type": "p",
+          "text": "Rainfall generally decreases from east to west across the Northern Plains because the Bay of Bengal branch loses moisture as it travels westward. Coastal areas usually have a smaller annual temperature range than inland regions."
+        },
+        {
+          "type": "p",
+          "text": "Climate influences crops, water availability, housing, clothing, transport, health and livelihoods. Droughts, floods, heat waves, cold waves and cyclones can create serious risks."
+        },
+        {
+          "type": "callout",
+          "title": "Map practice",
+          "text": "Mark the Western Ghats, Meghalaya plateau, Thar Desert, Ladakh, Tamil Nadu coast and the broad direction of both southwest monsoon branches."
         }
       ]
     }
   ],
   "revision": {
     "takeaways": [
-      "India’s climate is strongly influenced by latitude, altitude, pressure and winds, distance from the sea, ocean currents and relief.",
-      "The Himalayas influence climate by blocking cold winds from Central Asia and forcing moisture-bearing winds to rise. The Thar region and seasonal pressure differences contribute to monsoon circulation.",
-      "The four broad seasons are cold weather (winter), hot weather (summer), advancing southwest monsoon and retreating monsoon.",
-      "Rainfall varies greatly: windward slopes of the Western Ghats and parts of the northeast receive heavy rain, while western Rajasthan and the rain-shadow areas receive much less."
+      "Weather, Climate and Monsoon: Weather is the state of the atmosphere over a place at a particular time. Climate is the average pattern of weather conditions and their variations over a large area for a long period, conventionally around 30 years or more. The main elements of weather and cl",
+      "Climatic Controls and Factors Affecting India: The six major controls of climate are latitude, altitude, pressure and wind system, distance from the sea, ocean currents and relief features. Latitude affects the angle and intensity of solar energy. Altitude generally lowers temperature with increasing heigh",
+      "Mechanism of the Monsoon: During summer, intense heating creates low pressure over northwestern India and adjoining interior Asia. The Indian Ocean remains relatively higher in pressure, encouraging moisture-bearing winds to move towards the subcontinent. Southeast trade winds from the",
+      "The Four Seasons of India: The cold weather season generally extends from mid-November to February in northern India. Northeast trade winds prevail; most regions are dry, but western disturbances bring winter rain to northwestern plains and snowfall in the Himalayas. Tamil Nadu receives",
+      "Distribution of Rainfall and Climate’s Influence: Rainfall is unevenly distributed. The windward Western Ghats and parts of northeastern India receive very heavy rainfall, while western Rajasthan, Ladakh and rain-shadow areas receive much less. Rainfall generally decreases from east to west across the Norther"
     ],
-    "summary": "India’s climate is strongly influenced by latitude, altitude, pressure and winds, distance from the sea, ocean currents and relief. The Himalayas influence climate by blocking cold winds from Central Asia and forcing moisture-bearing winds to rise. The Thar region and seasonal pressure differences contribute to monsoon circulation. The four broad seasons are cold weather (winter), hot weather (summer), advancing southwest monsoon and retreating monsoon. Rainfall varies greatly: windward slopes of the Western Ghats and parts of the northeast receive heavy rain, while western Rajasthan and the rain-shadow areas receive much less.",
+    "summary": "Weather is the state of the atmosphere over a place at a particular time. Climate is the average pattern of weather conditions and their variations over a large area for a long period, conventionally around 30 years or more. The main elements of weather and climate are temperature, atmospheric pressure, wind, humidity and precipitation. Weather may change within hours, while climate describes longer-term patterns. A seasonal reversal in the direction of prevailing winds, associated with seasonal differences in heating and pressure between land and sea. India has a monsoon-type climate, but temperature and rainfall vary widely from region to region because of latitude, altitude, relief, distance from the sea and atmospheric circulation. The six major controls of climate are latitude, altitude, pressure and wind system, distance from the sea, ocean currents and relief features. Latitude affects the angle and intensity of solar energy. Altitude generally lowers temperature with increasing height. Coastal areas experience a moderating influence from the sea, while interiors often have greater seasonal temperature extremes. Pressure and wind systems transport heat and moisture. Ocean currents can warm or cool nearby coasts when onshore winds carry their influence inland. Mountains can block winds, force air to rise and produce orographic rainfall. During summer, intense heating creates low pressure over northwestern India and adjoining interior Asia. The Indian Ocean remains relatively higher in pressure, encouraging moisture-bearing winds to move towards the subcontinent. Southeast trade winds from the southern hemisphere cross the Equator and are deflected to the right by the Coriolis force. They reach India as the southwest monsoon and split into the Arabian Sea and Bay of Bengal branches. The Arabian Sea branch gives heavy rainfall along the windward side of the Western Ghats and advances towards northwestern India. The Bay of Bengal branch moves towards northeast India and then westward along the Ganga plains. The monsoon does not produce continuous rain everywhere. Active and break phases, depressions, local relief and changing circulation create variations in rainfall. An apparent deflection caused by Earth’s rotation: moving air is deflected to the right in the Northern Hemisphere and to the left in the Southern Hemisphere. The cold weather season generally extends from mid-November to February in northern India. Northeast trade winds prevail; most regions are dry, but western disturbances bring winter rain to northwestern plains and snowfall in the Himalayas. Tamil Nadu receives some rainfall from northeast winds after they cross the Bay of Bengal. The hot weather season extends broadly from March to May. Temperatures rise, low pressure develops over northwestern India, and local storms occur. Loo is a hot, dry wind in northern and northwestern India. Pre-monsoon showers benefit parts of southern India. The advancing southwest monsoon is the main rainy season, broadly from June to September. The monsoon arrives first over the Kerala coast and advances across the country. Rainfall is concentrated in this period for much of India. The retreating monsoon occurs mainly during October and November. The monsoon withdraws from northwestern India; low-pressure systems and cyclones over the Bay of Bengal can bring rain to the eastern coast, especially Tamil Nadu. Rainfall is unevenly distributed. The windward Western Ghats and parts of northeastern India receive very heavy rainfall, while western Rajasthan, Ladakh and rain-shadow areas receive much less. Rainfall generally decreases from east to west across the Northern Plains because the Bay of Bengal branch loses moisture as it travels westward. Coastal areas usually have a smaller annual temperature range than inland regions. Climate influences crops, water availability, housing, clothing, transport, health and livelihoods. Droughts, floods, heat waves, cold waves and cyclones can create serious risks. Mark the Western Ghats, Meghalaya plateau, Thar Desert, Ladakh, Tamil Nadu coast and the broad direction of both southwest monsoon branches.",
     "flashcards": [
       {
-        "q": [
-          "Which winds bring most of India’s annual rainfall?",
-          "The southwest monsoon winds."
-        ],
-        "a": [
-          "Name the four broad seasons of India.",
-          "Cold weather, hot weather, advancing southwest monsoon and retreating monsoon."
-        ]
+        "q": "What is the central idea of \"Weather, Climate and Monsoon\"?",
+        "a": "Weather is the state of the atmosphere over a place at a particular time. Climate is the average pattern of weather conditions and their variations over a large area for a long period, conventionally around 30 years or more. The main elements of weather and climate are temperature, atmospheric pressure, wind, humidity and precipitation. Weather may change within hours, while climate describes longer-term patterns. India has a monsoon-type climate, but temperature and rainfall vary widely from region to region because of latitude, altitude, reli"
       },
       {
-        "q": "What should you use alongside these notes?",
-        "a": "The official NCERT chapter PDF, maps, diagrams and textbook exercises."
+        "q": "What is the central idea of \"Climatic Controls and Factors Affecting India\"?",
+        "a": "The six major controls of climate are latitude, altitude, pressure and wind system, distance from the sea, ocean currents and relief features. Latitude affects the angle and intensity of solar energy. Altitude generally lowers temperature with increasing height. Coastal areas experience a moderating influence from the sea, while interiors often have greater seasonal temperature extremes. Pressure and wind systems transport heat and moisture. Ocean currents can warm or cool nearby coasts when onshore winds carry their influence inland. Mountains"
+      },
+      {
+        "q": "What is the central idea of \"Mechanism of the Monsoon\"?",
+        "a": "During summer, intense heating creates low pressure over northwestern India and adjoining interior Asia. The Indian Ocean remains relatively higher in pressure, encouraging moisture-bearing winds to move towards the subcontinent. Southeast trade winds from the southern hemisphere cross the Equator and are deflected to the right by the Coriolis force. They reach India as the southwest monsoon and split into the Arabian Sea and Bay of Bengal branches. The Arabian Sea branch gives heavy rainfall along the windward side of the Western Ghats and adv"
+      },
+      {
+        "q": "What is the central idea of \"The Four Seasons of India\"?",
+        "a": "The cold weather season generally extends from mid-November to February in northern India. Northeast trade winds prevail; most regions are dry, but western disturbances bring winter rain to northwestern plains and snowfall in the Himalayas. Tamil Nadu receives some rainfall from northeast winds after they cross the Bay of Bengal. The hot weather season extends broadly from March to May. Temperatures rise, low pressure develops over northwestern India, and local storms occur. Loo is a hot, dry wind in northern and northwestern India. Pre-monsoon"
+      },
+      {
+        "q": "What is the central idea of \"Distribution of Rainfall and Climate’s Influence\"?",
+        "a": "Rainfall is unevenly distributed. The windward Western Ghats and parts of northeastern India receive very heavy rainfall, while western Rajasthan, Ladakh and rain-shadow areas receive much less. Rainfall generally decreases from east to west across the Northern Plains because the Bay of Bengal branch loses moisture as it travels westward. Coastal areas usually have a smaller annual temperature range than inland regions. Climate influences crops, water availability, housing, clothing, transport, health and livelihoods. Droughts, floods, heat wav"
       }
     ]
   },
   "questions": [
     {
       "id": "q1",
-      "q": [
-        "Which winds bring most of India’s annual rainfall?",
-        "The southwest monsoon winds."
-      ],
+      "q": "Which statement best describes weather, climate and monsoon?",
       "options": [
-        [
-          "Name the four broad seasons of India.",
-          "Cold weather, hot weather, advancing southwest monsoon and retreating monsoon."
-        ],
-        "None of these",
-        "All options are incorrect",
-        "Cannot be determined"
+        "Weather is the state of the atmosphere over a place at a particular time. Climate is the average pattern of weather conditions and their variations over a large area for ",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
       ],
       "answer": 0,
-      "why": [
-        "Name the four broad seasons of India.",
-        "Cold weather, hot weather, advancing southwest monsoon and retreating monsoon."
-      ],
-      "ref": "overview"
+      "why": "Weather is the state of the atmosphere over a place at a particular time. Climate is the average pattern of weather conditions and their variations over a large area for a long period, conventionally around 30 years or more.",
+      "ref": "section-1"
     },
     {
       "id": "q2",
-      "q": "Which is the best way to revise this chapter?",
+      "q": "Which statement best describes climatic controls and factors affecting india?",
       "options": [
-        "Read only the title",
-        "Study the NCERT text with maps and these notes",
-        "Skip examples",
-        "Memorise unrelated facts"
+        "The six major controls of climate are latitude, altitude, pressure and wind system, distance from the sea, ocean currents and relief features.",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
       ],
-      "answer": 1,
-      "why": "Maps, examples and textbook activities help build geographical understanding.",
-      "ref": "importance"
+      "answer": 0,
+      "why": "The six major controls of climate are latitude, altitude, pressure and wind system, distance from the sea, ocean currents and relief features.",
+      "ref": "section-2"
+    },
+    {
+      "id": "q3",
+      "q": "Which statement best describes mechanism of the monsoon?",
+      "options": [
+        "During summer, intense heating creates low pressure over northwestern India and adjoining interior Asia. The Indian Ocean remains relatively higher in pressure, encouragi",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
+      ],
+      "answer": 0,
+      "why": "During summer, intense heating creates low pressure over northwestern India and adjoining interior Asia. The Indian Ocean remains relatively higher in pressure, encouraging moisture-bearing winds to move towards the subcontinent.",
+      "ref": "section-3"
+    },
+    {
+      "id": "q4",
+      "q": "Which statement best describes the four seasons of india?",
+      "options": [
+        "The cold weather season generally extends from mid-November to February in northern India. Northeast trade winds prevail; most regions are dry, but western disturbances b",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
+      ],
+      "answer": 0,
+      "why": "The cold weather season generally extends from mid-November to February in northern India. Northeast trade winds prevail; most regions are dry, but western disturbances bring winter rain to northwestern plains and snowfall in the Himalayas. Tamil Nadu receives some rainfall from northeast winds after they cross the Bay of Bengal.",
+      "ref": "section-4"
+    },
+    {
+      "id": "q5",
+      "q": "Which statement best describes distribution of rainfall and climate’s influence?",
+      "options": [
+        "Rainfall is unevenly distributed. The windward Western Ghats and parts of northeastern India receive very heavy rainfall, while western Rajasthan, Ladakh and rain-shadow ",
+        "It has no connection with India's geography.",
+        "It is unrelated to the chapter's subject.",
+        "None of the above"
+      ],
+      "answer": 0,
+      "why": "Rainfall is unevenly distributed. The windward Western Ghats and parts of northeastern India receive very heavy rainfall, while western Rajasthan, Ladakh and rain-shadow areas receive much less.",
+      "ref": "section-5"
     }
   ],
-  "sourceNote": "Original supplementary revision notes for the older NCERT Contemporary India–I textbook. The official NCERT PDF is linked above; use it for the complete textbook text, maps, diagrams, activities and exercises."
+  "sourceNote": "Detailed original supplementary study notes prepared for the older NCERT Contemporary India–I textbook. The PDF button opens the official NCERT chapter. Use the textbook for its original maps, diagrams, activities and end-of-chapter exercises. Census figures and other dated textbook data are labelled by their reference year."
 };
